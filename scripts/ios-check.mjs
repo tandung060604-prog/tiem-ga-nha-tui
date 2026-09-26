@@ -16,7 +16,11 @@ for (const deviceName of ['iPhone SE', 'iPhone 13', 'iPhone 15 Pro Max']) {
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', e => errors.push(String(e)));
-  page.on('response', r => { if (r.status() >= 400) errors.push(`HTTP ${r.status()} ${r.url()}`); });
+  page.on('response', r => {
+    if (r.status() >= 400) errors.push(`HTTP ${r.status()} ${r.url()}`);
+    // vite preview trả index.html (200) cho file không tồn tại → ảnh nhận về dạng HTML là ảnh hỏng (trang thật sẽ 404)
+    else if (r.request().resourceType() === 'image' && (r.headers()['content-type'] ?? '').includes('text/html')) errors.push(`Ảnh không tồn tại ${r.url()}`);
+  });
   const tag = `[${deviceName} ${device.viewport.width}px]`;
 
   await page.goto(TARGET);

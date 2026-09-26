@@ -26,7 +26,7 @@ export const TUTORIAL_TEXT: Record<TutorialStep, Omit<TutorialHint, 'step'>> = {
   },
   'fry-chicken': { text: 'Khách gọi gà. Bấm "+ Gà Rán" để thả một miếng vào chảo nè.', target: '#btn-fry-chicken' },
   'fry-fries': { text: 'Khách gọi khoai. Bấm "+ Khoai" để thả khoai vô chảo.', target: '#btn-fry-fries' },
-  'drink': { text: 'Nước ngọt thì khỏi chiên: bấm "Nước" là máy rót đúng loại khách gọi, có ly lạnh trong khay liền.', target: '#btn-add-drink' },
+  'drink': { text: 'Nước ngọt thì khỏi chiên: chạm vòi máy nước bác chỉ sáng, máy tự rót đúng loại khách còn thiếu vô khay liền.', target: '#btn-add-drink' },
   'wait': { text: 'Canh thanh đo nha. Còn ở vùng SỐNG thì chưa được nhấc — đợi kim chạy tới vùng VÀNG GIÒN.', target: '.cook-gauge-container' },
   'lift': { text: 'VÀNG GIÒN rồi! Chạm vô chảo để nhấc ngay, để lâu là cháy đó con!', target: '#btn-fry-pot' },
   'discard-raw': { text: 'Miếng này còn sống, khách không ăn đâu. Chạm vô món trong khay để bỏ, rồi chiên mẻ khác.', target: '.tray-item' },

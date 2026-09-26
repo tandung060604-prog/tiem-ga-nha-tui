@@ -28,7 +28,7 @@ import { SellingSession, createSellingSession, gameDeltaMs, tickSelling, drainFx
 import { OPEN_HOUR, CLOSE_HOUR } from './core/clock';
 import type { ShiftSnapshot } from './core/sellingSim';
 import { DRINK_RECIPES, TIMER_RECIPES, timerPhase, TimerStationId, AssemblyId, DrinkId, isTimerStationId, isAssemblyId, isDrinkId } from './core/stations';
-import { staffEffects, tickStaff, fryingItemId, traySizeFor, hasAutoWork } from './core/staff';
+import { staffEffects, tickStaff, fryingItemId, traySizeFor, hasAutoWork, missingItems } from './core/staff';
 import { TutorialState, tutorialStep, tutorialHint, shouldRunTutorial } from './core/tutorial';
 import { syncTutorialLayer } from './ui/components/TutorialLayer';
 import { weeklyWrapped } from './core/wrapped';
@@ -1160,11 +1160,11 @@ class AppController {
           this.showToast('Hết nước ngọt trong kho!');
           return;
         }
-        // Tự động rót loại nước khách trước mặt đang đợi (7Up, Fanta hoặc Coca)
+        // Rót loại nước khách đầu hàng còn THIẾU (tính cả ly đã có trong khay). Trước đây thấy khách gọi 7Up là
+        // rót 7Up mãi, kể cả khi khay đã có → khách gọi Coca + 7Up không bao giờ đủ, Bác Ba kẹt ở bước rót nước.
         const frontOrder = session.orders[0];
-        const wants7Up = frontOrder?.items.some(it => it.menuItemId === 'seven_up' && !it.completed);
-        const wantsFanta = frontOrder?.items.some(it => it.menuItemId === 'fanta_orange' && !it.completed);
-        const drinkType: DrinkId = wants7Up ? 'seven_up' : wantsFanta ? 'fanta_orange' : 'soda';
+        const missingDrink = frontOrder ? missingItems(frontOrder, cookingEngine.getTray()).find(isDrinkId) : undefined;
+        const drinkType: DrinkId = missingDrink ?? 'soda';
         cookingEngine.addDrink(drinkType);
         this.triggerDrinkPourAnimation(drinkType);
         audio.playPop();

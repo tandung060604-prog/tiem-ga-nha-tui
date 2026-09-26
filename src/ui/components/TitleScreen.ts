@@ -24,7 +24,7 @@ const CAT_QUOTES = [
 export function renderTitleScreen(state: GameState, hasProgress: boolean, musicOn: boolean): string {
   const chapter = CHAPTERS.find(c => c.number === state.currentChapter);
   return `
-    <div id="title-screen" class="title-screen" style="--landing-bg: url('${ASSETS.ui.landingVnBg}');">
+    <div id="title-screen" class="title-screen" style="--landing-bg: url('${new URL(ASSETS.ui.landingVnBg, document.baseURI).href}');">
       <!-- Ambient Dark & Warm Vignette -->
       <div class="title-overlay"></div>
 

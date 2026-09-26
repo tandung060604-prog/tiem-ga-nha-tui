@@ -114,9 +114,9 @@
     "semantic_hash": ""
   },
   "src/main.ts": {
-    "mtime": 1790450652.4230027,
-    "seen": 1790451194.64812,
-    "ast_hash": "60428596039c91e434c6d9e8d25723f0",
+    "mtime": 1790451852.2339864,
+    "seen": 1790452062.007124,
+    "ast_hash": "368fe1f51aa3038be762440efe3d48c0",
     "semantic_hash": ""
   },
   "src/types/game.ts": {
@@ -678,9 +678,9 @@
     "semantic_hash": ""
   },
   "src/ui/components/TitleScreen.ts": {
-    "mtime": 1790442861.1058564,
-    "seen": 1790449302.5147638,
-    "ast_hash": "f0a8441574fed4a34ca8b50ff3553812",
+    "mtime": 1790451636.0393486,
+    "seen": 1790452062.007144,
+    "ast_hash": "14af644601fcd6818e097367c705b3fe",
     "semantic_hash": ""
   },
   "src/vite-env.d.ts": {
@@ -1554,9 +1554,9 @@
     "semantic_hash": ""
   },
   "src/core/tutorial.ts": {
-    "mtime": 1790446095.0853293,
-    "seen": 1790449302.514738,
-    "ast_hash": "c88d8a3f25e2d378e9a9d346a8be6bb7",
+    "mtime": 1790451864.174803,
+    "seen": 1790452062.0071197,
+    "ast_hash": "d0ccc50572501c20258bc6600782e0c1",
     "semantic_hash": ""
   },
   "src/ui/components/DailyIncidentModal.ts": {
@@ -2007,6 +2007,36 @@
     "mtime": 1790450295.8245046,
     "seen": 1790451194.6481876,
     "ast_hash": "c2a9df1b4e03d77b8d7bdb3b7e22f67d",
+    "semantic_hash": ""
+  },
+  "tests/worker-logic.test.ts": {
+    "mtime": 1790451287.2293491,
+    "seen": 1790452062.0071828,
+    "ast_hash": "ae740cc479207c423060244c14b01ffb",
+    "semantic_hash": ""
+  },
+  "worker/src/index.ts": {
+    "mtime": 1790451258.0199544,
+    "seen": 1790452062.0071888,
+    "ast_hash": "b31242f4c5f159d36abb80c642a4e450",
+    "semantic_hash": ""
+  },
+  "worker/src/logic.ts": {
+    "mtime": 1790451256.96956,
+    "seen": 1790452062.00719,
+    "ast_hash": "5e710d733b578db18b6abbef80a99c83",
+    "semantic_hash": ""
+  },
+  "worker/tsconfig.json": {
+    "mtime": 1790451287.1753843,
+    "seen": 1790452062.0071907,
+    "ast_hash": "8b0798b60b4b19bed5425c783b4f0573",
+    "semantic_hash": ""
+  },
+  "worker/README.md": {
+    "mtime": 1790451287.2008338,
+    "seen": 1790452062.0072484,
+    "ast_hash": "eaac8f4cd048418d3b44596b8c4bb295",
     "semantic_hash": ""
   }
 }
