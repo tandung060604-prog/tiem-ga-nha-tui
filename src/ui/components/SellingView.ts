@@ -426,17 +426,25 @@ export function renderSellingView(state: GameState, session: SellingSession): st
   const traySlotsHtml = Array.from({ length: cookingEngine.getTraySize() }, (_, i) => i).map(slotIdx => {
     const item = tray[slotIdx];
     if (item) {
-      const isDrink = item.menuItemId === 'soda' || item.menuItemId === 'seven_up';
+      const isDrink = item.menuItemId === 'soda' || item.menuItemId === 'seven_up' || item.menuItemId === 'fanta_orange';
       const img = foodImage(item.menuItemId, item.quality);
       const qClass = isDrink ? 'good' : item.quality;
-      const qText = isDrink ? 'ƯỚP LẠNH ❄️' : TRAY_QUALITY_LABEL[item.quality];
+      const drinkTag = item.menuItemId === 'soda'
+        ? '🔴 COCA ĐÁ ❄️'
+        : item.menuItemId === 'seven_up'
+        ? '🟢 7UP CHANH ❄️'
+        : item.menuItemId === 'fanta_orange'
+        ? '🟠 FANTA CAM ❄️'
+        : 'ƯỚP LẠNH ❄️';
+      const qText = isDrink ? drinkTag : TRAY_QUALITY_LABEL[item.quality];
       const condimentHtml = item.condiment === 'ketchup'
         ? `<span class="tray-condiment-tag ketchup">🍅 Tương Cà</span>`
         : item.condiment === 'chili'
         ? `<span class="tray-condiment-tag chili">🌶️ Tương Ớt</span>`
         : '';
+      const drinkClass = item.menuItemId === 'soda' ? 'drink-coca' : item.menuItemId === 'seven_up' ? 'drink-7up' : item.menuItemId === 'fanta_orange' ? 'drink-fanta' : '';
       return `
-        <div class="tray-item" data-tray-idx="${slotIdx}" title="Bấm để vớt hoặc vứt">
+        <div class="tray-item ${drinkClass}" data-tray-idx="${slotIdx}" title="Bấm để vớt hoặc vứt">
           <div class="tray-food-frame">
             ${img ? `<img class="t-icon t-img" src="${img}" alt="${item.name}" width="52" height="52" />` : `<span class="t-icon">${item.icon}</span>`}
             ${condimentHtml}
@@ -480,10 +488,10 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <!-- Real Cast Iron Fryer Card (Bếp Chiên Ngập Dầu Chợ Lớn) -->
           <div class="fryer-card">
             <div class="fryer-header">
-              <span>🍳 Bếp Chiên Ngập Dầu 1990</span>
+              <span>🍳 Bếp Chiên 1990</span>
               <div class="oil-status">
                 <span class="oil-dot ${oilCondition}"></span>
-                <span>Dầu: ${oilLabel}</span>
+                <span>${oilLabel}</span>
               </div>
             </div>
 
@@ -519,53 +527,53 @@ export function renderSellingView(state: GameState, session: SellingSession): st
               </div>
             </div>
 
-            <!-- Khay Đựng Đồ Ăn Chưa Chế Biến (Raw Prep Containers) -->
+            <!-- Kệ Topping & Nguyên Liệu Tươi (Food Shelf / Topping Rack như Mì Cay Bà Tám) -->
             <div class="prep-baskets-section">
               <div class="prep-baskets-header">
-                <span class="prep-baskets-title">🧺 Nguyên Liệu</span>
+                <span class="prep-baskets-title">🧺 Kệ Topping & Nguyên Liệu</span>
                 <button id="btn-change-oil" class="oil-change-btn">Thay dầu (150k)</button>
               </div>
-              <div class="prep-baskets-grid">
-                <button id="btn-fry-chicken" class="prep-basket-btn primary ${cookState.isFrying ? 'disabled' : ''}" ${cookState.isFrying ? 'disabled' : ''} title="Thả gà tươi tẩm bột vào chảo chiên">
-                  <img src="${ASSETS.kitchen.prepChicken}" alt="Rổ Gà Tươi" class="prep-basket-img" />
-                  <div class="prep-basket-details">
-                    <span class="prep-basket-label">+ Gà Tươi</span>
-                    <span class="prep-basket-qty">Còn: ${chickenStock}</span>
-                  </div>
+              <div class="food-shelf-grid">
+                <!-- Slot 1: Gà Tươi Tẩm Bột -->
+                <button id="btn-fry-chicken" class="shelf-tile primary ${cookState.isFrying && cookState.fryingType === 'chicken' ? 'is-active-frying' : ''} ${cookState.isFrying ? 'disabled' : ''}" ${cookState.isFrying ? 'disabled' : ''} title="Thả gà tươi tẩm bột vào chảo chiên">
+                  <div class="shelf-badge ${chickenStock <= 0 ? 'empty' : ''}">${chickenStock}</div>
+                  <img src="${ASSETS.kitchen.prepChicken}" alt="Gà Tươi" class="shelf-img" />
+                  <span class="shelf-label">Gà Tươi</span>
+                  <span class="shelf-sub">Chảo 180°</span>
                 </button>
 
-                <button id="btn-fry-fries" class="prep-basket-btn ${cookState.isFrying ? 'disabled' : ''}" ${cookState.isFrying ? 'disabled' : ''} title="Thả khoai tây cắt sợi vào chảo chiên">
-                  <img src="${ASSETS.kitchen.prepFries}" alt="Khay Khoai Tươi" class="prep-basket-img" />
-                  <div class="prep-basket-details">
-                    <span class="prep-basket-label">+ Khoai Tươi</span>
-                    <span class="prep-basket-qty">Còn: ${friesStock}</span>
-                  </div>
+                <!-- Slot 2: Khoai Tây Cắt Sợi -->
+                <button id="btn-fry-fries" class="shelf-tile ${cookState.isFrying && cookState.fryingType === 'fries' ? 'is-active-frying' : ''} ${cookState.isFrying ? 'disabled' : ''}" ${cookState.isFrying ? 'disabled' : ''} title="Thả khoai tây cắt sợi vào chảo chiên">
+                  <div class="shelf-badge ${friesStock <= 0 ? 'empty' : ''}">${friesStock}</div>
+                  <img src="${ASSETS.kitchen.prepFries}" alt="Khoai Tươi" class="shelf-img" />
+                  <span class="shelf-label">Khoai Tươi</span>
+                  <span class="shelf-sub">Lắc Phô Mai</span>
                 </button>
 
                 ${stationOpen(state, 3, ['chicken_meat', 'flour']) ? `
-                  <button id="btn-fry-popcorn" class="prep-basket-btn ${cookState.isFrying ? 'disabled' : ''}" ${cookState.isFrying ? 'disabled' : ''} title="Chiên gà viên popcorn">
-                    <img src="${ASSETS.food.popcornChicken}" alt="Gà Viên" class="prep-basket-img" />
-                    <div class="prep-basket-details">
-                      <span class="prep-basket-label">+ Gà Viên</span>
-                      <span class="prep-basket-qty">Chảo</span>
-                    </div>
+                  <!-- Slot 3: Gà Viên Popcorn -->
+                  <button id="btn-fry-popcorn" class="shelf-tile ${cookState.isFrying && cookState.fryingType === 'popcorn' ? 'is-active-frying' : ''} ${cookState.isFrying ? 'disabled' : ''}" ${cookState.isFrying ? 'disabled' : ''} title="Chiên gà viên popcorn giòn tan">
+                    <div class="shelf-badge">Chảo</div>
+                    <img src="${ASSETS.food.popcornChicken}" alt="Gà Viên" class="shelf-img" />
+                    <span class="shelf-label">Gà Popcorn</span>
+                    <span class="shelf-sub">Giòn Cay</span>
                   </button>
                 ` : ''}
 
-                <button id="btn-add-drink" class="prep-basket-btn drink tap-coca" title="Máy Bơm Nước: Rót một cốc Coca thơm ngon sủi bọt">
-                  <img src="${ASSETS.kitchen.stationSodaFountain}" alt="Máy Bơm Coca" class="prep-basket-img" />
-                  <div class="prep-basket-details">
-                    <span class="prep-basket-label">🔴 Rót Coca</span>
-                    <span class="prep-basket-qty">Còn: ${drinkStock}</span>
-                  </div>
+                <!-- Slot 4: Chai Tương Cà -->
+                <button id="btn-squeeze-ketchup" class="shelf-tile condiment ketchup" title="Xịt Tương Cà đỏ tươi thơm ngọt lên món (+Tip & Hương vị)">
+                  <div class="shelf-badge sauce">🍅 +Tip</div>
+                  <img src="${ASSETS.kitchen.bottleKetchup}" alt="Tương Cà" class="shelf-img bottle" />
+                  <span class="shelf-label">Tương Cà</span>
+                  <span class="shelf-sub">Chua Ngọt</span>
                 </button>
 
-                <button id="btn-pour-7up" class="prep-basket-btn drink tap-7up" title="Rót một cốc 7Up Chanh đá mát lạnh">
-                  <img src="${ASSETS.food.sevenUp}" alt="Cốc 7Up" class="prep-basket-img" />
-                  <div class="prep-basket-details">
-                    <span class="prep-basket-label">🟢 Rót 7Up</span>
-                    <span class="prep-basket-qty">Chanh</span>
-                  </div>
+                <!-- Slot 5: Chai Tương Ớt -->
+                <button id="btn-squeeze-chili" class="shelf-tile condiment chili" title="Xịt Tương Ớt cay nồng giòn rụm lên món (+Tip & Hương vị)">
+                  <div class="shelf-badge sauce">🌶️ +Tip</div>
+                  <img src="${ASSETS.kitchen.bottleChili}" alt="Tương Ớt" class="shelf-img bottle" />
+                  <span class="shelf-label">Tương Ớt</span>
+                  <span class="shelf-sub">Cay Nồng</span>
                 </button>
               </div>
             </div>
@@ -582,17 +590,55 @@ export function renderSellingView(state: GameState, session: SellingSession): st
               ${traySlotsHtml}
             </div>
 
-            <!-- Condiment Station: Chai tương bóp xịt món ăn -->
-            <div class="condiment-station">
-              <span class="condiment-station-title">🧴 Chai Tương Xịt Món:</span>
-              <div class="condiment-bottles-row">
-                <button id="btn-squeeze-ketchup" class="condiment-btn ketchup" title="Xịt Tương Cà đỏ tươi thơm ngọt lên món (+Tip & Hương vị)">
-                  <img src="${ASSETS.kitchen.bottleKetchup}" alt="Tương Cà" class="condiment-btn-img" />
-                  <span class="condiment-btn-text">🍅 Tương Cà</span>
+            <!-- Quầy Máy Rót Nước Đa Vị & Hiệu Ứng Đổ Đầy Cốc Nước -->
+            <div class="fountain-station">
+              <div class="fountain-header">
+                <span class="fountain-title">🥤 Máy Rót Nước Tự Động</span>
+                <span class="fountain-stock">Kho: <b>${drinkStock}</b></span>
+              </div>
+
+              <!-- Khu vực mô phỏng dòng nước rót và cốc dâng đầy nước -->
+              <div class="fountain-pour-stage" id="fountain-pour-stage">
+                <div class="fountain-nozzle-row">
+                  <div class="nozzle-tap tap-coca" title="Vòi Coca"></div>
+                  <div class="nozzle-tap tap-7up" title="Vòi 7Up"></div>
+                  <div class="nozzle-tap tap-fanta" title="Vòi Fanta"></div>
+                </div>
+                <div class="pour-stream-line" id="pour-stream-line"></div>
+                <div class="glass-cup-wrap" id="glass-cup-wrap">
+                  <div class="glass-cup-rim"></div>
+                  <div class="glass-cup-body">
+                    <div class="cup-ice-cube ice-1">🧊</div>
+                    <div class="cup-ice-cube ice-2">🧊</div>
+                    <div class="cup-liquid-fill" id="cup-liquid-fill">
+                      <div class="liquid-foam"></div>
+                      <div class="soda-bubble b1"></div>
+                      <div class="soda-bubble b2"></div>
+                      <div class="soda-bubble b3"></div>
+                    </div>
+                  </div>
+                  <span class="glass-cup-label" id="glass-cup-label">💧 Chạm vòi để rót</span>
+                </div>
+              </div>
+
+              <!-- Hàng 3 vòi bấm rót nước đa vị -->
+              <div class="fountain-taps-grid">
+                <button id="btn-add-drink" class="fountain-tap-btn tap-coca" data-action="pour-coca" title="Rót đầy một cốc Coca-Cola sủi bọt caramel mát lạnh">
+                  <div class="tap-badge">🔴 Cola</div>
+                  <img src="${ASSETS.food.soda}" alt="Coca-Cola" class="tap-cup-img" />
+                  <span class="tap-name">Coca-Cola</span>
                 </button>
-                <button id="btn-squeeze-chili" class="condiment-btn chili" title="Xịt Tương Ớt cay nồng giòn rụm lên món (+Tip & Hương vị)">
-                  <img src="${ASSETS.kitchen.bottleChili}" alt="Tương Ớt" class="condiment-btn-img" />
-                  <span class="condiment-btn-text">🌶️ Tương Ớt</span>
+
+                <button id="btn-pour-7up" class="fountain-tap-btn tap-7up" data-action="pour-7up" title="Rót đầy một cốc 7Up Chanh đá mát lạnh">
+                  <div class="tap-badge">🟢 7Up</div>
+                  <img src="${ASSETS.food.sevenUp}" alt="7Up Chanh" class="tap-cup-img" />
+                  <span class="tap-name">7Up Chanh</span>
+                </button>
+
+                <button id="btn-pour-fanta" class="fountain-tap-btn tap-fanta" data-action="pour-fanta" title="Rót đầy một cốc Fanta Cam bùng nổ hương vị">
+                  <div class="tap-badge">🟠 Fanta</div>
+                  <img src="${ASSETS.food.fantaOrange}" alt="Fanta Cam" class="tap-cup-img" />
+                  <span class="tap-name">Fanta Cam</span>
                 </button>
               </div>
             </div>

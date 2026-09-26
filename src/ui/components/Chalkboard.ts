@@ -58,6 +58,9 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
           <button id="btn-open-bunny-notes" class="btn-sm btn-bunny-card">
             🐰 Thỏ Cam
           </button>
+          <button id="btn-open-incidents" class="btn-sm btn-incident-card">
+            🎭 Sổ Tay Hẻm (${state.seenIncidentIds?.length ?? 0}/25)
+          </button>
           <button id="btn-read-story" class="btn-sm primary btn-story-card">
             📖 Truyện Hẻm 1102
           </button>

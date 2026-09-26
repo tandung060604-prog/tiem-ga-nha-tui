@@ -15,6 +15,8 @@ const SERVABLE_IDS: ReadonlySet<string> = new Set(
 
 export class OrdersEngine {
   public static generateOrder(state: GameState, isDelivery: boolean = false, priceMultiplier: number = 1): CustomerOrder {
+    // Không gian đẹp → khách trả thêm (nâng cấp Không gian, core/upgrades.ts)
+    priceMultiplier *= 1 + upgradeEffects(state.upgrades).pricePremiumPct / 100;
     // Món khách được gọi: đã tới chương, có trạm trong bếp, nguyên liệu đã ký hợp đồng.
     // Combo chỉ xuất hiện khi làm được TỪNG món trong combo.
     const content = new Map(INITIAL_MENU.map(m => [m.id as string, m]));

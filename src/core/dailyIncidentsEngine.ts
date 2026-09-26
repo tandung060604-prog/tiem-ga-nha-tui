@@ -27,13 +27,17 @@ export function pickDailyIncident(
   timing: 'morning' | 'shift' | 'any' = 'any'
 ): DailyIncident | null {
   const currentChapter = state.currentChapter ?? 1;
+  const currentDay = state.day ?? 1;
+  const currentStars = state.ratings?.overall ?? 4.0;
   const seen = new Set(state.seenIncidentIds ?? []);
 
-  // Lọc sự kiện đủ điều kiện theo chương và thời điểm
+  // Lọc sự kiện đủ điều kiện theo chương, ngày tối thiểu, số sao và thời điểm
   const candidates = DAILY_INCIDENTS.filter(inc => {
     const chapterOk = (inc.minChapter ?? 1) <= currentChapter;
+    const dayOk = (inc.minDay ?? 1) <= currentDay;
+    const starsOk = !inc.requiredStars || currentStars >= inc.requiredStars;
     const timingOk = timing === 'any' || inc.phaseTiming === 'any' || inc.phaseTiming === timing;
-    return chapterOk && timingOk;
+    return chapterOk && dayOk && starsOk && timingOk;
   });
 
   if (candidates.length === 0) return null;

@@ -1,69 +1,255 @@
 import { DailyIncident, NonEmpty } from '../types/game';
 
+/**
+ * 25 SỰ KIỆN TÌNH HUỐNG HẺM 1102 (ĐỜI THƯỜNG & BẮT TREND)
+ * Phân tầng theo 4 Giai Đoạn Tiến Độ:
+ *  - Giai đoạn 1 (Chương 1, Ngày 2–7): Xe Đẩy Vỉa Hè Mộc Mạc
+ *  - Giai đoạn 2 (Chương 2, Ngày 8–18): Căn Nhà Số 14 Trong Hẻm & Khách Trẻ
+ *  - Giai đoạn 3 (Chương 3, Ngày 19–35): Mặt Tiền Phố Lớn & Đối Thủ Cạnh Tranh
+ *  - Giai đoạn 4 (Chương 4–5, Ngày 36+): Đế Chế Bistro & Thử Thách Bản Lĩnh Triệu Đô
+ */
 export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
-  // 1. Tiktoker xin review free
+  // =========================================================================
+  // GIAI ĐOẠN 1: KHỞI NGHIỆP XE ĐẨY VỈA HÈ (CHƯƠNG 1, NGÀY 2 - 7)
+  // =========================================================================
+
+  // 1. Mèo hoang lạc vào bếp (Ngày 2)
   {
-    id: 'incident_tiktoker_free',
-    title: 'Idol Tóp Tóp Xin Ăn Free Review',
-    icon: '📱',
-    characterName: 'Ben Lee',
-    characterAvatar: '🤳',
-    characterRole: 'Tiktoker 200k Follower',
-    context: 'Một nam thanh niên tóc tai bóng bẩy, cầm cây chống rung và gắn micro thu âm bước vào tiệm với vẻ mặt tự tin.',
-    dialogue: 'Anh chủ ơi, kênh em đang viral clip triệu view. Anh tài trợ cho em 1 Xô Gà Gia Đình đầy đủ sốt bơ tỏi với 2 ly kem, em quay clip đẩy quán anh lên xu hướng bảo đảm mai khách xếp hàng nghẹt hẻm luôn!',
-    phaseTiming: 'shift',
+    id: 'incident_cat_adopted',
+    title: 'Bé Mèo Con Lạc Vào Chân Xe Đẩy',
+    categoryTag: 'LINH VẬT CHIÊU TÀI',
+    icon: '🐱',
+    characterName: 'Bé Mèo Mướp Con',
+    characterAvatar: '🐾',
+    characterImg: '/assets/ui/sticker_cat.png',
+    emoteBubble: '🐾',
+    characterRole: 'Khách Không Mời Dễ Thương',
+    context: 'Một chú mèo mướp con ướt nhẹp, mắt tròn xoe ngơ ngác chui vào nấp dưới chân xe đẩy gà, kêu meo meo thèm thuồng mùi thịt giòn.',
+    dialogue: 'Meo... meooo... (Chú mèo nhỏ ngước đôi mắt long lanh nhìn bạn cầu cứu...)',
+    phaseTiming: 'morning',
     isSecurityRisk: false,
     minChapter: 1,
+    minDay: 2,
+    rarity: 'common',
+    unlockHint: 'Mở khóa ở Ngày 2: Một vị khách bốn chân bé nhỏ bất ngờ ghé thăm xe đẩy.',
     choices: [
       {
-        id: 'tiktoker_free_accept',
-        label: 'Tài trợ miễn phí trọn gói, còn tặng thêm 2 ly trà đào mát lạnh',
-        kicker: '🌟 NẮM BẮT CƠ HỘI VIRAL',
-        karmaDelta: { ambition: 15, community: -5 },
-        moneyDelta: -55000,
-        reactionTitle: 'Video Lên Xu Hướng Tóp Tóp!',
-        reactionNarrative: 'Ben Lee quay góc cận cảnh miếng gà giòn rụm bốc khói rất đẹp mắt. Video cắn gà ròn tan đạt 50k tim trong đêm, hôm sau quán đón thêm nhiều bạn trẻ tò mò ghé ăn thử!'
+        id: 'cat_adopt_mascot',
+        label: 'Nhận nuôi làm Linh Vật Chiêu Tài',
+        subDesc: 'Tốn 20k thịt gà luộc, khách bu lại cưng nựng chụp hình đăng Threads',
+        kicker: '💖 BÉ MÈO CHIÊU TÀI',
+        karmaDelta: { community: 25, craftsmanship: 5 },
+        moneyDelta: -20000,
+        reactionTitle: 'Linh Vật "Bé Bột" Của Tiệm Gà!',
+        reactionNarrative: 'Được ăn no ấm áp, bé mèo quấn quýt nằm ngoan ngoãn trên chiếc ghế riêng đầu ngõ. Khách tới ăn ai cũng xúm lại nựng và chụp hình khoe lên Threads, tiệm gà vỉa hè bỗng nổi như cồn!'
       },
       {
-        id: 'tiktoker_free_reject',
-        label: 'Từ chối lịch sự: "Quán lấy công làm lời, xin phép bán đúng giá niêm yết"',
-        kicker: '🔥 TÔN TRỌNG TAY NGHỀ',
-        karmaDelta: { craftsmanship: 15, ambition: -5 },
+        id: 'cat_gift_neighbor',
+        label: 'Gửi bà Năm hàng xóm nuôi giùm',
+        subDesc: 'Giữ gian bếp sạch bóng tiệt trùng, bà Năm có bạn già đỡ quạnh quẽ',
+        kicker: '🏡 GỬI GẮM YÊU THƯƠNG',
+        karmaDelta: { community: 15, craftsmanship: 10 },
         moneyDelta: 0,
-        reactionTitle: 'Giữ Vững Bản Lĩnh Người Làm Bếp',
-        reactionNarrative: 'Ben Lee hơi bẽ bàng nhưng thấy thái độ tự tin, đàng hoàng của bạn nên vẫn móc ví gọi 1 phần gà giòn. Khi ăn thử miếng đầu tiên, cậu ta gật gù khen: "Gà giòn thật, không cần làm màu!".'
+        reactionTitle: 'Mái Ấm Cho Mèo Nhỏ',
+        reactionNarrative: 'Bà Năm vui vẻ nhận bé mèo về bầu bạn cho đỡ quạnh quẽ. Thi thoảng bạn lại mang mẩu gà luộc sang thăm chú mèo mập mạp.'
       },
       {
-        id: 'tiktoker_free_snack',
-        label: 'Tặng đĩa khoai lắc phô mai làm quen, gà rán vẫn tính tiền bình thường',
-        kicker: '🤝 ĐỐI ĐÃI KHÉO LÉO',
-        karmaDelta: { community: 10, craftsmanship: 5 },
-        moneyDelta: -15000,
-        reactionTitle: 'Hài Hòa Cả Đôi Đường',
-        reactionNarrative: 'Vừa được ăn khoai lắc thơm phức miễn phí vừa được chủ tiệm vui vẻ tiếp chuyện, Ben Lee rất thích tính cách xởi lởi của bạn và quay một đoạn ngắn khen ngợi lòng mến khách của hẻm 1102.'
+        id: 'cat_chase_away',
+        label: 'Xua đuổi dứt khoát khỏi gian bếp',
+        subDesc: 'Tuân thủ nghiêm ngặt nguyên tắc vệ sinh, nhân viên có chút tiếc nuối',
+        kicker: '🚫 NGUYÊN TẮC BẾP',
+        karmaDelta: { craftsmanship: 10, community: -15 },
+        moneyDelta: 0,
+        reactionTitle: 'Giữ Vệ Sinh Tuyệt Đối',
+        reactionNarrative: 'Bé mèo lủi thủi chạy sang hiên nhà khác. Gian bếp của bạn bảo đảm chuẩn vệ sinh nhưng nhân viên có chút tiếc nuối.'
       }
     ]
   },
 
-  // 2. Khách xin nợ rồi không quay lại (hoặc quay lại)
+  // 2. Chú nghệ sĩ già hát rong (Ngày 2)
+  {
+    id: 'incident_street_singer',
+    title: 'Khúc Nhạc Trịnh Bên Mái Hiên Tiệm Gà',
+    categoryTag: 'NGHỆ SĨ ĐƯỜNG PHỐ',
+    icon: '🎸',
+    characterName: 'Nghệ Sĩ Ba Đờn',
+    characterAvatar: '👨‍🦳',
+    emoteBubble: '🎵',
+    characterRole: 'Nghệ Sĩ Guitar Hẻm 1102',
+    context: 'Một chú nghệ sĩ mù với cây đàn guitar sờn cũ đứng dưới bóng râm trước xe đẩy, gảy một đoạn khúc Trịnh Công Sơn làm nao lòng người qua đường.',
+    dialogue: 'Hạt bụi nào hóa kiếp thân tôi... để một mai vươn hình hài lớn dậy... Xin gửi chút tiếng đàn bình an đến quán xá bà con...',
+    phaseTiming: 'morning',
+    isSecurityRisk: false,
+    minChapter: 1,
+    minDay: 2,
+    rarity: 'common',
+    unlockHint: 'Mở khóa ở Ngày 2: Tiếng đàn guitar mộc mạc ghé qua đầu ngõ.',
+    choices: [
+      {
+        id: 'singer_treat_and_tip',
+        label: 'Mời chú vào ghế mát, tặng gà & biếu 30k',
+        subDesc: 'Chú Ba xúc động đàn khúc "Nắng Thủy Tinh", khách lặng người lắng nghe',
+        kicker: '🎵 TRI ÂM ĐƯỜNG PHỐ',
+        karmaDelta: { community: 20, craftsmanship: 10 },
+        moneyDelta: -30000,
+        reactionTitle: 'Khoảnh Khắc Lắng Đọng Tâm Hồn',
+        reactionNarrative: 'Chú Ba cười hiền hậu, ăn từng miếng gà giòn rụm rồi gảy tặng tiệm bản "Nắng Thủy Tinh" tuyệt mỹ. Khách ngồi ăn ai nấy đều lặng người xúc động, không khí quán ngập tràn sự bình yên hiếm có.'
+      },
+      {
+        id: 'singer_play_for_guests',
+        label: 'Nhờ chú đàn giao lưu 3 bài',
+        subDesc: 'Xe gà biến thành góc acoustic ấm cúng, khách thưởng tiền rôm rả',
+        kicker: '✨ BẦU KHÔNG KHÍ ẤM ÁP',
+        karmaDelta: { community: 15, ambition: 10 },
+        moneyDelta: 0,
+        reactionTitle: 'Mini Show Acoustic Tiệm Gà',
+        reactionNarrative: 'Tiếng đàn mộc mạc biến xe đẩy gà thành một góc hòa nhạc thu nhỏ ấm cúng. Khách ủng hộ chú chiếc nón đầy tiền lẻ, ai cũng tấm tắc khen quán có gu!'
+      },
+      {
+        id: 'singer_send_away',
+        label: 'Tặng chai nước ngọt & mời đi nơi khác',
+        subDesc: 'Mất 8k nước sâm, giữ không gian yên tĩnh tuyệt đối cho khách ăn',
+        kicker: '🔇 GIỮ YÊN TĨNH',
+        karmaDelta: { ambition: 5, community: -10 },
+        moneyDelta: -8000,
+        reactionTitle: 'Quán Giữ Sự Riêng Tư',
+        reactionNarrative: 'Chú Ba nhận chai nước cám ơn rồi lặng lẽ bước đi. Không gian yên ắng trở lại để khách tập trung ăn uống.'
+      }
+    ]
+  },
+
+  // 3. Bà Năm ve chai xin dầu chiên cũ (Ngày 3)
+  {
+    id: 'incident_neighbour_oil',
+    title: 'Bà Năm Xin Dầu Chiên Cũ Gom Bán',
+    categoryTag: 'TÌNH NGHĨA HÀNG XÓM',
+    icon: '👵',
+    characterName: 'Bà Năm Ve Chai',
+    characterAvatar: '👵',
+    characterImg: '/assets/characters/char_babay_stand.png',
+    emoteBubble: '👵',
+    characterRole: 'Cụ Bà Hẻm 1102',
+    context: 'Bà Năm xách chiếc can nhựa cũ sang trước giờ mở bán, ngỏ lời xin gom dầu chiên đã qua sử dụng của tiệm để bán kiếm tiền.',
+    dialogue: 'Con ơi, dầu chiên thừa tiệm con có bán lại cho bà gom không? Mấy chỗ họ mua lại dầu cũ giá cao lắm, bà gom kiếm ít đồng mua thuốc khớp...',
+    phaseTiming: 'morning',
+    isSecurityRisk: false,
+    minChapter: 1,
+    minDay: 3,
+    rarity: 'common',
+    unlockHint: 'Mở khóa ở Ngày 3: Bà cụ hàng xóm sang xin dầu chiên thải.',
+    choices: [
+      {
+        id: 'oil_deny_and_gift',
+        label: 'Từ chối vì sợ dầu bẩn, biếu bà 50k & hộp gà',
+        subDesc: 'Bảo vệ sức khỏe cộng đồng, bà Năm xúc động cảm ơn tấm lòng',
+        kicker: '🔥 ĐẠO ĐỨC NGHỀ BẾP & TÌNH THÂN',
+        karmaDelta: { craftsmanship: 20, community: 20 },
+        moneyDelta: -50000,
+        reactionTitle: 'Tấm Lòng Lương Thiện Của Chủ Tiệm',
+        reactionNarrative: 'Bạn ân cần giải thích tiệm giao dầu cho đơn vị chế biến diesel sinh học để bảo vệ sức khỏe cộng đồng, rồi biếu bà 50.000đ cùng hộp gà nóng. Bà Năm xúc động chúc bạn buôn may bán đắt!'
+      },
+      {
+        id: 'oil_give_freely',
+        label: 'Bán can dầu cũ cho bà kiếm thêm 30k',
+        subDesc: 'Thu thêm 30k tiền túi, nhưng lòng cắn rứt vì lo dầu bẩn trôi nổi',
+        kicker: '⚠️ THỎA HIỆP KHÔNG NGUYÊN TẮC',
+        karmaDelta: { community: 10, craftsmanship: -20 },
+        moneyDelta: 30000,
+        reactionTitle: 'Bà Năm Vui Vẻ Nhận Dầu',
+        reactionNarrative: 'Bà Năm cảm ơn và xách can dầu đi. Dù giúp được bà một ít tiền nhưng trong lòng bạn cứ gợn lên nỗi lo về nguồn dầu bẩn trôi nổi.'
+      },
+      {
+        id: 'oil_strict_reject',
+        label: 'Lắc đầu dứt khoát: "Dầu tiệm con tự hủy"',
+        subDesc: 'Giữ vững chuẩn mực vệ sinh nghiêm ngặt, bà cụ hơi chạnh lòng',
+        kicker: '💼 NGUYÊN TẮC CỨNG NHẮC',
+        karmaDelta: { craftsmanship: 10, community: -10 },
+        moneyDelta: 0,
+        reactionTitle: 'Giữ Vững Tiêu Chuẩn',
+        reactionNarrative: 'Bà Năm lủi thủi quay về xe ve chai. Bạn bảo đảm được quy chuẩn nhưng ánh mắt bà cụ khiến bạn suy nghĩ mãi.'
+      }
+    ]
+  },
+
+  // 4. Trẻ cơ nhỡ đổi vé số lấy gà rán (Ngày 3)
+  {
+    id: 'incident_kid_lottery',
+    title: 'Đổi Vé Số Lấy Gà Rán Cho Hai Bé',
+    categoryTag: 'CHIỀU MƯA HẺM SÂU',
+    icon: '🎟️',
+    characterName: 'Bé Bo & Bé Bắp',
+    characterAvatar: '🧒',
+    characterImg: '/assets/characters/char_becon_stand.png',
+    emoteBubble: '🎟️',
+    characterRole: 'Trẻ Bán Vé Số Mùa Mưa',
+    context: 'Trời đổ mưa rào, hai anh em bán vé số quần áo ướt mèm đứng nép dưới mái hiên tiệm gà, mắt dán chặt vào khay gà chiên sốt bơ tỏi thơm lừng.',
+    dialogue: 'Anh ơi... tụi em còn 4 tờ vé số ế chưa bán được, đổi cho hai đứa em một miếng gà rán ăn cho đỡ lạnh bụng được không anh?',
+    phaseTiming: 'shift',
+    isSecurityRisk: false,
+    minChapter: 1,
+    minDay: 3,
+    rarity: 'common',
+    unlockHint: 'Mở khóa ở Ngày 3: Hai đứa trẻ cơ nhỡ nép mưa dưới mái hiên.',
+    choices: [
+      {
+        id: 'kid_exchange_feast',
+        label: 'Đổi 4 vé số lấy Combo Gà + Khoai no nê',
+        subDesc: 'Mất 40k làm phúc, tối dò vé số trúng lộc trời ban 100k!',
+        kicker: '❤️ NẤU BẰNG TẤM LÒNG',
+        karmaDelta: { community: 25, craftsmanship: 10, ambition: -5 },
+        moneyDelta: -40000,
+        reactionTitle: 'Bữa Ăn Hạnh Phúc Nhất Đời!',
+        reactionNarrative: 'Hai đứa trẻ cầm miếng gà giòn nóng hổi, cắn rôm rốp mà mắt cười tít lại hạnh phúc. Đêm đó bạn dò vé số: trúng giải tám 100.000đ! Đúng là lộc trời ban cho người có tâm!'
+      },
+      {
+        id: 'kid_gift_only',
+        label: 'Tặng 2 đùi gà, dặn giữ vé số bán tiếp',
+        subDesc: 'Tốn 30k tiền gà, hai đứa nhỏ cúi đầu cảm ơn rối rít trong mưa',
+        kicker: '🎁 CHO ĐI KHÔNG TOAN TÍNH',
+        karmaDelta: { community: 20, ambition: -10 },
+        moneyDelta: -30000,
+        reactionTitle: 'Ấm Lòng Chiều Mưa Hẻm',
+        reactionNarrative: 'Hai đứa nhỏ mừng rỡ cúi đầu cảm ơn rối rít rồi chia nhau ăn ngon lành dưới mái hiên. Tình người Sài Gòn luôn ấm áp như thế.'
+      },
+      {
+        id: 'kid_refuse',
+        label: 'Từ chối: "Quán không nhận đổi đồ ăn"',
+        subDesc: 'Cửa tiệm ngăn nắp gọn gàng, hai đứa trẻ lầm lũi đội mưa đi tiếp',
+        kicker: '💼 KINH DOANH THỰC TẾ',
+        karmaDelta: { ambition: 10, community: -20 },
+        moneyDelta: 0,
+        reactionTitle: 'Hai Đứa Trẻ Lặng Lẽ Rời Đi',
+        reactionNarrative: 'Hai đứa nhỏ ôm xấp vé số ướt bước tiếp vào màn mưa. Bạn giữ được cửa tiệm gọn gàng nhưng đáy lòng thoáng chốc chùng xuống.'
+      }
+    ]
+  },
+
+  // 5. Khách xin nợ quên ví (Ngày 4)
   {
     id: 'incident_debt_runner',
-    title: 'Khách Vội Quên Ví Xin Ghi Nợ',
+    title: 'Khách Ăn Xong Quên Ví Xin Ghi Nợ',
+    categoryTag: 'DRAMA QUỴT TIỀN',
     icon: '💸',
     characterName: 'Anh Tuấn Thợ Mộc',
     characterAvatar: '🪵',
+    characterImg: '/assets/characters/char_vanphong_stand.png',
+    emoteBubble: '💸',
     characterRole: 'Khách Vãng Lai Vội Vã',
     context: 'Ăn xong hai miếng gà sốt cay và ly nước ngọt mát lạnh, vị khách vội vàng sờ khắp túi áo túi quần rồi toát mồ hôi gãi đầu ái ngại.',
     dialogue: 'Chết rồi em ơi! Nãy chạy giao bàn ghế gấp quá anh để quên bóp ở xưởng mộc, điện thoại lại sập nguồn tối thui. Cho anh ghi nợ 65k chiều anh quay lại gửi liền nha!',
     phaseTiming: 'shift',
     isSecurityRisk: true,
     minChapter: 1,
+    minDay: 4,
+    rarity: 'common',
+    unlockHint: 'Mở khóa ở Ngày 4: Một vị khách ăn xong quên mang ví xin ghi nợ.',
     choices: [
       {
         id: 'debt_trust',
-        label: 'Cười tươi tin tưởng: "Dạ không sao anh ơi, lúc nào tiện ghé gửi em cũng được!"',
+        label: 'Cười tươi tin tưởng: "Lúc nào tiện ghé gửi em"',
+        subDesc: 'hên xui: chiều anh quay lại trả đủ mua thêm 2 xô, hoặc một đi không trở lại',
         kicker: '❤️ NGHĨA TÌNH HẺM SÂU',
-        riskRate: 0.35, // 35% rủi ro khách quên luôn
+        riskRate: 0.35,
         karmaDelta: { community: 15, ambition: -5 },
         moneyDelta: -65000,
         reactionTitle: 'Chữ Tín Đáng Giá Ngàn Vàng!',
@@ -72,7 +258,8 @@ export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
       },
       {
         id: 'debt_collateral',
-        label: 'Giữ lại giấy tờ hoặc chiếc đồng hồ đeo tay cũ làm tin',
+        label: 'Giữ lại chiếc đồng hồ đeo tay làm tin',
+        subDesc: 'Tiền bạc phân minh, anh khách hơi sượng mặt tháo đồng hồ để lại',
         kicker: '💼 KỶ CƯƠNG KINH DOANH',
         karmaDelta: { ambition: 10, community: -10 },
         moneyDelta: 0,
@@ -81,7 +268,8 @@ export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
       },
       {
         id: 'debt_security_help',
-        label: 'Nhờ Chú Bảo Vệ cho mượn củ sạc nhanh cắm điện thoại chuyển khoản ngay',
+        label: 'Nhờ Chú Bảo Vệ cho mượn củ sạc nhanh quét QR',
+        subDesc: '👮 Chú Tư cắm sạc dự phòng 2 phút: Khách bật nguồn chuyển khoản ngay',
         kicker: '👮 CÓ BẢO VỆ TIỆM GÀ',
         requiresSecurity: true,
         karmaDelta: { community: 10, craftsmanship: 5 },
@@ -92,127 +280,93 @@ export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
     ]
   },
 
-  // 3. Quán đối thủ sai người đến thả ruồi vào dĩa
+  // 6. Shipper làm rơi vỡ đơn hàng (Ngày 4)
   {
-    id: 'incident_rival_fly',
-    title: 'Kẻ Lạ Mặt Thả Ruồi Vào Dĩa Gà',
-    icon: '🪰',
-    characterName: 'Gã Mắt Lươn',
-    characterAvatar: '🕶️',
-    characterRole: 'Kẻ Phá Rối Nặc Danh',
-    context: 'Một gã đàn ông ngồi góc khuất lấm lét ngó nghiêng, rồi lén rút từ bao thuốc lá ra một con ruồi chết thả vào đĩa gà đang bốc khói, lập tức đập bàn la toáng lên!',
-    dialogue: 'Trời ơi! Quán làm ăn dơ bẩn cỡ này hả? Gà rán có nguyên con ruồi to đùng! Đền tôi 500k tiền viện phí không tôi chụp hình bóc phốt lên mạng cho sập tiệm!',
+    id: 'incident_shipper_spill',
+    title: 'Shipper Làm Rơi Đơn Ngồi Bật Khóc',
+    categoryTag: 'SỰ CỐ NGHỀ SHIP',
+    icon: '🛵',
+    characterName: 'Chú Sáu Shipper',
+    characterAvatar: '😢',
+    characterImg: '/assets/characters/char_shipper_stand.png',
+    emoteBubble: '🛵',
+    characterRole: 'Tài Xế Công Nghệ Lớn Tuổi',
+    context: 'Chú Sáu vấp phải gờ giảm tốc ngay trước cửa tiệm, thùng đồ ăn bung ra khiến 2 phần combo gà rán và nước ngọt đổ tung tóe xuống đường. Chú ngồi thụp xuống ôm đầu bất lực.',
+    dialogue: 'Trời ơi là trời... Chạy từ sáng tới giờ chưa đủ tiền mua sữa cho cháu, giờ đền đơn này là mất trắng cả ngày công... App nó khóa tài khoản mất thôi con ơi...',
     phaseTiming: 'shift',
-    isSecurityRisk: true,
-    minChapter: 2,
-    choices: [
-      {
-        id: 'fly_security_bust',
-        label: 'Chú Bảo Vệ tiến tới giữ tay, trích xuất camera góc quán',
-        kicker: '👮 BẢO VỆ BẮT QUẢ TANG',
-        requiresSecurity: true,
-        karmaDelta: { community: 10, craftsmanship: 15 },
-        moneyDelta: 0,
-        reactionTitle: 'Lật Tẩy Kẻ Đê Hèn!',
-        reactionNarrative: 'Chú Bảo Vệ đã để mắt tới gã từ lúc vào quán. Chú chỉ tay thẳng vào mắt kính của gã: "Camera góc kia quay rõ mồn một cảnh anh rút ruồi từ bao thuốc lá ra nhé!". Gã tái mặt, lủi thủi chuồn mất dạng giữa tiếng cười chê của thực khách!'
-      },
-      {
-        id: 'fly_no_sec_pay',
-        label: 'Bấm bụng đền 200.000đ cho êm chuyện để khách khác không hoảng sợ',
-        kicker: '💸 NGẬM BỒ HÒN LÀM NGỌT',
-        riskRate: 0.8,
-        karmaDelta: { ambition: -10, craftsmanship: -5 },
-        moneyDelta: -200000,
-        reactionTitle: 'Thiệt Đơn Thiệt Kép',
-        reactionNarrative: 'Vì không có người an ninh đối chất, bạn đành móc tiền túi đền cho gã để dập tắt ồn ào. Gã đắc chí đút túi tiền rồi hí hửng rời đi.',
-        reactionFailureNarrative: 'Bạn vừa đền tiền xong thì gã vẫn lên mạng đăng một bài ẩn danh bịa đặt. Không có bảo vệ hay bằng chứng rõ ràng, quán bị mất oan một khoản tiền!'
-      },
-      {
-        id: 'fly_scientific_proof',
-        label: 'Mời khách vào xem chảo dầu sôi 180°C đối chất khoa học',
-        kicker: '🔥 CHÂN LÝ LỬA VÀ DẦU',
-        karmaDelta: { craftsmanship: 20, ambition: 5 },
-        moneyDelta: 0,
-        reactionTitle: 'Chân Tướng Rõ Ràng!',
-        reactionNarrative: 'Bạn điềm tĩnh chỉ ra: "Dầu chiên ở 180°C, nếu ruồi rơi vào từ đầu thì cánh và thân đã cháy giòn tan từ lâu, không thể còn nguyên vẹn và tươi thế này được!". Khách xung quanh đồng thanh vỗ tay ủng hộ, kẻ phá rối xấu hổ trốn tiệt.'
-      }
-    ]
-  },
-
-  // 4. Chiêu trò chuyển khoản giả mạo
-  {
-    id: 'incident_fake_transfer',
-    title: 'Khách Đưa Ảnh Chuyển Khoản Ảo',
-    icon: '💳',
-    characterName: 'Thanh Niên Điệu Đà',
-    characterAvatar: '🕶️',
-    characterRole: 'Khách Đi Xe Ga',
-    context: 'Order đơn hàng mang về trị giá 150k, thanh niên nhanh tay giơ màn hình điện thoại chụp sẵn biên lai chuyển khoản giả trong chớp mắt rồi toan lên xe rồ ga phóng đi.',
-    dialogue: 'Em chuyển khoản thành công rồi nha chị! Khác ngân hàng nên tin nhắn tiền về hơi trễ xíu đó, em đang vội đi họp sếp gọi quá!',
-    phaseTiming: 'shift',
-    isSecurityRisk: true,
+    isSecurityRisk: false,
     minChapter: 1,
+    minDay: 4,
+    rarity: 'common',
+    unlockHint: 'Mở khóa ở Ngày 4: Tai nạn bất ngờ của bác tài xế công nghệ già.',
     choices: [
       {
-        id: 'fake_sec_stop',
-        label: 'Chú Bảo Vệ giữ đuôi xe, mời kiểm tra thông báo ngân hàng nổi tiền',
-        kicker: '👮 BẢO VỆ CHẶN BẮT',
-        requiresSecurity: true,
-        karmaDelta: { ambition: 10, community: 5 },
-        moneyDelta: 150000,
-        reactionTitle: 'Bảo Vệ Tỉnh Táo Tóm Gọn!',
-        reactionNarrative: 'Chú Bảo Vệ đứng ngay cửa liền giơ tay chặn nhẹ: "Kìa bạn trẻ, ngồi uống ly trà đá chờ ngân hàng nổ chuông đã nhé!". Bị bắt thóp chiếc ảnh photoshop giờ giấc sai lệch, thanh niên ngượng chín mặt đành móc ví trả đủ tiền mặt!'
+        id: 'shipper_cook_free',
+        label: 'Chiên lại đơn mới nóng hổi MIỄN PHÍ',
+        subDesc: 'Tốn 45k vốn, chú Sáu cảm động rơi nước mắt, khách xung quanh vỗ tay tán thưởng',
+        kicker: '❤️ NGHĨA ĐỒNG BÀO SÀI GÒN',
+        karmaDelta: { community: 25, craftsmanship: 10, ambition: -10 },
+        moneyDelta: -45000,
+        reactionTitle: 'Nụ Cười Rạng Rỡ Trong Nước Mắt',
+        reactionNarrative: 'Bạn kéo chú vào quầy, rót ly nước sâm đá và bảo nhân viên làm lại mẻ gà mới giòn rụm trong 5 phút. Chú Sáu cảm động rơi nước mắt, chắp tay cảm ơn rối rít. Khách chứng kiến tấm lòng của bạn đều gật đầu tán thưởng!'
       },
       {
-        id: 'fake_let_go',
-        label: 'Tin người cho đi luôn vì sợ làm phiền khách vội',
-        kicker: '⚠️ MAY RỦI THẢ TRÔI',
-        riskRate: 0.65, // 65% là lừa đảo
-        karmaDelta: { community: 5, ambition: -10 },
-        moneyDelta: -150000,
-        reactionTitle: 'Khách Chuyển Thật Sự!',
-        reactionNarrative: 'Khoảng 10 phút sau chuông điện thoại reng "ting ting", tiền nổi thật do nghẽn mạng liên ngân hàng. Hú hồn một phen!',
-        reactionFailureNarrative: 'Cả ngày không thấy tiền đâu, kiểm tra lại mới biết mã giao dịch là ảnh cắt ghép. Quán chịu mất trắng đơn hàng 150k coi như bài học cảnh giác!'
+        id: 'shipper_split_cost',
+        label: 'Hỗ trợ chia đôi 50% tiền vốn với chú',
+        subDesc: 'Mỗi bên gánh 20k, chú Sáu cảm kích sự thông cảm của quán',
+        kicker: '🤝 CHIA SẺ RỦI RO',
+        karmaDelta: { community: 15, ambition: 5 },
+        moneyDelta: -20000,
+        reactionTitle: 'Mỗi Người Gánh Một Nửa',
+        reactionNarrative: 'Chú Sáu vui vẻ gửi bạn một nửa tiền vốn và cảm ơn sự cảm thông của tiệm. Đơn hàng mới được làm nhanh chóng để chú kịp giao khách.'
       },
       {
-        id: 'fake_strict_policy',
-        label: 'Yêu cầu mở app ngân hàng kiểm tra biến động lịch sử',
-        kicker: '🛡️ NGUYÊN TẮC RÕ RÀNG',
-        karmaDelta: { ambition: 10, craftsmanship: 5 },
+        id: 'shipper_strict_app',
+        label: 'Yêu cầu tự báo cáo sự cố lên tổng đài',
+        subDesc: 'Không mất tiền túi, chú Sáu gạt nước mắt gọi app xin hủy đơn',
+        kicker: '📱 NGUYÊN TẮC QUY ĐỊNH',
+        karmaDelta: { ambition: 15, community: -15 },
         moneyDelta: 0,
-        reactionTitle: 'Kiểm Tra Đúng Quy Trình',
-        reactionNarrative: 'Thấy bạn cứng rắn yêu cầu mở app thật kiểm tra, thanh niên ấp úng viện cớ "quên mật khẩu ngân hàng" rồi lẳng lặng bỏ lại bịch gà chuồn mất.'
+        reactionTitle: 'Giải Quyết Theo Thủ Tục',
+        reactionNarrative: 'Chú Sáu gạt nước mắt gọi tổng đài app xin hủy chuyến theo quy định. Tiệm không bị tổn thất tiền bạc nhưng không khí trong bếp chùng xuống đôi chút.'
       }
     ]
   },
 
-  // 5. Trộm rình bình gas ban đêm
+  // 7. Kẻ gian rình trộm bình gas ban đêm (Ngày 5)
   {
     id: 'incident_thief_gas',
-    title: 'Kẻ Gian Rình Trộm Bình Gas Ban Đêm',
+    title: 'Kẻ Gian Cắt Khóa Trộm Bình Gas Đêm',
+    categoryTag: 'TRỘM ĐÊM RÌNH RẬP',
     icon: '🦹',
     characterName: 'Bóng Đen Lén Lút',
     characterAvatar: '🥷',
-    characterRole: 'Kẻ Trộm Đêm',
+    emoteBubble: '🚨',
+    characterRole: 'Kẻ Trộm Đêm Hẻm 1102',
     context: '21h30 chuẩn bị đóng cửa dọn quán, một bóng đen đội mũ trùm kín mặt lén lút tiếp cận góc đặt bình gas dự phòng và xô inox của tiệm.',
     dialogue: '(Tiếng lục lọi loảng xoảng trong đêm vắng... Bóng đen đang lăm lăm chiếc kìm cộng lực định cắt khóa xích bình gas...)',
     phaseTiming: 'shift',
     isSecurityRisk: true,
     minChapter: 1,
+    minDay: 5,
+    rarity: 'rare',
+    unlockHint: 'Mở khóa ở Ngày 5: Hiểm nguy rình rập thiết bị quán trong đêm tối.',
     choices: [
       {
         id: 'gas_sec_ambush',
-        label: 'Chú Bảo Vệ phục kích sẵn, hô to quật ngã kẻ trộm',
+        label: 'Chú Bảo Vệ phục kích tóm gọn tên trộm',
+        subDesc: '👮 Chú Tư quật ngã tên trộm tại trận, Bác Ba thưởng nóng 50k giữ bình yên',
         kicker: '👮 BẢO VỆ TÚM GỌN',
         requiresSecurity: true,
         karmaDelta: { community: 20, ambition: 10 },
-        moneyDelta: 50000, // Tổ dân phố thưởng nóng
+        moneyDelta: 50000,
         reactionTitle: 'Bảo Vệ Lập Công Lớn!',
         reactionNarrative: 'Chú Bảo Vệ lao ra như một cơn lốc quật ngã tên trộm tại trận, bà con lối xóm cầm gậy gộc chạy ra vây bắt giao công an phường. Bác Ba tổ trưởng thưởng nóng cho tiệm vì giữ bình yên con hẻm!'
       },
       {
         id: 'gas_solo_chase',
-        label: 'Cầm chảo chiên lao ra tri hô đuổi trộm một mình',
+        label: 'Cầm chảo chiên lao ra tri hô một mình',
+        subDesc: 'hên xui: trộm hoảng hốt vứt kìm tháo chạy, hoặc cuỗm mất bình gas 300k',
         kicker: '⚠️ LIỀU LĨNH TỰ THÂN',
         riskRate: 0.5,
         karmaDelta: { community: 10, ambition: 5 },
@@ -223,7 +377,8 @@ export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
       },
       {
         id: 'gas_lock_inside',
-        label: 'Bấm còi báo động khẩn cấp và khóa chặt cửa trong',
+        label: 'Bấm còi báo động & khóa chặt cửa',
+        subDesc: 'Còi hú inh ỏi dọa kẻ gian bỏ chạy, bảo đảm 100% an toàn tính mạng',
         kicker: '🔒 AN TOÀN TRÊN HẾT',
         karmaDelta: { craftsmanship: 5, ambition: 5 },
         moneyDelta: 0,
@@ -233,33 +388,366 @@ export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
     ]
   },
 
-  // 6. Bẻ khóa trộm xe máy khách
+  // =========================================================================
+  // GIAI ĐOẠN 2: CĂN NHÀ SỐ 14 TRONG HẺM & KHÁCH TRẺ (CHƯƠNG 2, NGÀY 8 - 18)
+  // =========================================================================
+
+  // 8. Cậu tân sinh viên xin rửa chén (Chương 2, Ngày 8)
+  {
+    id: 'incident_student_parttime',
+    title: 'Cậu Tân Sinh Viên Xin Rửa Chén Kiếm Tiền Học',
+    categoryTag: 'TÂN SINH VIÊN',
+    icon: '🎓',
+    characterName: 'Minh (Sinh Viên Năm Nhất)',
+    characterAvatar: '👦',
+    emoteBubble: '📚',
+    characterRole: 'Cậu Trò Nghèo Đất Quê',
+    context: 'Một cậu sinh viên rụt rè đứng trước cửa tiệm mới thuê, áo sờn vai xin việc làm thêm buổi tối.',
+    dialogue: 'Dạ anh/chị ơi... em mới ở quê lên nhập học, mẹ em dưới quê đang nằm viện. Quán có việc gì rửa chén hay lau bàn buổi tối không, trả em ít tiền cũng được ạ...',
+    phaseTiming: 'morning',
+    isSecurityRisk: false,
+    minChapter: 2,
+    minDay: 8,
+    rarity: 'common',
+    unlockHint: 'Mở khóa ở Chương 2: Một cậu học trò nghèo tìm đến xin phụ việc.',
+    choices: [
+      {
+        id: 'student_hire_warm',
+        label: 'Nhận vào phụ việc & bao cơm gà',
+        subDesc: 'Trả công 50k mỗi ca, cậu bé làm việc siêng năng sạch bóng',
+        kicker: '❤️ NÂNG ĐỠ ƯỚC MƠ',
+        karmaDelta: { community: 25, craftsmanship: 10, ambition: 5 },
+        moneyDelta: -50000,
+        reactionTitle: 'Người Em Chăm Chỉ Của Tiệm',
+        reactionNarrative: 'Minh làm việc cực kỳ siêng năng, rửa chén bát sạch bóng và nhanh thoăn thoắt. Mỗi tối tan ca được ăn đĩa cơm gà ấm áp, mắt cậu ánh lên niềm tin vào cuộc đời tươi đẹp.'
+      },
+      {
+        id: 'student_gift_meal',
+        label: 'Tặng cơm gà & chỉ sang quán trà sữa',
+        subDesc: 'Mất 20k phần gà, cậu bé xin việc thành công bên quán trà sữa',
+        kicker: '🤝 GIÚP ĐỠ ĐÚNG NƠI',
+        karmaDelta: { community: 15, ambition: 5 },
+        moneyDelta: -20000,
+        reactionTitle: 'Kết Nối Duyên Lành',
+        reactionNarrative: 'Cậu bé cảm ơn ríu rít ăn hết phần gà rồi sang xin việc bên tiệm trà sữa thành công. Cậu luôn nhớ mãi ơn nghĩa của tiệm gà.'
+      },
+      {
+        id: 'student_reject_full',
+        label: 'Từ chối: "Quán anh đủ người rồi em"',
+        subDesc: 'Không tốn chi phí, cậu bé lẳng lặng cúi đầu đi tìm nơi khác',
+        kicker: '💼 KINH DOANH LÝ TRÍ',
+        karmaDelta: { ambition: 5, community: -10 },
+        moneyDelta: 0,
+        reactionTitle: 'Cậu Bé Lặng Lẽ Rời Đi',
+        reactionNarrative: 'Minh cúi chào rồi bước tiếp trên vỉa hè tìm việc. Công việc kinh doanh của bạn vẫn ổn định theo kế hoạch.'
+      }
+    ]
+  },
+
+  // 9. Trend sốt matcha trân châu (Chương 2, Ngày 9)
+  {
+    id: 'incident_food_trend_matcha',
+    title: 'Khách Đòi Trend "Gà Sốt Matcha Trân Châu"',
+    categoryTag: 'TRENDING TIKTOK',
+    icon: '🍵',
+    characterName: 'Nhóm Bạn Trẻ Bàn 4',
+    characterAvatar: '👧',
+    emoteBubble: '✨',
+    characterRole: 'GenZ Thích Trải Nghiệm Mới',
+    context: 'Một nhóm học sinh giơ điện thoại hí hửng hỏi quán có làm món đang rần rần trên mạng xã hội không.',
+    dialogue: 'Anh chủ ơi trên Tóp Tóp đang sốt món Gà Rán Nhúng Sốt Matcha Trân Châu Đường Đen kìa! Quán làm thử cho tụi em 3 dĩa ăn thử check-in với!',
+    phaseTiming: 'shift',
+    isSecurityRisk: false,
+    minChapter: 2,
+    minDay: 9,
+    rarity: 'common',
+    unlockHint: 'Mở khóa ở Chương 2: Cơn sốt trào lưu ẩm thực kỳ lạ đổ bộ.',
+    choices: [
+      {
+        id: 'trend_cash_grab',
+        label: 'Bắt trend ngay lập tức, bán 89k/dĩa',
+        subDesc: 'Bỏ túi 120k tiền lời, nhưng món ăn dị làm giảm uy tín hương vị',
+        kicker: '💸 TỐI ƯU TREND THỜI THƯỢNG',
+        karmaDelta: { ambition: 20, craftsmanship: -15 },
+        moneyDelta: 120000,
+        reactionTitle: 'Hốt Bạc Nhờ Bắt Trend',
+        reactionNarrative: 'Tụi nhỏ chụp hình đăng mạng nườm nượp kéo theo nhiều khách tò mò. Món ăn hơi dị nhưng quán kiếm được khoản lời đậm đà!'
+      },
+      {
+        id: 'trend_stick_standard',
+        label: 'Giữ vững chuẩn mực gà bơ tỏi gia truyền',
+        subDesc: 'Mời khách thử gà mật ong chuẩn vị, khách gật gù khen ngon đỉnh',
+        kicker: '🔥 ĐẲNG CẤP HƯƠNG VỊ',
+        karmaDelta: { craftsmanship: 20, ambition: -5 },
+        moneyDelta: 0,
+        reactionTitle: 'Thuyết Phục Bằng Chất Lượng Thật',
+        reactionNarrative: 'Bạn mời nhóm thử đĩa Gà Sốt Mật Ong Bơ Tỏi chân ái. Cắn miếng gà giòn béo ngậy, các bạn trẻ gật gù: "Đúng là gà chuẩn vị ăn đứt mấy trend ăn xổi anh ơi!".'
+      },
+      {
+        id: 'trend_trial_staff',
+        label: 'Làm thử nội bộ cho nhân viên nếm',
+        subDesc: 'Tốn 25k nguyên liệu, cả bếp lắc đầu vì matcha đắng chát',
+        kicker: '🧪 THỬ NGHIỆM THẬN TRỌNG',
+        karmaDelta: { craftsmanship: 10, community: 10 },
+        moneyDelta: -25000,
+        reactionTitle: 'Hội Đồng Bếp Lắc Đầu',
+        reactionNarrative: 'Nhân viên nếm xong cười nghiêng ngả vì vị đắng chát của matcha không hợp với da gà rán. Tiệm quyết định giữ vững menu chuẩn chỉ.'
+      }
+    ]
+  },
+
+  // 10. Khách đưa ảnh chuyển khoản giả mạo (Chương 2, Ngày 10)
+  {
+    id: 'incident_fake_transfer',
+    title: 'Khách Đưa Ảnh Chuyển Khoản Ảo',
+    categoryTag: 'CẠM BẪY CHUYỂN KHOẢN',
+    icon: '💳',
+    characterName: 'Thanh Niên Điệu Đà',
+    characterAvatar: '🕶️',
+    characterImg: '/assets/characters/char_gamethu_stand.png',
+    emoteBubble: '💳',
+    characterRole: 'Khách Đi Xe Ga',
+    context: 'Order đơn hàng mang về trị giá 150k, thanh niên nhanh tay giơ màn hình điện thoại chụp sẵn biên lai chuyển khoản giả trong chớp mắt rồi toan lên xe rồ ga phóng đi.',
+    dialogue: 'Em chuyển khoản thành công rồi nha chị! Khác ngân hàng nên tin nhắn tiền về hơi trễ xíu đó, em đang vội đi họp sếp gọi quá!',
+    phaseTiming: 'shift',
+    isSecurityRisk: true,
+    minChapter: 2,
+    minDay: 10,
+    rarity: 'rare',
+    unlockHint: 'Mở khóa ở Chương 2 (Ngày 10): Cạm bẫy thanh toán thời đại chuyển khoản số.',
+    choices: [
+      {
+        id: 'fake_sec_stop',
+        label: 'Chú Bảo Vệ giữ đuôi xe, đợi tiền nổi',
+        subDesc: '👮 Chú Tư chặn xe lịch thiệp: Bắt thóp ảnh fake, khách đành trả đủ 150k tiền mặt',
+        kicker: '👮 BẢO VỆ CHẶN BẮT',
+        requiresSecurity: true,
+        karmaDelta: { ambition: 10, community: 5 },
+        moneyDelta: 150000,
+        reactionTitle: 'Bảo Vệ Tỉnh Táo Tóm Gọn!',
+        reactionNarrative: 'Chú Bảo Vệ đứng ngay cửa liền giơ tay chặn nhẹ: "Kìa bạn trẻ, ngồi uống ly trà đá chờ ngân hàng nổ chuông đã nhé!". Bị bắt thóp chiếc ảnh photoshop giờ giấc sai lệch, thanh niên ngượng chín mặt đành móc ví trả đủ tiền mặt!'
+      },
+      {
+        id: 'fake_let_go',
+        label: 'Tin người cho đi luôn vì sợ khách vội',
+        subDesc: 'hên xui: ngân hàng nghẽn mạng tiền về sau, hoặc mất trắng đơn 150k',
+        kicker: '⚠️ MAY RỦI THẢ TRÔI',
+        riskRate: 0.65,
+        karmaDelta: { community: 5, ambition: -10 },
+        moneyDelta: -150000,
+        reactionTitle: 'Khách Chuyển Thật Sự!',
+        reactionNarrative: 'Khoảng 10 phút sau chuông điện thoại reng "ting ting", tiền nổi thật do nghẽn mạng liên ngân hàng. Hú hồn một phen!',
+        reactionFailureNarrative: 'Cả ngày không thấy tiền đâu, kiểm tra lại mới biết mã giao dịch là ảnh cắt ghép. Quán chịu mất trắng đơn hàng 150k coi như bài học cảnh giác!'
+      },
+      {
+        id: 'fake_strict_policy',
+        label: 'Yêu cầu mở app ngân hàng kiểm tra lịch sử',
+        subDesc: 'Khách ấp úng viện cớ quên mật khẩu rồi lẳng lặng chuồn mất',
+        kicker: '🛡️ NGUYÊN TẮC RÕ RÀNG',
+        karmaDelta: { ambition: 10, craftsmanship: 5 },
+        moneyDelta: 0,
+        reactionTitle: 'Kiểm Tra Đúng Quy Trình',
+        reactionNarrative: 'Thấy bạn cứng rắn yêu cầu mở app thật kiểm tra, thanh niên ấp úng viện cớ "quên mật khẩu ngân hàng" rồi lẳng lặng bỏ lại bịch gà chuồn mất.'
+      }
+    ]
+  },
+
+  // 11. Tiktoker xin review free (Chương 2, Ngày 11, cần ≥ 4.0⭐)
+  {
+    id: 'incident_tiktoker_free',
+    title: 'Idol Tóp Tóp Xin Ăn Free Review',
+    categoryTag: 'IDOL TÓP TÓP',
+    icon: '📱',
+    characterName: 'Ben Lee',
+    characterAvatar: '🤳',
+    characterImg: '/assets/characters/char_tiktoker_stand.png',
+    emoteBubble: '📱',
+    characterRole: 'Tiktoker 200k Follower',
+    context: 'Một nam thanh niên tóc tai bóng bẩy, cầm cây chống rung và gắn micro thu âm bước vào tiệm với vẻ mặt tự tin khi thấy quán đạt trên 4 sao.',
+    dialogue: 'Anh chủ ơi, kênh em đang viral clip triệu view. Anh tài trợ cho em 1 Xô Gà Gia Đình đầy đủ sốt bơ tỏi với 2 ly kem, em quay clip đẩy quán anh lên xu hướng bảo đảm mai khách xếp hàng nghẹt hẻm luôn!',
+    phaseTiming: 'shift',
+    isSecurityRisk: false,
+    minChapter: 2,
+    minDay: 11,
+    requiredStars: 4.0,
+    rarity: 'rare',
+    unlockHint: 'Mở khóa ở Chương 2 (Ngày 11 & ≥4.0⭐): Người nổi tiếng mạng xã hội đánh hơi thấy độ hot của quán.',
+    choices: [
+      {
+        id: 'tiktoker_free_accept',
+        label: 'Tài trợ miễn phí trọn gói & trà đào',
+        subDesc: 'Mất 55k xô gà, đổi lại clip lên xu hướng 50k tim nườm nượp khách',
+        kicker: '🌟 NẮM BẮT CƠ HỘI VIRAL',
+        karmaDelta: { ambition: 15, community: -5 },
+        moneyDelta: -55000,
+        reactionTitle: 'Video Lên Xu Hướng Tóp Tóp!',
+        reactionNarrative: 'Ben Lee quay góc cận cảnh miếng gà giòn rụm bốc khói rất đẹp mắt. Video cắn gà ròn tan đạt 50k tim trong đêm, hôm sau quán đón thêm nhiều bạn trẻ tò mò ghé ăn thử!'
+      },
+      {
+        id: 'tiktoker_free_reject',
+        label: 'Từ chối: "Quán bán đúng giá niêm yết"',
+        subDesc: 'Ben Lee tự móc ví mua ăn, gật gù khen gà ngon thật không cần màu mè',
+        kicker: '🔥 TÔN TRỌNG TAY NGHỀ',
+        karmaDelta: { craftsmanship: 15, ambition: -5 },
+        moneyDelta: 0,
+        reactionTitle: 'Giữ Vững Bản Lĩnh Người Làm Bếp',
+        reactionNarrative: 'Ben Lee hơi bẽ bàng nhưng thấy thái độ tự tin, đàng hoàng của bạn nên vẫn móc ví gọi 1 phần gà giòn. Khi ăn thử miếng đầu tiên, cậu ta gật gù khen: "Gà giòn thật, không cần làm màu!".'
+      },
+      {
+        id: 'tiktoker_free_snack',
+        label: 'Tặng đĩa khoai lắc, gà tính tiền đủ',
+        subDesc: 'Mất 15k khoai lắc, đôi bên vui vẻ quay clip khen quán mến khách',
+        kicker: '🤝 ĐỐI ĐÃI KHÉO LÉO',
+        karmaDelta: { community: 10, craftsmanship: 5 },
+        moneyDelta: -15000,
+        reactionTitle: 'Hài Hòa Cả Đôi Đường',
+        reactionNarrative: 'Vừa được ăn khoai lắc thơm phức miễn phí vừa được chủ tiệm vui vẻ tiếp chuyện, Ben Lee rất thích tính cách xởi lởi của bạn và quay một đoạn ngắn khen ngợi lòng mến khách của hẻm 1102.'
+      }
+    ]
+  },
+
+  // 12. Thách đấu ăn gà siêu cay cấp 7 (Chương 2, Ngày 12)
+  {
+    id: 'incident_spicy_challenge',
+    title: 'Thách Đấu Gà Siêu Cay Cấp Độ 7',
+    categoryTag: 'THÁCH ĐẤU SIÊU CAY',
+    icon: '🌶️',
+    characterName: 'Streamer Khang Gà',
+    characterAvatar: '🤠',
+    emoteBubble: '🔥',
+    characterRole: 'Thánh Ăn Cay Livestream',
+    context: 'Một nam thanh niên bật livestream trước cửa tiệm, gạ chủ quán làm đĩa gà cay cấp độ xé họng để thử thách.',
+    dialogue: 'Anh chủ có dám làm cho em 1 đĩa gà cay xé họng cấp 7 không? Nếu em ăn hết trong 5 phút mà không uống giọt nước nào, anh miễn phí bữa này và tặng em áo kỷ niệm nha!',
+    phaseTiming: 'shift',
+    isSecurityRisk: false,
+    minChapter: 2,
+    minDay: 12,
+    rarity: 'rare',
+    unlockHint: 'Mở khóa ở Chương 2 (Ngày 12): Kèo thách thức ăn cay xé lưỡi trực tiếp.',
+    choices: [
+      {
+        id: 'spicy_accept_milk',
+        label: 'Nhận kèo & chuẩn bị sữa tươi lạnh',
+        subDesc: 'Khang húp sữa chịu thua nộp 50k, livestream triệu view cười nghiêng ngả',
+        kicker: '🌶️ VUI VẺ CHĂM SÓC KHÁCH',
+        karmaDelta: { craftsmanship: 15, community: 10, ambition: 10 },
+        moneyDelta: 50000,
+        reactionTitle: 'Trận Chiến Cay Nồng Đầy Tiếng Cười',
+        reactionNarrative: 'Khang ăn tới miếng thứ hai thì mắt đỏ hoe toát mồ hôi hột kêu trời. Bạn đưa ngay ly sữa tươi đá lạnh giải cứu kịp thời. Khán giả xem live cười ngất ngưởng, like thả tim ầm ầm!'
+      },
+      {
+        id: 'spicy_refuse_health',
+        label: 'Từ chối: "Quán không nấu hại bao tử khách"',
+        subDesc: 'Khang thán phục cái tâm của bạn, gọi đĩa gà giòn ăn ngon lành',
+        kicker: '🛡️ BẢO VỆ SỨC KHỎE KHÁCH',
+        karmaDelta: { craftsmanship: 20, ambition: -5 },
+        moneyDelta: 0,
+        reactionTitle: 'Lời Khuyên Có Tâm Của Người Nấu',
+        reactionNarrative: 'Khang ngẫm lại thấy bạn nói rất có lý. Cậu tắt thử thách và gọi đĩa gà giòn sốt cay thông thường, ăn uống ngon lành và khen ngợi tư duy làm nghề chuẩn mực của bạn.'
+      },
+      {
+        id: 'spicy_double_bet',
+        label: 'Thách ngược lại: Bỏ cuộc trả tiền gấp đôi!',
+        subDesc: 'Thu về 100k tiền phạt, nhưng streamer ôm bụng cay xè ấm ức',
+        kicker: '💼 SÁT PHẠT KINH DOANH',
+        karmaDelta: { ambition: 20, community: -10 },
+        moneyDelta: 100000,
+        reactionTitle: 'Thua Cược Nộp Phạt',
+        reactionNarrative: 'Khang bỏ cuộc ở phút thứ 3 vì quá cay, đành móc ví trả gấp đôi tiền đĩa gà. Bạn đút túi tiền lời nhưng Khang ôm bụng khó chịu rời quán.'
+      }
+    ]
+  },
+
+  // 13. Chuyện tình trong bếp (Chương 2, Ngày 13 - Phong cách Mì Cay Bà Tám)
+  {
+    id: 'incident_kitchen_romance',
+    title: 'Anh Khang Với Bé Linh Hẹn Hò!',
+    categoryTag: 'CHUYỆN TÌNH TRONG BẾP',
+    icon: '💑',
+    characterName: 'Khang & Linh',
+    characterAvatar: '👩‍🍳',
+    characterImg: '/assets/characters/char_capdoi_stand.png',
+    emoteBubble: '❤️',
+    characterRole: 'Cặp Đôi Bếp & Thu Ngân',
+    context: 'Mấy bữa nay anh Khang phụ bếp cứ lén bỏ thêm đùi gà giòn sốt cay vào hộp cơm của bé Linh thu ngân. Hôm nay hai đứa đỏ mặt lí nhí xin nghỉ ngày mai đi chơi Vũng Tàu.',
+    dialogue: 'Dạ... tụi em xin phép anh chủ cho hai đứa tụi em xin nghỉ ngày mai để đi Vũng Tàu đổi gió một bữa ngắm biển được không anh...',
+    phaseTiming: 'morning',
+    isSecurityRisk: false,
+    minChapter: 2,
+    minDay: 13,
+    rarity: 'rare',
+    unlockHint: 'Mở khóa ở Chương 2 (Ngày 13): Chuyện tình bí mật nảy nở bên chảo dầu thơm nức.',
+    choices: [
+      {
+        id: 'romance_day_off',
+        label: 'Cho nghỉ 1 ngày',
+        subDesc: '1 ngày tự đứng chảo chiên gà mỏi rã rời, không trả lương hai đứa',
+        kicker: '❤️ TÁC THÀNH LỨA ĐÔI',
+        karmaDelta: { community: 20, craftsmanship: 5, ambition: -5 },
+        moneyDelta: 0,
+        reactionTitle: 'Tình Yêu Nở Rộ Trong Bếp!',
+        reactionNarrative: 'Hai đứa mừng rỡ cúi đầu cảm ơn rối rít, dắt tay nhau đi Vũng Tàu chụp một rổ ảnh kỷ niệm. Bạn ở lại tiệm một mình rán gà mỏi rã cánh tay nhưng trong lòng ấm áp vì đã tác thành cho một đôi trẻ!'
+      },
+      {
+        id: 'romance_strict_no',
+        label: 'Không cho nghỉ, ai nghỉ trừ lương',
+        subDesc: 'hên xui: hai đứa dỗi tắt máy trốn luôn 2-3 ngày, hoặc chịu trừ lương',
+        kicker: '💼 KỶ CƯƠNG BẾP NÚC',
+        riskRate: 0.5,
+        karmaDelta: { ambition: 15, community: -15 },
+        moneyDelta: -50000,
+        reactionTitle: 'Chịu Trừ Lương Ở Lại Làm',
+        reactionNarrative: 'Thấy bạn cứng rắn, hai đứa đành lí nhí xin lỗi chịu ở lại làm ca. Dù hơi tiu nghỉu nhưng quán không bị thiếu hụt người làm.',
+        reactionFailureNarrative: 'Bị từ chối phũ phàng, hai đứa dỗi dắt tay nhau tắt điện thoại bỏ về quê luôn 2 ngày! Quán thiếu người rối tinh rối mù, bạn vừa chiên gà vừa tính tiền toát mồ hôi!'
+      },
+      {
+        id: 'romance_sec_cover',
+        label: 'Nhờ Chú Bảo Vệ bưng bê phụ ca để cho nghỉ',
+        subDesc: '👮 Chú Tư nhận bưng bê dọn bàn giúp: Tiệm chạy êm, hỗ trợ 30k tiền xăng xe',
+        kicker: '👮 CÓ BẢO VỆ TIỆM GÀ',
+        requiresSecurity: true,
+        karmaDelta: { community: 25, craftsmanship: 10 },
+        moneyDelta: -30000,
+        reactionTitle: 'Chú Bảo Vệ Đa Năng Ra Tay!',
+        reactionNarrative: 'Chú Bảo Vệ xắn tay áo cười khà khà: "Thôi cho tụi nhỏ đi chơi đi cháu, có gì chú bưng bê dọn bàn phụ cho!". Chú Tư vừa giữ xe vừa thoăn thoắt bưng gà, quán vẫn nhộn nhịp vui vẻ!'
+      }
+    ]
+  },
+
+  // 14. Bẻ khóa xe máy khách (Chương 2, Ngày 14)
   {
     id: 'incident_bike_theft',
     title: 'Đạo Chích Bẻ Khóa Xe Máy Của Khách',
+    categoryTag: 'AN NINH HẺM 1102',
     icon: '🏍️',
     characterName: 'Tay Đua Nóng Xe',
     characterAvatar: '👺',
+    emoteBubble: '🚨',
     characterRole: 'Kẻ Bẻ Khóa Chuyên Nghiệp',
-    context: 'Giờ cao điểm tối, khách đang ăn gà rôm rả bên trong thì một đối tượng áp sát chiếc xe tay ga đắt tiền dựng trước quán, tay rút đoản chữ T chuẩn bị bẻ khóa.',
+    context: 'Giờ cao điểm tối khi quán bắt đầu đông khách dựng xe ngoài ngõ, một đối tượng áp sát chiếc xe tay ga đắt tiền của khách, tay rút đoản chữ T chuẩn bị bẻ khóa.',
     dialogue: '(Két... Tiếng ổ khóa xe máy bị cấn mạnh dưới tán cây...)',
     phaseTiming: 'shift',
     isSecurityRisk: true,
     minChapter: 2,
+    minDay: 14,
+    rarity: 'epic',
+    unlockHint: 'Mở khóa ở Chương 2 (Ngày 14): Bãi xe đông đúc lọt vào tầm ngắm kẻ gian (Cần Bảo Vệ).',
     choices: [
       {
         id: 'bike_sec_catch',
-        label: 'Chú Bảo Vệ quật gậy giữ xe, tóm gọn tên trộm tại trận',
+        label: 'Chú Bảo Vệ quật gậy giữ xe tóm gọn',
+        subDesc: '👮 Chú Tư quật ngã tên trộm, khách mừng rớt nước mắt tip nóng 100k',
         kicker: '👮 BẢO VỆ CHUYÊN NGHIỆP',
         requiresSecurity: true,
         karmaDelta: { community: 25, craftsmanship: 10 },
         moneyDelta: 100000,
         reactionTitle: 'Khách Cảm Kích Tột Cùng!',
-        reactionNarrative: 'Chú Bảo Vệ phản ứng cực nhanh, đạp văng chiếc xe máy của tên trộm khiến hắn ngã dúi dụi. Khách ăn gà chạy ra thấy xe mình còn nguyên vẹn mừng rớt nước mắt, tip ngay cho quán 100k và đăng bài khen ngợi nức nở trên mạng!'
+        reactionNarrative: 'Chú Bảo Vệ phản ứng cực nhanh, quật ngã tên trộm khiến hắn không kịp tẩu thoát. Khách ăn gà chạy ra thấy xe mình còn nguyên vẹn mừng rớt nước mắt, tip ngay cho quán 100k và đăng bài khen ngợi nức nở trên mạng!'
       },
       {
         id: 'bike_no_sec_luck',
-        label: 'Khách trong quán vô tình nhìn thấy qua cửa kính hô hoán',
+        label: 'Khách vô tình thấy qua cửa kính hô hoán',
+        subDesc: 'hên xui: trộm giật mình quăng đoản chạy, hoặc bẻ khóa mất xe đền 500k',
         kicker: '⚠️ MAY RỦI NGẪU NHIÊN',
         riskRate: 0.55,
         karmaDelta: { community: -10, ambition: -10 },
@@ -270,7 +758,8 @@ export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
       },
       {
         id: 'bike_shout_neighbors',
-        label: 'Hô hoán cả hẻm 1102 cùng đổ ra tiếp ứng',
+        label: 'Hô hoán cả hẻm 1102 cùng tiếp ứng',
+        subDesc: 'Bà con chặn kín hai đầu hẻm, tên trộm vứt xe chạy thục mạng',
         kicker: '🏘️ SỨC MẠNH CỘNG ĐỒNG',
         karmaDelta: { community: 20, ambition: -5 },
         moneyDelta: 0,
@@ -280,243 +769,298 @@ export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
     ]
   },
 
-  // 7. Shipper làm rơi vỡ đơn hàng ngồi khóc
+  // 15. Cúp điện giờ cao điểm (Chương 2, Ngày 15)
   {
-    id: 'incident_shipper_spill',
-    title: 'Shipper Làm Rơi Đơn Ngồi Bật Khóc',
-    icon: '🛵',
-    characterName: 'Chú Sáu Shipper',
-    characterAvatar: '😢',
-    characterRole: 'Tài Xế Công Nghệ Lớn Tuổi',
-    context: 'Chú Sáu vấp phải gờ giảm tốc ngay trước cửa tiệm, thùng đồ ăn bung ra khiến 2 phần combo gà rán và nước ngọt đổ tung tóe xuống đường. Chú ngồi thụp xuống ôm đầu bất lực.',
-    dialogue: 'Trời ơi là trời... Chạy từ sáng tới giờ chưa đủ tiền mua sữa cho cháu, giờ đền đơn này là mất trắng cả ngày công... App nó khóa tài khoản mất thôi con ơi...',
+    id: 'incident_blackout',
+    title: 'Cúp Điện Đột Ngột Giữa Giờ Đông Khách',
+    categoryTag: 'CÚP ĐIỆN ĐỘT NGỘT',
+    icon: '⚡',
+    characterName: 'Bác Ba Tổ Trưởng',
+    characterAvatar: '👴',
+    characterImg: '/assets/characters/char_bacba_front.png',
+    emoteBubble: '🕯️',
+    characterRole: 'Tổ Trưởng Khu Phố',
+    context: '19h00 tối, tiếng "bụp" ngoài trạm biến áp, cả con hẻm chìm vào bóng tối. Khách đang ngồi đông nghẹt bắt đầu nhốn nháo khi quạt và đèn vụt tắt.',
+    dialogue: 'Đứt cáp đầu hẻm rồi con ơi! Thợ điện báo phải mất ít nhất 1 tiếng nữa mới nối xong. Quán tính sao đây?',
     phaseTiming: 'shift',
     isSecurityRisk: false,
-    minChapter: 1,
+    minChapter: 2,
+    minDay: 15,
+    rarity: 'rare',
+    unlockHint: 'Mở khóa ở Chương 2 (Ngày 15): Sự cố mất điện bất ngờ trong hẻm sâu.',
     choices: [
       {
-        id: 'shipper_cook_free',
-        label: 'Mời chú vào nghỉ, chiên lại toàn bộ đơn mới nóng hổi MIỄN PHÍ',
-        kicker: '❤️ NGHĨA ĐỒNG BÀO SÀI GÒN',
-        karmaDelta: { community: 25, craftsmanship: 10, ambition: -10 },
-        moneyDelta: -45000, // Chi phí vốn gà
-        reactionTitle: 'Nụ Cười Rạng Rỡ Trong Nước Mắt',
-        reactionNarrative: 'Bạn kéo chú vào quầy, rót ly nước sâm đá và bảo nhân viên làm lại mẻ gà mới giòn rụm trong 5 phút. Chú Sáu cảm động rơi nước mắt, chắp tay cảm ơn rối rít. Khách chứng kiến tấm lòng của bạn đều gật đầu tán thưởng!'
-      },
-      {
-        id: 'shipper_split_cost',
-        label: 'Hỗ trợ chia đôi 50% tiền vốn với chú shipper',
-        kicker: '🤝 CHIA SẺ RỦI RO',
-        karmaDelta: { community: 15, ambition: 5 },
+        id: 'blackout_candles',
+        label: 'Thắp nến trên từng bàn & mở nhạc hát',
+        subDesc: 'Tốn 20k mua nến, khách thích thú quay clip tiệm gà lãng mạn nhất Sài Gòn',
+        kicker: '🕯️ BIẾN NGUY THÀNH CƠ',
+        karmaDelta: { community: 25, craftsmanship: 10, ambition: 5 },
         moneyDelta: -20000,
-        reactionTitle: 'Mỗi Người Gánh Một Nửa',
-        reactionNarrative: 'Chú Sáu vui vẻ gửi bạn một nửa tiền vốn và cảm ơn sự cảm thông của tiệm. Đơn hàng mới được làm nhanh chóng để chú kịp giao khách.'
+        reactionTitle: 'Đêm Gà Rán Dưới Ánh Nến Lãng Mạn',
+        reactionNarrative: 'Những ngọn nến lung linh bừng sáng. Bạn tặng mỗi bàn một ly nước mát và cùng nhân viên gảy đàn hát những khúc ca vui vẻ. Khách thích thú quay video check-in "Tiệm gà lãng mạn nhất Sài Gòn"!'
       },
       {
-        id: 'shipper_strict_app',
-        label: 'Nhắc chú tự báo cáo sự cố rơi vỡ lên tổng đài ứng dụng',
-        kicker: '📱 NGUYÊN TẮC QUY ĐỊNH',
-        karmaDelta: { ambition: 15, community: -15 },
-        moneyDelta: 0,
-        reactionTitle: 'Giải Quyết Theo Thủ Tục',
-        reactionNarrative: 'Chú Sáu gạt nước mắt gọi tổng đài app xin hủy chuyến theo quy định. Tiệm không bị tổn thất tiền bạc nhưng không khí trong bếp chùng xuống đôi chút.'
-      }
-    ]
-  },
-
-  // 8. Bà Năm xin dầu chiên cũ
-  {
-    id: 'incident_neighbour_oil',
-    title: 'Bà Năm Xin Dầu Chiên Thải Về Bán Lại',
-    icon: '👵',
-    characterName: 'Bà Năm Ve Chai',
-    characterAvatar: '👵',
-    characterRole: 'Cụ Bà Hẻm 1102',
-    context: 'Bà Năm xách chiếc can nhựa cũ sang trước giờ mở bán, ngỏ lời xin gom dầu chiên đã qua sử dụng của tiệm.',
-    dialogue: 'Con ơi, dầu chiên thừa bên tiệm con có bán lại cho bà gom không? Mấy chỗ họ mua lại dầu cũ giá cao lắm, bà gom kiếm ít đồng mua thuốc khớp...',
-    phaseTiming: 'morning',
-    isSecurityRisk: false,
-    minChapter: 1,
-    choices: [
-      {
-        id: 'oil_deny_and_gift',
-        label: 'Từ chối vì sợ dầu bẩn quay lại đồ ăn, biếu bà 50k & hộp gà nóng',
-        kicker: '🔥 ĐẠO ĐỨC NGHỀ BẾP & TÌNH THÂN',
-        karmaDelta: { craftsmanship: 20, community: 20 },
+        id: 'blackout_generator',
+        label: 'Kéo máy nổ dự phòng chạy tiếp',
+        subDesc: 'Tốn 50k xăng máy nổ, bếp vẫn đỏ lửa ra món liên tục không gián đoạn',
+        kicker: '⚡ ĐẦU TƯ BẢN LĨNH',
+        karmaDelta: { ambition: 20, craftsmanship: 15 },
         moneyDelta: -50000,
-        reactionTitle: 'Tấm Lòng Lương Thiện Của Chủ Tiệm',
-        reactionNarrative: 'Bạn ân cần giải thích tiệm giao dầu cho đơn vị chế biến diesel sinh học để bảo vệ sức khỏe cộng đồng, rồi biếu bà 50.000đ cùng hộp gà nóng. Bà Năm xúc động chúc bạn buôn may bán đắt!'
+        reactionTitle: 'Bếp Vẫn Đỏ Lửa Trong Đêm',
+        reactionNarrative: 'Máy nổ gầm vang, ánh đèn bật sáng trở lại. Mùi gà rán thơm lừng vẫn tỏa khắp con ngõ tối, đơn hàng vẫn ra đều đặn không gián đoạn phút nào!'
       },
       {
-        id: 'oil_give_freely',
-        label: 'Cho bà toàn bộ can dầu cũ để bà kiếm thêm thu nhập',
-        kicker: '⚠️ THỎA HIỆP KHÔNG NGUYÊN TẮC',
-        karmaDelta: { community: 10, craftsmanship: -20 },
-        moneyDelta: 30000,
-        reactionTitle: 'Bà Năm Vui Vẻ Nhận Dầu',
-        reactionNarrative: 'Bà Năm cảm ơn và xách can dầu đi. Dù giúp được bà một ít tiền nhưng trong lòng bạn cứ gợn lên nỗi lo về nguồn dầu bẩn trôi nổi.'
-      },
-      {
-        id: 'oil_strict_reject',
-        label: 'Lắc đầu dứt khoát: "Dầu tiệm con tự hủy, không cho ai được"',
-        kicker: '💼 NGUYÊN TẮC CỨNG NHẮC',
-        karmaDelta: { craftsmanship: 10, community: -10 },
-        moneyDelta: 0,
-        reactionTitle: 'Giữ Vững Tiêu Chuẩn',
-        reactionNarrative: 'Bà Năm lủi thủi quay về xe ve chai. Bạn bảo đảm được quy chuẩn nhưng ánh mắt bà cụ khiến bạn suy nghĩ mãi.'
+        id: 'blackout_refund_close',
+        label: 'Xin lỗi, hoàn tiền đơn dở & đóng cửa sớm',
+        subDesc: 'Mất 100k tiền hoàn đơn, cả tiệm có một buổi tối quây quần nghỉ ngơi',
+        kicker: '🚪 NGHỈ NGƠI AN TOÀN',
+        karmaDelta: { craftsmanship: 10, ambition: -15 },
+        moneyDelta: -100000,
+        reactionTitle: 'Một Tối Nghỉ Ngơi Sớm',
+        reactionNarrative: 'Khách thông cảm nhận lại tiền và hẹn hôm khác quay lại. Đội ngũ nhân viên có một buổi tối hiếm hoi được nghỉ ngơi quây quần bên nhau.'
       }
     ]
   },
 
-  // 9. Chú nghệ sĩ già hát rong qua quán
-  {
-    id: 'incident_street_singer',
-    title: 'Khúc Nhạc Trịnh Bên Mái Hiên Tiệm Gà',
-    icon: '🎸',
-    characterName: 'Nghệ Sĩ Ba Đờn',
-    characterAvatar: '👨‍🦳',
-    characterRole: 'Nghệ Sĩ Đường Phố',
-    context: 'Một chú nghệ sĩ mù với cây đàn guitar sờn cũ đứng dưới bóng râm trước tiệm, gảy một đoạn nhạc khúc Trịnh Công Sơn làm nao lòng người qua đường.',
-    dialogue: 'Hạt bụi nào hóa kiếp thân tôi... để một mai vươn hình hài lớn dậy... Xin gửi chút tiếng đàn bình an đến quán xá bà con...',
-    phaseTiming: 'morning',
-    isSecurityRisk: false,
-    minChapter: 1,
-    choices: [
-      {
-        id: 'singer_treat_and_tip',
-        label: 'Mời chú vào ghế mát, tặng đĩa gà nóng & gửi chú 30.000đ',
-        kicker: '🎵 TRI ÂM ĐƯỜNG PHỐ',
-        karmaDelta: { community: 20, craftsmanship: 10 },
-        moneyDelta: -30000,
-        reactionTitle: 'Khoảnh Khắc Lắng Đọng Tâm Hồn',
-        reactionNarrative: 'Chú Ba cười hiền hậu, ăn từng miếng gà giòn rụm rồi gảy tặng tiệm bản "Nắng Thủy Tinh" tuyệt mỹ. Khách ngồi ăn ai nấy đều lặng người xúc động, không khí quán ngập tràn sự bình yên hiếm có.'
-      },
-      {
-        id: 'singer_play_for_guests',
-        label: 'Nhờ chú đàn giao lưu 3 bài, khách thưởng tiền rôm rả',
-        kicker: '✨ BẦU KHÔNG KHÍ ẤM ÁP',
-        karmaDelta: { community: 15, ambition: 10 },
-        moneyDelta: 0,
-        reactionTitle: 'Mini Show Acoustic Tiệm Gà',
-        reactionNarrative: 'Tiếng đàn mộc mạc biến quán gà thành một phòng trà thu nhỏ ấm cúng. Khách ủng hộ chú chiếc nón đầy tiền lẻ, ai cũng tấm tắc khen quán có gu!'
-      },
-      {
-        id: 'singer_send_away',
-        label: 'Tặng chú chai nước ngọt rồi nhẹ nhàng mời chú sang nơi khác',
-        kicker: '🔇 GIỮ YÊN TĨNH',
-        karmaDelta: { ambition: 5, community: -10 },
-        moneyDelta: -8000,
-        reactionTitle: 'Quán Giữ Sự Riêng Tư',
-        reactionNarrative: 'Chú Ba nhận chai nước cám ơn rồi lặng lẽ bước đi. Không gian yên ắng trở lại để khách tập trung ăn uống.'
-      }
-    ]
-  },
+  // =========================================================================
+  // GIAI ĐOẠN 3: MẶT TIỀN PHỐ LỚN & ĐỐI THỦ CẠNH TRANH (CHƯƠNG 3, NGÀY 19 - 35)
+  // =========================================================================
 
-  // 10. Đổi vé số lấy gà rán cho trẻ cơ nhỡ
+  // 16. Bể ống nước sạch đầu hẻm (Chương 3, Ngày 19)
   {
-    id: 'incident_kid_lottery',
-    title: 'Đổi Vé Số Lấy Gà Rán Cho Hai Bé',
-    icon: '🎟️',
-    characterName: 'Bé Bo & Bé Bắp',
-    characterAvatar: '🧒',
-    characterRole: 'Trẻ Bán Vé Số Mùa Mưa',
-    context: 'Trời đổ mưa rào, hai anh em bán vé số quần áo ướt mèm đứng nép dưới mái hiên tiệm gà, mắt dán chặt vào khay gà chiên sốt bơ tỏi thơm lừng.',
-    dialogue: 'Anh ơi... tụi em còn 4 tờ vé số ế chưa bán được, đổi cho hai đứa em một miếng gà rán ăn cho đỡ lạnh bụng được không anh?',
-    phaseTiming: 'shift',
-    isSecurityRisk: false,
-    minChapter: 1,
-    choices: [
-      {
-        id: 'kid_exchange_feast',
-        label: 'Đổi 4 vé số lấy Combo Gà Rán + Khoai Lắc no nê',
-        kicker: '❤️ NẤU BẰNG TẤM LÒNG',
-        karmaDelta: { community: 25, craftsmanship: 10, ambition: -5 },
-        moneyDelta: -40000,
-        reactionTitle: 'Bữa Ăn Hạnh Phúc Nhất Đời!',
-        reactionNarrative: 'Hai đứa trẻ cầm miếng gà giòn nóng hổi, cắn rôm rốp mà mắt cười tít lại hạnh phúc. Đêm đó bạn dò vé số: trúng giải tám 100.000đ! Đúng là lộc trời ban cho người có tâm!'
-      },
-      {
-        id: 'kid_gift_only',
-        label: 'Tặng hai bé 2 đùi gà miễn phí, dặn giữ vé số bán tiếp lấy tiền',
-        kicker: '🎁 CHO ĐI KHÔNG TOAN TÍNH',
-        karmaDelta: { community: 20, ambition: -10 },
-        moneyDelta: -30000,
-        reactionTitle: 'Ấm Lòng Chiều Mưa Hẻm',
-        reactionNarrative: 'Hai đứa nhỏ mừng rỡ cúi đầu cảm ơn rối rít rồi chia nhau ăn ngon lành dưới mái hiên. Tình người Sài Gòn luôn ấm áp như thế.'
-      },
-      {
-        id: 'kid_refuse',
-        label: 'Từ chối vì sợ trẻ em tụ tập đông trước cửa quán',
-        kicker: '💼 KINH DOANH THỰC TẾ',
-        karmaDelta: { ambition: 10, community: -20 },
-        moneyDelta: 0,
-        reactionTitle: 'Hai Đứa Trẻ Lặng Lẽ Rời Đi',
-        reactionNarrative: 'Hai đứa nhỏ ôm xấp vé số ướt bước tiếp vào màn mưa. Bạn giữ được cửa tiệm gọn gàng nhưng đáy lòng thoáng chốc chùng xuống.'
-      }
-    ]
-  },
-
-  // 11. Đối thủ gạ mua bí quyết bột chiên 20 triệu
-  {
-    id: 'incident_rival_poach',
-    title: 'MegaChicken Gạ Mua Công Thức 20 Triệu',
-    icon: '💰',
-    characterName: 'Đại Diện MegaChicken',
-    characterAvatar: '👔',
-    characterRole: 'Chuyên Viên Thu Mua Chuỗi Lớn',
-    context: 'Một người đàn ông ăn mặc lịch thiệp đưa danh thiếp tập đoàn đồ ăn nhanh đối diện, đặt chiếc phong bì dày cộp lên bàn bạn.',
-    dialogue: 'Bột chiên của tiệm bạn giữ độ giòn da gà cực tốt sau 40 phút. Chúng tôi gửi bạn 20.000.000đ tiền mặt để chuyển giao tỉ lệ pha bột. Bạn vẫn được bán nhưng không được đăng ký thương hiệu.',
+    id: 'incident_water_outage',
+    title: 'Bể Đường Ống Nước Sạch Đầu Hẻm',
+    categoryTag: 'KHỦNG HOẢNG NƯỚC SẠCH',
+    icon: '🚰',
+    characterName: 'Bác Ba Tổ Trưởng',
+    characterAvatar: '👴',
+    characterImg: '/assets/characters/char_bacba_front.png',
+    emoteBubble: '🚰',
+    characterRole: 'Tổ Trưởng Khu Phố',
+    context: 'Xe tải cán vỡ đường ống nước máy đầu hẻm, toàn khu vực bị cắt nước sạch trong 5 tiếng đúng lúc tiệm đang cần rửa chén bát dồn dập.',
+    dialogue: 'Cắt nước toàn hẻm tới tối muộn mới sửa xong nghen con! Nhà nào lo trữ nước nấu ăn đi!',
     phaseTiming: 'morning',
     isSecurityRisk: false,
     minChapter: 3,
+    minDay: 19,
+    rarity: 'rare',
+    unlockHint: 'Mở khóa ở Chương 3: Khủng hoảng nguồn nước sạch giờ phục vụ cao điểm.',
     choices: [
       {
-        id: 'poach_reject_pride',
-        label: 'Kiên quyết từ chối: "Công thức là linh hồn của tiệm, tiền tỷ cũng không bán!"',
-        kicker: '🔥 BẢN LĨNH NGHỆ NHÂN',
-        karmaDelta: { craftsmanship: 25, community: 15, ambition: -10 },
+        id: 'water_buy_purified',
+        label: 'Mua 10 bình nước khoáng rửa tiệt trùng',
+        subDesc: 'Tốn 120k mua nước bình, đảm bảo vệ sinh 5 sao, khách tin tưởng tuyệt đối',
+        kicker: '🧼 VỆ SINH TUYỆT ĐỐI',
+        karmaDelta: { craftsmanship: 20, community: 10 },
+        moneyDelta: -120000,
+        reactionTitle: 'Đẳng Cấp An Toàn Vệ Sinh',
+        reactionNarrative: 'Chấp nhận tốn thêm tiền mua nước bình tinh khiết, từng chiếc khay, chiếc kẹp đều được rửa sạch bóng không tì vết. Khách thấy quán dùng nước lọc rửa đồ càng thêm tin tưởng bội phần!'
+      },
+      {
+        id: 'water_use_stagnant',
+        label: 'Múc nước bể ngầm cũ dùng tạm',
+        subDesc: 'Tiết kiệm chi phí, nhưng nước ngả vàng canh cánh nỗi lo',
+        kicker: '⚠️ TIẾT KIỆM NGUY CƠ',
+        karmaDelta: { ambition: 10, craftsmanship: -15 },
         moneyDelta: 0,
-        reactionTitle: 'Linh Hồn Không Thể Bán Đứng!',
-        reactionNarrative: 'Đại diện MegaChicken lắc đầu tiếc nuối ra về. Bác Ba chứng kiến từ đầu cười vang: "Khá lắm con! Giữ được ngọn lửa của riêng mình thì chẳng sợ đế chế nào nuốt chửng!".'
+        reactionTitle: 'Rửa Nước Lắng Cũ',
+        reactionNarrative: 'Nước bể ngầm hơi ngả vàng khiến chén đĩa không được sạch bóng như thường ngày. Bạn tiết kiệm được ít tiền nhưng canh cánh nỗi lo vệ sinh.'
       },
       {
-        id: 'poach_take_cash',
-        label: 'Cầm ngay 20.000.000đ tiền mặt để có vốn mở rộng tiệm lập tức',
-        kicker: '🏢 CƠ HỘI LÀM GIÀU',
-        karmaDelta: { ambition: 30, craftsmanship: -25, community: -15 },
-        moneyDelta: 20000000,
-        reactionTitle: 'Đổi Lấy Triệu Đồng',
-        reactionNarrative: 'Túi tiền căng phồng 20 triệu giúp bạn nâng cấp mặt bằng tức thì. Nhưng ít hôm sau, chuỗi đối thủ bắt đầu tung ra món gà giống hệt tiệm bạn với giá rẻ mạt!'
-      },
-      {
-        id: 'poach_fake_recipe',
-        label: 'Giao công thức pha bột cơ bản trên mạng rồi lấy 10 triệu tiền cọc',
-        kicker: '🦊 MẸO VẶT MA MÃNH',
-        karmaDelta: { ambition: 15, craftsmanship: -15 },
-        moneyDelta: 10000000,
-        reactionTitle: 'Cú Lừa Ngoạn Mục',
-        reactionNarrative: 'Bạn đút túi 10 triệu tiền cọc. Bên đối thủ hí hửng đem về thử nghiệm nhưng chiên lên bột vừa cứng vừa ngấy dầu, không bao giờ đạt được hương vị Tiệm Gà Nhà Tui!'
+        id: 'water_takeaway_only',
+        label: 'Chuyển sang chỉ bán mang đi (hộp giấy)',
+        subDesc: 'Tốn 30k hộp giấy, linh hoạt thích ứng không tốn giọt nước',
+        kicker: '📦 LINH HOẠT THÍCH ỨNG',
+        karmaDelta: { craftsmanship: 10, ambition: 5 },
+        moneyDelta: -30000,
+        reactionTitle: 'Giải Pháp Hộp Giấy Thông Minh',
+        reactionNarrative: 'Toàn bộ đơn hàng được đóng gói trong hộp giấy thân thiện môi trường, vừa sạch sẽ vừa không tốn nước rửa chén!'
       }
     ]
   },
 
-  // 12. Giang hồ vặt đòi phí bảo kê
+  // 17. Bỏ quên iPhone 15 Pro Max (Chương 3, Ngày 20)
+  {
+    id: 'incident_lost_iphone',
+    title: 'Khách Bỏ Quên iPhone 15 Pro Max Trên Bàn',
+    categoryTag: 'CỦA RƠI HẺM PHỐ',
+    icon: '📱',
+    characterName: 'Bé Linh Nhân Viên',
+    characterAvatar: '👩',
+    characterImg: '/assets/characters/char_vanphong_stand.png',
+    emoteBubble: '💎',
+    characterRole: 'Phục Vụ Bàn',
+    context: 'Dọn dẹp bàn số 2 sau khi tốp khách văn phòng rời đi, nhân viên phát hiện chiếc iPhone đời mới trị giá 30 triệu nằm dưới kẽ ghế sofa.',
+    dialogue: 'Anh chủ ơi, khách bàn 2 bỏ quên chiếc điện thoại xịn đét này nè anh! Chuông đang reo liên tục có người gọi đến!',
+    phaseTiming: 'shift',
+    isSecurityRisk: false,
+    minChapter: 3,
+    minDay: 20,
+    rarity: 'rare',
+    unlockHint: 'Mở khóa ở Chương 3: Thử thách lòng trung thực trước tài sản giá trị lớn.',
+    choices: [
+      {
+        id: 'iphone_return_prompt',
+        label: 'Bắt máy & trao trả tận tay khách',
+        subDesc: 'Khách mừng rớt nước mắt, gửi tặng 200k uống nước và chấm 5 sao',
+        kicker: '❤️ THẬT THÀ LÀ VỐN QUÝ',
+        karmaDelta: { community: 25, craftsmanship: 10 },
+        moneyDelta: 200000,
+        reactionTitle: 'Chữ Tín Lan Tỏa Hẻm Sâu',
+        reactionNarrative: 'Chủ nhân chiếc máy hớt hải chạy lại tiệm, mừng rỡ khi thấy tài sản còn nguyên vẹn. Khách cảm kích gửi tặng đội ngũ 200.000đ uống nước và viết bài review 5 sao ca ngợi sự tử tế của quán!'
+      },
+      {
+        id: 'iphone_post_threads',
+        label: 'Đăng Threads tìm chủ nhân kèm ảnh tiệm',
+        subDesc: 'Bài viết viral nghìn share, khách tìm được máy còn tiệm nổi như cồn',
+        kicker: '📢 TIẾP THỊ LAN TỎA',
+        karmaDelta: { ambition: 15, community: 15 },
+        moneyDelta: 0,
+        reactionTitle: 'Bài Viết Viral Nổi Tiếng!',
+        reactionNarrative: 'Bài đăng tìm người đánh rơi nhận được hàng nghìn lượt chia sẻ vì nghĩa cử đẹp. Khách tìm lại được máy, còn tiệm gà thì nổi tiếng khắp cõi mạng!'
+      },
+      {
+        id: 'iphone_keep_silent',
+        label: 'Cất vào tủ chờ khách tự quay lại',
+        subDesc: 'Khách nhận lại đồ nhưng thắc mắc sao gọi nhiều cuộc không ai nghe máy',
+        kicker: '🤫 THỤ ĐỘNG CẨN THẬN',
+        karmaDelta: { ambition: 5, community: -10 },
+        moneyDelta: 0,
+        reactionTitle: 'Khách Quay Lại Nhận Đồ',
+        reactionNarrative: 'Hôm sau khách mới nhớ ra quay lại hỏi. Bạn trả lại điện thoại an toàn nhưng khách vẫn hơi thắc mắc sao hôm qua gọi nhiều cuộc không thấy ai nghe máy.'
+      }
+    ]
+  },
+
+  // 18. Người yêu cũ dẫn người mới ghé tiệm (Chương 3, Ngày 22)
+  {
+    id: 'incident_ex_lover',
+    title: 'Người Yêu Cũ Dẫn Người Mới Ghé Quán',
+    categoryTag: 'NGƯỜI CŨ GHÉ THĂM',
+    icon: '💔',
+    characterName: 'Ngọc Lan (Người Yêu Cũ)',
+    characterAvatar: '💃',
+    characterImg: '/assets/characters/char_karen_stand.png',
+    emoteBubble: '💔',
+    characterRole: 'Người Xưa Từng Chê Xe Đẩy',
+    context: 'Bước vào quán là cô bạn gái cũ từng chia tay bạn vì "anh bán gà rán vỉa hè không có tương lai", nay đi cùng một anh chàng đi xe sang ăn mặc bảnh bao.',
+    dialogue: 'Ủa... anh là chủ tiệm gà đông khách này hả? Em thấy rần rần trên mạng nên dắt bạn trai ghé ăn thử, không ngờ là quán của anh...',
+    phaseTiming: 'shift',
+    isSecurityRisk: false,
+    minChapter: 3,
+    minDay: 22,
+    rarity: 'epic',
+    unlockHint: 'Mở khóa ở Chương 3 (Ngày 22): Cuộc hội ngộ bất ngờ với người yêu cũ năm xưa.',
+    choices: [
+      {
+        id: 'ex_serve_perfect',
+        label: 'Tự tay làm phần Gà Perfect đỉnh cao',
+        subDesc: 'Thu 80k, phong thái bản lĩnh tự tin khiến cả hai trầm trồ nể phục',
+        kicker: '👑 PHONG THÁI BẢN LĨNH',
+        karmaDelta: { craftsmanship: 20, ambition: 20, community: 10 },
+        moneyDelta: 80000,
+        reactionTitle: 'Đẳng Cấp Của Sự Trưởng Thành!',
+        reactionNarrative: 'Đĩa gà vàng óng, da giòn rụm tỏa khói nghi ngút được bạn bưng ra với nụ cười tự tin, phong thái đĩnh đạc của một người làm chủ chân chính. Cả hai người họ ăn xong phải trầm trồ thán phục!'
+      },
+      {
+        id: 'ex_extra_spicy',
+        label: 'Cho gấp ba lượng ớt siêu cay cho bõ tức',
+        subDesc: 'Thu 50k, bạn trai mặt đỏ gay tu 3 chai nước, người cũ ngượng ngùng rời đi',
+        kicker: '🌶️ TRẢ THÙ NGỌT NGÀO',
+        karmaDelta: { ambition: 10, craftsmanship: -15 },
+        moneyDelta: 50000,
+        reactionTitle: 'Cay Đến Chảy Nước Mắt',
+        reactionNarrative: 'Anh bạn trai ăn miếng đầu tiên mặt mày đỏ gay, uống cạn sạch 3 chai nước ngọt. Ngọc Lan biết bạn chơi khăm nhưng chỉ biết cười trừ rồi vội vã rời đi.'
+      },
+      {
+        id: 'ex_hide_kitchen',
+        label: 'Lánh mặt sau bếp để nhân viên phục vụ',
+        subDesc: 'Thu 50k, giữ khoảng cách bình yên mỉm cười nhìn người xưa khuất bóng',
+        kicker: '🙈 TRÁNH CHUYỆN THỊ PHI',
+        karmaDelta: { community: 5, ambition: -10 },
+        moneyDelta: 50000,
+        reactionTitle: 'Giữ Khoảng Cách An Yên',
+        reactionNarrative: 'Khách ăn xong tính tiền ra về êm thấu. Bạn đứng bên chảo dầu nhìn bóng lưng người xưa khuất dần, mỉm cười thanh thản vì mình đã đi được một chặng đường dài.'
+      }
+    ]
+  },
+
+  // 19. Đơn tiệc công ty 50 phần (Chương 3, Ngày 24)
+  {
+    id: 'incident_corporate_catering',
+    title: 'Công Ty Đối Diện Đặt Gấp 50 Hộp Gà',
+    categoryTag: 'ĐƠN TIỆC 50 HỘP',
+    icon: '🏢',
+    characterName: 'Chị Mai Trưởng Phòng',
+    characterAvatar: '👩‍💼',
+    characterImg: '/assets/characters/char_truongphong_stand.png',
+    emoteBubble: '🏢',
+    characterRole: 'Khách Đặt Tiệc Đột Xuất',
+    context: '16h30 chiều, chị trưởng phòng công ty tài chính chạy hớt hải sang tiệm gà thở không ra hơi.',
+    dialogue: 'Em ơi cứu chị với! Công ty chị sếp tổng ghé đột xuất, cần ngay 50 phần gà rán khoai tây trong 40 phút nữa! Làm kịp chị gửi thêm 200k tiền bo!',
+    phaseTiming: 'shift',
+    isSecurityRisk: false,
+    minChapter: 3,
+    minDay: 24,
+    rarity: 'rare',
+    unlockHint: 'Mở khóa ở Chương 3: Cơ hội đơn tiệc khổng lồ từ giới văn phòng.',
+    choices: [
+      {
+        id: 'catering_rush_all',
+        label: 'Cả đội dốc toàn lực chiên thần tốc',
+        subDesc: 'Kiếm đậm 450k tiền lời, giao đúng 38 phút sếp lớn công ty khen nức nở',
+        kicker: '⚡ THẦN TỐC TẬP TRUNG',
+        karmaDelta: { ambition: 20, craftsmanship: 10 },
+        moneyDelta: 450000,
+        reactionTitle: 'Kỳ Tích 50 Hộp Gà Nóng Hổi!',
+        reactionNarrative: 'Tất cả nhân viên phối hợp nhịp nhàng như một cỗ máy: người tẩm bột, người canh giỏ, người đóng hộp. Đúng 38 phút, 50 phần gà vàng ruộm thơm lừng được giao tận tay, sếp lớn công ty khen nức nở!'
+      },
+      {
+        id: 'catering_refuse_quality',
+        label: 'Từ chối: "40 phút không đảm bảo độ giòn"',
+        subDesc: 'Không đánh đổi uy tín, khách hiểu và hôm sau đặt trước chu đáo',
+        kicker: '🔥 GIỮ CHẤT LƯỢNG MÓN',
+        karmaDelta: { craftsmanship: 25, ambition: -15 },
+        moneyDelta: 0,
+        reactionTitle: 'Không Đánh Đổi Uy Tín',
+        reactionNarrative: 'Chị Mai hơi tiếc nhưng hiểu bạn là người coi trọng chất lượng món ăn trên hết. Hôm sau chị đặt trước 1 ngày để tiệm chuẩn bị chu đáo nhất.'
+      },
+      {
+        id: 'catering_split_batch',
+        label: 'Giao trước 25 phần, 25 phần sau 15 phút',
+        subDesc: 'Kiếm 350k, gà luôn nóng giòn bỏng tay, khách cảm ơn sự linh hoạt',
+        kicker: '🧠 LINH HOẠT THIỆN CHÍ',
+        karmaDelta: { ambition: 15, craftsmanship: 10, community: 10 },
+        moneyDelta: 350000,
+        reactionTitle: 'Giải Pháp Vẹn Cả Đôi Đường',
+        reactionNarrative: 'Công ty chia thành hai đợt tiệc vừa vặn, gà mang lên lúc nào cũng nóng giòn bỏng tay. Chị Mai cảm ơn sự linh hoạt tuyệt vời của quán!'
+      }
+    ]
+  },
+
+  // 20. Đầu gấu đòi tiền bảo kê (Chương 3, Ngày 26)
   {
     id: 'incident_protection_racketeer',
     title: 'Đầu Gấu Đòi "Phí An Ninh Trật Tự"',
+    categoryTag: 'ĐÒI TIỀN BẢO KÊ',
     icon: '🥋',
     characterName: 'Hải Búa Đầu Hẻm',
     characterAvatar: '🦹‍♂️',
+    emoteBubble: '⚡',
     characterRole: 'Giang Hồ Vặt Xăm Trổ',
-    context: 'Ba thanh niên xăm trổ ngồi rung đùi gác chân lên bàn, nói chuyện oang oang đòi thu tiền "an ninh".',
-    dialogue: 'Quán làm ăn đông khách quá ta. Đầu hẻm này xe cộ phức tạp lắm đó, mỗi tháng gửi anh em 300k tiền nước non bảo kê xe cộ cho yên ổn nghen!',
+    context: 'Ba thanh niên xăm trổ ngồi rung đùi gác chân lên bàn khi thấy tiệm phát đạt, nói chuyện oang oang đòi thu tiền "an ninh".',
+    dialogue: 'Quán làm ăn đông khách quá ta. Mặt tiền này xe cộ phức tạp lắm đó, mỗi tháng gửi anh em 300k tiền nước non bảo kê xe cộ cho yên ổn nghen!',
     phaseTiming: 'shift',
     isSecurityRisk: true,
-    minChapter: 2,
+    minChapter: 3,
+    minDay: 26,
+    rarity: 'epic',
+    unlockHint: 'Mở khóa ở Chương 3 (Ngày 26): Mặt tiền lớn thu hút sự chú ý của các băng nhóm bảo kê.',
     choices: [
       {
         id: 'racketeer_sec_bust',
-        label: 'Chú Bảo Vệ bước ra cùng đội cựu chiến binh đầu hẻm',
+        label: 'Chú Bảo Vệ bước ra cùng đội cựu chiến binh',
+        subDesc: '👮 Chú Tư từng là công an khu vực: Hải Búa tái mét mặt xin lỗi rồi lủi mất',
         kicker: '👮 BẢO VỆ CỨNG CỰA',
         requiresSecurity: true,
         karmaDelta: { community: 20, craftsmanship: 10 },
@@ -526,7 +1070,8 @@ export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
       },
       {
         id: 'racketeer_call_police',
-        label: 'Báo ngay cho Bác Ba Tổ Trưởng và Công An Phường xử lý',
+        label: 'Báo ngay Bác Ba và Công An Phường',
+        subDesc: 'Công an có mặt lập biên bản răn đe, khu hẻm giữ vững trật tự',
         kicker: '⚖️ THƯỢNG TÔN PHÁP LUẬT',
         karmaDelta: { community: 15, ambition: 5 },
         moneyDelta: 0,
@@ -535,7 +1080,8 @@ export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
       },
       {
         id: 'racketeer_pay_quiet',
-        label: 'Bấm bụng đưa 300.000đ cho êm ấm làm ăn',
+        label: 'Bấm bụng đưa 300.000đ cho êm ấm',
+        subDesc: 'hên xui: chúng bỏ đi êm thấm, hoặc tuần sau kéo tới đòi tăng 500k',
         kicker: '💸 THỎA HIỆP YẾU THẾ',
         riskRate: 0.7,
         karmaDelta: { ambition: -10, community: -15 },
@@ -547,508 +1093,88 @@ export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
     ]
   },
 
-  // 13. Trend bắt mắt: Gà Sốt Matcha Trân Châu Đường Đen
+  // 21. Quán đối thủ sai người đến thả ruồi (Chương 3, Ngày 28)
   {
-    id: 'incident_food_trend_matcha',
-    title: 'Khách Đòi Trend "Gà Sốt Matcha Trân Châu"',
-    icon: '🍵',
-    characterName: 'Nhóm Bạn Trẻ Bàn 4',
-    characterAvatar: '👧',
-    characterRole: 'GenZ Thích Trải Nghiệm Mới',
-    context: 'Một nhóm học sinh giơ điện thoại hí hửng hỏi quán có làm món đang rần rần trên mạng xã hội không.',
-    dialogue: 'Anh chủ ơi trên Tóp Tóp đang sốt món Gà Rán Nhúng Sốt Matcha Trân Châu Đường Đen kìa! Quán làm thử cho tụi em 3 dĩa ăn thử check-in với!',
-    phaseTiming: 'shift',
-    isSecurityRisk: false,
-    minChapter: 2,
-    choices: [
-      {
-        id: 'trend_cash_grab',
-        label: 'Bắt trend ngay lập tức, chế biến bán giá cao 89k/dĩa',
-        kicker: '💸 TỐI ƯU TREND THỜI THƯỢNG',
-        karmaDelta: { ambition: 20, craftsmanship: -15 },
-        moneyDelta: 120000,
-        reactionTitle: 'Hốt Bạc Nhờ Bắt Trend',
-        reactionNarrative: 'Tụi nhỏ chụp hình đăng mạng nườm nượp kéo theo nhiều khách tò mò. Món ăn hơi dị nhưng quán kiếm được khoản lời đậm đà!'
-      },
-      {
-        id: 'trend_stick_standard',
-        label: 'Giữ vững chuẩn mực: "Gà tiệm anh chỉ phục vụ sốt cay bơ tỏi chuẩn vị!"',
-        kicker: '🔥 ĐẲNG CẤP HƯƠNG VỊ',
-        karmaDelta: { craftsmanship: 20, ambition: -5 },
-        moneyDelta: 0,
-        reactionTitle: 'Thuyết Phục Bằng Chất Lượng Thật',
-        reactionNarrative: 'Bạn mời nhóm thử đĩa Gà Sốt Mật Ong Bơ Tỏi chân ái. Cắn miếng gà giòn béo ngậy, các bạn trẻ gật gù: "Đúng là gà chuẩn vị ăn đứt mấy trend ăn xổi anh ơi!".'
-      },
-      {
-        id: 'trend_trial_staff',
-        label: 'Làm thử nội bộ cho nhân viên tiệm nếm thử đánh giá trước',
-        kicker: '🧪 THỬ NGHIỆM THẬN TRỌNG',
-        karmaDelta: { craftsmanship: 10, community: 10 },
-        moneyDelta: -25000,
-        reactionTitle: 'Hội Đồng Bếp Lắc Đầu',
-        reactionNarrative: 'Nhân viên nếm xong cười nghiêng ngả vì vị đắng chát của matcha không hợp với da gà rán. Tiệm quyết định giữ vững menu chuẩn chỉ.'
-      }
-    ]
-  },
-
-  // 14. Bỏ quên iPhone 15 Pro Max
-  {
-    id: 'incident_lost_iphone',
-    title: 'Khách Bỏ Quên iPhone 15 Pro Max Trên Bàn',
-    icon: '📱',
-    characterName: 'Bé Linh Nhân Viên',
-    characterAvatar: '👩',
-    characterRole: 'Phục Vụ Bàn',
-    context: 'Dọn dẹp bàn số 2 sau khi tốp khách văn phòng rời đi, nhân viên phát hiện chiếc iPhone đời mới trị giá 30 triệu nằm dưới kẽ ghế.',
-    dialogue: 'Anh chủ ơi, khách bàn 2 bỏ quên chiếc điện thoại xịn đét này nè anh! Chuông đang reo liên tục có người gọi đến!',
-    phaseTiming: 'shift',
-    isSecurityRisk: false,
-    minChapter: 2,
-    choices: [
-      {
-        id: 'iphone_return_prompt',
-        label: 'Bắt máy liền, hẹn khách quay lại tiệm trao trả nguyên vẹn',
-        kicker: '❤️ THẬT THÀ LÀ VỐN QUÝ',
-        karmaDelta: { community: 25, craftsmanship: 10 },
-        moneyDelta: 200000, // Khách hậu tạ
-        reactionTitle: 'Chữ Tín Lan Tỏa Hẻm Sâu',
-        reactionNarrative: 'Chủ nhân chiếc máy hớt hải chạy lại tiệm, mừng rỡ khi thấy tài sản còn nguyên vẹn. Khách cảm kích gửi tặng đội ngũ 200.000đ uống nước và viết bài review 5 sao ca ngợi sự tử tế của quán!'
-      },
-      {
-        id: 'iphone_post_threads',
-        label: 'Đăng bài lên Threads tìm chủ nhân kèm hình ảnh tiệm gà',
-        kicker: '📢 TIẾP THỊ LAN TỎA',
-        karmaDelta: { ambition: 15, community: 15 },
-        moneyDelta: 0,
-        reactionTitle: 'Bài Viết Viral Nổi Tiếng!',
-        reactionNarrative: 'Bài đăng tìm người đánh rơi nhận được hàng nghìn lượt chia sẻ vì nghĩa cử đẹp. Khách tìm lại được máy, còn tiệm gà thì nổi tiếng khắp cõi mạng!'
-      },
-      {
-        id: 'iphone_keep_silent',
-        label: 'Cất vào tủ chờ khách tự nhớ ra quay lại đòi',
-        kicker: '🤫 THỤ ĐỘNG CẨN THẬN',
-        karmaDelta: { ambition: 5, community: -10 },
-        moneyDelta: 0,
-        reactionTitle: 'Khách Quay Lại Nhận Đồ',
-        reactionNarrative: 'Hôm sau khách mới nhớ ra quay lại hỏi. Bạn trả lại điện thoại an toàn nhưng khách vẫn hơi thắc mắc sao hôm qua gọi nhiều cuộc không thấy ai nghe máy.'
-      }
-    ]
-  },
-
-  // 15. Thách đấu Gà Cay Cấp Độ 7
-  {
-    id: 'incident_spicy_challenge',
-    title: 'Thách Đấu Gà Siêu Cay Cấp Độ 7',
-    icon: '🌶️',
-    characterName: 'Streamer Khang Gà',
-    characterAvatar: '🤠',
-    characterRole: 'Thánh Ăn Cay Livestream',
-    context: 'Một nam thanh niên bật livestream trước cửa tiệm, gạ chủ quán làm đĩa gà cay cấp độ xé họng để thử thách.',
-    dialogue: 'Anh chủ có dám làm cho em 1 đĩa gà cay xé họng cấp 7 không? Nếu em ăn hết trong 5 phút mà không uống giọt nước nào, anh miễn phí bữa này và tặng em áo kỷ niệm nha!',
-    phaseTiming: 'shift',
-    isSecurityRisk: false,
-    minChapter: 2,
-    choices: [
-      {
-        id: 'spicy_accept_milk',
-        label: 'Nhận kèo, nấu sốt siêu cay nhưng chuẩn bị sẵn sữa tươi lạnh',
-        kicker: '🌶️ VUI VẺ CHĂM SÓC KHÁCH',
-        karmaDelta: { craftsmanship: 15, community: 10, ambition: 10 },
-        moneyDelta: 50000,
-        reactionTitle: 'Trận Chiến Cay Nồng Đầy Tiếng Cười',
-        reactionNarrative: 'Khang ăn tới miếng thứ hai thì mắt đỏ hoe toát mồ hôi hột kêu trời. Bạn đưa ngay ly sữa tươi đá lạnh giải cứu kịp thời. Khán giả xem live cười ngất ngưởng, like thả tim ầm ầm!'
-      },
-      {
-        id: 'spicy_refuse_health',
-        label: 'Từ chối: "Quán nấu ăn để thưởng thức, không làm cay hại bao tử khách"',
-        kicker: '🛡️ BẢO VỆ SỨC KHỎE KHÁCH',
-        karmaDelta: { craftsmanship: 20, ambition: -5 },
-        moneyDelta: 0,
-        reactionTitle: 'Lời Khuyên Có Tâm Của Người Nấu',
-        reactionNarrative: 'Khang ngẫm lại thấy bạn nói rất có lý. Cậu tắt thử thách và gọi đĩa gà giòn sốt cay thông thường, ăn uống ngon lành và khen ngợi tư duy làm nghề chuẩn mực của bạn.'
-      },
-      {
-        id: 'spicy_double_bet',
-        label: 'Bắt cá cược: Nếu không ăn hết thì phải trả tiền gấp đôi!',
-        kicker: '💼 SÁT PHẠT KINH DOANH',
-        karmaDelta: { ambition: 20, community: -10 },
-        moneyDelta: 100000,
-        reactionTitle: 'Thua Cược Nộp Phạt',
-        reactionNarrative: 'Khang bỏ cuộc ở phút thứ 3 vì quá cay, đành móc ví trả gấp đôi tiền đĩa gà. Bạn đút túi tiền lời nhưng Khang ôm bụng khó chịu rời quán.'
-      }
-    ]
-  },
-
-  // 16. Đơn tiệc đột xuất 50 phần
-  {
-    id: 'incident_corporate_catering',
-    title: 'Công Ty Đối Diện Đặt Gấp 50 Hộp Gà',
-    icon: '🏢',
-    characterName: 'Chị Mai Trưởng Phòng',
-    characterAvatar: '👩‍💼',
-    characterRole: 'Khách Đặt Tiệc Đột Xuất',
-    context: '16h30 chiều, chị trưởng phòng công ty tài chính chạy hớt hải sang tiệm gà thở không ra hơi.',
-    dialogue: 'Em ơi cứu chị với! Công ty chị sếp tổng ghé đột xuất, cần ngay 50 phần gà rán khoai tây trong 40 phút nữa! Làm kịp chị gửi thêm 200k tiền bo!',
-    phaseTiming: 'shift',
-    isSecurityRisk: false,
-    minChapter: 3,
-    choices: [
-      {
-        id: 'catering_rush_all',
-        label: 'Cả đội dốc toàn lực, bếp chiên hoạt động tối đa công suất',
-        kicker: '⚡ THẦN TỐC TẬP TRUNG',
-        karmaDelta: { ambition: 20, craftsmanship: 10 },
-        moneyDelta: 450000, // Lợi nhuận lớn
-        reactionTitle: 'Kỳ Tích 50 Hộp Gà Nóng Hổi!',
-        reactionNarrative: 'Tất cả nhân viên phối hợp nhịp nhàng như một cỗ máy: người tẩm bột, người canh giỏ, người đóng hộp. Đúng 38 phút, 50 phần gà vàng ruộm thơm lừng được giao tận tay, sếp lớn công ty khen nức nở!'
-      },
-      {
-        id: 'catering_refuse_quality',
-        label: 'Từ chối: "40 phút làm 50 phần gà sẽ không kịp giòn chuẩn chất lượng"',
-        kicker: '🔥 GIỮ CHẤT LƯỢNG MÓN',
-        karmaDelta: { craftsmanship: 25, ambition: -15 },
-        moneyDelta: 0,
-        reactionTitle: 'Không Đánh Đổi Uy Tín',
-        reactionNarrative: 'Chị Mai hơi tiếc nhưng hiểu bạn là người coi trọng chất lượng món ăn trên hết. Hôm sau chị đặt trước 1 ngày để tiệm chuẩn bị chu đáo nhất.'
-      },
-      {
-        id: 'catering_split_batch',
-        label: 'Thỏa thuận giao trước 25 phần nóng, 25 phần sau 15 phút',
-        kicker: '🧠 LINH HOẠT THIỆN CHÍ',
-        karmaDelta: { ambition: 15, craftsmanship: 10, community: 10 },
-        moneyDelta: 350000,
-        reactionTitle: 'Giải Pháp Vẹn Cả Đôi Đường',
-        reactionNarrative: 'Công ty chia thành hai đợt tiệc vừa vặn, gà mang lên lúc nào cũng nóng giòn bỏng tay. Chị Mai cảm ơn sự linh hoạt tuyệt vời của quán!'
-      }
-    ]
-  },
-
-  // 17. Khách bơm hết bình tương ớt cá nhân
-  {
-    id: 'incident_sauce_hoarder',
-    title: 'Vị Khách Bơm Đầy Bình Tương Mang Về',
-    icon: '🍅',
-    characterName: 'Bác Khách Tiết Kiệm',
-    characterAvatar: '👨‍🦳',
-    characterRole: 'Khách Nghiện Tương',
-    context: 'Gọi 1 phần khoai tây chiên nhỏ 20k nhưng vị khách mang bình giữ nhiệt 1 lít ra quầy gia vị, lén bơm cạn sạch 2 bình tương ớt và tương cà cao cấp của tiệm.',
-    dialogue: '(Tiếng bơm tương pịt pịt liên hồi... Hai chai tương đắt tiền sắp cạn đáy...)',
+    id: 'incident_rival_fly',
+    title: 'Kẻ Lạ Mặt Thả Ruồi Vào Dĩa Gà',
+    categoryTag: 'ĐỐI THỦ PHÁ ĐÁM',
+    icon: '🪰',
+    characterName: 'Gã Mắt Lươn',
+    characterAvatar: '🕶️',
+    emoteBubble: '⚠️',
+    characterRole: 'Kẻ Phá Rối Nặc Danh',
+    context: 'Một gã đàn ông ngồi góc khuất lấm lét ngó nghiêng, rồi lén rút từ bao thuốc lá ra một con ruồi chết thả vào đĩa gà đang bốc khói, lập tức đập bàn la toáng lên!',
+    dialogue: 'Trời ơi! Quán làm ăn dơ bẩn cỡ này hả? Gà rán có nguyên con ruồi to đùng! Đền tôi 500k tiền viện phí không tôi chụp hình bóc phốt lên mạng cho sập tiệm!',
     phaseTiming: 'shift',
     isSecurityRisk: true,
-    minChapter: 1,
+    minChapter: 3,
+    minDay: 28,
+    rarity: 'epic',
+    unlockHint: 'Mở khóa ở Chương 3 (Ngày 28): Đòn bẩn phá hoại từ chuỗi gà đối thủ MegaChicken.',
     choices: [
       {
-        id: 'sauce_sec_gentle',
-        label: 'Chú Bảo Vệ bước tới tươi cười rót thêm tương, tặng gói tương nhỏ',
-        kicker: '👮 BẢO VỆ LỊCH THIỆP',
+        id: 'fly_security_bust',
+        label: 'Chú Bảo Vệ giữ tay, trích camera góc quán',
+        subDesc: '👮 Chú Tư lật tẩy cảnh rút ruồi từ bao thuốc lá, kẻ phá hoại chạy mất dạng',
+        kicker: '👮 BẢO VỆ BẮT QUẢ TANG',
         requiresSecurity: true,
-        karmaDelta: { community: 15, craftsmanship: 10 },
-        moneyDelta: -10000,
-        reactionTitle: 'Ứng Xử Đỉnh Cao Của Bảo Vệ!',
-        reactionNarrative: 'Chú Bảo Vệ tiến lại nhỏ nhẹ: "Dạ bác thích tương này tiệm con tặng bác 2 gói mang về nhé, để lại chút cho các cháu bàn sau ăn cùng nghen!". Bác khách ngượng ngùng buông tay, cảm ơn chú bảo vệ khéo léo.'
-      },
-      {
-        id: 'sauce_call_out',
-        label: 'To tiếng nhắc nhở trước mặt mọi người, đòi tính tiền tương 50k',
-        kicker: '📢 CỨNG RẮN TRỪNG PHẠT',
-        karmaDelta: { ambition: 10, community: -20 },
-        moneyDelta: 50000,
-        reactionTitle: 'Quán Rơi Vào Im Lặng Căng Thẳng',
-        reactionNarrative: 'Bác khách xấu hổ đỏ mặt móc 50k ném lên bàn rồi bỏ đi. Dù đòi được tiền tương nhưng không khí quán ăn trở nên ngột ngạt khó chịu.'
-      },
-      {
-        id: 'sauce_ignore_loss',
-        label: 'Coi như của đi thay người, lặng lẽ châm thêm bình tương mới',
-        kicker: '🤷 BẤM BỤNG BỎ QUA',
-        karmaDelta: { community: 5, ambition: -5 },
-        moneyDelta: -35000,
-        reactionTitle: 'Chấp Nhận Thiệt Thòi',
-        reactionNarrative: 'Bạn lẳng lặng mang bình tương mới ra thay. Vị khách hí hửng mang bình tương đầy ắp về nhà mà không biết chủ tiệm đã nhẫn nhịn nhường nào.'
-      }
-    ]
-  },
-
-  // 18. Mất điện giờ cao điểm
-  {
-    id: 'incident_blackout',
-    title: 'Cúp Điện Đột Ngột Giữa Giờ Đông Khách',
-    icon: '⚡',
-    characterName: 'Bác Ba Tổ Trưởng',
-    characterAvatar: '👴',
-    characterRole: 'Tổ Trưởng Khu Phố',
-    context: '19h00 tối, tiếng "bụp" ngoài trạm biến áp, cả con hẻm chìm vào bóng tối. Khách đang ngồi đông nghẹt bắt đầu nhốn nháo khi quạt và đèn vụt tắt.',
-    dialogue: 'Đứt cáp đầu hẻm rồi con ơi! Thợ điện báo phải mất ít nhất 1 tiếng nữa mới nối xong. Quán tính sao đây?',
-    phaseTiming: 'shift',
-    isSecurityRisk: false,
-    minChapter: 2,
-    choices: [
-      {
-        id: 'blackout_candles',
-        label: 'Thắp nến trên từng bàn, mở nhạc điện thoại hát tặng khách',
-        kicker: '🕯️ BIẾN NGUY THÀNH CƠ',
-        karmaDelta: { community: 25, craftsmanship: 10, ambition: 5 },
-        moneyDelta: -20000, // Chi phí nến và nước ngọt tặng
-        reactionTitle: 'Đêm Gà Rán Dưới Ánh Nến Lãng Mạn',
-        reactionNarrative: 'Những ngọn nến lung linh bừng sáng. Bạn tặng mỗi bàn một ly nước mát và cùng nhân viên gảy đàn hát những khúc ca vui vẻ. Khách thích thú quay video check-in "Tiệm gà lãng mạn nhất Sài Gòn"!'
-      },
-      {
-        id: 'blackout_generator',
-        label: 'Kéo máy nổ dự phòng chạy tiếp bếp chiên',
-        kicker: '⚡ ĐẦU TƯ BẢN LĨNH',
-        karmaDelta: { ambition: 20, craftsmanship: 15 },
-        moneyDelta: -50000, // Tiền xăng máy nổ
-        reactionTitle: 'Bếp Vẫn Đỏ Lửa Trong Đêm',
-        reactionNarrative: 'Máy nổ gầm vang, ánh đèn bật sáng trở lại. Mùi gà rán thơm lừng vẫn tỏa khắp con ngõ tối, đơn hàng vẫn ra đều đặn không gián đoạn phút nào!'
-      },
-      {
-        id: 'blackout_refund_close',
-        label: 'Xin lỗi thực khách, hoàn tiền các đơn dở và đóng cửa sớm',
-        kicker: '🚪 NGHỈ NGƠI AN TOÀN',
-        karmaDelta: { craftsmanship: 10, ambition: -15 },
-        moneyDelta: -100000,
-        reactionTitle: 'Một Tối Nghỉ Ngơi Sớm',
-        reactionNarrative: 'Khách thông cảm nhận lại tiền và hẹn hôm khác quay lại. Đội ngũ nhân viên có một buổi tối hiếm hoi được nghỉ ngơi quây quần bên nhau.'
-      }
-    ]
-  },
-
-  // 19. Người yêu cũ dẫn bạn mới ghé quán
-  {
-    id: 'incident_ex_lover',
-    title: 'Người Yêu Cũ Dẫn Người Mới Ghé Quán',
-    icon: '💔',
-    characterName: 'Ngọc Lan (Người Yêu Cũ)',
-    characterAvatar: '💃',
-    characterRole: 'Người Xưa Từng Chê Xe Đẩy',
-    context: 'Bước vào quán là cô bạn gái cũ từng chia tay bạn vì "anh bán gà rán vỉa hè không có tiền đồ", nay đi cùng một anh chàng đi xe sang ăn mặc bảnh bao.',
-    dialogue: 'Ủa... anh là chủ tiệm gà đông khách này hả? Em thấy rần rần trên mạng nên dắt bạn trai ghé ăn thử, không ngờ là quán của anh...',
-    phaseTiming: 'shift',
-    isSecurityRisk: false,
-    minChapter: 2,
-    choices: [
-      {
-        id: 'ex_serve_perfect',
-        label: 'Tự tay làm phần Gà Perfect đỉnh cao nhất, phục vụ chuyên nghiệp',
-        kicker: '👑 PHONG THÁI BẢN LĨNH',
-        karmaDelta: { craftsmanship: 20, ambition: 20, community: 10 },
-        moneyDelta: 80000,
-        reactionTitle: 'Đẳng Cấp Của Sự Trưởng Thành!',
-        reactionNarrative: 'Đĩa gà vàng óng, da giòn rụm tỏa khói nghi ngút được bạn bưng ra với nụ cười tự tin, phong thái đĩnh đạc của một người làm chủ chân chính. Cả hai người họ ăn xong phải trầm trồ thán phục!'
-      },
-      {
-        id: 'ex_extra_spicy',
-        label: 'Bỏ gấp ba lượng bột ớt siêu cay cho bõ tức năm xưa!',
-        kicker: '🌶️ TRẢ THÙ NGỌT NGÀO',
-        karmaDelta: { ambition: 10, craftsmanship: -15 },
-        moneyDelta: 50000,
-        reactionTitle: 'Cay Đến Chảy Nước Mắt',
-        reactionNarrative: 'Anh bạn trai ăn miếng đầu tiên mặt mày đỏ gay, uống cạn sạch 3 chai nước ngọt. Ngọc Lan biết bạn chơi khăm nhưng chỉ biết cười trừ rồi vội vã rời đi.'
-      },
-      {
-        id: 'ex_hide_kitchen',
-        label: 'Lánh mặt sau bếp để nhân viên phục vụ, tránh khó xử',
-        kicker: '🙈 TRÁNH CHUYỆN THỊ PHI',
-        karmaDelta: { community: 5, ambition: -10 },
-        moneyDelta: 50000,
-        reactionTitle: 'Giữ Khoảng Cách An Yên',
-        reactionNarrative: 'Khách ăn xong tính tiền ra về êm thấu. Bạn đứng bên chảo dầu nhìn bóng lưng người xưa khuất dần, mỉm cười thanh thản vì mình đã đi được một chặng đường dài.'
-      }
-    ]
-  },
-
-  // 20. Gạ bán thịt gà đông lạnh lậu giá siêu rẻ
-  {
-    id: 'incident_cheap_meat_dealer',
-    title: 'Lái Buôn Gạ Bán Thịt Gà Lậu Giá Rẻ Một Nửa',
-    icon: '🍗',
-    characterName: 'Cò Gà Đầu Mối',
-    characterAvatar: '🕶️',
-    characterRole: 'Tay Buôn Thực Phẩm Chui',
-    context: 'Một tay buôn ghé quán sáng sớm thì thào gạ gẫm cung cấp nguồn thịt gà đông lạnh trôi nổi.',
-    dialogue: 'Em trai, anh có mối gà đông lạnh xả hàng giá chỉ bằng 35% thị trường thôi. Bột chiên đậm đà tẩm vào là giòn rụm ai biết đâu mà lần, mỗi tháng bỏ túi thêm 15-20 triệu ngon ơ!',
-    phaseTiming: 'morning',
-    isSecurityRisk: false,
-    minChapter: 2,
-    choices: [
-      {
-        id: 'meat_reject_proudly',
-        label: 'Cự tuyệt thẳng thừng: "Tiệm chỉ dùng gà tươi kiểm dịch có nguồn gốc!"',
-        kicker: '🔥 ĐẠO ĐỨC NGHỀ NGHIỆP TỐI THƯỢNG',
-        karmaDelta: { craftsmanship: 25, community: 15, ambition: -5 },
+        karmaDelta: { community: 10, craftsmanship: 15 },
         moneyDelta: 0,
-        reactionTitle: 'Lương Tâm Người Làm Bếp Vững Vàng!',
-        reactionNarrative: 'Tay buôn bĩu môi bỏ đi. Bạn ngẩng cao đầu chuẩn bị từng mẻ thịt gà tươi nguyên óng ả. Hương vị ngọt thơm tự nhiên từ gà tươi chính là bí quyết không đế chế nào sao chép được!'
+        reactionTitle: 'Lật Tẩy Kẻ Đê Hèn!',
+        reactionNarrative: 'Chú Bảo Vệ đã để mắt tới gã từ lúc vào quán. Chú chỉ tay thẳng vào mắt kính của gã: "Camera góc kia quay rõ mồn một cảnh anh rút ruồi từ bao thuốc lá ra nhé!". Gã tái mặt, lủi thủi chuồn mất dạng giữa tiếng cười chê của thực khách!'
       },
       {
-        id: 'meat_buy_cheap',
-        label: 'Ham lời nhập thử 1 thùng thịt giá rẻ để tối ưu lợi nhuận',
-        kicker: '⚠️ CON ĐƯỜNG TỘI LỖI',
-        karmaDelta: { ambition: 30, craftsmanship: -30, community: -25 },
-        moneyDelta: 300000,
-        reactionTitle: 'Hậu Quả Thịt Đông Lạnh Bở Nát',
-        reactionNarrative: 'Thịt chiên lên bị ra nước, bở bùng bục và có mùi lạ. Khách quen ăn thử liền nhăn mặt chê bai, đánh tụt điểm sao của tiệm!'
+        id: 'fly_no_sec_pay',
+        label: 'Bấm bụng đền 200k cho êm chuyện',
+        subDesc: 'hên xui: êm ấm tạm thời, hoặc mất 200k mà vẫn bị chụp ảnh bôi nhọ',
+        kicker: '💸 NGẬM BỒ HÒN LÀM NGỌT',
+        riskRate: 0.8,
+        karmaDelta: { ambition: -10, craftsmanship: -5 },
+        moneyDelta: -200000,
+        reactionTitle: 'Thiệt Đơn Thiệt Kép',
+        reactionNarrative: 'Vì không có người an ninh đối chất, bạn đành móc tiền túi đền cho gã để dập tắt ồn ào. Gã đắc chí đút túi tiền rồi hí hửng rời đi.',
+        reactionFailureNarrative: 'Bạn vừa đền tiền xong thì gã vẫn lên mạng đăng một bài ẩn danh bịa đặt. Không có bảo vệ hay bằng chứng rõ ràng, quán bị mất oan một khoản tiền!'
       },
       {
-        id: 'meat_report_authorities',
-        label: 'Ghi lại biển số xe báo cho Đội Quản Lý Thị Trường',
-        kicker: '⚖️ BẢO VỆ CỘNG ĐỒNG',
-        karmaDelta: { community: 25, craftsmanship: 15 },
-        moneyDelta: 100000, // Thưởng tin báo
-        reactionTitle: 'Xóa Sổ Điểm Thực Phẩm Bẩn',
-        reactionNarrative: 'Nhờ tin báo chuẩn xác của bạn, đội kiểm tra đã chặn đứng kho thịt bẩn tuồn ra thị trường. Cơ quan trao giấy khen cho tiệm vì ý thức trách nhiệm cao!'
+        id: 'fly_scientific_proof',
+        label: 'Đối chất khoa học: Dầu 180°C ruồi phải cháy đen',
+        subDesc: 'Cả quán vỗ tay ủng hộ chứng minh chuẩn xác, kẻ phá rối xấu hổ trốn tiệt',
+        kicker: '🔥 CHÂN LÝ LỬA VÀ DẦU',
+        karmaDelta: { craftsmanship: 20, ambition: 5 },
+        moneyDelta: 0,
+        reactionTitle: 'Chân Tướng Rõ Ràng!',
+        reactionNarrative: 'Bạn điềm tĩnh chỉ ra: "Dầu chiên ở 180°C, nếu ruồi rơi vào từ đầu thì cánh và thân đã cháy giòn tan từ lâu, không thể còn nguyên vẹn và tươi thế này được!". Khách xung quanh đồng thanh vỗ tay ủng hộ, kẻ phá rối xấu hổ trốn tiệt.'
       }
     ]
   },
 
-  // 21. Bể ống nước sạch đầu hẻm
-  {
-    id: 'incident_water_outage',
-    title: 'Bể Đường Ống Nước Sạch Đầu Hẻm',
-    icon: '🚰',
-    characterName: 'Bác Ba Tổ Trưởng',
-    characterAvatar: '👴',
-    characterRole: 'Tổ Trưởng Khu Phố',
-    context: 'Xe tải cán vỡ đường ống nước máy đầu hẻm, toàn khu vực bị cắt nước sạch trong 5 tiếng đúng lúc tiệm đang cần rửa chén bát dồn dập.',
-    dialogue: 'Cắt nước toàn hẻm tới tối muộn mới sửa xong nghen con! Nhà nào lo trữ nước nấu ăn đi!',
-    phaseTiming: 'morning',
-    isSecurityRisk: false,
-    minChapter: 2,
-    choices: [
-      {
-        id: 'water_buy_purified',
-        label: 'Chi tiền mua 10 bình nước khoáng 20L về rửa tiệt trùng chuẩn 5 sao',
-        kicker: '🧼 VỆ SINH TUYỆT ĐỐI',
-        karmaDelta: { craftsmanship: 20, community: 10 },
-        moneyDelta: -120000,
-        reactionTitle: 'Đẳng Cấp An Toàn Vệ Sinh',
-        reactionNarrative: 'Chấp nhận tốn thêm tiền mua nước bình tinh khiết, từng chiếc khay, chiếc kẹp đều được rửa sạch bóng không tì vết. Khách thấy quán dùng nước lọc rửa đồ càng thêm tin tưởng bội phần!'
-      },
-      {
-        id: 'water_use_stagnant',
-        label: 'Múc nước tích trữ trong bể ngầm cũ dùng tạm cho tiết kiệm',
-        kicker: '⚠️ TIẾT KIỆM NGUY CƠ',
-        karmaDelta: { ambition: 10, craftsmanship: -15 },
-        moneyDelta: 0,
-        reactionTitle: 'Rửa Nước Lắng Cũ',
-        reactionNarrative: 'Nước bể ngầm hơi ngả vàng khiến chén đĩa không được sạch bóng như thường ngày. Bạn tiết kiệm được ít tiền nhưng canh cánh nỗi lo vệ sinh.'
-      },
-      {
-        id: 'water_takeaway_only',
-        label: 'Tạm chuyển sang chỉ bán mang đi (hộp giấy), ngưng phục vụ tại bàn',
-        kicker: '📦 LINH HOẠT THÍCH ỨNG',
-        karmaDelta: { craftsmanship: 10, ambition: 5 },
-        moneyDelta: -30000,
-        reactionTitle: 'Giải Pháp Hộp Giấy Thông Minh',
-        reactionNarrative: 'Toàn bộ đơn hàng được đóng gói trong hộp giấy thân thiện môi trường, vừa sạch sẽ vừa không tốn nước rửa chén!'
-      }
-    ]
-  },
+  // =========================================================================
+  // GIAI ĐOẠN 4: ĐẾ CHẾ BISTRO & THỬ THÁCH BẢN LĨNH TRIỆU ĐÔ (CHƯƠNG 4-5, NGÀY 36+)
+  // =========================================================================
 
-  // 22. Mèo hoang lạc vào bếp chiên
-  {
-    id: 'incident_cat_adopted',
-    title: 'Bé Mèo Con Lạc Vào Gầm Quầy Giữ Nóng',
-    icon: '🐱',
-    characterName: 'Bé Mèo Mướp Con',
-    characterAvatar: '🐾',
-    characterRole: 'Khách Không Mời Dễ Thương',
-    context: 'Một chú mèo mướp con ướt nhẹp, mắt tròn xoe ngơ ngác chui vào nấp dưới chân quầy giữ nhiệt, kêu meo meo thèm thuồng mùi gà.',
-    dialogue: 'Meo... meooo... (Chú mèo nhỏ ngước đôi mắt long lanh nhìn bạn đầy cầu cứu...)',
-    phaseTiming: 'morning',
-    isSecurityRisk: false,
-    minChapter: 1,
-    choices: [
-      {
-        id: 'cat_adopt_mascot',
-        label: 'Xé thịt gà luộc cho bé ăn, nhận nuôi làm "Linh Vật Chiêu Tài"',
-        kicker: '💖 BÉ MÈO CHIÊU TÀI',
-        karmaDelta: { community: 25, craftsmanship: 5 },
-        moneyDelta: -20000, // Chi phí mua chuông và thức ăn
-        reactionTitle: 'Linh Vật "Bé Bột" Của Tiệm Gà!',
-        reactionNarrative: 'Được ăn no ấm áp, bé mèo quấn quýt nằm ngoan ngoãn trên ghế riêng trước cửa. Khách tới ăn ai cũng xúm lại nựng và chụp hình khoe lên Threads, tiệm gà bỗng nổi như cồn!'
-      },
-      {
-        id: 'cat_gift_neighbor',
-        label: 'Nhờ bà Năm hàng xóm nuôi giúp để đảm bảo tiêu chuẩn bếp',
-        kicker: '🏡 GỬI GẮM YÊU THƯƠNG',
-        karmaDelta: { community: 15, craftsmanship: 10 },
-        moneyDelta: 0,
-        reactionTitle: 'Mái Ấm Cho Mèo Nhỏ',
-        reactionNarrative: 'Bà Năm vui vẻ nhận bé mèo về bầu bạn cho đỡ quạnh quẽ. Thi thoảng bạn lại mang mẩu gà luộc sang thăm chú mèo mập mạp.'
-      },
-      {
-        id: 'cat_chase_away',
-        label: 'Xua đuổi đi nơi khác vì quy định nghiêm ngặt không nuôi thú cưng',
-        kicker: '🚫 NGUYÊN TẮC CÔNG NGHIỆP',
-        karmaDelta: { craftsmanship: 10, community: -15 },
-        moneyDelta: 0,
-        reactionTitle: 'Giữ Vệ Sinh Không Tì Vết',
-        reactionNarrative: 'Bé mèo lủi thủi chạy sang hiên nhà khác. Gian bếp của bạn bảo đảm chuẩn vệ sinh công nghiệp nhưng nhân viên có chút tiếc nuối.'
-      }
-    ]
-  },
-
-  // 23. Cậu tân sinh viên xin rửa chén
-  {
-    id: 'incident_student_parttime',
-    title: 'Cậu Tân Sinh Viên Xin Rửa Chén Kiếm Tiền Học',
-    icon: '🎓',
-    characterName: 'Minh (Sinh Viên Năm Nhất)',
-    characterAvatar: '👦',
-    characterRole: 'Cậu Trò Nghèo Đất Quê',
-    context: 'Một cậu sinh viên rụt rè đứng trước cửa tiệm, áo sờn vai xin việc làm thêm buổi tối.',
-    dialogue: 'Dạ anh/chị ơi... em mới ở quê lên nhập học, mẹ em dưới quê đang nằm viện. Quán có việc gì rửa chén hay lau bàn buổi tối không, trả em ít tiền cũng được ạ...',
-    phaseTiming: 'morning',
-    isSecurityRisk: false,
-    minChapter: 2,
-    choices: [
-      {
-        id: 'student_hire_warm',
-        label: 'Nhận vào phụ việc, trả lương tử tế và bao cơm gà nóng sốt',
-        kicker: '❤️ NÂNG ĐỠ ƯỚC MƠ',
-        karmaDelta: { community: 25, craftsmanship: 10, ambition: 5 },
-        moneyDelta: -50000,
-        reactionTitle: 'Người Em Chăm Chỉ Của Tiệm',
-        reactionNarrative: 'Minh làm việc cực kỳ siêng năng, rửa chén bát sạch bóng và nhanh thoăn thoắt. Mỗi tối tan ca được ăn đĩa cơm gà ấm áp, mắt cậu ánh lên niềm tin vào cuộc đời tươi đẹp.'
-      },
-      {
-        id: 'student_gift_meal',
-        label: 'Tặng phần gà ăn lấy sức và chỉ em sang tiệm trà sữa đầu ngõ đang tuyển',
-        kicker: '🤝 GIÚP ĐỠ ĐÚNG NƠI',
-        karmaDelta: { community: 15, ambition: 5 },
-        moneyDelta: -20000,
-        reactionTitle: 'Kết Nối Duyên Lành',
-        reactionNarrative: 'Cậu bé cảm ơn ríu rít ăn hết phần gà rồi sang xin việc bên tiệm trà sữa thành công. Cậu luôn nhớ mãi ơn nghĩa của tiệm gà.'
-      },
-      {
-        id: 'student_reject_full',
-        label: 'Từ chối dứt khoát: "Quán anh đủ người rồi em ơi"',
-        kicker: '💼 KINH DOANH LÝ TRÍ',
-        karmaDelta: { ambition: 5, community: -10 },
-        moneyDelta: 0,
-        reactionTitle: 'Cậu Bé Lặng Lẽ Rời Đi',
-        reactionNarrative: 'Minh cúi chào rồi bước tiếp trên vỉa hè tìm việc. Công việc kinh doanh của bạn vẫn ổn định theo kế hoạch.'
-      }
-    ]
-  },
-
-  // 24. Tin đồn thất thiệt "Dầu bẩn ung thư"
+  // 22. Tin đồn bóc phốt ảo dầu bẩn (Chương 4, Ngày 36)
   {
     id: 'incident_rumor_social',
-    title: 'Bài Viết Bóc Phốt Ảo "Quán Dùng Dầu Đen Chiên Đi Chiên Lại"',
+    title: 'Bài Viết Bóc Phốt Ảo "Quán Dùng Dầu Đen Chiên Lại"',
+    categoryTag: 'BÃO DƯ LUẬN ẢO',
     icon: '📢',
     characterName: 'Tài Khoản Ẩn Danh',
     characterAvatar: '👻',
+    emoteBubble: '💬',
     characterRole: 'Nick Clone Phá Hoại',
     context: 'Một tài khoản nặc danh đăng lên nhóm khu phố Facebook bài viết vu khống quán chiên gà bằng dầu đen khét lẹt gây ung thư, thu hút nhiều bình luận hoang mang.',
     dialogue: '(Ảnh chụp chảo dầu cháy đen ở quán nào đó trên mạng ghép vào tên Tiệm Gà Nhà Tui...)',
     phaseTiming: 'morning',
     isSecurityRisk: false,
-    minChapter: 2,
+    minChapter: 4,
+    minDay: 36,
+    rarity: 'epic',
+    unlockHint: 'Mở khóa ở Chương 4: Bão truyền thông ác ý nhắm vào uy tín thương hiệu.',
     choices: [
       {
         id: 'rumor_livestream_oil',
-        label: 'Livestream công khai que đo dầu và quy trình thay dầu vàng óng',
+        label: 'Livestream que đo dầu & quy trình sạch bóng',
+        subDesc: 'Minh bạch 100%, cộng đồng quay sang chỉ trích kẻ vu khống, tiệm thêm uy tín',
         kicker: '🔥 MINH BẠCH BẰNG SỰ THẬT',
         karmaDelta: { craftsmanship: 25, community: 15 },
         moneyDelta: 0,
@@ -1057,7 +1183,8 @@ export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
       },
       {
         id: 'rumor_invite_neighbors',
-        label: 'Mời Bác Ba và ban quản trị khu phố ghé kiểm tra trực tiếp',
+        label: 'Mời Bác Ba & ban quản trị khu phố chứng thực',
+        subDesc: 'Cả khu phố lên tiếng bảo chứng, tin đồn ác ý tan biến như bọt nước',
         kicker: '🏘️ BẢO CHỨNG BÀ CON HẺM',
         karmaDelta: { community: 25, craftsmanship: 10 },
         moneyDelta: 0,
@@ -1066,33 +1193,41 @@ export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
       },
       {
         id: 'rumor_ignore',
-        label: 'Im lặng không quan tâm, tin rằng hữu xạ tự nhiên hương',
+        label: 'Im lặng không quan tâm, hữu xạ tự nhiên hương',
+        subDesc: 'Khách mới hơi chần chừ mất 50k, khách quen vẫn nhiệt tình ủng hộ',
         kicker: '🤫 IM LẶNG LÀ VÀNG',
         karmaDelta: { ambition: -10, craftsmanship: 5 },
-        moneyDelta: -50000, // Ảnh hưởng ít khách
+        moneyDelta: -50000,
         reactionTitle: 'Khách Hơi E Ngại Ban Đầu',
         reactionNarrative: 'Một số khách mới hơi chần chừ khi ghé ăn, nhưng khách quen trong hẻm vẫn ủng hộ nhiệt tình giúp tiệm vượt qua sóng gió.'
       }
     ]
   },
 
-  // 25. Xô đại gia đình 10 người
+  // 23. Đại gia đình 10 người đòi xô gà độc bản (Chương 4, Ngày 38)
   {
     id: 'incident_giant_bucket',
     title: 'Đại Gia Đình 10 Người Đòi Xô Gà Độc Bản',
+    categoryTag: 'ĐẠI GIA ĐÌNH SUM VẦY',
     icon: '👨‍👩‍👧‍👦',
     characterName: 'Ông Sáu Trưởng Tộc',
     characterAvatar: '👴',
+    characterImg: '/assets/characters/char_mecon_stand.png',
+    emoteBubble: '🍗',
     characterRole: 'Đại Gia Đình Sum Vầy',
     context: 'Cả gia đình 3 thế hệ gồm ông bà, cha mẹ và 4 đứa nhỏ đi mừng thọ ghé tiệm muốn thưởng thức một bữa tiệc gà rán đáng nhớ.',
     dialogue: 'Tiệm có xô gà nào to bự đủ cho 10 người ăn mà có cả gà cay cho ba mẹ, gà ngọt cho tụi nhỏ và cháo gà nóng cho ông bà không cháu ơi?',
     phaseTiming: 'shift',
     isSecurityRisk: false,
-    minChapter: 3,
+    minChapter: 4,
+    minDay: 38,
+    rarity: 'rare',
+    unlockHint: 'Mở khóa ở Chương 4: Bữa tiệc sum vầy của đại gia đình 3 thế hệ.',
     choices: [
       {
         id: 'giant_custom_craft',
-        label: 'Sáng tạo Xô Đại Sum Vầy: đủ vị gà + súp nóng + tặng kem cho các bé',
+        label: 'Sáng tạo Xô Đại Sum Vầy & tặng kem các bé',
+        subDesc: 'Thu 320k, đủ vị cay ngọt và cháo nóng, cả nhà quây quần hạnh phúc',
         kicker: '👑 NGHỆ THUẬT PHỤC VỤ TẬN TÂM',
         karmaDelta: { craftsmanship: 20, community: 20 },
         moneyDelta: 320000,
@@ -1101,7 +1236,8 @@ export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
       },
       {
         id: 'giant_standard_combos',
-        label: 'Tư vấn gọi 3 combo tiêu chuẩn có sẵn trong menu',
+        label: 'Tư vấn 3 combo tiêu chuẩn trong menu',
+        subDesc: 'Thu 250k, phục vụ chuẩn thực đơn nhanh chóng ngăn nắp',
         kicker: '📋 QUY CHUẨN MENU',
         karmaDelta: { ambition: 15, craftsmanship: 5 },
         moneyDelta: 250000,
@@ -1110,12 +1246,118 @@ export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
       },
       {
         id: 'giant_add_surcharge',
-        label: 'Nhận làm theo yêu cầu nhưng phụ thu 20% phí bàn đông',
+        label: 'Phụ thu 20% phí phục vụ bàn đông',
+        subDesc: 'Thu 380k, túi tiền rủng rỉnh nhưng bữa ăn mất đi một chút vị ngọt ngào',
         kicker: '💼 TỐI ƯU DOANH THU',
         karmaDelta: { ambition: 20, community: -15 },
         moneyDelta: 380000,
         reactionTitle: 'Thu Đậm Nhưng Kém Ấm Cúng',
         reactionNarrative: 'Gia đình thanh toán đủ tiền nhưng người lớn có phần phàn nàn vì khoản phụ thu bất ngờ. Bữa ăn mất đi một chút vị ngọt ngào.'
+      }
+    ]
+  },
+
+  // 24. Lái buôn chào gà đông lạnh nhập lậu (Chương 4, Ngày 40)
+  {
+    id: 'incident_cheap_meat_dealer',
+    title: 'Lái Buôn Gạ Bán Thịt Gà Lậu Giá Rẻ Một Nửa',
+    categoryTag: 'CÁM DỖ GÀ BẨN',
+    icon: '🍗',
+    characterName: 'Cò Gà Đầu Mối',
+    characterAvatar: '🕶️',
+    emoteBubble: '🍖',
+    characterRole: 'Tay Buôn Thực Phẩm Chui',
+    context: 'Một tay buôn ghé tiệm sáng sớm thì thào gạ gẫm cung cấp nguồn thịt gà đông lạnh trôi nổi giá rẻ mạt để ăn chênh lệch dày.',
+    dialogue: 'Em trai, anh có mối gà đông lạnh xả hàng giá chỉ bằng 35% thị trường thôi. Bột chiên đậm đà tẩm vào là giòn rụm ai biết đâu mà lần, mỗi tháng bỏ túi thêm 15-20 triệu ngon ơ!',
+    phaseTiming: 'morning',
+    isSecurityRisk: false,
+    minChapter: 4,
+    minDay: 40,
+    rarity: 'epic',
+    unlockHint: 'Mở khóa ở Chương 4 (Ngày 40): Cám dỗ siêu lợi nhuận từ nguồn thịt gà bẩn.',
+    choices: [
+      {
+        id: 'meat_reject_proudly',
+        label: 'Cự tuyệt: "Tiệm chỉ dùng gà tươi kiểm dịch!"',
+        subDesc: 'Giữ vững đạo đức nghề bếp, thịt gà tươi ngọt tự nhiên không ai sánh bằng',
+        kicker: '🔥 ĐẠO ĐỨC NGHỀ NGHIỆP TỐI THƯỢNG',
+        karmaDelta: { craftsmanship: 25, community: 15, ambition: -5 },
+        moneyDelta: 0,
+        reactionTitle: 'Lương Tâm Người Làm Bếp Vững Vàng!',
+        reactionNarrative: 'Tay buôn bĩu môi bỏ đi. Bạn ngẩng cao đầu chuẩn bị từng mẻ thịt gà tươi nguyên óng ả. Hương vị ngọt thơm tự nhiên từ gà tươi chính là bí quyết không đế chế nào sao chép được!'
+      },
+      {
+        id: 'meat_buy_cheap',
+        label: 'Ham lời nhập thử 1 thùng tối ưu chi phí',
+        subDesc: 'Kiếm thêm 300k, nhưng thịt bở bùng bục có mùi lạ bị khách chê tụt sao',
+        kicker: '⚠️ CON ĐƯỜNG TỘI LỖI',
+        karmaDelta: { ambition: 30, craftsmanship: -30, community: -25 },
+        moneyDelta: 300000,
+        reactionTitle: 'Hậu QuẢ Thịt Đông Lạnh Bở Nát',
+        reactionNarrative: 'Thịt chiên lên bị ra nước, bở bùng bục và có mùi lạ. Khách quen ăn thử liền nhăn mặt chê bai, đánh tụt điểm sao của tiệm!'
+      },
+      {
+        id: 'meat_report_authorities',
+        label: 'Báo biển số xe cho Quản Lý Thị Trường',
+        subDesc: 'Được thưởng nóng 100k và giấy khen, xóa sổ một kho hàng lậu',
+        kicker: '⚖️ BẢO VỆ CỘNG ĐỒNG',
+        karmaDelta: { community: 25, craftsmanship: 15 },
+        moneyDelta: 100000,
+        reactionTitle: 'Xóa Sổ Điểm Thực Phẩm Bẩn',
+        reactionNarrative: 'Nhờ tin báo chuẩn xác của bạn, đội kiểm tra đã chặn đứng kho thịt bẩn tuồn ra thị trường. Cơ quan trao giấy khen cho tiệm vì ý thức trách nhiệm cao!'
+      }
+    ]
+  },
+
+  // 25. MegaChicken gạ mua công thức 20 triệu (Chương 4, Ngày 42)
+  {
+    id: 'incident_rival_poach',
+    title: 'MegaChicken Gạ Mua Công Thức 20 Triệu',
+    categoryTag: 'GẠ MUA CÔNG THỨC',
+    icon: '💰',
+    characterName: 'Đại Diện MegaChicken',
+    characterAvatar: '👔',
+    characterImg: '/assets/characters/char_truongphong_stand.png',
+    emoteBubble: '💰',
+    characterRole: 'Chuyên Viên Thu Mua Chuỗi Lớn',
+    context: 'Một người đàn ông ăn mặc lịch thiệp đưa danh thiếp tập đoàn đồ ăn nhanh đối diện, đặt chiếc phong bì dày cộp 20 triệu lên bàn bạn.',
+    dialogue: 'Bột chiên của tiệm bạn giữ độ giòn da gà cực tốt sau 40 phút. Chúng tôi gửi bạn 20.000.000đ tiền mặt để chuyển giao tỉ lệ pha bột. Bạn vẫn được bán nhưng không được đăng ký thương hiệu.',
+    phaseTiming: 'morning',
+    isSecurityRisk: false,
+    minChapter: 4,
+    minDay: 42,
+    rarity: 'epic',
+    unlockHint: 'Mở khóa ở Chương 4 (Ngày 42): Lời gạ gẫm 20 triệu tiền mặt mua đứt linh hồn quán.',
+    choices: [
+      {
+        id: 'poach_reject_pride',
+        label: 'Kiên quyết từ chối: "Linh hồn quán không thể bán!"',
+        subDesc: 'Giữ vững bản lĩnh nghệ nhân, Bác Ba cười vang khen ngợi hết lời',
+        kicker: '🔥 BẢN LĨNH NGHỆ NHÂN',
+        karmaDelta: { craftsmanship: 25, community: 15, ambition: -10 },
+        moneyDelta: 0,
+        reactionTitle: 'Linh Hồn Không Thể Bán Đứng!',
+        reactionNarrative: 'Đại diện MegaChicken lắc đầu tiếc nuối ra về. Bác Ba chứng kiến từ đầu cười vang: "Khá lắm con! Giữ được ngọn lửa của riêng mình thì chẳng sợ đế chế nào nuốt chửng!".'
+      },
+      {
+        id: 'poach_take_cash',
+        label: 'Cầm 20.000.000đ tiền mặt mở rộng tiệm ngay',
+        subDesc: 'Có ngay 20 triệu vốn, nhưng đối thủ tung gà nhái giá rẻ đè bẹp thị trường',
+        kicker: '🏢 CƠ HỘI LÀM GIÀU',
+        karmaDelta: { ambition: 30, craftsmanship: -25, community: -15 },
+        moneyDelta: 20000000,
+        reactionTitle: 'Đổi Lấy Triệu Đồng',
+        reactionNarrative: 'Túi tiền căng phồng 20 triệu giúp bạn nâng cấp mặt bằng tức thì. Nhưng ít hôm sau, chuỗi đối thủ bắt đầu tung ra món gà giống hệt tiệm bạn với giá rẻ mạt!'
+      },
+      {
+        id: 'poach_fake_recipe',
+        label: 'Giao công thức cơ bản lấy 10 triệu cọc',
+        subDesc: 'Đút túi 10 triệu cọc, đối thủ chiên lên bột cứng ngắc không bao giờ bằng',
+        kicker: '🦊 MẸO VẶT MA MÃNH',
+        karmaDelta: { ambition: 15, craftsmanship: -15 },
+        moneyDelta: 10000000,
+        reactionTitle: 'Cú Lừa Ngoạn Mục',
+        reactionNarrative: 'Bạn đút túi 10 triệu tiền cọc. Bên đối thủ hí hửng đem về thử nghiệm nhưng chiên lên bột vừa cứng vừa ngấy dầu, không bao giờ đạt được hương vị Tiệm Gà Nhà Tui!'
       }
     ]
   }

@@ -2067,232 +2067,312 @@ body.selling-mode .awning::after {
 }
 
 /* ==========================================================================
-   DAILY INCIDENT MODAL (25 SỰ KIỆN HÀI HƯỚC & TÌNH HUỐNG HẺM 1102)
+/* ==========================================================================
+   DAILY INCIDENT MODAL (PHONG CÁCH CHIBI 2 TẦNG CHỮ - MÌ CAY BÀ TÁM)
    ========================================================================== */
 
 .incident-dialog {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 4px 2px;
-  text-align: left;
-}
-
-.incident-header {
-  display: flex;
   align-items: center;
-  gap: 10px;
-  border-bottom: 2px dashed #eedbc5;
-  padding-bottom: 8px;
+  text-align: center;
+  padding: 4px 0 2px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.incident-icon-bubble {
-  width: 48px;
-  height: 48px;
-  min-width: 48px;
-  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
-  border: 2px solid #ffb74d;
-  border-radius: 50%;
+/* 1. Avatar Tròn Chibi trên đỉnh & Floating Heart Emote */
+.incident-avatar-wrap {
+  position: relative;
+  margin: 0 auto 12px;
+  width: 88px;
+  height: 88px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.8rem;
-  box-shadow: 0 3px 6px rgba(230, 81, 0, 0.15);
 }
 
-.incident-title-box {
-  flex: 1;
-}
-
-.incident-kicker {
-  display: block;
-  font-size: 0.72rem;
-  font-weight: 800;
-  color: #d32f2f;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.incident-title {
-  margin: 2px 0 0;
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: var(--ink, #2d241e);
-  line-height: 1.25;
-}
-
-.incident-char-card {
+.incident-chibi-circle {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe4e6 100%);
+  border: 3.5px solid #ffccd2;
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: #fdf8f0;
-  border: 1.5px solid #ebd7bf;
-  border-radius: 12px;
-  padding: 8px 12px;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(235, 77, 61, 0.18);
 }
 
-.char-avatar {
-  font-size: 2rem;
+.chibi-avatar-img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.incident-dialog:hover .chibi-avatar-img {
+  transform: scale(1.05);
+}
+
+.chibi-avatar-emoji {
+  font-size: 2.8rem;
   line-height: 1;
 }
 
-.char-info {
-  flex: 1;
+.incident-heart-badge {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.35rem;
+  line-height: 1;
+  animation: floatHeart 2s ease-in-out infinite;
+  filter: drop-shadow(0 2px 5px rgba(220, 38, 38, 0.45));
 }
 
-.char-name {
-  font-size: 0.95rem;
-  font-weight: 800;
-  color: #3e2723;
+@keyframes floatHeart {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-5px) scale(1.12);
+  }
 }
 
-.char-role {
+/* 2. Tag Pill phân loại đỏ cam */
+.incident-pill-badge {
+  display: inline-block;
+  margin: 0 auto 8px;
+  background: #eb483b;
+  color: #ffffff;
+  font-family: var(--font-display, sans-serif);
   font-size: 0.76rem;
+  font-weight: 850;
+  letter-spacing: 0.6px;
+  padding: 4px 18px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  box-shadow: 0 3px 8px rgba(235, 72, 59, 0.32);
+}
+
+.incident-pill-badge.pill-success {
+  background: #2e7d32;
+  box-shadow: 0 3px 8px rgba(46, 125, 50, 0.3);
+}
+
+.incident-pill-badge.pill-failure {
+  background: #d32f2f;
+  box-shadow: 0 3px 8px rgba(211, 47, 47, 0.3);
+}
+
+/* 3. Tiêu đề đậm, tròn trịa, to bản */
+.incident-main-title {
+  margin: 0 0 4px;
+  font-family: var(--font-display, sans-serif);
+  font-size: 1.35rem;
+  font-weight: 850;
+  color: #2d2019;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.incident-char-subtitle {
+  font-size: 0.78rem;
+  color: #8c7365;
+  margin-bottom: 12px;
   font-weight: 600;
-  color: #8d6e63;
+  text-align: center;
 }
 
-.incident-context-box {
-  background: #fff;
-  border: 1.5px solid #e2d2bf;
-  border-radius: 12px;
-  padding: 10px 12px;
+.char-role-dot {
+  color: #eb483b;
+  font-size: 0.65rem;
+  vertical-align: middle;
 }
 
-.context-desc {
-  margin: 0 0 8px;
-  font-size: 0.85rem;
-  line-height: 1.45;
-  color: #4a3b32;
+/* 4. Lời dẫn dí dỏm, chân thực đời thường */
+.incident-story-box {
+  margin-bottom: 14px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.context-quote {
-  background: #fff9ed;
+.incident-story-desc {
+  margin: 0;
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: #614e44;
+  text-align: center;
+  padding: 0 4px;
+}
+
+.incident-quote-card {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #fff8eb;
   border-left: 3.5px solid #e65100;
-  border-radius: 0 8px 8px 0;
-  padding: 8px 10px;
+  border-radius: 4px 10px 10px 4px;
   font-style: italic;
   font-size: 0.84rem;
-  line-height: 1.4;
-  color: #2e1c0c;
+  color: #3e2615;
+  line-height: 1.45;
+  text-align: left;
   display: flex;
   gap: 4px;
 }
 
-.quote-mark {
-  font-weight: 900;
-  font-size: 1.1rem;
+.incident-quote-card .quote-mark {
   color: #e65100;
+  font-weight: 900;
+  font-size: 1.15rem;
   line-height: 1;
 }
 
-.quote-text {
+.incident-quote-card .quote-body {
   flex: 1;
 }
 
 .incident-security-tip {
   background: #fff3e0;
   border: 1px solid #ffcc80;
-  border-radius: 8px;
-  padding: 7px 10px;
+  border-radius: 12px;
+  padding: 8px 12px;
   font-size: 0.78rem;
-  color: #e65100;
-  line-height: 1.35;
+  color: #d84315;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+/* 5. Nút Lựa Chọn 2 Tầng Chữ Chuẩn Mì Cay Bà Tám */
 .incident-choices-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 4px;
-}
-
-.choices-prompt-label {
-  font-size: 0.84rem;
-  font-weight: 800;
-  color: #5d4037;
-  margin-bottom: 2px;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .incident-choice-btn {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   width: 100%;
-  padding: 10px 12px;
-  min-height: 48px;
-  background: #fff;
-  border: 2px solid #e0d0bd;
-  border-radius: 12px;
-  text-align: left;
+  border-radius: 18px;
+  padding: 12px 14px;
+  min-height: 56px;
   cursor: pointer;
-  transition: all 0.15s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-}
-
-.incident-choice-btn:hover:not(:disabled) {
-  border-color: #e65100;
-  background: #fff8f0;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(230, 81, 0, 0.12);
+  transition: transform 0.1s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  box-sizing: border-box;
+  font-family: var(--font-body, sans-serif);
 }
 
 .incident-choice-btn:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translateY(2px);
 }
 
+.choice-tier1 {
+  font-family: var(--font-display, sans-serif);
+  font-size: 1.05rem;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+.choice-tier2 {
+  font-size: 0.77rem;
+  font-weight: 500;
+  line-height: 1.35;
+  margin-top: 3px;
+}
+
+/* Nút 1: Đỏ Cam Coral Rực Rỡ (Cho nghỉ 1 ngày) */
+.btn-coral-choice {
+  background: linear-gradient(180deg, #f05041 0%, #e63c2c 100%);
+  border: none;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(230, 60, 44, 0.35);
+}
+
+.btn-coral-choice:hover:not(:disabled) {
+  filter: brightness(1.04);
+  box-shadow: 0 6px 18px rgba(230, 60, 44, 0.42);
+}
+
+.btn-coral-choice .choice-tier1 {
+  color: #ffffff;
+}
+
+.btn-coral-choice .choice-tier2 {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* Nút 2: Kem Be Sữa Nhẹ Nhàng (Không cho nghỉ, ai nghỉ trừ lương) */
+.btn-cream-choice {
+  background: #f2ece0;
+  border: 1.5px solid #ded3c0;
+  color: #3b2a20;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.btn-cream-choice:hover:not(:disabled) {
+  background: #ebe4d5;
+  border-color: #cbbea7;
+}
+
+.btn-cream-choice .choice-tier1 {
+  color: #342319;
+}
+
+.btn-cream-choice .choice-tier2 {
+  color: #6e5c50;
+}
+
+/* Nút 3: Xanh An Ninh Bảo Vệ */
+.btn-security-choice {
+  background: #ecf7ed;
+  border: 1.5px solid #a4dba8;
+  color: #1b5e20;
+  box-shadow: 0 2px 8px rgba(46, 125, 50, 0.12);
+}
+
+.btn-security-choice:hover:not(:disabled) {
+  background: #e2f2e4;
+  border-color: #8bc38f;
+}
+
+.btn-security-choice .choice-tier1 {
+  color: #1b5e20;
+}
+
+.btn-security-choice .choice-tier2 {
+  color: #2e7d32;
+}
+
+/* Nút Bị Khóa hoặc Disable */
+.btn-locked-choice,
 .incident-choice-btn.is-disabled {
-  opacity: 0.55;
-  background: #f5ede4;
-  border-color: #d7ccc8;
+  background: #f3ede7;
+  border: 1.5px dashed #ccc3bb;
+  color: #9c9086;
+  opacity: 0.65;
   cursor: not-allowed;
 }
 
-.choice-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
+.btn-locked-choice .choice-tier1,
+.incident-choice-btn.is-disabled .choice-tier1 {
+  color: #8e7f75;
 }
 
-.choice-kicker {
-  font-size: 0.72rem;
-  font-weight: 800;
-  color: #bf360c;
-  letter-spacing: 0.3px;
-}
-
-.incident-badge {
-  display: inline-block;
-  font-size: 0.7rem;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 10px;
-}
-
-.sec-badge {
-  background: #e8f5e9;
-  color: #2e7d32;
-  border: 1px solid #a5d6a7;
-}
-
-.risk-badge {
-  background: #fff3e0;
-  color: #e65100;
-  border: 1px solid #ffcc80;
-}
-
-.locked-badge {
-  background: #efebe9;
-  color: #8d6e63;
-  border: 1px solid #d7ccc8;
-}
-
-.choice-label {
-  font-size: 0.86rem;
-  font-weight: 700;
-  color: #2d241e;
-  line-height: 1.35;
+.btn-locked-choice .choice-tier2,
+.incident-choice-btn.is-disabled .choice-tier2 {
+  color: #a2968d;
 }
 
 /* Reaction Dialog */
@@ -2301,63 +2381,57 @@ body.selling-mode .awning::after {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 6px 2px;
-}
-
-.reaction-icon-box {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.2rem;
-  margin-bottom: 8px;
-}
-
-.reaction-icon-box.success {
-  background: #e8f5e9;
-  border: 2.5px solid #66bb6a;
-  box-shadow: 0 4px 10px rgba(76, 175, 80, 0.2);
-}
-
-.reaction-icon-box.failure {
-  background: #ffebee;
-  border: 2.5px solid #ef5350;
-  box-shadow: 0 4px 10px rgba(244, 67, 54, 0.2);
-}
-
-.reaction-title {
-  margin: 0 0 10px;
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: #2d241e;
-}
-
-.reaction-narrative-box {
-  background: #fdf8f0;
-  border: 1.5px solid #ebd7bf;
-  border-radius: 12px;
-  padding: 12px 14px;
-  margin-bottom: 12px;
+  padding: 4px 0 2px;
   width: 100%;
   box-sizing: border-box;
 }
 
+.reaction-result-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.3rem;
+}
+
+.reaction-result-circle.success {
+  background: #e8f5e9;
+  border: 3.5px solid #66bb6a;
+  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.25);
+}
+
+.reaction-result-circle.failure {
+  background: #ffebee;
+  border: 3.5px solid #ef5350;
+  box-shadow: 0 6px 16px rgba(244, 67, 54, 0.25);
+}
+
+.reaction-narrative-box {
+  background: #fffaf2;
+  border: 1.5px solid #ebd8c2;
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin: 10px 0 12px;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+}
+
 .reaction-text {
   margin: 0;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: #3e2723;
-  text-align: left;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: #3e271c;
 }
 
 .reaction-money-chip {
   display: inline-block;
-  padding: 6px 14px;
+  padding: 6px 16px;
   border-radius: 20px;
   font-size: 0.88rem;
-  font-weight: 800;
+  font-weight: 850;
   margin-bottom: 10px;
 }
 
@@ -2374,9 +2448,252 @@ body.selling-mode .awning::after {
 }
 
 .reaction-secret-note {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: #795548;
-  line-height: 1.35;
+  line-height: 1.4;
+  margin-bottom: 12px;
   max-width: 320px;
+}
+
+.btn-reaction-continue {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #f05041 0%, #e63c2c 100%);
+  border: none;
+  color: #ffffff;
+  font-family: var(--font-display, sans-serif);
+  font-size: 1.05rem;
+  font-weight: 850;
+  box-shadow: 0 4px 14px rgba(230, 60, 44, 0.35);
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   ALBUM SỔ TAY TÌNH HUỐNG HẺM 1102 (INCIDENTS ALBUM CHRONICLE)
+   ========================================================================== */
+
+.btn-incident-card {
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2) !important;
+  color: #e65100 !important;
+  border: 1.5px solid #ffb74d !important;
+  font-weight: 800 !important;
+}
+
+.btn-incident-card:hover {
+  background: linear-gradient(135deg, #ffe0b2, #ffcc80) !important;
+}
+
+.incidents-album-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  max-height: 85vh;
+}
+
+.album-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 2px dashed #eedbc5;
+  padding-bottom: 8px;
+}
+
+.album-icon-badge {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  background: linear-gradient(135deg, #ffe0b2, #ffcc80);
+  border: 2px solid #e65100;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+}
+
+.album-title-box {
+  flex: 1;
+}
+
+.album-kicker {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #e65100;
+  letter-spacing: 0.5px;
+}
+
+.album-heading {
+  margin: 2px 0 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--ink, #2d241e);
+}
+
+.album-progress-box {
+  background: #fdf8f0;
+  border: 1.5px solid #ebd7bf;
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.album-progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #4e342e;
+  margin-bottom: 6px;
+}
+
+.progress-pct-val {
+  color: #e65100;
+  font-weight: 800;
+}
+
+.album-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #efebe9;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.album-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff9800, #e65100);
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.album-progress-sub {
+  font-size: 0.72rem;
+  color: #8d6e63;
+  line-height: 1.3;
+  margin-top: 6px;
+}
+
+.album-cards-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 52vh;
+  overflow-y: auto;
+  padding-right: 4px;
   margin-top: 4px;
+}
+
+.album-incident-card {
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.album-incident-card.is-unlocked {
+  background: #ffffff;
+  border: 1.5px solid #e0d0bd;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+}
+
+.album-incident-card.is-locked {
+  background: #f9f5f0;
+  border: 1.5px dashed #d7ccc8;
+  opacity: 0.85;
+}
+
+.card-top-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.card-order-badge {
+  color: #8d6e63;
+}
+
+.card-status-tag.unlocked {
+  background: #e8f5e9;
+  color: #2e7d32;
+  padding: 1px 6px;
+  border-radius: 6px;
+}
+
+.card-status-tag.locked {
+  background: #efebe9;
+  color: #8d6e63;
+  padding: 1px 6px;
+  border-radius: 6px;
+}
+
+.card-chapter-tag {
+  margin-left: auto;
+  color: #a1887f;
+}
+
+.card-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.card-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.card-icon.locked-icon {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+
+.card-details {
+  flex: 1;
+}
+
+.card-title {
+  margin: 0 0 2px;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #2d241e;
+}
+
+.card-title.locked-title {
+  color: #795548;
+}
+
+.card-char {
+  font-size: 0.76rem;
+  color: #6d4c41;
+}
+
+.card-hint {
+  font-size: 0.76rem;
+  color: #d84315;
+  line-height: 1.35;
+}
+
+.card-quote {
+  margin: 0;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: #5d4037;
+  background: #fff9ed;
+  border-left: 2.5px solid #ffb74d;
+  padding: 4px 8px;
+  border-radius: 0 6px 6px 0;
+}
+
+.card-resolved-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #558b2f;
+  border-top: 1px solid #f1e4d4;
+  padding-top: 4px;
 }

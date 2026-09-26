@@ -11,7 +11,7 @@ export type OilCondition = 'clean' | 'medium' | 'dirty';
 
 // Món có sẵn trong content; món combo người chơi tự tạo có id tự sinh (string).
 export type BaseMenuItemId =
-  | 'crispy_chicken' | 'shake_fries' | 'soda' | 'seven_up'
+  | 'crispy_chicken' | 'shake_fries' | 'soda' | 'seven_up' | 'fanta_orange'
   | 'spicy_chicken' | 'honey_garlic_chicken' | 'pasta_beef' | 'combo_duo'
   | 'biscuit_honey' | 'chicken_burger' | 'popcorn_chicken' | 'peach_tea'
   | 'chicken_rice' | 'korean_tokbokki_chicken' | 'sundae_icecream'
@@ -217,6 +217,7 @@ export interface IncidentChoice {
   id: string;
   label: string;
   kicker?: string;
+  subDesc?: string; // Dòng phụ giải thích tình thế, hệ quả, cái giá phải trả hoặc may rủi (chuẩn 2 tầng chữ phong cách Mì Cay Bà Tám)
   requiresSecurity?: boolean; // Cần có Nhân viên Bảo vệ mới kích hoạt được
   riskRate?: number; // Tỷ lệ rủi ro thất bại khi KHÔNG có bảo vệ (0.0 -> 1.0)
   karmaDelta: {
@@ -242,8 +243,15 @@ export interface DailyIncident {
   dialogue: string;
   choices: IncidentChoice[];
   minChapter?: number;
+  minDay?: number; // Ngày tối thiểu trong game mới có thể xuất hiện
+  unlockHint?: string; // Gợi ý bí ẩn khi sự kiện chưa mở khóa (kích thích tò mò)
+  rarity?: 'common' | 'rare' | 'epic'; // Phân loại độ hiếm
+  requiredStars?: number; // Yêu cầu số sao đánh giá tối thiểu (ví dụ reviewer chỉ đến khi quán nổi)
   isSecurityRisk?: boolean; // Tình huống có nguy cơ quỵt nợ, trộm cắp, phá hoại
   phaseTiming?: 'morning' | 'shift' | 'any'; // Thời điểm xuất hiện trong ngày
+  categoryTag?: string; // Tag pill như 'CHUYỆN TÌNH TRONG BẾP', 'DRAMA HẺM SÂU', 'GẶP NẠN GIỮA CA'...
+  characterImg?: string; // Đường dẫn ảnh chibi tròn sạch nền (ví dụ: '/assets/characters/char_capdoi_stand.png')
+  emoteBubble?: string; // Biểu tượng trái tim / cảm xúc bay bổng trên đỉnh avatar: '❤️', '🔥', '💸', '🐾', '👮'
 }
 
 export interface GameState {

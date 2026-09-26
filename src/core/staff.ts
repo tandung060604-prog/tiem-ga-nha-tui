@@ -2,6 +2,9 @@ import { CustomerOrder, QualityRating, StaffMember, TrayItem } from '../types/ga
 import type { FryType, Sauce } from './cooking';
 import { ASSEMBLY_RECIPES, DrinkId, isAssemblyId, isDrinkId } from './stations';
 import { random } from './rng';
+import { upgradeEffects } from './upgrades';
+import type { UpgradeBranch } from '../types/game';
+type Upgrades = { [id: string]: UpgradeBranch };
 
 // Nhân viên có tác dụng thật trong ca bán (trước đây chỉ trừ lương). Mọi con số tính từ chỉ số
 // (tốc độ, tay nghề, thái độ) × tâm trạng × quản lý. main.ts và mô phỏng cân bằng dùng chung.
@@ -12,6 +15,7 @@ import { random } from './rng';
 //  • Quản lý: cả đội +20% hiệu suất, tâm trạng giảm chậm một nửa
 
 export const MAX_HELPER_FRYERS = 2;
+export const SELF_SERVE_MS = 2000;
 export const BASE_APP_COMMISSION = 0.08;
 // Quán càng lớn càng chứa được nhiều người (Chương 2: 3 người … Chương 5: 6 người)
 export const maxStaff = (chapter: number) => (chapter < 2 ? 0 : chapter + 1);
@@ -19,6 +23,10 @@ export const SHIFT_HOURS = 8;
 // Mỗi phụ bếp / phục vụ kê thêm 1 ô khay ra món (tối đa +2): thêm người mà chung 4 ô khay thì kẹt tay nhau
 export const extraTraySlots = (staff: readonly StaffMember[]) =>
   Math.min(2, staff.filter(m => m.role === 'cook' || m.role === 'waiter').length);
+// Khay = 4 ô gốc + nhân viên (tối đa +2) + nâng cấp Không gian (tối đa +3), trần 7 ô (vừa màn 320px)
+export const MAX_TRAY_SIZE = 7;
+export const traySizeFor = (state: { staff: readonly StaffMember[]; upgrades: Upgrades }) =>
+  Math.min(MAX_TRAY_SIZE, 4 + extraTraySlots(state.staff) + upgradeEffects(state.upgrades).traySlots);
 export const severancePay = (m: StaffMember) => m.hourlyWage * SHIFT_HOURS; // cho nghỉ: trả thêm 1 ngày lương
 
 // Món chảo làm được: loại mẻ + sốt + nguyên liệu trừ lúc thả
@@ -82,8 +90,10 @@ const power = (m: StaffMember, stat: 'speed' | 'skill' | 'attitude', boost: numb
   (m[stat] / 100) * (0.6 + 0.4 * m.mood / 100) * boost;
 const has = (m: StaffMember, trait: string) => m.traits.includes(trait);
 
-export function staffEffects(staff: readonly StaffMember[], gameHour = 12): StaffEffects {
+export function staffEffects(staff: readonly StaffMember[], gameHour = 12, upgrades?: Upgrades): StaffEffects {
   const boost = managerBoost(staff);
+  const up = upgrades ? upgradeEffects(upgrades) : null;
+  const kitchenSpeed = 1 + (up?.fryRampPct ?? 0) / 200; // bếp tốt: giỏ phụ bếp cũng nhanh hơn (một nửa mức của chủ quán)
   const ofRole = (role: StaffMember['role']) => staff.filter(m => m.role === role);
 
   const cooks = [...ofRole('cook')]
@@ -94,7 +104,7 @@ export function staffEffects(staff: readonly StaffMember[], gameHour = 12): Staf
       return {
         staffId: m.id,
         name: m.name,
-        cycleMs: Math.round(Math.max(3500, 8000 - 5000 * power(m, 'speed', boost)) / nightOwl),
+        cycleMs: Math.round(Math.max(3500, 8000 - 5000 * power(m, 'speed', boost)) / nightOwl / kitchenSpeed),
         perfectChance: Math.min(0.95, 0.3 + 0.6 * power(m, 'skill', boost)),
         burntChance: has(m, 'clumsy') ? 0.1 : 0.03
       };
@@ -110,7 +120,8 @@ export function staffEffects(staff: readonly StaffMember[], gameHour = 12): Staf
     walkInPatiencePct: Math.min(40, sum(ofRole('cashier').map(m => 25 * power(m, 'attitude', boost)))),
     deliveryPatiencePct: Math.min(50, sum(drivers.map(m => 35 * power(m, 'speed', boost)))),
     commissionRate: BASE_APP_COMMISSION * (1 - Math.min(0.6, sum(drivers.map(m => 0.5 * power(m, 'skill', boost))))),
-    waiterServeMs: waiters.length ? Math.round(Math.max(600, 2600 - 1600 * fastestWaiter)) : null,
+    // Kiosk tự order (Vận hành cấp 4): khách tự lấy món như có phục vụ (chậm hơn phục vụ giỏi)
+    waiterServeMs: waiters.length ? Math.round(Math.max(600, 2600 - 1600 * fastestWaiter)) : up?.selfServe ? SELF_SERVE_MS : null,
     hygienePerDay: Math.min(0.12, sum(waiters.map(m => 0.06 * power(m, 'attitude', boost)))),
     customersPct: Math.min(30, staff.filter(m => has(m, 'tiktok_idol')).length * 15),
     hasSecurity: staff.some(m => m.role === 'security' && m.mood > 20)

@@ -43,14 +43,15 @@ import { BUNNY_LETTERS, BunnyLetter, MysteryBunnyEngine } from './content/myster
 import { ShareCardEngine } from './ui/components/ShareCard';
 import { ASSETS } from './content/assets';
 import { pickDailyIncident, resolveIncidentChoice } from './core/dailyIncidentsEngine';
-import { renderIncidentPrompt, renderIncidentReaction } from './ui/components/DailyIncidentModal';
+import { DAILY_INCIDENTS } from './content/dailyIncidents';
+import { renderIncidentPrompt, renderIncidentReaction, renderIncidentAlbumModal } from './ui/components/DailyIncidentModal';
 import type { DailyIncident } from './types/game';
 
 type TabId = 'inventory' | 'upgrades' | 'staff' | 'reviews' | 'menu';
 
 const SELLING_ACTIONS = [
   'toggle-fast', 'fry-chicken', 'fry-fries', 'fry-popcorn',
-  'add-drink', 'pour-coca', 'pour-7up', 'squeeze-ketchup', 'squeeze-chili',
+  'add-drink', 'pour-coca', 'pour-7up', 'pour-fanta', 'squeeze-ketchup', 'squeeze-chili',
   'fry-pot', 'change-oil', 'season-spicy', 'season-honey', 'serve-order'
 ] as const;
 type SellingAction = typeof SELLING_ACTIONS[number];
@@ -122,6 +123,13 @@ class AppController {
     });
     // iOS Safari bỏ qua user-scalable=no: chặn phóng to bằng 2 ngón để không vỡ bố cục khi đang chiên
     document.addEventListener('gesturestart', e => e.preventDefault());
+
+    (window as any).__app = this;
+    (window as any).__triggerIncident = (id?: string) => {
+      const inc = id ? DAILY_INCIDENTS.find(i => i.id === id) : pickDailyIncident(stateManager.getState(), 'morning');
+      if (inc) this.openDailyIncidentDialog(inc);
+      return inc;
+    };
 
     this.showTitleScreen();
   }
@@ -274,6 +282,37 @@ class AppController {
     }, 2400);
   }
 
+  public triggerDrinkPourAnimation(drinkType: DrinkId) {
+    const stage = document.getElementById('fountain-pour-stage');
+    const label = document.getElementById('glass-cup-label');
+    const fill = document.getElementById('cup-liquid-fill');
+    if (!stage || !fill) return;
+
+    stage.classList.remove('is-pouring', 'flavor-soda', 'flavor-seven_up', 'flavor-fanta_orange');
+    void stage.offsetWidth; // trigger reflow
+    stage.classList.add('is-pouring', `flavor-${drinkType}`);
+
+    const nameMap: Record<DrinkId, string> = {
+      soda: '🔴 Coca-Cola',
+      seven_up: '🟢 7Up Chanh',
+      fanta_orange: '🟠 Fanta Cam',
+      peach_tea: '🍑 Trà Đào',
+      sundae_icecream: '🍨 Kem Sundae'
+    };
+
+    if (label) {
+      label.textContent = `Đang rót ${nameMap[drinkType] || 'nước'}...`;
+    }
+
+    setTimeout(() => {
+      if (label) label.textContent = `✨ Đầy cốc ${nameMap[drinkType] || ''}!`;
+      setTimeout(() => {
+        if (stage) stage.classList.remove('is-pouring');
+        if (label) label.textContent = '💧 Chạm vòi để rót';
+      }, 500);
+    }, 450);
+  }
+
   public openModal(contentHtml: string) {
     const overlay = document.getElementById('modal-container');
     const content = document.getElementById('modal-content');
@@ -342,6 +381,21 @@ class AppController {
         }
       };
     });
+  }
+
+  public openIncidentsAlbumDialog() {
+    audio.playPop();
+    const state = stateManager.getState();
+    const html = renderIncidentAlbumModal(state);
+    this.openModal(html);
+
+    const closeBtn = document.getElementById('btn-close-incidents-album');
+    if (closeBtn) {
+      closeBtn.onclick = () => {
+        audio.playPop();
+        this.closeModal();
+      };
+    }
   }
 
   public openStoryModal(actIndex: number = 0) {
@@ -647,6 +701,13 @@ class AppController {
       openBunnyNotesBtn.onclick = () => {
         audio.playPop();
         this.openBunnyAlbumDialog(0);
+      };
+    }
+
+    const openIncidentsBtn = document.getElementById('btn-open-incidents');
+    if (openIncidentsBtn) {
+      openIncidentsBtn.onclick = () => {
+        this.openIncidentsAlbumDialog();
       };
     }
 
@@ -1055,11 +1116,13 @@ class AppController {
           this.showToast('Hết nước ngọt trong kho!');
           return;
         }
-        // Tự động rót loại nước khách trước mặt đang đợi (7Up hoặc Coca)
+        // Tự động rót loại nước khách trước mặt đang đợi (7Up, Fanta hoặc Coca)
         const frontOrder = session.orders[0];
         const wants7Up = frontOrder?.items.some(it => it.menuItemId === 'seven_up' && !it.completed);
-        const drinkType: DrinkId = wants7Up ? 'seven_up' : 'soda';
+        const wantsFanta = frontOrder?.items.some(it => it.menuItemId === 'fanta_orange' && !it.completed);
+        const drinkType: DrinkId = wants7Up ? 'seven_up' : wantsFanta ? 'fanta_orange' : 'soda';
         cookingEngine.addDrink(drinkType);
+        this.triggerDrinkPourAnimation(drinkType);
         audio.playPop();
         break;
       }
@@ -1074,8 +1137,9 @@ class AppController {
           return;
         }
         cookingEngine.addDrink('soda');
+        this.triggerDrinkPourAnimation('soda');
         audio.playPop();
-        this.showToast('🥤 Đã bơm một ly Coca sủi bọt mát lạnh vào khay!');
+        this.showToast('🥤 Đang rót đầy ly Coca sủi bọt caramel mát lạnh!');
         break;
       }
 
@@ -1089,8 +1153,25 @@ class AppController {
           return;
         }
         cookingEngine.addDrink('seven_up');
+        this.triggerDrinkPourAnimation('seven_up');
         audio.playPop();
-        this.showToast('🍋 Đã bơm một ly 7Up Chanh đá sảng khoái vào khay!');
+        this.showToast('🍋 Đang rót đầy ly 7Up Chanh đá sảng khoái!');
+        break;
+      }
+
+      case 'pour-fanta': {
+        if (cookingEngine.isTrayFull()) {
+          this.showToast('Khay đầy rồi, giao bớt món trước đã!');
+          return;
+        }
+        if (!this.useIngredients(['soft_drink'])) {
+          this.showToast('Hết nước ngọt trong kho!');
+          return;
+        }
+        cookingEngine.addDrink('fanta_orange');
+        this.triggerDrinkPourAnimation('fanta_orange');
+        audio.playPop();
+        this.showToast('🍊 Đang rót đầy ly Fanta Cam bùng nổ sảng khoái!');
         break;
       }
 
@@ -1100,7 +1181,7 @@ class AppController {
         const sauceName = sauce === 'ketchup' ? 'Tương Cà' : 'Tương Ớt';
         const tray = cookingEngine.getTray();
         // Tìm món trong khay chưa có tương (ưu tiên món chiên/món ăn kèm)
-        const target = tray.find(item => item.menuItemId !== 'soda' && item.menuItemId !== 'seven_up' && !item.condiment);
+        const target = tray.find(item => item.menuItemId !== 'soda' && item.menuItemId !== 'seven_up' && item.menuItemId !== 'fanta_orange' && !item.condiment);
         if (!target) {
           this.showToast(`Chưa có món chiên nào trong khay để xịt ${sauceName}!`);
           return;
@@ -1164,7 +1245,15 @@ class AppController {
       default:
         return assertNever(action);
     }
+
     this.render();
+    if (action === 'add-drink' || action === 'pour-coca' || action === 'pour-7up' || action === 'pour-fanta') {
+      const frontOrder = session.orders[0];
+      const wants7Up = frontOrder?.items.some(it => it.menuItemId === 'seven_up' && !it.completed);
+      const wantsFanta = frontOrder?.items.some(it => it.menuItemId === 'fanta_orange' && !it.completed);
+      const drinkType: DrinkId = action === 'pour-7up' ? 'seven_up' : action === 'pour-fanta' ? 'fanta_orange' : (action === 'add-drink' ? (wants7Up ? 'seven_up' : wantsFanta ? 'fanta_orange' : 'soda') : 'soda');
+      this.triggerDrinkPourAnimation(drinkType);
+    }
   }
 
   // Giao món cho khách đầu hàng (luật ở core/day.ts); ở đây chỉ lo tiền vào ví, âm thanh, thông báo.

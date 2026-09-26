@@ -121,6 +121,7 @@ export const ASSETS = {
     shakeFries: url('assets/food/food_shake_fries.png'),
     soda: url('assets/food/food_soda.png'),
     sevenUp: url('assets/food/food_7up.png'),
+    fantaOrange: url('assets/food/food_fanta.png'),
     pastaBeef: url('assets/food/food_pasta_beef.png'),
     biscuitHoney: url('assets/food/food_biscuit_honey.png'),
     chickenBurger: url('assets/food/food_chicken_burger.png'),
@@ -164,6 +165,9 @@ export function foodImage(menuItemId: string, quality: QualityRating): string | 
     case 'seven_up':
     case '7up':
       return ASSETS.food.sevenUp;
+    case 'fanta_orange':
+    case 'fanta':
+      return ASSETS.food.fantaOrange;
     case 'pasta_beef':
       return ASSETS.food.pastaBeef;
     case 'biscuit_honey':

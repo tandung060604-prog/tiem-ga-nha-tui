@@ -186,12 +186,14 @@ describe('Hệ Thống 25 Sự Kiện Hài Hước Bắt Trend & Quyết Định
 
   describe('4. Bộ Chọn Sự Kiện Theo Thời Điểm & Tiến Độ (Pick Incident)', () => {
     it('Chọn được sự kiện phù hợp cho sáng sớm (morning)', () => {
+      state.day = 2;
       const inc = pickDailyIncident(state, 'morning');
       expect(inc).toBeDefined();
       expect(inc?.phaseTiming === 'morning' || inc?.phaseTiming === 'any').toBe(true);
     });
 
     it('Chọn được sự kiện phù hợp cho ca bán (shift)', () => {
+      state.day = 3;
       const inc = pickDailyIncident(state, 'shift');
       expect(inc).toBeDefined();
       expect(inc?.phaseTiming === 'shift' || inc?.phaseTiming === 'any').toBe(true);
@@ -201,11 +203,53 @@ describe('Hệ Thống 25 Sự Kiện Hài Hước Bắt Trend & Quyết Định
       state.seenIncidentIds = DAILY_INCIDENTS.slice(0, 24).map(i => i.id);
       const remainingId = DAILY_INCIDENTS[24].id;
 
-      // Chương 5 để mở khóa toàn bộ
+      // Chương 5, Ngày 50 để mở khóa toàn bộ
       state.currentChapter = 5;
+      state.day = 50;
 
       const picked = pickDailyIncident(state, 'any');
       expect(picked?.id).toBe(remainingId);
+    });
+
+    it('Phân tầng tiến độ chặt chẽ: Ngày 2 Chương 1 không thể xuất hiện sự kiện Chương 3-4', () => {
+      state.currentChapter = 1;
+      state.day = 2;
+
+      // Lấy thử 30 lần random ở ngày 2 chương 1
+      for (let i = 0; i < 30; i++) {
+        const inc = pickDailyIncident(state, 'any');
+        expect(inc).toBeDefined();
+        expect(inc?.minChapter ?? 1).toBeLessThanOrEqual(1);
+        expect(inc?.minDay ?? 1).toBeLessThanOrEqual(2);
+      }
+    });
+
+    it('Mỗi sự kiện đều có gợi ý bí ẩn unlockHint để kích thích tò mò', () => {
+      for (const inc of DAILY_INCIDENTS) {
+        expect(inc.unlockHint).toBeTruthy();
+        expect(inc.unlockHint?.length).toBeGreaterThan(10);
+      }
+    });
+  });
+
+  describe('5. Album Sổ Tay Tình Huống Hẻm 1102 (Incidents Album Modal)', () => {
+    it('Render giao diện Album đầy đủ tiến độ và gợi ý bí ẩn', async () => {
+      const { renderIncidentAlbumModal } = await import('../src/ui/components/DailyIncidentModal');
+      
+      // Giả lập đã gặp 2 sự kiện
+      state.seenIncidentIds = ['incident_cat_adopted', 'incident_street_singer'];
+      state.resolvedIncidents = [
+        { incidentId: 'incident_cat_adopted', choiceId: 'cat_adopt_mascot', day: 2, succeeded: true }
+      ];
+
+      const html = renderIncidentAlbumModal(state);
+      expect(html).toContain('SỔ TAY TÌNH HUỐNG HẺM 1102');
+      expect(html).toContain('2/25');
+      expect(html).toContain('ĐÃ KHÁM PHÁ');
+      expect(html).toContain('CHƯA MỞ KHÓA');
+      expect(html).toContain('Tình Huống Bí Ẩn');
+      expect(html).toContain('Bé Mèo Mướp Con');
+      expect(html).toContain('Xử lý thành công');
     });
   });
 });

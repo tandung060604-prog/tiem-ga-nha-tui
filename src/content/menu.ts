@@ -53,6 +53,18 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
 
   // CHƯƠNG 2
   {
+    id: 'fanta_orange',
+    name: 'Nước Ngọt Fanta Cam',
+    basePrice: 15000,
+    currentPrice: 15000,
+    chapter: 2,
+    icon: '🥤',
+    category: 'drinks',
+    station: 'drink',
+    steps: ['Bơm Fanta Cam đầy cốc'],
+    ingredients: { soft_drink: 1 }
+  },
+  {
     id: 'spicy_chicken',
     name: 'Gà Sốt Cay Xé Lưỡi',
     basePrice: 42000,
