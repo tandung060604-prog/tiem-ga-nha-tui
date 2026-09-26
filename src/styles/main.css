@@ -1157,6 +1157,129 @@ body.selling-mode .awning::after {
   background: var(--panel-alt);
 }
 
+.story-scene-stage {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: -10px;
+  z-index: 2;
+}
+
+.story-reading-panel {
+  background: #faf4ea;
+  border: 2px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  overflow-y: auto;
+  max-height: 52vh;
+  font-family: var(--font-body);
+  line-height: 1.6;
+  font-size: 0.88rem;
+  color: #3d2c2e;
+  position: relative;
+  z-index: 1;
+}
+
+.story-dilemma-section {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 2px dashed #d7ccc8;
+}
+
+.story-dilemma-title {
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: #5d4037;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.story-dilemma-prompt {
+  font-size: 0.82rem;
+  color: #6d4c41;
+  margin-bottom: 12px;
+  font-style: italic;
+}
+
+.story-reaction-narrative {
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 0.82rem;
+  color: #1b5e20;
+}
+
+.btn-story-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  text-align: left;
+  background: #ffffff;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+.btn-story-choice:hover:not(:disabled) {
+  border-color: var(--red);
+  background: #fff8f8;
+  transform: translateY(-1px);
+}
+
+.btn-story-choice:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn-story-choice.chosen {
+  background: #e8f5e9;
+  border-color: #2e7d32;
+}
+
+.btn-story-choice:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-story-choice-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.btn-story-choice-kicker {
+  font-weight: 800;
+  font-size: 0.75rem;
+  color: var(--red);
+}
+
+.btn-story-choice.chosen .btn-story-choice-kicker {
+  color: #2e7d32;
+}
+
+.btn-story-choice-badge {
+  font-size: 0.72rem;
+  color: var(--soft);
+  font-weight: 700;
+}
+
+.btn-story-choice-label {
+  font-size: 0.84rem;
+  color: var(--ink);
+  line-height: 1.35;
+}
+
 /* ==========================================================================
    THƯ THỎ CAM & SỔ KÝ ỨC (.bunny-note, .bunny-album-grid)
    ========================================================================== */

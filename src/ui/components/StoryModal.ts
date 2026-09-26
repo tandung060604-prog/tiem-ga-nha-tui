@@ -3,6 +3,18 @@ import { STORY_ACTS, StoryEpisode, chooseDialogueOption } from '../../content/st
 import { audio } from '../../core/audio';
 import { chapterProgress } from '../../core/progression';
 import { canNarrate } from '../../core/music';
+import { ASSETS } from '../../content/assets';
+
+export function getCharacterPortrait(name: string): string {
+  if (name.includes('Bác Ba')) return ASSETS.bacba.front;
+  if (name.includes('Thỏ Cam')) return ASSETS.thocam.front;
+  if (name.includes('Học Sinh') || name.includes('Trí')) return ASSETS.hocsinh.stand;
+  if (name.includes('Văn Phòng') || name.includes('Châu')) return ASSETS.vanphong.stand;
+  if (name.includes('Karen') || name.includes('Khó Tính')) return ASSETS.karen.stand;
+  if (name.includes('Shipper')) return ASSETS.shipper.stand;
+  if (name.includes('Game') || name.includes('Cú Đêm')) return ASSETS.gamethu.stand;
+  return ASSETS.gabong.front;
+}
 
 // Hồi của chương đang chơi hé mở dần theo tiến độ gom tiền cọc (25% → 100% số đoạn);
 // hồi của chương đã qua thì đọc trọn. Lựa chọn quyết định chỉ hiện khi đọc hết.
@@ -50,18 +62,21 @@ export function renderStoryModal(state: GameState, selectedActIndex: number = 0)
     const karmaBadges = isChosen ? '✔ Đã chọn' : '';
 
     return `
-      <button class="btn-story-choice ${isChosen ? 'chosen' : ''}" data-act-idx="${selectedActIndex}" data-opt-id="${opt.id}" ${isDisabled ? 'disabled' : ''} style="display: block; width: 100%; text-align: left; background: ${isChosen ? '#e8f5e9' : isDisabled ? '#f5f5f5' : '#fff'}; border: 1.5px solid ${isChosen ? '#2e7d32' : 'var(--line)'}; border-radius: 8px; padding: 10px; margin-bottom: 8px; cursor: ${isDisabled ? 'not-allowed' : 'pointer'}; opacity: ${isDisabled ? '0.6' : '1'};">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-          <span style="font-weight: 800; font-size: 0.75rem; color: ${isChosen ? '#2e7d32' : 'var(--red)'};">${opt.kicker}</span>
-          <span style="font-size: 0.72rem; color: var(--soft); font-weight: 700;">${karmaBadges}</span>
+      <button class="btn-story-choice ${isChosen ? 'chosen' : ''}" data-act-idx="${selectedActIndex}" data-opt-id="${opt.id}" ${isDisabled ? 'disabled' : ''}>
+        <div class="btn-story-choice-top">
+          <span class="btn-story-choice-kicker">${opt.kicker}</span>
+          <span class="btn-story-choice-badge">${karmaBadges}</span>
         </div>
-        <div style="font-size: 0.84rem; color: var(--ink); line-height: 1.35;">${opt.label}</div>
+        <div class="btn-story-choice-label">${opt.label}</div>
       </button>
     `;
   }).join('') : '';
 
+  const leftChar = currentEpisode.characters[1] || currentEpisode.characters[0] || 'Bác Ba Tổ Trưởng';
+  const rightChar = currentEpisode.characters[0] || 'Chủ Tiệm Gà';
+
   return `
-    <div style="text-align: left; display: flex; flex-direction: column; gap: 10px; max-height: 85vh;">
+    <div style="text-align: left; display: flex; flex-direction: column; gap: 8px; max-height: 85vh;">
       <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--line); padding-bottom: 8px;">
         <div>
           <h2 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: var(--ink);">📖 Visual Novel: Hẻm 1102</h2>
@@ -79,8 +94,18 @@ export function renderStoryModal(state: GameState, selectedActIndex: number = 0)
         ${actsListHtml}
       </div>
 
+      <!-- Visual Novel 2D Character Portraits -->
+      ${isCurrentUnlocked ? `
+        <div class="story-scene-stage">
+          <div class="story-portraits">
+            <img class="story-portrait is-speaking" src="${getCharacterPortrait(leftChar)}" alt="${leftChar}" title="${leftChar}">
+            <img class="story-portrait is-muted" src="${getCharacterPortrait(rightChar)}" alt="${rightChar}" title="${rightChar}">
+          </div>
+        </div>
+      ` : ''}
+
       <!-- Reading Body -->
-      <div style="background: #faf4ea; border: 2px solid var(--line); border-radius: var(--radius-md); padding: 14px; overflow-y: auto; max-height: 52vh; font-family: var(--font-body); line-height: 1.6; font-size: 0.88rem; color: #3d2c2e;">
+      <div class="story-reading-panel">
         ${isCurrentUnlocked ? `
           <div style="border-bottom: 1.5px dashed var(--line); padding-bottom: 8px; margin-bottom: 12px;">
             <div style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 800; color: var(--red);">
@@ -105,18 +130,20 @@ export function renderStoryModal(state: GameState, selectedActIndex: number = 0)
 
           <!-- Dilemma & Branching Choices -->
           ${currentEpisode.dilemmaPrompt && revealed.complete ? `
-            <div style="margin-top: 18px; padding-top: 14px; border-top: 2px dashed #d7ccc8;">
-              <div style="font-weight: 800; font-size: 0.88rem; color: #5d4037; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+            <div class="story-dilemma-section">
+              <div class="story-dilemma-title">
                 <span>⚡ LỰA CHỌN QUYẾT ĐỊNH HƯỚNG ĐI</span>
               </div>
-              <div style="font-size: 0.82rem; color: #6d4c41; margin-bottom: 12px; font-style: italic;">
+              <div class="story-dilemma-prompt">
                 "${currentEpisode.dilemmaPrompt}"
               </div>
 
-              ${optionsHtml}
+              <div class="story-choice">
+                ${optionsHtml}
+              </div>
 
               ${chosenOption ? `
-                <div style="background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 0.82rem; color: #1b5e20;">
+                <div class="story-reaction-narrative">
                   <b>💬 Diễn biến tiếp theo:</b> ${chosenOption.reactionNarrative}
                 </div>
               ` : ''}
