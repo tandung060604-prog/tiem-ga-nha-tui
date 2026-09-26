@@ -14,33 +14,46 @@ const SERVABLE_IDS: ReadonlySet<string> = new Set(
 
 export class OrdersEngine {
   public static generateOrder(state: GameState, isDelivery: boolean = false, priceMultiplier: number = 1): CustomerOrder {
-    const filtered = state.menu.filter(m => {
-      if (m.chapter > state.currentChapter || !SERVABLE_IDS.has(m.id)) return false;
-      return Object.keys(m.ingredients).every(ingId => state.inventory[ingId]?.unlocked !== false);
-    });
-    const availableMenuItems = filtered.length > 0 ? filtered : state.menu.filter(m => m.chapter <= state.currentChapter && SERVABLE_IDS.has(m.id));
+    // Món khách được gọi: đã tới chương, có trạm trong bếp, nguyên liệu đã ký hợp đồng.
+    // Combo chỉ xuất hiện khi làm được TỪNG món trong combo.
+    const content = new Map(INITIAL_MENU.map(m => [m.id as string, m]));
+    const canMake = (id: string): boolean => {
+      const def = content.get(id);
+      const live = state.menu.find(m => m.id === id);
+      if (!def?.station || !live || live.chapter > state.currentChapter) return false;
+      if (def.components) return def.components.every(c => canMake(c.menuItemId));
+      return Object.keys(def.ingredients).every(ingId => state.inventory[ingId]?.unlocked !== false);
+    };
+    const makeable = state.menu.filter(m => canMake(m.id));
+    const singles = makeable.filter(m => !content.get(m.id)?.components);
+    const combos = makeable.filter(m => content.get(m.id)?.components);
+    const pool = singles.length > 0 ? singles : state.menu.filter(m => m.chapter <= state.currentChapter && SERVABLE_IDS.has(m.id));
 
-    // Chọn ngẫu nhiên 1 - 2 món
-    const itemCount = random() < 0.65 ? 1 : 2;
     const selectedItems: CustomerOrder['items'] = [];
+    const addItem = (menuItemId: string, count: number) => {
+      const existing = selectedItems.find(x => x.menuItemId === menuItemId);
+      if (existing) existing.count += count;
+      else selectedItems.push({ menuItemId, count, served: 0, completed: false });
+    };
     let totalPrice = 0;
+    let comboName: string | undefined;
 
-    for (let i = 0; i < itemCount; i++) {
-      const item = pick(availableMenuItems);
-      // Kiểm tra xem món đã có trong order chưa
-      const existing = selectedItems.find(x => x.menuItemId === item.id);
-      if (existing) {
-        existing.count += 1;
-      } else {
-        selectedItems.push({
-          menuItemId: item.id,
-          count: 1,
-          served: 0,
-          completed: false
-        });
+    const combo = combos.length > 0 && random() < 0.18 ? pick(combos) : undefined;
+    if (combo) {
+      // Combo: nhận từng món, trả giá combo
+      for (const c of content.get(combo.id)?.components ?? []) addItem(c.menuItemId, c.count);
+      totalPrice = Math.round(combo.currentPrice * priceMultiplier);
+      comboName = combo.name;
+    } else {
+      // 1 - 2 món lẻ
+      const itemCount = random() < 0.65 ? 1 : 2;
+      for (let i = 0; i < itemCount; i++) {
+        const item = pick(pool);
+        addItem(item.id, 1);
+        totalPrice += Math.round(item.currentPrice * priceMultiplier);
       }
-      totalPrice += Math.round(item.currentPrice * priceMultiplier);
     }
+    const extraItems = selectedItems.reduce((n, it) => n + it.count, 0) - 1;
 
     // Sinh nhân vật thông qua CharacterGenerator (100 - 200 nhân vật phân bổ đều)
     const char = CharacterGenerator.generateCharacter();
@@ -50,7 +63,8 @@ export class OrdersEngine {
     // Thời gian kiên nhẫn: 28 - 42 giây (ảnh hưởng bởi archetype và nâng cấp không gian)
     const spaceBonus = (state.upgrades.space?.currentLevel || 1) * 2;
     const patienceBoost = 1 + upgradeEffects(state.upgrades).patiencePct / 100; // POS, màn gọi số, kiosk
-    const patienceMax = Math.max(18, Math.round((28 + random() * 12 + spaceBonus) * char.patienceMultiplier * patienceBoost));
+    const orderSizeBonus = Math.min(30, extraItems * 5); // order nhiều món (combo) chờ được lâu hơn
+    const patienceMax = Math.max(18, Math.round((28 + random() * 12 + spaceBonus + orderSizeBonus) * char.patienceMultiplier * patienceBoost));
 
     return {
       id: 'ord_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
@@ -58,6 +72,7 @@ export class OrdersEngine {
       avatar,
       isDelivery,
       items: selectedItems,
+      ...(comboName ? { comboName } : {}),
       patienceMax,
       patienceCurrent: patienceMax,
       totalPrice,

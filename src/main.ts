@@ -27,7 +27,8 @@ import { renderSellingView, patchSellingView, sellingStructureKey } from './ui/c
 import { SellingSession, createSellingSession, gameDeltaMs, tickSelling } from './core/sellingSim';
 import { OPEN_HOUR, CLOSE_HOUR } from './core/clock';
 import type { ShiftSnapshot } from './core/sellingSim';
-import { creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, SAUCE_STOCK, serveFirstOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP } from './core/day';
+import { TIMER_RECIPES, timerPhase, TimerStationId, AssemblyId, DrinkId, isTimerStationId, isAssemblyId, isDrinkId } from './core/stations';
+import { StationResult, startTimerStation, pullTimerStation, assembleAtCounter, makeDrink, creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, SAUCE_STOCK, serveFirstOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP } from './core/day';
 import { upgradeEffects } from './core/upgrades';
 import { renderSummaryModal } from './ui/components/SummaryModal';
 import { renderSettingsModal } from './ui/components/SettingsModal';
@@ -43,10 +44,25 @@ type TabId = 'inventory' | 'upgrades' | 'staff' | 'reviews' | 'menu';
 
 // Id nút trong màn bán hàng là `btn-<action>` (hợp đồng với SellingView + CSS)
 const SELLING_ACTIONS = [
-  'toggle-fast', 'fry-chicken', 'fry-fries', 'add-drink', 'fry-pot',
+  'toggle-fast', 'fry-chicken', 'fry-fries', 'fry-popcorn', 'add-drink', 'fry-pot',
   'change-oil', 'season-spicy', 'season-honey', 'serve-order'
 ] as const;
 type SellingAction = typeof SELLING_ACTIONS[number];
+
+// Nút của trạm mở theo chương: btn-timer-<nồi>, btn-assemble-<món>, btn-drink-<đồ uống>
+type StationAction =
+  | { kind: 'timer'; id: TimerStationId }
+  | { kind: 'assemble'; id: AssemblyId }
+  | { kind: 'drink'; id: DrinkId };
+
+function parseStationAction(action: string | undefined): StationAction | null {
+  const [kind, ...rest] = (action ?? '').split('-');
+  const id = rest.join('-');
+  if (kind === 'timer' && isTimerStationId(id)) return { kind, id };
+  if (kind === 'assemble' && isAssemblyId(id)) return { kind, id };
+  if (kind === 'drink' && isDrinkId(id)) return { kind, id };
+  return null;
+}
 
 function isSellingAction(value: string | undefined): value is SellingAction {
   return (SELLING_ACTIONS as readonly string[]).includes(value ?? '');
@@ -648,6 +664,7 @@ class AppController {
 
   // --- SELLING PHASE ---
   private lastShiftSnapshotAt = 0;
+  private timerAlerted = new Set<TimerStationId>();
 
   // Lưu ca bán dở vào save. `immediate`: ghi ngay (trang sắp ẩn/đóng, bộ đếm lưu có thể không kịp chạy)
   private snapshotShift(immediate = true) {
@@ -768,6 +785,18 @@ class AppController {
       }
     }
 
+    // Nồi mì / lò bánh vừa chín → chuông báo một lần (đang canh chảo dễ quên)
+    for (const id of Object.keys(TIMER_RECIPES) as TimerStationId[]) {
+      const ready = timerPhase(TIMER_RECIPES[id], session.timers[id]) === 'ready';
+      if (ready && !this.timerAlerted.has(id)) {
+        this.timerAlerted.add(id);
+        audio.playPerfect();
+        this.showToast(`${TIMER_RECIPES[id].icon} ${TIMER_RECIPES[id].name} chín rồi, lấy ra ngay kẻo hỏng!`);
+      } else if (!ready) {
+        this.timerAlerted.delete(id);
+      }
+    }
+
     this.render();
     if (currentTimestamp - this.lastShiftSnapshotAt > 5000) this.snapshotShift(false);
 
@@ -814,8 +843,43 @@ class AppController {
 
     const button = target.closest<HTMLElement>('[id]');
     const action = button?.id.replace(/^btn-/, '');
-    if (!button || button.hasAttribute('disabled') || !isSellingAction(action)) return;
+    if (!button || button.hasAttribute('disabled')) return;
+    const station = parseStationAction(action);
+    if (station) {
+      this.runStationAction(station);
+      return;
+    }
+    if (!isSellingAction(action)) return;
     this.runSellingAction(action);
+  }
+
+  private runStationAction(action: StationAction) {
+    const session = this.sellingSession;
+    if (!session) return;
+    let result = 'locked' as StationResult; // gán trong callback của update()
+    stateManager.update(draft => {
+      if (action.kind === 'timer') {
+        result = session.timers[action.id] === null
+          ? startTimerStation(draft, session, action.id)
+          : pullTimerStation(session, cookingEngine, action.id);
+      } else if (action.kind === 'assemble') {
+        result = assembleAtCounter(draft, session, cookingEngine, action.id);
+      } else {
+        result = makeDrink(draft, session, cookingEngine, action.id);
+      }
+    });
+    const messages: Record<StationResult, string> = {
+      ok: '',
+      locked: 'Trạm này chưa mở (cần tới chương hoặc ký hợp đồng nguyên liệu).',
+      'no-stock': 'Hết nguyên liệu cho món này! Vào Kho hàng để nhập thêm.',
+      busy: 'Trạm đang bận nấu.',
+      'tray-full': 'Khay đầy rồi, giao bớt món trước đã!',
+      'not-ready': 'Chưa chín, đợi thêm chút nhé!',
+      'no-base': 'Cần có gà chiên phù hợp trong khay để ráp món này.'
+    };
+    if (result === 'ok') audio.playPop();
+    else this.showToast(messages[result]);
+    this.render();
   }
 
   private runSellingAction(action: SellingAction) {
@@ -829,19 +893,20 @@ class AppController {
         break;
 
       case 'fry-chicken':
-      case 'fry-fries': {
-        const isChicken = action === 'fry-chicken';
+      case 'fry-fries':
+      case 'fry-popcorn': {
+        const type = action === 'fry-fries' ? 'fries' : action === 'fry-popcorn' ? 'popcorn' : 'chicken';
         if (cookingEngine.getCookState().isFrying) return;
         if (cookingEngine.isTrayFull()) {
           this.showToast('Khay đầy rồi, giao bớt món trước đã!');
           return;
         }
-        if (!this.useIngredients(isChicken ? ['chicken_meat', 'flour'] : ['potato_cheese'])) {
-          this.showToast(isChicken ? 'Hết thịt gà hoặc bột chiên giòn!' : 'Hết khoai tây & phô mai!');
+        if (!this.useIngredients(type === 'fries' ? ['potato_cheese'] : ['chicken_meat', 'flour'])) {
+          this.showToast(type === 'fries' ? 'Hết khoai tây & phô mai!' : 'Hết thịt gà hoặc bột chiên giòn!');
           return;
         }
         session.totalFriedCount += 1;
-        cookingEngine.startFrying(isChicken ? 'chicken' : 'fries');
+        cookingEngine.startFrying(type);
         break;
       }
 

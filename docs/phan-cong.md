@@ -61,6 +61,12 @@ Phiên làm việc: 26/09/2026, 14:35 → 15:35 (1 tiếng mỗi bên, chạy so
 
 | 20:51 | Claude | **Unlock.** Xong: đặt tên quán khi mở tiệm mới, tiếp tục ca bán dở sau khi thoát, mã sao lưu/khôi phục trong Cài đặt, xin trình duyệt giữ dữ liệu. Lưu ý cho Gemini 2: mọi trường mới của `GameState` PHẢI có giá trị mặc định trong `createInitialState()`, nếu không sẽ mất sau khi tải lại trang (đã xảy ra với cờ chống gian lận). Class mới cho Gemini 1: `.shop-name-dialog`, `.shop-name-chip`, `.save-backup`. |
 
+| 20:56 | Claude | **[Lock Task] Bước 1 — trạm nấu cho Chương 2–5:** nồi trụng mì, lò nướng bánh, bàn ráp món (burger, cơm gà, tokbokki), máy nước (trà đào, kem), gà viên, combo. File: `src/core/stations.ts` (mới), `src/core/cooking.ts`, `src/core/orders.ts`, `src/core/sellingSim.ts`, `src/core/day.ts`, `src/content/menu.ts`, `src/types/game.ts`, `src/ui/components/SellingView.ts`, `src/main.ts`, `scripts/balance-sim.ts`, `tests/**`. |
+
+| 21:40 | Claude | **Unlock bước 1.** Xong trạm nấu: nồi mì (Ch2, chín 7s, để quá 6s là hỏng), lò bánh (Ch3), gà viên (chảo, chín nhanh ×1,5), bàn ráp burger/cơm gà/tokbokki (biến món chiên trong khay thành món mới, giữ chất lượng), máy nước trà đào/kem, combo (khách nhận từng món, trả giá combo). Kiểm tra: 187/187 test, build, `ios:check`, `ui:check` PASS. Class mới cho **Gemini 1**: `.station-strip` (hàng nút trạm dưới khay), `.station-btn` + trạng thái `.timer-idle` / `.timer-cooking` / `.timer-ready` (nhấp nháy mời vớt) / `.timer-ruined`, `.timer-progress[data-timer]` (thanh tiến độ, JS đặt `width`), `.order-combo` (tên combo trên thẻ khách). Ảnh tham khảo: `ui-check-out/ios-390-ch4-stations.png` — hiện hàng nút trạm đang xếp dọc, nên xếp lưới 2 cột. |
+
+| 21:42 | Claude | **[Lock Task] Bước 4 — nhân viên có tác dụng thật** (thu ngân, phụ bếp, phục vụ, giao hàng, quản lý). File: `src/core/staff.ts` (mới), `src/core/day.ts`, `src/core/sellingSim.ts`, `src/core/orders.ts`, `src/types/game.ts`, `src/main.ts`, `src/ui/components/SellingView.ts`, `src/ui/components/StaffTab.ts`, `scripts/balance-sim.ts`, `tests/**`. |
+
 ## 4. Báo cáo cuối giờ
 - Claude: `docs/bao-cao/claude-gio-1.md`
 - Gemini: `docs/gemini/bao-cao-gio-1.md`, `docs/gemini/bao-cao-gio-2.md`

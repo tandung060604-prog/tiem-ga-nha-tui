@@ -18,7 +18,7 @@ export type BaseMenuItemId =
   | 'family_bucket';
 
 // Trạm trong bếp làm ra món. Món chưa có trạm thì khách chưa được gọi.
-export type Station = 'fryer' | 'drink';
+export type Station = 'fryer' | 'drink' | 'noodle' | 'oven' | 'assembly' | 'combo';
 
 export interface MenuItem {
   id: string;
@@ -29,6 +29,7 @@ export interface MenuItem {
   icon: string;
   category: 'chicken' | 'sides' | 'drinks' | 'combo';
   station?: Station;
+  components?: { menuItemId: BaseMenuItemId; count: number }[]; // combo: khách nhận từng món, trả giá combo
   steps: string[];
   ingredients: { [key: string]: number };
 }
@@ -135,6 +136,7 @@ export interface CustomerOrder {
   patienceMax: number;
   patienceCurrent: number;
   totalPrice: number;
+  comboName?: string;    // khách gọi combo: tên combo hiển thị trên thẻ khách
   burntPenalty?: number; // tiền bị trừ vì giao gà cháy (nửa giá mỗi món cháy)
   perfectBonus?: number; // tip thêm cho mỗi món Perfect
   startTime: number;

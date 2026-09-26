@@ -1,6 +1,7 @@
 import { CustomerOrder } from '../types/game';
 import { EconomyEngine } from './economy';
 import type { CookingSnapshot } from './cooking';
+import { TimerStations, emptyTimerStations, tickTimers } from './stations';
 import { OPEN_HOUR, CLOSE_HOUR, GAME_HOUR_MS, isRushHour } from './clock';
 
 // Mô phỏng ca bán, không đụng DOM/âm thanh: main.ts gọi mỗi frame rồi tự xử lý các sự kiện
@@ -15,6 +16,7 @@ export interface SellingSession {
   servedCount: number;
   totalWaitSec: number; // tổng thời gian chờ của khách đã phục vụ → sao Tốc độ
   perfectStreak: number; // số mẻ Perfect liên tiếp (cháy/sống → về 0): thưởng tay nghề
+  timers: TimerStations; // nồi mì, lò bánh (null = rảnh)
   lostCount: number;
   grossRevenue: number;
   tips: number;
@@ -35,6 +37,7 @@ export function createSellingSession(): SellingSession {
     servedCount: 0,
     totalWaitSec: 0,
     perfectStreak: 0,
+    timers: emptyTimerStations(),
     lostCount: 0,
     grossRevenue: 0,
     tips: 0,
@@ -80,6 +83,7 @@ export function tickSelling(session: SellingSession, gameDt: number, ctx: TickCo
   const events: TickEvent[] = [];
 
   session.gameHour += gameDt / GAME_HOUR_MS;
+  tickTimers(session.timers, gameDt);
 
   const stillWaiting: CustomerOrder[] = [];
   for (const order of session.orders) {

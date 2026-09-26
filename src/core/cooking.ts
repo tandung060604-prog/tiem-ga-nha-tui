@@ -1,11 +1,15 @@
 import { QualityRating, OilCondition, TrayItem } from '../types/game';
 import { audio } from './audio';
+import { DRINK_RECIPES, DrinkId } from './stations';
 
 export type Sauce = 'spicy' | 'honey';
+// Gà viên (Chương 3): mẻ nhỏ chín nhanh gấp 1,5 → vùng Perfect ngắn hơn, đòi tay canh nhanh hơn
+export type FryType = 'chicken' | 'fries' | 'popcorn';
+const FRY_SPEED: Record<FryType, number> = { chicken: 1, fries: 1, popcorn: 1.5 };
 
 export interface CookingState {
   isFrying: boolean;
-  fryingType: 'chicken' | 'fries';
+  fryingType: FryType;
   progress: number; // 0 to 100
 }
 
@@ -56,7 +60,7 @@ export class CookingEngine {
   }
 
   // Bắt đầu thả gà/khoai vào chảo chiên
-  public startFrying(type: 'chicken' | 'fries'): boolean {
+  public startFrying(type: FryType): boolean {
     if (this.cookState.isFrying) return false;
     this.cookState.isFrying = true;
     this.cookState.fryingType = type;
@@ -74,7 +78,7 @@ export class CookingEngine {
     // Nâng cấp bếp chỉ rút ngắn pha còn sống; từ vùng Vừa trở đi chạy tốc độ chuẩn
     // để cửa sổ Perfect luôn dài như nhau (nâng cấp không làm game khó hơn).
     const ramp = this.cookState.progress < CookingEngine.ZONES.raw ? 1 + this.fryRampPct / 100 : 1;
-    const step = (deltaMs / 6000) * 100 * ramp;
+    const step = (deltaMs / 6000) * 100 * ramp * FRY_SPEED[this.cookState.fryingType];
     this.cookState.progress += step;
 
     if (this.cookState.progress >= 100) {
@@ -112,18 +116,24 @@ export class CookingEngine {
   }
 
   // Trạm nước: lấy lon lạnh bỏ thẳng vào khay, không qua chảo
-  public addDrink(): TrayItem | null {
-    if (this.isTrayFull()) return null;
+  public addDrink(drink: DrinkId = 'soda'): TrayItem | null {
+    const r = DRINK_RECIPES[drink];
     const item: TrayItem = {
       id: 'tray_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
-      menuItemId: 'soda',
-      name: 'Nước Ngọt Có Ga',
-      icon: '🥤',
+      menuItemId: r.menuItemId,
+      name: r.name,
+      icon: r.icon,
       quality: 'good'
     };
+    return this.addToTray(item) ? item : null;
+  }
+
+  // Đặt món từ trạm khác (nồi mì, lò bánh) vào khay; khay đầy → false
+  public addToTray(item: TrayItem): boolean {
+    if (this.isTrayFull()) return false;
     this.tray.push(item);
     audio.playPop();
-    return item;
+    return true;
   }
 
   // Nhấc vợt vớt gà ra khỏi chảo
@@ -150,6 +160,10 @@ export class CookingEngine {
       menuItemId = 'shake_fries';
       name = 'Khoai Lắc Phô Mai';
       icon = '🍟';
+    } else if (this.cookState.fryingType === 'popcorn') {
+      menuItemId = 'popcorn_chicken';
+      name = 'Gà Viên Popcorn';
+      icon = '🍿';
     }
 
     // Sốt chỉ phủ lên gà, không phủ lên khoai

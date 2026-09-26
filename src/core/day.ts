@@ -6,6 +6,9 @@ import { EconomyEngine } from './economy';
 import { ReviewsEngine } from './reviewsEngine';
 import { ageOneDay, consumeStock, addStock } from './inventory';
 import { CookingEngine, Sauce } from './cooking';
+import {
+  TIMER_RECIPES, TimerStationId, collectTimer, DRINK_RECIPES, DrinkId, ASSEMBLY_RECIPES, AssemblyId, assemble, assemblyBaseIndex
+} from './stations';
 import { upgradeEffects } from './upgrades';
 import { auditState, flagIntegrity } from './integrity';
 import { SellingSession } from './sellingSim';
@@ -104,6 +107,53 @@ export function requestBaBaAid(draft: GameState): boolean {
   draft.money += BA_BA_AID_MONEY;
   draft.lifetimeStats.totalBonus = (draft.lifetimeStats.totalBonus ?? 0) + BA_BA_AID_MONEY;
   return true;
+}
+
+// ---------------------------------------------------------------------------
+// Trạm nấu mới (Chương 2–5): kiểm tra mở khóa + trừ nguyên liệu ở một chỗ cho game và mô phỏng
+// ---------------------------------------------------------------------------
+
+export type StationResult = 'ok' | 'locked' | 'no-stock' | 'busy' | 'tray-full' | 'not-ready' | 'no-base';
+
+// Trạm/món mở khi đã tới chương và mọi nguyên liệu đã ký hợp đồng
+export function stationOpen(state: GameState, chapter: number, stock: readonly string[]): boolean {
+  return state.currentChapter >= chapter && stock.every(id => state.inventory[id]?.unlocked !== false);
+}
+
+export function startTimerStation(draft: GameState, session: SellingSession, id: TimerStationId): StationResult {
+  const r = TIMER_RECIPES[id];
+  if (!stationOpen(draft, r.chapter, r.stock)) return 'locked';
+  if (session.timers[id] !== null) return 'busy';
+  if (!useIngredients(draft, session, r.stock)) return 'no-stock';
+  session.timers[id] = 0;
+  return 'ok';
+}
+
+export function pullTimerStation(session: SellingSession, cook: CookingEngine, id: TimerStationId): StationResult {
+  if (cook.isTrayFull()) return 'tray-full';
+  const item = collectTimer(session.timers, id);
+  if (!item) return 'not-ready';
+  cook.addToTray(item);
+  if (item.quality === 'burnt') session.burntCount += 1;
+  return 'ok';
+}
+
+export function makeDrink(draft: GameState, session: SellingSession, cook: CookingEngine, id: DrinkId): StationResult {
+  const r = DRINK_RECIPES[id];
+  if (!stationOpen(draft, r.chapter, [r.stock])) return 'locked';
+  if (cook.isTrayFull()) return 'tray-full';
+  if (!useIngredients(draft, session, [r.stock])) return 'no-stock';
+  cook.addDrink(id);
+  return 'ok';
+}
+
+export function assembleAtCounter(draft: GameState, session: SellingSession, cook: CookingEngine, id: AssemblyId): StationResult {
+  const r = ASSEMBLY_RECIPES[id];
+  if (!stationOpen(draft, r.chapter, r.stock)) return 'locked';
+  if (assemblyBaseIndex(cook.getTray(), r) < 0) return 'no-base';
+  if (!useIngredients(draft, session, r.stock)) return 'no-stock';
+  assemble(cook.getTray(), r);
+  return 'ok';
 }
 
 // ---------------------------------------------------------------------------
@@ -211,7 +261,7 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   const perfectRatio = session.totalFriedCount > 0 ? session.perfectCount / session.totalFriedCount : 0.8;
   const avgWait = session.servedCount > 0 ? session.totalWaitSec / session.servedCount : 0;
   const { newRatings, generatedReview, advisorTip } = ReviewsEngine.evaluateDay(
-    draft, perfectRatio, session.burntCount, avgWait, session.lostCount
+    draft, perfectRatio, session.burntCount, avgWait, session.lostCount, session.servedCount, session.totalFriedCount
   );
   if (inspected) {
     const delta = oil === 'dirty' ? -0.3 : oil === 'clean' ? 0.2 : 0;

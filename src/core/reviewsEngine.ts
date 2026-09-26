@@ -32,24 +32,35 @@ export class ReviewsEngine {
     perfectFriedRatio: number,
     burntCount: number,
     averageWaitTimeSec: number,
-    lostCustomerCount: number
+    lostCustomerCount: number,
+    servedCount?: number,
+    friedCount?: number
   ): { newRatings: StarRating; generatedReview: CustomerReview; advisorTip: string } {
     const r = { ...currentState.ratings };
+    // Chấm theo TỈ LỆ (mô phỏng: ngưỡng tuyệt đối "bỏ >1 khách / cháy >1 mẻ" làm sao Tốc độ, Hương vị kẹt đáy
+    // khi tiệm đông khách ở chương sau). Không truyền số khách/số mẻ → giữ luật cũ.
+    const lostRatio = servedCount === undefined ? (lostCustomerCount > 1 ? 1 : lostCustomerCount === 0 ? 0 : 0.1)
+      : lostCustomerCount / Math.max(1, servedCount + lostCustomerCount);
+    const burntRatio = friedCount === undefined ? (burntCount > 1 ? 1 : burntCount === 0 ? 0 : 0.1)
+      : burntCount / Math.max(1, friedCount);
 
     // 1. Hương vị (30%): Phụ thuộc vào tỉ lệ Perfect chiên và mẻ cháy
     // Nâng cấp bếp (tủ giữ nóng, nồi áp suất): tăng nhanh hơn, tụt chậm hơn
     const tasteBoost = upgradeEffects(currentState.upgrades).tastePct / 100;
-    if (perfectFriedRatio >= 0.75 && burntCount === 0) {
+    if (perfectFriedRatio >= 0.75 && burntRatio <= 0.05) {
       r.taste = Math.min(5.0, r.taste + 0.15 * (1 + tasteBoost));
-    } else if (burntCount > 1 || perfectFriedRatio < 0.4) {
+    } else if (burntRatio > 0.15 || perfectFriedRatio < 0.4) {
       r.taste = Math.max(2.0, r.taste - 0.25 * (1 - tasteBoost / 2));
     }
 
     // 2. Tốc độ (25%): Phụ thuộc thời gian chờ và khách bỏ đi
-    if (lostCustomerCount === 0 && averageWaitTimeSec <= 18) {
+    if (lostRatio <= 0.05 && averageWaitTimeSec <= 22) {
       r.speed = Math.min(5.0, r.speed + 0.2);
-    } else if (lostCustomerCount > 1 || averageWaitTimeSec > 35) {
+    } else if (lostRatio > 0.2 || averageWaitTimeSec > 35) {
       r.speed = Math.max(1.5, r.speed - 0.3);
+    } else if (servedCount !== undefined) {
+      // Ngày bình thường: dần về mức trung bình 3,5 (mô phỏng: sao Tốc độ từng kẹt đáy 1,5 vĩnh viễn)
+      r.speed = r.speed < 3.5 ? Math.min(3.5, r.speed + 0.15) : Math.max(3.5, r.speed - 0.05);
     }
 
     // 3. Vệ sinh (15%): Dầu chiên sạch / dơ

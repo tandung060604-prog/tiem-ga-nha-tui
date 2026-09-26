@@ -3,6 +3,9 @@ import { cookingEngine } from '../../core/cooking';
 import { SellingSession } from '../../core/sellingSim';
 import { isRushHour } from '../../core/clock';
 import { foodImage, ASSETS } from '../../content/assets';
+import { TIMER_RECIPES, TimerStationId, timerPhase, DRINK_RECIPES, DrinkId, ASSEMBLY_RECIPES, AssemblyId, assemblyBaseIndex } from '../../core/stations';
+import { stationOpen } from '../../core/day';
+import { escapeHtml } from '../escapeHtml';
 
 export type { SellingSession };
 
@@ -26,7 +29,8 @@ export function sellingStructureKey(state: GameState, session: SellingSession): 
     cookingEngine.getTray().map(t => t.id),
     cook.isFrying, cook.fryingType, quality, cookingEngine.getActiveSeasoning(),
     state.oilCondition, state.currentChapter,
-    session.isFastForward, isRushHour(session.gameHour)
+    session.isFastForward, isRushHour(session.gameHour),
+    stationStripKey(state, session)
   ]);
 }
 
@@ -35,6 +39,16 @@ export function sellingStructureKey(state: GameState, session: SellingSession): 
 export function patchSellingView(root: HTMLElement, session: SellingSession): void {
   const clock = root.querySelector('.clock b');
   if (clock) clock.textContent = formatClock(session.gameHour);
+
+  for (const id of Object.keys(TIMER_RECIPES) as TimerStationId[]) {
+    const el = root.querySelector<HTMLElement>(`.timer-progress[data-timer="${id}"]`);
+    const elapsed = session.timers[id];
+    if (el && elapsed !== null) {
+      const r = TIMER_RECIPES[id];
+      const pct = Math.min(100, Math.round((elapsed / r.cookMs) * 100));
+      el.textContent = timerPhase(r, elapsed) === 'cooking' ? `${pct}%` : '';
+    }
+  }
 
   for (const order of session.orders) {
     const card = root.querySelector<HTMLElement>(`.customer-card[data-order-id="${order.id}"]`);
@@ -287,7 +301,8 @@ export function renderSellingView(state: GameState, session: SellingSession): st
     const { percent: patiencePercent, cls: patienceColorClass, angry: isAngry } = patienceLevel(ord);
     const visual = getCustomerVisual(ord);
 
-    const itemsHtml = ord.items.map(it => {
+    const comboHtml = ord.comboName ? `<div class="order-combo" style="font-size: .72rem; font-weight: 800; color: var(--red);">🍱 ${escapeHtml(ord.comboName)}</div>` : '';
+    const itemsHtml = comboHtml + ord.items.map(it => {
       const menuItem = state.menu.find(m => m.id === it.menuItemId);
       const name = menuItem ? menuItem.name : it.menuItemId;
       return `
@@ -482,6 +497,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin-top: 2px;">
               <button id="btn-fry-chicken" class="btn-sm primary" ${cookState.isFrying ? 'disabled' : ''}>+ Gà Rán</button>
               <button id="btn-fry-fries" class="btn-sm" ${cookState.isFrying ? 'disabled' : ''}>+ Khoai</button>
+              ${stationOpen(state, 3, ['chicken_meat', 'flour']) ? `<button id="btn-fry-popcorn" class="btn-sm" ${cookState.isFrying ? 'disabled' : ''}>+ Gà viên</button>` : ''}
               <button id="btn-add-drink" class="btn-sm">🥤 Nước</button>
               <button id="btn-change-oil" class="oil-change-btn">Thay dầu (150k)</button>
             </div>
@@ -508,6 +524,8 @@ export function renderSellingView(state: GameState, session: SellingSession): st
               </button>
             </div>`}
 
+            ${renderStationStrip(state, session)}
+
             <!-- Serve Button -->
             <button id="btn-serve-order" class="btn-serve" ${session.orders.length === 0 || tray.length === 0 ? 'disabled' : ''}>
               🛎️ KENG! LÊN MÓN (SERVE)
@@ -517,4 +535,53 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       </div>
     </div>
   `;
+}
+
+// ---------------------------------------------------------------------------
+// Dải trạm nấu mở theo chương: nồi mì, lò bánh, bàn ráp, máy nước (luật ở core/stations.ts + core/day.ts)
+// ---------------------------------------------------------------------------
+const TIMER_LABEL: Record<TimerStationId, { idle: string; ready: string }> = {
+  noodle: { idle: 'Trụng mì', ready: 'Vớt mì!' },
+  oven: { idle: 'Nướng bánh', ready: 'Lấy bánh!' }
+};
+
+function openDrinks(state: GameState): DrinkId[] {
+  return (Object.keys(DRINK_RECIPES) as DrinkId[])
+    .filter(id => id !== 'soda' && stationOpen(state, DRINK_RECIPES[id].chapter, [DRINK_RECIPES[id].stock]));
+}
+function openTimers(state: GameState): TimerStationId[] {
+  return (Object.keys(TIMER_RECIPES) as TimerStationId[]).filter(id => stationOpen(state, TIMER_RECIPES[id].chapter, TIMER_RECIPES[id].stock));
+}
+function openAssembly(state: GameState): AssemblyId[] {
+  return (Object.keys(ASSEMBLY_RECIPES) as AssemblyId[]).filter(id => stationOpen(state, ASSEMBLY_RECIPES[id].chapter, ASSEMBLY_RECIPES[id].stock));
+}
+
+function stationStripKey(state: GameState, session: SellingSession): string {
+  const tray = cookingEngine.getTray();
+  return [
+    openDrinks(state).join(','),
+    openTimers(state).map(id => `${id}:${timerPhase(TIMER_RECIPES[id], session.timers[id])}`).join(','),
+    openAssembly(state).map(id => `${id}:${assemblyBaseIndex(tray, ASSEMBLY_RECIPES[id]) >= 0}`).join(',')
+  ].join('|');
+}
+
+function renderStationStrip(state: GameState, session: SellingSession): string {
+  const tray = cookingEngine.getTray();
+  const buttons = [
+    ...openTimers(state).map(id => {
+      const r = TIMER_RECIPES[id];
+      const phase = timerPhase(r, session.timers[id]);
+      const label = phase === 'idle' ? TIMER_LABEL[id].idle : phase === 'cooking' ? 'Đang nấu' : phase === 'ready' ? TIMER_LABEL[id].ready : 'Hỏng rồi! Dọn';
+      return `<button id="btn-timer-${id}" class="btn-sm station-btn timer-${phase}" ${phase === 'cooking' ? 'disabled' : ''}>
+        ${r.icon} ${label} <small class="timer-progress" data-timer="${id}"></small></button>`;
+    }),
+    ...openAssembly(state).map(id => {
+      const r = ASSEMBLY_RECIPES[id];
+      const ready = assemblyBaseIndex(tray, r) >= 0;
+      return `<button id="btn-assemble-${id}" class="btn-sm station-btn" ${ready ? '' : 'disabled'} title="Cần ${r.base === 'crispy_chicken' ? 'Gà Giòn' : 'Gà Sốt Cay'} trong khay">${r.icon} Ráp ${r.name.split(' ')[0]}</button>`;
+    }),
+    ...openDrinks(state).map(id => `<button id="btn-drink-${id}" class="btn-sm station-btn">${DRINK_RECIPES[id].icon} ${DRINK_RECIPES[id].label}</button>`)
+  ];
+  if (buttons.length === 0) return '';
+  return `<div class="station-strip" style="display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0;">${buttons.join('')}</div>`;
 }

@@ -164,6 +164,7 @@ export function migrateSave(raw: unknown): { state: GameState; repaired: string[
   const shiftValid = !!shift && shift.day === state.day && Array.isArray(shift.session?.orders)
     && typeof shift.session.gameHour === 'number' && Array.isArray(shift.cooking?.tray);
   if (!shiftValid) state.pausedShift = null;
+  else if (shift && !shift.session.timers) shift.session.timers = { noodle: null, oven: null };
   state.phase = shiftValid ? 'selling' : 'prep';
   return { state, repaired };
 }
