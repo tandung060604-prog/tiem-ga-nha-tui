@@ -1,0 +1,14 @@
+# Cấu hình Cloudflare Worker — CHƯA DEPLOY. Xem worker/README.md.
+name = "tiem-ga-nha-tui-api"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+
+[vars]
+ALLOWED_ORIGIN = "https://tandung060604-prog.github.io"
+
+# Tạo KV: npx wrangler kv namespace create LEADERBOARD  → dán id vào đây
+[[kv_namespaces]]
+binding = "LEADERBOARD"
+id = "DIEN_ID_KV_O_DAY"
+
+# Bí mật ký token (KHÔNG ghi vào file): npx wrangler secret put TOKEN_SECRET
