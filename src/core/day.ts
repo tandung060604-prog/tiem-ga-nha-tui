@@ -198,6 +198,7 @@ export function serveFirstOrder(
     OrdersEngine.matchItemToOrder(order, item.menuItemId);
     if (item.quality === 'burnt') order.burntPenalty = (order.burntPenalty ?? 0) + Math.round(prices(item.menuItemId) / 2);
     if (item.quality === 'perfect') order.perfectBonus = (order.perfectBonus ?? 0) + perfectTip(session.perfectStreak);
+    if (item.condiment) order.perfectBonus = (order.perfectBonus ?? 0) + 2000;
     removeAt(i);
     matched = true;
   }

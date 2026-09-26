@@ -450,7 +450,11 @@
 .fryer-card .btn-sm,
 #btn-fry-chicken,
 #btn-fry-fries,
-#btn-add-drink {
+#btn-add-drink,
+#btn-pour-coca,
+#btn-pour-7up,
+#btn-squeeze-ketchup,
+#btn-squeeze-chili {
   min-height: 44px;
   min-width: 44px;
   padding: 8px 10px;
@@ -519,13 +523,11 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 5px;
-  flex: 1;
-  min-height: 85px;
+  flex: 0 0 auto;
   background: #f5ebdc;
   border-radius: 10px;
   padding: 5px;
   border: 2px dashed #dfcbb3;
-  align-content: stretch;
 }
 
 .tray-item {
@@ -818,5 +820,114 @@
   padding: 1px 4px;
   border-radius: 4px;
   margin-top: 1px;
+}
+
+/* Condiment Station: 2 Chai Tương Bóp Nhựa (Tương Cà & Tương Ớt) */
+.condiment-station {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 6px 0 4px;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1.5px dashed #d4a373;
+  border-radius: 10px;
+}
+
+.condiment-station-title {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #5c351f;
+  letter-spacing: 0.2px;
+}
+
+.condiment-bottles-row {
+  display: flex;
+  gap: 8px;
+}
+
+.condiment-btn {
+  flex: 1;
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1.5px solid #d4a373;
+  border-radius: 8px;
+  padding: 4px 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  transition: transform 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.12s ease;
+}
+
+.condiment-btn:active {
+  transform: translateY(2px) scale(0.96);
+}
+
+.condiment-btn.ketchup {
+  border-color: #e63946;
+  background: #fff5f5;
+}
+
+.condiment-btn.chili {
+  border-color: #f77f00;
+  background: #fff8f0;
+}
+
+.condiment-btn-img {
+  width: 22px;
+  height: 38px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.18));
+  transition: transform 0.15s ease;
+}
+
+.condiment-btn:hover .condiment-btn-img,
+.condiment-btn:active .condiment-btn-img {
+  transform: rotate(-15deg) scale(1.08);
+}
+
+.condiment-btn-text {
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #3d2414;
+}
+
+/* Condiment Badge on Tray Item */
+.tray-condiment-tag {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.52rem;
+  font-weight: 800;
+  padding: 1px 4px;
+  border-radius: 4px;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  z-index: 5;
+}
+
+.tray-condiment-tag.ketchup {
+  background: #e63946;
+  color: #ffffff;
+}
+
+.tray-condiment-tag.chili {
+  background: #d9480f;
+  color: #ffffff;
+}
+
+/* Tap styling in prep baskets */
+.prep-basket-btn.tap-coca {
+  border-color: #e63946;
+}
+
+.prep-basket-btn.tap-7up {
+  border-color: #2b9348;
 }
 

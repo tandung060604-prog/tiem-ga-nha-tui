@@ -28,14 +28,26 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   },
   {
     id: 'soda',
-    name: 'Nước Ngọt Có Ga',
+    name: 'Nước Ngọt Coca',
     basePrice: 15000,
     currentPrice: 15000,
     chapter: 1,
     icon: '🥤',
     category: 'drinks',
     station: 'drink',
-    steps: ['Lấy lon lạnh'],
+    steps: ['Bơm Coca đầy cốc'],
+    ingredients: { soft_drink: 1 }
+  },
+  {
+    id: 'seven_up',
+    name: 'Nước Ngọt 7Up Chanh',
+    basePrice: 15000,
+    currentPrice: 15000,
+    chapter: 1,
+    icon: '🥤',
+    category: 'drinks',
+    station: 'drink',
+    steps: ['Bơm 7Up đầy cốc'],
     ingredients: { soft_drink: 1 }
   },
 

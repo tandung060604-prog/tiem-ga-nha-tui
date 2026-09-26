@@ -426,14 +426,20 @@ export function renderSellingView(state: GameState, session: SellingSession): st
   const traySlotsHtml = Array.from({ length: cookingEngine.getTraySize() }, (_, i) => i).map(slotIdx => {
     const item = tray[slotIdx];
     if (item) {
-      const isDrink = item.menuItemId === 'soda';
+      const isDrink = item.menuItemId === 'soda' || item.menuItemId === 'seven_up';
       const img = foodImage(item.menuItemId, item.quality);
       const qClass = isDrink ? 'good' : item.quality;
       const qText = isDrink ? 'ƯỚP LẠNH ❄️' : TRAY_QUALITY_LABEL[item.quality];
+      const condimentHtml = item.condiment === 'ketchup'
+        ? `<span class="tray-condiment-tag ketchup">🍅 Tương Cà</span>`
+        : item.condiment === 'chili'
+        ? `<span class="tray-condiment-tag chili">🌶️ Tương Ớt</span>`
+        : '';
       return `
         <div class="tray-item" data-tray-idx="${slotIdx}" title="Bấm để vớt hoặc vứt">
           <div class="tray-food-frame">
             ${img ? `<img class="t-icon t-img" src="${img}" alt="${item.name}" width="52" height="52" />` : `<span class="t-icon">${item.icon}</span>`}
+            ${condimentHtml}
           </div>
           <span class="t-name">${item.name}</span>
           <span class="t-quality ${qClass}">${qText}</span>
@@ -516,7 +522,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             <!-- Khay Đựng Đồ Ăn Chưa Chế Biến (Raw Prep Containers) -->
             <div class="prep-baskets-section">
               <div class="prep-baskets-header">
-                <span class="prep-baskets-title">🧺 Khay Nguyên Liệu Sẵn Sàng</span>
+                <span class="prep-baskets-title">🧺 Nguyên Liệu</span>
                 <button id="btn-change-oil" class="oil-change-btn">Thay dầu (150k)</button>
               </div>
               <div class="prep-baskets-grid">
@@ -546,11 +552,19 @@ export function renderSellingView(state: GameState, session: SellingSession): st
                   </button>
                 ` : ''}
 
-                <button id="btn-add-drink" class="prep-basket-btn drink" title="Lấy lon nước ngọt lạnh ra khay">
-                  <img src="${ASSETS.kitchen.prepSoda}" alt="Thùng Nước Lạnh" class="prep-basket-img" />
+                <button id="btn-add-drink" class="prep-basket-btn drink tap-coca" title="Máy Bơm Nước: Rót một cốc Coca thơm ngon sủi bọt">
+                  <img src="${ASSETS.kitchen.stationSodaFountain}" alt="Máy Bơm Coca" class="prep-basket-img" />
                   <div class="prep-basket-details">
-                    <span class="prep-basket-label">🥤 Nước Lạnh</span>
+                    <span class="prep-basket-label">🔴 Rót Coca</span>
                     <span class="prep-basket-qty">Còn: ${drinkStock}</span>
+                  </div>
+                </button>
+
+                <button id="btn-pour-7up" class="prep-basket-btn drink tap-7up" title="Rót một cốc 7Up Chanh đá mát lạnh">
+                  <img src="${ASSETS.food.sevenUp}" alt="Cốc 7Up" class="prep-basket-img" />
+                  <div class="prep-basket-details">
+                    <span class="prep-basket-label">🟢 Rót 7Up</span>
+                    <span class="prep-basket-qty">Chanh</span>
                   </div>
                 </button>
               </div>
@@ -566,6 +580,21 @@ export function renderSellingView(state: GameState, session: SellingSession): st
 
             <div class="tray-slots">
               ${traySlotsHtml}
+            </div>
+
+            <!-- Condiment Station: Chai tương bóp xịt món ăn -->
+            <div class="condiment-station">
+              <span class="condiment-station-title">🧴 Chai Tương Xịt Món:</span>
+              <div class="condiment-bottles-row">
+                <button id="btn-squeeze-ketchup" class="condiment-btn ketchup" title="Xịt Tương Cà đỏ tươi thơm ngọt lên món (+Tip & Hương vị)">
+                  <img src="${ASSETS.kitchen.bottleKetchup}" alt="Tương Cà" class="condiment-btn-img" />
+                  <span class="condiment-btn-text">🍅 Tương Cà</span>
+                </button>
+                <button id="btn-squeeze-chili" class="condiment-btn chili" title="Xịt Tương Ớt cay nồng giòn rụm lên món (+Tip & Hương vị)">
+                  <img src="${ASSETS.kitchen.bottleChili}" alt="Tương Ớt" class="condiment-btn-img" />
+                  <span class="condiment-btn-text">🌶️ Tương Ớt</span>
+                </button>
+              </div>
             </div>
 
             <!-- Seasoning Addons (món sốt mở từ chương 2) -->
@@ -604,7 +633,7 @@ const TIMER_LABEL: Record<TimerStationId, { idle: string; ready: string }> = {
 
 function openDrinks(state: GameState): DrinkId[] {
   return (Object.keys(DRINK_RECIPES) as DrinkId[])
-    .filter(id => id !== 'soda' && stationOpen(state, DRINK_RECIPES[id].chapter, [DRINK_RECIPES[id].stock]));
+    .filter(id => id !== 'soda' && id !== 'seven_up' && stationOpen(state, DRINK_RECIPES[id].chapter, [DRINK_RECIPES[id].stock]));
 }
 function openTimers(state: GameState): TimerStationId[] {
   return (Object.keys(TIMER_RECIPES) as TimerStationId[]).filter(id => stationOpen(state, TIMER_RECIPES[id].chapter, TIMER_RECIPES[id].stock));

@@ -7,17 +7,17 @@ const chicken = (): InventoryItem => createInitialState().inventory.chicken_meat
 
 describe('đổi trả trong ngày (nút −5)', () => {
   it('lỗi cũ: hàng TẶNG lúc đầu game không đổi ra tiền được', () => {
-    const item = chicken();               // 25 miếng tặng sẵn
+    const item = chicken();               // 8 miếng tặng sẵn
     expect(refundableUnits(item)).toBe(0);
     expect(refundPurchase(item, 5)).toBe(0);
-    expect(item.amount).toBe(25);
+    expect(item.amount).toBe(8);
   });
 
   it('hàng vừa mua hôm nay hoàn đúng giá đã trả', () => {
     const item = chicken();
     addStock(item, 10, 14000);
     expect(refundPurchase(item, 5)).toBe(70000);
-    expect(item.amount).toBe(30);
+    expect(item.amount).toBe(13);
     expect(refundableUnits(item)).toBe(5);
   });
 
@@ -44,7 +44,7 @@ describe('đổi trả trong ngày (nút −5)', () => {
     const item = chicken();
     addStock(item, 5, 14000);
     refundPurchase(item, 5);
-    expect(item.batches).toEqual([{ amount: 25, daysLeft: 2 }]);
+    expect(item.batches).toEqual([{ amount: 8, daysLeft: 2 }]);
   });
 
   it('không nhận số lượng âm / không có hàng', () => {

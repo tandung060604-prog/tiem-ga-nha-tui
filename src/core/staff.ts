@@ -73,6 +73,7 @@ export interface StaffEffects {
   waiterServeMs: number | null; // null = không có phục vụ
   hygienePerDay: number;
   customersPct: number;
+  hasSecurity: boolean;
 }
 
 const managerBoost = (staff: readonly StaffMember[]) => (staff.some(m => m.role === 'manager') ? 1.2 : 1);
@@ -111,7 +112,8 @@ export function staffEffects(staff: readonly StaffMember[], gameHour = 12): Staf
     commissionRate: BASE_APP_COMMISSION * (1 - Math.min(0.6, sum(drivers.map(m => 0.5 * power(m, 'skill', boost))))),
     waiterServeMs: waiters.length ? Math.round(Math.max(600, 2600 - 1600 * fastestWaiter)) : null,
     hygienePerDay: Math.min(0.12, sum(waiters.map(m => 0.06 * power(m, 'attitude', boost)))),
-    customersPct: Math.min(30, staff.filter(m => has(m, 'tiktok_idol')).length * 15)
+    customersPct: Math.min(30, staff.filter(m => has(m, 'tiktok_idol')).length * 15),
+    hasSecurity: staff.some(m => m.role === 'security' && m.mood > 20)
   };
 }
 
@@ -135,6 +137,8 @@ export function describeStaffEffect(member: StaffMember, team: readonly StaffMem
       return `Khách app chờ lâu hơn ${Math.round(eff.deliveryPatiencePct)}% · hoa hồng app ${(eff.commissionRate * 100).toFixed(1)}%`;
     case 'manager':
       return 'Cả đội +20% hiệu suất · tâm trạng giảm chậm một nửa';
+    case 'security':
+      return 'Bảo vệ an ninh, trông xe an toàn · tóm gọn 100% trộm cắp, quỵt nợ & đối thủ phá hoại';
   }
 }
 

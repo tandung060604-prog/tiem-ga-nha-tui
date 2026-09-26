@@ -4,95 +4,103 @@ import { CHAPTERS } from '../../content/chapters';
 import { escapeHtml } from '../escapeHtml';
 import { audio } from '../../core/audio';
 
-const GABONG_QUOTES = [
-  'Dạ Tiệm Gà Nhà Tui xin chào bạn! 🍗',
-  'Hôm nay đùi gà sốt cay giòn rụm đang chờ chủ tiệm nè! ✨',
-  'Khởi nghiệp từ chiếc xe đẩy nhỏ xíu, cùng nhau cố lên nha! 💛',
-  'Chíp chíp! Chúc quán hôm nay bán hết veo trong một nốt nhạc! 🌟',
-  'Bí quyết là sốt tẩm đậm đà và nụ cười tươi rói với khách! 🥰'
+const OWNER_QUOTES = [
+  'Dạ Tiệm Gà Nhà Tui xin chào bạn! Hôm nay gà vàng giòn đang chờ nè! 🍗✨',
+  'Khởi nghiệp từ chiếc xe đẩy nhỏ xíu ở hẻm 1102, cùng nhau cố lên nha! 💛',
+  'Gà giòn thơm nức mũi, sốt đậm đà, khách ăn một lần là nhớ mãi! 🌟'
+];
+
+const BACBA_QUOTES = [
+  'Con ơi, cứ bình tĩnh mà làm! Bác đứng đây canh hẻm và chỉ dẫn cho con. 👴',
+  'Khởi nghiệp cực lắm con, nhưng chăm chỉ và thật thà thì lộc sẽ tự đến! 🍵',
+  'Mùi gà rán của con thơm nức cả con hẻm rồi đấy, khách đang ngóng kìa! 🍗'
 ];
 
 const CAT_QUOTES = [
-  'Meo~ Mùi gà rán thơm phức làm mèo thức giấc nè! 🐱',
-  'Meo meo... Cho mèo xin một miếng gà giòn không tiêu nha! ✨',
-  'Ngủ nướng một xíu rồi phụ chủ tiệm canh hẻm nha meo~ 🐾'
-];
-
-const BASKET_QUOTES = [
-  'Xèo xèo~ Mẻ gà vừa chiên xong, vàng giòn rùm rụm thơm nức mũi! 🍗🔥',
-  'Vỏ ngoài giòn tan, bên trong mọng nước ngọt thịt! 🤤',
-  'Lắc thêm xíu phô mai béo ngậy nữa là số dách luôn! 🧀'
-];
-
-const LANTERN_QUOTES = [
-  '🏮 Đèn lồng sáng ấm, góc hẻm nhỏ bỗng bình yên lạ kỳ!',
-  '✨ Ánh đèn vàng lung linh soi lối thực khách ghé tiệm gà!'
+  'Meo~ Mùi gà rán thơm phức làm mèo thức giấc nè! Cho xin một miếng nha! 🐱✨',
+  'Meo meo... Mèo nằm canh tiền vía cho tiệm hôm nay buôn may bán đắt nha! 🐾'
 ];
 
 export function renderTitleScreen(state: GameState, hasProgress: boolean, musicOn: boolean): string {
   const chapter = CHAPTERS.find(c => c.number === state.currentChapter);
   return `
-    <div id="title-screen" class="title-screen" style="--landing-bg: url('${ASSETS.ui.landingBg}');">
-      <!-- Vignette and mood gradient overlay -->
+    <div id="title-screen" class="title-screen" style="--landing-bg: url('${ASSETS.ui.landingVnBg}');">
+      <!-- Ambient Dark & Warm Vignette -->
       <div class="title-overlay"></div>
 
       <!-- Scalloped Awning on top edge -->
       <div class="title-awning"></div>
 
-      <!-- Top Title Area -->
-      <div class="title-top">
-        <div class="title-kicker">🏮 TIỆM NHỎ KHỞI NGHIỆP · HẺM 1102 🏮</div>
-        <h1 class="title-name">TIỆM GÀ<br/>NHÀ TUI</h1>
-        <p class="title-tagline">Từ xe đẩy đầu hẻm đến chuỗi gà quốc dân</p>
-        ${hasProgress ? `
-          <div class="title-save">
-            🍗 ${escapeHtml(state.shopName)} · Ngày ${state.day}${chapter ? ` · Chương ${chapter.number}` : ''}
-          </div>` : ''}
-      </div>
+      <!-- Top Title Area: Clean, Crisp Branding -->
+      <header class="title-header-badge">
+        <span class="title-kicker-tag">🏮 HẺM 1102 SÀI GÒN · KHỞI NGHIỆP INDIE 🏮</span>
+      </header>
 
-      <!-- Interactive Hotspots on the AI Landing Backdrop -->
-      <div class="title-hotspots">
-        <!-- Hotspot 1: Mascot Gà Bông -->
-        <button id="hotspot-gabong" class="title-hotspot hotspot-gabong" aria-label="Gà Bông" title="Chạm để nói chuyện với Gà Bông">
-          <span class="hotspot-ping"></span>
-          <span class="hotspot-pill">🐥 Gà Bông</span>
-        </button>
+      <!-- Invisible Character Tap Zones on the Artwork (No ugly floating pills) -->
+      <div class="title-touch-zones">
+        <!-- Tap Zone: Shop Owner (Center) -->
+        <button id="zone-owner" class="touch-zone zone-owner" aria-label="Chủ tiệm" title="Trò chuyện với chủ tiệm"></button>
 
-        <!-- Hotspot 2: Rổ gà rán giòn rụm -->
-        <button id="hotspot-basket" class="title-hotspot hotspot-basket" aria-label="Rổ Gà Rán" title="Chạm xem gà chiên giòn">
-          <span class="hotspot-ping"></span>
-          <span class="hotspot-pill">🍗 Gà Rán Giòn</span>
-        </button>
+        <!-- Tap Zone: Bac Ba (Right) -->
+        <button id="zone-bacba" class="touch-zone zone-bacba" aria-label="Bác Ba" title="Trò chuyện với Bác Ba"></button>
 
-        <!-- Hotspot 3: Mèo ngủ trên gờ tường -->
-        <button id="hotspot-cat" class="title-hotspot hotspot-cat" aria-label="Mèo Ngủ" title="Chạm đánh thức bé mèo">
-          <span class="hotspot-ping"></span>
-          <span class="hotspot-pill">🐱 Bé Mèo</span>
-        </button>
+        <!-- Tap Zone: Cat on stool (Left) -->
+        <button id="zone-cat" class="touch-zone zone-cat" aria-label="Bé Miu" title="Vuốt ve bé mèo"></button>
 
-        <!-- Hotspot 4: Đèn lồng ấm cúng -->
-        <button id="hotspot-lantern" class="title-hotspot hotspot-lantern" aria-label="Đèn Lồng" title="Chạm thắp sáng đèn lồng">
-          <span class="hotspot-ping"></span>
-          <span class="hotspot-pill">🏮 Đèn Lồng</span>
-        </button>
-
-        <!-- Dynamic Floating Speech Bubble Container -->
+        <!-- Dynamic Speech Bubble -->
         <div id="title-speech-bubble" class="title-speech-bubble" hidden></div>
       </div>
 
-      <!-- Bottom Actions Area -->
-      <div class="title-bottom">
-        <div class="title-actions">
-          <button id="btn-title-play" class="title-btn-play">
-            ${hasProgress ? '▶ TIẾP TỤC BÁN GÀ' : '🍗 MỞ TIỆM NGAY (BẮT ĐẦU)'}
-          </button>
-          <div class="title-sub-actions">
-            ${hasProgress ? '<button id="btn-title-new" class="btn-sm title-btn-sub">🆕 Chơi lại từ đầu</button>' : ''}
-            <button id="btn-title-music" class="btn-sm title-btn-sub">${musicOn ? '🎵 Nhạc: Bật' : '🔇 Nhạc: Tắt'}</button>
+      <!-- Bottom Interactive Bistro Board (Gọn gàng, sang trọng, mang phong cách quán gà VN) -->
+      <div class="title-bottom-panel">
+        <div class="title-bistro-board">
+          <div class="board-header">
+            <img src="${ASSETS.ui.logoKoreanChicken}" class="board-logo" alt="Logo Tiệm Gà" />
+            <div class="board-info">
+              <h2 class="board-shop-name">${escapeHtml(state.shopName)}</h2>
+              <div class="board-meta">
+                ${hasProgress 
+                  ? `<span class="board-tag day">Ngày ${state.day}</span>
+                     <span class="board-tag chapter">Chương ${chapter ? chapter.number : 1}</span>
+                     <span class="board-tag money">Vốn: ${state.money.toLocaleString('vi-VN')}đ</span>` 
+                  : `<span class="board-tag new">✨ Tiệm Mới Khởi Đầu</span>
+                     <span class="board-tag capital">Vốn: ${state.money.toLocaleString('vi-VN')}đ</span>`}
+              </div>
+            </div>
+          </div>
+
+          <!-- Character Ensemble Cast Preview -->
+          <div class="board-cast-strip">
+            <div class="cast-item">
+              <span class="cast-avatar">🧑‍🍳</span>
+              <span class="cast-name">Chủ Tiệm</span>
+            </div>
+            <div class="cast-divider">•</div>
+            <div class="cast-item">
+              <span class="cast-avatar">👴</span>
+              <span class="cast-name">Bác Ba Cố Vấn</span>
+            </div>
+            <div class="cast-divider">•</div>
+            <div class="cast-item">
+              <span class="cast-avatar">🐱</span>
+              <span class="cast-name">Bé Miu Canh Tiệm</span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="board-actions">
+            <button id="btn-title-play" class="btn-play-hero">
+              ${hasProgress ? '▶ TIẾP TỤC MỞ BÁN' : '🍗 BẮT ĐẦU MỞ TIỆM'}
+            </button>
+            <div class="board-sub-row">
+              ${hasProgress ? '<button id="btn-title-new" class="btn-sub-pill">🔄 Chơi lại từ đầu</button>' : ''}
+              <button id="btn-title-music" class="btn-sub-pill">${musicOn ? '🎵 Nhạc: Bật' : '🔇 Nhạc: Tắt'}</button>
+            </div>
           </div>
         </div>
-        <p class="title-hint">
-          ✨ Chạm vào <b>Gà Bông</b>, <b>Rổ Gà</b> hoặc <b>Bé Mèo</b> để tương tác nha!
+
+        <p class="title-touch-hint">
+          💡 Chạm vào <b>Chủ Tiệm</b>, <b>Bác Ba</b> hoặc <b>Bé Miu</b> trên tranh để nghe tâm sự nha!
         </p>
       </div>
     </div>
@@ -115,10 +123,10 @@ export function bindTitleScreenInteractions() {
     bubble.classList.add('pop-anim');
     bubbleTimeout = setTimeout(() => {
       bubble.hidden = true;
-    }, 3800);
+    }, 4200);
   };
 
-  const bindHotspot = (id: string, quotes: string[], left: number, top: number, onSound: () => void) => {
+  const bindZone = (id: string, quotes: string[], left: number, top: number, onSound: () => void) => {
     const el = document.getElementById(id);
     if (!el) return;
     let idx = 0;
@@ -128,14 +136,10 @@ export function bindTitleScreenInteractions() {
       const quote = quotes[idx % quotes.length] ?? '';
       idx++;
       showBubble(quote, left, top);
-      el.classList.remove('hotspot-tapped');
-      void el.offsetWidth;
-      el.classList.add('hotspot-tapped');
     };
   };
 
-  bindHotspot('hotspot-gabong', GABONG_QUOTES, 32, 54, () => audio.playPop());
-  bindHotspot('hotspot-basket', BASKET_QUOTES, 55, 58, () => audio.playPerfect());
-  bindHotspot('hotspot-cat', CAT_QUOTES, 65, 33, () => audio.playPop());
-  bindHotspot('hotspot-lantern', LANTERN_QUOTES, 72, 45, () => audio.playPop());
+  bindZone('zone-owner', OWNER_QUOTES, 50, 42, () => audio.playPop());
+  bindZone('zone-bacba', BACBA_QUOTES, 70, 40, () => audio.playPop());
+  bindZone('zone-cat', CAT_QUOTES, 25, 68, () => audio.playPerfect());
 }

@@ -29,6 +29,7 @@ export interface SellingSession {
   perfectCount: number;
   totalFriedCount: number;
   topSellerId: string;
+  midIncidentTriggered?: boolean;
 }
 
 export function createSellingSession(): SellingSession {

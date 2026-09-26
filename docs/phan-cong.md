@@ -77,6 +77,9 @@ Phiên làm việc: 26/09/2026, 14:35 → 15:35 (1 tiếng mỗi bên, chạy so
 
 
 
+| 00:32 | Antigravity | **[Lock Task] Hệ Thống 25 Sự Kiện Hài Hước Bắt Trend, Quyết Định Ảnh Hưởng Ending & Cơ Chế Bảo Vệ Chống Quỵt/Trộm.** Triển khai: (1) Data Contract `DailyIncident`, `IncidentChoice`, `StaffRole = 'security'` trong `src/types/game.ts`; (2) Ngân hàng 25 sự kiện tương tác hẻm Sài Gòn & trend TikTok/Threads trong `src/content/dailyIncidents.ts`; (3) Engine xử lý quyết định, may rủi và bảo vệ trong `src/core/dailyIncidentsEngine.ts`; (4) Giao diện Modal tương tác ẩn điểm số `DailyIncidentModal.ts` và style CSS; (5) Tích hợp 1-2 sự kiện mỗi ngày vào `src/main.ts` (đầu ngày & giữa ca bán); (6) Bổ sung vai trò Bảo Vệ vào `src/core/staff.ts` & `src/content/staff.ts`; (7) Bộ unit test Vitest chuyên sâu `tests/daily-incidents.test.ts`. |
+| 00:45 | Antigravity | **[Bìa Game Việt Nam, Cân Bằng Độ Khó, Máy Bơm Nước Ngọt & Quầy Xịt Tương]: XONG 100%.** Đã hoàn tất: (1) Vẽ bìa game phong cách tiệm gà hẻm Sài Gòn hoài niệm với dàn nhân vật chính (Chủ tiệm GenZ, Bác Ba, Bé Miu), dỡ bỏ toàn bộ nút trôi lơ lửng, chuyển sang Touch Zones tương tác trực tiếp lên nhân vật; (2) Tăng độ khó kinh tế: giảm mạnh tồn kho ban đầu (thịt gà 25→8, bột 30→10, dầu 2→1, nước 30→8) và tăng giá nâng cấp thiết bị 35%–50% để tạo thử thách; (3) Máy rót nước ngọt 2 vòi (Coca & 7Up) với thao tác rót thủ công, mở rộng cho Fanta/Pepsi sau này; (4) Quầy 2 chai tương (Tương cà & Tương ớt) thao tác xịt sốt lên món trong khay giữ nhiệt tặng thêm +2,000đ tiền tip; (5) Toàn bộ kiểm thử chất lượng đạt 100% PASS: Vitest 257/257 PASS, `npm run build` PASS, `npm run ui:check` PASS 100% (360px & 390px), `npm run ios:check` PASS 100% (iPhone SE, 13, 15 Pro Max). |
+
 ## 4. Báo cáo cuối giờ
 - Claude: `docs/bao-cao/claude-gio-1.md`
 - Gemini: `docs/gemini/bao-cao-gio-1.md`, `docs/gemini/bao-cao-gio-2.md`

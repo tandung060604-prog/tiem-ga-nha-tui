@@ -42,13 +42,16 @@ import { evaluateEnding } from './content/endings';
 import { BUNNY_LETTERS, BunnyLetter, MysteryBunnyEngine } from './content/mysteryBunny';
 import { ShareCardEngine } from './ui/components/ShareCard';
 import { ASSETS } from './content/assets';
+import { pickDailyIncident, resolveIncidentChoice } from './core/dailyIncidentsEngine';
+import { renderIncidentPrompt, renderIncidentReaction } from './ui/components/DailyIncidentModal';
+import type { DailyIncident } from './types/game';
 
 type TabId = 'inventory' | 'upgrades' | 'staff' | 'reviews' | 'menu';
 
-// Id nút trong màn bán hàng là `btn-<action>` (hợp đồng với SellingView + CSS)
 const SELLING_ACTIONS = [
-  'toggle-fast', 'fry-chicken', 'fry-fries', 'fry-popcorn', 'add-drink', 'fry-pot',
-  'change-oil', 'season-spicy', 'season-honey', 'serve-order'
+  'toggle-fast', 'fry-chicken', 'fry-fries', 'fry-popcorn',
+  'add-drink', 'pour-coca', 'pour-7up', 'squeeze-ketchup', 'squeeze-chili',
+  'fry-pot', 'change-oil', 'season-spicy', 'season-honey', 'serve-order'
 ] as const;
 type SellingAction = typeof SELLING_ACTIONS[number];
 
@@ -285,6 +288,60 @@ class AppController {
     if (overlay) {
       overlay.setAttribute('hidden', '');
     }
+  }
+
+  public openDailyIncidentDialog(incident: DailyIncident, onDone?: () => void) {
+    const state = stateManager.getState();
+    const wasSelling = state.phase === 'selling' && !!this.sellingSession;
+    if (wasSelling && this.sellingSession) {
+      this.sellingSession.isPaused = true;
+    }
+    babble(incident.dialogue, 'guest');
+    const promptHtml = renderIncidentPrompt(incident, state);
+    this.openModal(promptHtml);
+
+    document.querySelectorAll<HTMLButtonElement>('.incident-choice-btn').forEach(btn => {
+      btn.onclick = () => {
+        const choiceId = btn.dataset.choiceId;
+        const choice = incident.choices.find(c => c.id === choiceId);
+        if (!choice) return;
+
+        let result: ReturnType<typeof resolveIncidentChoice> | undefined;
+        stateManager.update(draft => {
+          result = resolveIncidentChoice(draft, incident, choice);
+        });
+
+        if (!result) return;
+
+        if (result.succeeded) {
+          audio.playCash();
+        } else {
+          audio.playPop();
+        }
+
+        const reactionHtml = renderIncidentReaction(
+          result.reactionTitle,
+          result.reactionNarrative,
+          result.succeeded,
+          result.moneyDelta
+        );
+        this.openModal(reactionHtml);
+
+        const continueBtn = document.getElementById('btn-incident-continue');
+        if (continueBtn) {
+          continueBtn.onclick = () => {
+            audio.playPop();
+            this.closeModal();
+            if (wasSelling && this.sellingSession) {
+              this.sellingSession.isPaused = false;
+              this.lastTimestamp = performance.now();
+            }
+            this.render();
+            if (onDone) onDone();
+          };
+        }
+      };
+    });
   }
 
   public openStoryModal(actIndex: number = 0) {
@@ -838,6 +895,15 @@ class AppController {
     this.updateTutorial(session); // sau render: viền sáng gắn vào nút vừa dựng
     if (currentTimestamp - this.lastShiftSnapshotAt > 5000) this.snapshotShift(false);
 
+    // Sự kiện 2 trong ngày: Tình huống bất ngờ giữa ca bán (giờ cao điểm, không bật lúc đang có tutorial)
+    if (!session.tutorial && !session.midIncidentTriggered && session.gameHour >= 14.5 && (stateManager.getState().todayIncidentsCount ?? 0) < 2) {
+      session.midIncidentTriggered = true;
+      const shiftIncident = pickDailyIncident(stateManager.getState(), 'shift');
+      if (shiftIncident) {
+        this.openDailyIncidentDialog(shiftIncident);
+      }
+    }
+
     if (dayOver) {
       this.finishDay();
       return;
@@ -980,7 +1046,7 @@ class AppController {
         break;
       }
 
-      case 'add-drink':
+      case 'add-drink': {
         if (cookingEngine.isTrayFull()) {
           this.showToast('Khay đầy rồi, giao bớt món trước đã!');
           return;
@@ -989,8 +1055,61 @@ class AppController {
           this.showToast('Hết nước ngọt trong kho!');
           return;
         }
-        cookingEngine.addDrink();
+        // Tự động rót loại nước khách trước mặt đang đợi (7Up hoặc Coca)
+        const frontOrder = session.orders[0];
+        const wants7Up = frontOrder?.items.some(it => it.menuItemId === 'seven_up' && !it.completed);
+        const drinkType: DrinkId = wants7Up ? 'seven_up' : 'soda';
+        cookingEngine.addDrink(drinkType);
+        audio.playPop();
         break;
+      }
+
+      case 'pour-coca': {
+        if (cookingEngine.isTrayFull()) {
+          this.showToast('Khay đầy rồi, giao bớt món trước đã!');
+          return;
+        }
+        if (!this.useIngredients(['soft_drink'])) {
+          this.showToast('Hết nước ngọt trong kho!');
+          return;
+        }
+        cookingEngine.addDrink('soda');
+        audio.playPop();
+        this.showToast('🥤 Đã bơm một ly Coca sủi bọt mát lạnh vào khay!');
+        break;
+      }
+
+      case 'pour-7up': {
+        if (cookingEngine.isTrayFull()) {
+          this.showToast('Khay đầy rồi, giao bớt món trước đã!');
+          return;
+        }
+        if (!this.useIngredients(['soft_drink'])) {
+          this.showToast('Hết nước ngọt trong kho!');
+          return;
+        }
+        cookingEngine.addDrink('seven_up');
+        audio.playPop();
+        this.showToast('🍋 Đã bơm một ly 7Up Chanh đá sảng khoái vào khay!');
+        break;
+      }
+
+      case 'squeeze-ketchup':
+      case 'squeeze-chili': {
+        const sauce = action === 'squeeze-ketchup' ? 'ketchup' : 'chili';
+        const sauceName = sauce === 'ketchup' ? 'Tương Cà' : 'Tương Ớt';
+        const tray = cookingEngine.getTray();
+        // Tìm món trong khay chưa có tương (ưu tiên món chiên/món ăn kèm)
+        const target = tray.find(item => item.menuItemId !== 'soda' && item.menuItemId !== 'seven_up' && !item.condiment);
+        if (!target) {
+          this.showToast(`Chưa có món chiên nào trong khay để xịt ${sauceName}!`);
+          return;
+        }
+        target.condiment = sauce;
+        audio.playPop();
+        this.showToast(`${sauce === 'ketchup' ? '🍅' : '🌶️'} Đã xịt ${sauceName} lên ${target.name}! (+Hương vị & Tip)`);
+        break;
+      }
 
       case 'fry-pot': {
         // Chảo trống: chạm chảo = thả gà nhanh
@@ -1191,10 +1310,19 @@ class AppController {
         stateManager.update(draft => {
           draft.day += 1;
           draft.phase = 'prep';
+          draft.todayIncidentsCount = 0;
         });
         this.pickDailyEvent();
         this.setPhase('prep');
         this.showToast(`Chào buổi sáng Ngày ${stateManager.getState().day}! Chuẩn bị hàng nào! ☀️`);
+
+        // Kích hoạt Sự kiện 1 (Tình huống đầu ngày)
+        setTimeout(() => {
+          const morningIncident = pickDailyIncident(stateManager.getState(), 'morning');
+          if (morningIncident) {
+            this.openDailyIncidentDialog(morningIncident);
+          }
+        }, 500);
       };
     }
 

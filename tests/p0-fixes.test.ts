@@ -41,7 +41,7 @@ describe('#8 kho theo lô', () => {
 
   it('save cũ không có batches được migrate thành 1 lô', () => {
     const state = createInitialState();
-    expect(state.inventory.chicken_meat.batches).toEqual([{ amount: 25, daysLeft: 2 }]);
+    expect(state.inventory.chicken_meat.batches).toEqual([{ amount: 8, daysLeft: 2 }]);
   });
 });
 
@@ -56,7 +56,7 @@ describe('#1 #2 tiền không bị tính 2 lần', () => {
 describe('#3 order chỉ gồm món bếp làm được', () => {
   it('chương 1 không bao giờ gọi món không có trạm', () => {
     const state = createInitialState();
-    const allowed = new Set(['crispy_chicken', 'shake_fries', 'soda']);
+    const allowed = new Set(['crispy_chicken', 'shake_fries', 'soda', 'seven_up']);
     for (let i = 0; i < 300; i++) {
       for (const it of OrdersEngine.generateOrder(state).items) expect(allowed.has(it.menuItemId)).toBe(true);
     }

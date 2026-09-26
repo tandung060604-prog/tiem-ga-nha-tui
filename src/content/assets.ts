@@ -105,7 +105,11 @@ export const ASSETS = {
     prepFries: url('assets/kitchen/prep_tray_raw_fries.png'),
     prepSoda: url('assets/kitchen/prep_crate_cold_soda.png'),
     prepSpicyPot: url('assets/kitchen/prep_pot_spicy_sauce.png'),
-    prepHoneyPot: url('assets/kitchen/prep_pot_honey_sauce.png')
+    prepHoneyPot: url('assets/kitchen/prep_pot_honey_sauce.png'),
+    stationSodaFountain: url('assets/kitchen/station_soda_fountain.png'),
+    bottleKetchup: url('assets/kitchen/bottle_ketchup.png'),
+    bottleChili: url('assets/kitchen/bottle_chili.png'),
+    sauceDish: url('assets/kitchen/sauce_dish.png')
   },
   food: {
     crispyChickenPerfect: url('assets/food/food_crispy_chicken_perfect.png'),
@@ -116,6 +120,7 @@ export const ASSETS = {
     popcornChicken: url('assets/food/food_popcorn_chicken.png'),
     shakeFries: url('assets/food/food_shake_fries.png'),
     soda: url('assets/food/food_soda.png'),
+    sevenUp: url('assets/food/food_7up.png'),
     pastaBeef: url('assets/food/food_pasta_beef.png'),
     biscuitHoney: url('assets/food/food_biscuit_honey.png'),
     chickenBurger: url('assets/food/food_chicken_burger.png'),
@@ -134,7 +139,8 @@ export const ASSETS = {
     stickerCat: url('assets/ui/sticker_cat.png'),
     stickerLantern: url('assets/ui/sticker_lantern.png'),
     stickerDaisy: url('assets/ui/sticker_daisy.png'),
-    landingBg: url('assets/ui/landing_bg.jpg')
+    landingBg: url('assets/ui/landing_bg.jpg'),
+    landingVnBg: url('assets/ui/landing_vn_bg.jpg')
   }
 } as const;
 
@@ -155,6 +161,9 @@ export function foodImage(menuItemId: string, quality: QualityRating): string | 
       return quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.shakeFries;
     case 'soda':
       return ASSETS.food.soda;
+    case 'seven_up':
+    case '7up':
+      return ASSETS.food.sevenUp;
     case 'pasta_beef':
       return ASSETS.food.pastaBeef;
     case 'biscuit_honey':

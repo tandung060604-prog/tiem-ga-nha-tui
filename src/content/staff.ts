@@ -26,6 +26,11 @@ export const STAFF_ROLES_INFO: { [key in StaffRole]: { name: string; desc: strin
     name: 'Quản Lý Ca',
     desc: 'Điều phối toàn bộ tiệm, tăng 20% hiệu suất đồng đội.',
     icon: '👔'
+  },
+  security: {
+    name: 'Bảo Vệ Giữ Xe & An Ninh',
+    desc: 'Trông xe an toàn, dẹp loạn, tóm gọn kẻ trộm và quỵt tiền.',
+    icon: '👮'
   }
 };
 
@@ -118,12 +123,26 @@ export const INITIAL_CANDIDATES: StaffMember[] = [
     hourlyWage: 28000,
     mood: 100,
     shiftsWorked: 0
+  },
+  {
+    id: 'staff_5',
+    name: 'Chú Tư Dân Phòng',
+    role: 'security',
+    avatar: '👮‍♂️',
+    speed: 75,
+    skill: 85,
+    attitude: 90,
+    stamina: 88,
+    traits: ['night_owl'],
+    hourlyWage: 25000,
+    mood: 100,
+    shiftsWorked: 0
   }
 ];
 
 export function generateCandidate(chapter: number): StaffMember {
-  const names = ['Thành Nam', 'Huyền Trang', 'Quốc Bảo', 'Ngọc Ánh', 'Việt Anh', 'Phương Nhi', 'Minh Đức', 'Khánh Vy'];
-  const roles: StaffRole[] = ['cashier', 'cook', 'waiter', 'delivery', 'manager'];
+  const names = ['Thành Nam', 'Huyền Trang', 'Quốc Bảo', 'Ngọc Ánh', 'Việt Anh', 'Phương Nhi', 'Minh Đức', 'Khánh Vy', 'Chú Tư Giữ Xe', 'Anh Quyết An Ninh'];
+  const roles: StaffRole[] = ['cashier', 'cook', 'waiter', 'delivery', 'manager', 'security'];
   const avatars = ['👦', '👧', '🧑', '👩', '👱‍♂️', '👱‍♀️'];
   
   const name = pick(names);

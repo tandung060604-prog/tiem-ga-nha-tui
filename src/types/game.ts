@@ -11,7 +11,7 @@ export type OilCondition = 'clean' | 'medium' | 'dirty';
 
 // Món có sẵn trong content; món combo người chơi tự tạo có id tự sinh (string).
 export type BaseMenuItemId =
-  | 'crispy_chicken' | 'shake_fries' | 'soda'
+  | 'crispy_chicken' | 'shake_fries' | 'soda' | 'seven_up'
   | 'spicy_chicken' | 'honey_garlic_chicken' | 'pasta_beef' | 'combo_duo'
   | 'biscuit_honey' | 'chicken_burger' | 'popcorn_chicken' | 'peach_tea'
   | 'chicken_rice' | 'korean_tokbokki_chicken' | 'sundae_icecream'
@@ -81,7 +81,7 @@ export interface UpgradeBranch {
   tiers: UpgradeTier[];
 }
 
-export type StaffRole = 'cashier' | 'cook' | 'waiter' | 'delivery' | 'manager';
+export type StaffRole = 'cashier' | 'cook' | 'waiter' | 'delivery' | 'manager' | 'security';
 
 export interface StaffMember {
   id: string;
@@ -148,6 +148,7 @@ export interface TrayItem {
   name: string;
   icon: string;
   quality: QualityRating;
+  condiment?: 'ketchup' | 'chili' | null;
 }
 
 export interface DayLedger {
@@ -212,6 +213,39 @@ export interface StoryEnding {
   karma: KarmaState;
 }
 
+export interface IncidentChoice {
+  id: string;
+  label: string;
+  kicker?: string;
+  requiresSecurity?: boolean; // Cần có Nhân viên Bảo vệ mới kích hoạt được
+  riskRate?: number; // Tỷ lệ rủi ro thất bại khi KHÔNG có bảo vệ (0.0 -> 1.0)
+  karmaDelta: {
+    community?: number;
+    craftsmanship?: number;
+    ambition?: number;
+  };
+  moneyDelta?: number; // Thay đổi tiền mặt (âm = mất tiền, dương = thưởng)
+  reputationDelta?: number; // Thay đổi sao đánh giá
+  reactionTitle: string;
+  reactionNarrative: string; // Diễn biến câu chuyện khi thành công / giải quyết (ẩn điểm số)
+  reactionFailureNarrative?: string; // Diễn biến khi gặp rủi ro thất bại (quán phải tự chịu)
+}
+
+export interface DailyIncident {
+  id: string;
+  title: string;
+  icon: string;
+  characterName: string;
+  characterAvatar: string;
+  characterRole: string;
+  context: string;
+  dialogue: string;
+  choices: IncidentChoice[];
+  minChapter?: number;
+  isSecurityRisk?: boolean; // Tình huống có nguy cơ quỵt nợ, trộm cắp, phá hoại
+  phaseTiming?: 'morning' | 'shift' | 'any'; // Thời điểm xuất hiện trong ngày
+}
+
 export interface GameState {
   version: number;
   day: number;
@@ -249,6 +283,9 @@ export interface GameState {
   achievedEndings?: StoryEndingId[]; // kết thúc đã đạt: chỉ những cái này được xem lại
   debtStreak?: number;               // số ngày liên tiếp đóng cửa với quỹ âm
   chosenDialogueIds?: string[];
+  seenIncidentIds?: string[];        // Danh sách các sự kiện đã gặp
+  resolvedIncidents?: { incidentId: string; choiceId: string; day: number; succeeded: boolean }[];
+  todayIncidentsCount?: number;      // Đếm số sự kiện đã xuất hiện trong ngày hiện tại
   lifetimeStats: {
     totalFried: number;
     totalBurnt: number;
