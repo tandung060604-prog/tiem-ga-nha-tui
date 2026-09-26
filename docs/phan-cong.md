@@ -93,6 +93,7 @@ Phiên làm việc: 26/09/2026, 14:35 → 15:35 (1 tiếng mỗi bên, chạy so
 | 02:18 | Gemini | **G5: XONG 100%.** (1) Thiết kế hoàn thiện bộ CSS Thẻ 'Gà Wrapped' 1080×1350px (tỷ lệ 4:5 chuẩn Threads/Instagram) trong `src/styles/share.css`: Mái hiên sọc đỏ-trắng, Logo tiệm gà, thẻ danh hiệu vinh danh độc quyền (Bậc thầy giòn rụm / Chiến thần canh lửa / Ông trùm kinh doanh), lưới 4 chỉ số vàng (doanh thu, miếng gà chiên, thực khách, kỷ lục chuỗi Perfect), món ruột spotlight kèm trích dẫn Threads, mascot Gà Bông và con dấu đỏ chứng nhận Hẻm 1102; (2) Trang xem trước tương tác với 3 chế độ thu phóng (360px mobile, laptop, 1080px gốc) tại `docs/gemini/preview-ga-wrapped.html`; (3) Tài liệu đặc tả toạ độ Canvas 2D $(X, Y, W, H)$, mã màu và font chữ sẵn sàng tại `docs/gemini/ga-wrapped-specs.md` để Claude vẽ Canvas ở C5; (4) Vượt qua toàn bộ nghiệm thu kép: 264/264 Vitest PASS, build sạch 727ms, 16/16 Chrome `ui:check` PASS (360 & 390px). |
 | 02:22 | Gemini | **[Lock Task] G4. Giao diện cảnh truyện Visual Novel: Chân dung 2 nhân vật đối thoại (.story-portraits .is-speaking/.is-muted) + khung thoại (.story-dialog .story-speaker) + nút lựa chọn phân nhánh (.story-choice .choice-btn) tương thích với dữ liệu truyện.** File tác động: `src/ui/components/StoryModal.ts`, `src/styles/main.css`, `docs/gemini/preview-story.html`, `docs/phan-cong.md`. |
 | 02:30 | Gemini | **G4: XONG 100%.** (1) Nâng cấp giao diện Story Modal thành cảnh thoại Visual Novel sống động: Chân dung 2D của 2 nhân vật đối thoại `.story-portraits` với trạng thái nhân vật đang nói `.story-portrait.is-speaking` sáng bừng và nhân vật đang lắng nghe `.story-portrait.is-muted` mờ nhẹ; (2) Hàm ánh xạ chân dung `getCharacterPortrait()` tự động chọn sprite tương ứng (Bác Ba, Thỏ Cam, Học sinh Minh Trí, Dân văn phòng Bảo Châu, Shipper...); (3) Tái cấu trúc nút lựa chọn phân nhánh `.btn-story-choice` với CSS chuẩn (không inline style); (4) Vượt qua toàn bộ nghiệm thu kép: 264/264 Vitest PASS, build sạch 669ms, 16/16 Chrome `ui:check` PASS (360 & 390px). Sẵn sàng đồng bộ ngay khi Claude Lead xuất API C3! |
+| 02:35 | Gemini | **BÁO CÁO TỔNG KẾT CA ĐÊM 27/09 HOÀN THÀNH 100%.** Đã hoàn tất toàn bộ 6 hạng mục G0 -> G5 theo đúng phân công. Chi tiết báo cáo đầy đủ các mốc, hình ảnh nghiệm thu ui-check-out/ và hướng dẫn bàn giao tại `docs/gemini/bao-cao-dem-27-09.md`. |
 
 
 
@@ -102,5 +103,5 @@ Phiên làm việc: 26/09/2026, 14:35 → 15:35 (1 tiếng mỗi bên, chạy so
 
 ## 4. Báo cáo cuối giờ
 - Claude: `docs/bao-cao/claude-gio-1.md`
-- Gemini: `docs/gemini/bao-cao-gio-1.md`, `docs/gemini/bao-cao-gio-2.md`
+- Gemini: `docs/gemini/bao-cao-gio-1.md`, `docs/gemini/bao-cao-gio-2.md`, `docs/gemini/bao-cao-dem-27-09.md` (Báo cáo tổng kết ca đêm 27/09)
 
