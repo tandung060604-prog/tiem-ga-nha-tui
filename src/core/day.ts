@@ -4,9 +4,10 @@ import { BUNNY_LETTERS, BunnyLetter, MysteryBunnyEngine } from '../content/myste
 import { OrdersEngine } from './orders';
 import { EconomyEngine } from './economy';
 import { ReviewsEngine } from './reviewsEngine';
-import { ageOneDay, consumeStock } from './inventory';
+import { ageOneDay, consumeStock, addStock } from './inventory';
 import { CookingEngine, Sauce } from './cooking';
 import { upgradeEffects } from './upgrades';
+import { auditState, flagIntegrity } from './integrity';
 import { SellingSession } from './sellingSim';
 import { random } from './rng';
 
@@ -16,6 +17,10 @@ import { random } from './rng';
 export const INSPECTION_FINE = 200000;
 export const FAST_SERVICE_TIP = 5000;
 export const PERFECT_TIP = 2000;
+// Chuỗi Perfect liên tiếp nhân tip: 1 mẻ ×1, rồi +25% mỗi mẻ, tối đa ×3 (mô phỏng: kỹ năng trước đây gần như không ra tiền)
+export function perfectTip(streak: number): number {
+  return Math.round(PERFECT_TIP * (1 + Math.min(Math.max(streak - 1, 0), 8) * 0.25) * 2.5);
+}
 export const BUNNY_VISIT_TIP = 35000;
 
 export function eventForDay(day: number): GameEvent {
@@ -78,8 +83,25 @@ export function recordFryerLift(
   if (result.usedSauce) useIngredients(draft, session, [SAUCE_STOCK[result.usedSauce]]);
   draft.oilBatchesCooked += 1;
   draft.oilCondition = CookingEngine.getOilCondition(draft.oilBatchesCooked, upgradeEffects(draft.upgrades).oilLifePct);
-  if (session && result.quality === 'perfect') session.perfectCount += 1;
+  if (session && result.quality === 'perfect') {
+    session.perfectCount += 1;
+    session.perfectStreak += 1;
+  }
   if (session && result.quality === 'burnt') session.burntCount += 1;
+  if (session && result.quality !== 'perfect') session.perfectStreak = 0; // chỉ Perfect mới giữ chuỗi
+}
+
+// Bác Ba tiếp tế khi hết gà và hết tiền: 1 lần mỗi chương (trước đây không giới hạn → cày tiền được)
+export const BA_BA_AID_MONEY = 150000;
+export function requestBaBaAid(draft: GameState): boolean {
+  if ((draft.baBaAidChapter ?? 0) >= draft.currentChapter) return false;
+  draft.baBaAidChapter = draft.currentChapter;
+  const { chicken_meat: meat, flour } = draft.inventory;
+  if (meat) addStock(meat, 15);
+  if (flour) addStock(flour, 20);
+  draft.money += BA_BA_AID_MONEY;
+  draft.lifetimeStats.totalBonus = (draft.lifetimeStats.totalBonus ?? 0) + BA_BA_AID_MONEY;
+  return true;
 }
 
 // ---------------------------------------------------------------------------
@@ -114,7 +136,7 @@ export function serveFirstOrder(
     }
     OrdersEngine.matchItemToOrder(order, item.menuItemId);
     if (item.quality === 'burnt') order.burntPenalty = (order.burntPenalty ?? 0) + Math.round(prices(item.menuItemId) / 2);
-    if (item.quality === 'perfect') order.perfectBonus = (order.perfectBonus ?? 0) + PERFECT_TIP;
+    if (item.quality === 'perfect') order.perfectBonus = (order.perfectBonus ?? 0) + perfectTip(session.perfectStreak);
     removeAt(i);
     matched = true;
   }
@@ -132,16 +154,24 @@ export function serveFirstOrder(
   return { kind: 'complete', order, paid, tip, burnt: (order.burntPenalty ?? 0) > 0 };
 }
 
+// Tiền bán hàng vào ví ngay lúc giao; ghi vào doanh thu trọn đời (dùng cho kiểm tra sổ sách)
+export function creditSale(draft: GameState, paid: number, tip: number) {
+  draft.money += paid + tip;
+  draft.lifetimeStats.totalRevenue += paid + tip;
+}
+
 // Thưởng khi giao cho Bé Thỏ Cam: có thư → tiền tip + cộng sao tiêu chí; ghé thường → 35.000đ.
 export function applyBunnyReward(draft: GameState, order: CustomerOrder): BunnyLetter | undefined {
   draft.bunnyVisitsCount += 1;
   const letter = order.bunnyLetterId ? BUNNY_LETTERS.find(l => l.id === order.bunnyLetterId) : undefined;
   if (!letter) {
     draft.money += BUNNY_VISIT_TIP;
+    draft.lifetimeStats.totalBonus = (draft.lifetimeStats.totalBonus ?? 0) + BUNNY_VISIT_TIP;
     return undefined;
   }
   if (!draft.unlockedBunnyLetters.includes(letter.id)) draft.unlockedBunnyLetters.push(letter.id);
   draft.money += letter.tip;
+  draft.lifetimeStats.totalBonus = (draft.lifetimeStats.totalBonus ?? 0) + letter.tip;
   if (letter.boost) {
     for (const c of letter.boost.criteria) draft.ratings[c] = Math.min(5.0, draft.ratings[c] + letter.boost.value);
     draft.ratings.overall = ReviewsEngine.calculateOverallStars(draft.ratings);
@@ -188,6 +218,7 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   }
 
   draft.money -= EconomyEngine.closingCharges(ledger);
+  draft.debtStreak = draft.money < 0 ? (draft.debtStreak ?? 0) + 1 : 0; // phá sản khi âm quỹ nhiều ngày liền
   draft.ratings = newRatings;
   draft.dayHistory.push(ledger);
   draft.recentReviews.unshift(generatedReview);
@@ -195,6 +226,8 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   draft.lifetimeStats.totalFried += session.totalFriedCount;
   draft.lifetimeStats.totalBurnt += session.burntCount;
   draft.lifetimeStats.perfectFriedCount += session.perfectCount;
+
+  flagIntegrity(draft, auditState(draft)); // chống gian lận: sổ sách phải hợp lý sau mỗi ngày
 
   // Qua chương không còn tự động ở đây: người chơi bấm "Đặt cọc" (core/progression.ts)
 

@@ -1,8 +1,10 @@
 import { GameState, GamePhase, DayLedger, CustomerReview, StoryEndingId } from './types/game';
 import { stateManager } from './core/state';
 import { audio } from './core/audio';
+import { music, babble, narrate, stopNarration } from './core/music';
+import { renderTitleScreen } from './ui/components/TitleScreen';
+import { STORY_ACTS } from './content/storyNovel';
 import { cookingEngine, CookingEngine, Sauce } from './core/cooking';
-import { addStock } from './core/inventory';
 import { SHOP_NAME_MAX } from './ui/escapeHtml';
 import { OrdersEngine } from './core/orders';
 import { EconomyEngine } from './core/economy';
@@ -22,11 +24,11 @@ import { renderMenuTab, bindMenuEvents } from './ui/components/MenuTab';
 import { renderSellingView, patchSellingView, sellingStructureKey } from './ui/components/SellingView';
 import { SellingSession, createSellingSession, gameDeltaMs, tickSelling } from './core/sellingSim';
 import { OPEN_HOUR, CLOSE_HOUR } from './core/clock';
-import { eventForDay, createCustomerSource, useIngredients, recordFryerLift, SAUCE_STOCK, serveFirstOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP } from './core/day';
+import { creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, SAUCE_STOCK, serveFirstOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP } from './core/day';
 import { upgradeEffects } from './core/upgrades';
 import { renderSummaryModal } from './ui/components/SummaryModal';
 import { renderSettingsModal } from './ui/components/SettingsModal';
-import { renderStoryModal, bindStoryEvents } from './ui/components/StoryModal';
+import { renderStoryModal, bindStoryEvents, revealedStory } from './ui/components/StoryModal';
 import { renderBunnyLetterModal, renderBunnyAlbumModal, bindBunnyModalEvents } from './ui/components/BunnyModal';
 import { renderEndingModal, bindEndingEvents } from './ui/components/EndingModal';
 import { evaluateEnding } from './content/endings';
@@ -93,13 +95,55 @@ class AppController {
     // Initial render
     this.render();
 
-    // Hiện modal chào mừng mở đầu game ở Ngày 1
-    if (state.day === 1 && !sessionStorage.getItem('tiem_ga_welcome_seen')) {
-      sessionStorage.setItem('tiem_ga_welcome_seen', 'true');
-      setTimeout(() => {
-        this.openWelcomeDialog();
-      }, 400);
-    }
+    // Âm thanh: tắt tiếng thì tắt nhạc; chuyển app/khóa máy thì dừng nhạc (iOS treo AudioContext)
+    audio.onMuteChange(muted => (muted ? music.stop() : this.titleDismissed && music.start()));
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') { music.stop(); stopNarration(); }
+      else if (this.titleDismissed) music.start();
+    });
+    // iOS Safari bỏ qua user-scalable=no: chặn phóng to bằng 2 ngón để không vỡ bố cục khi đang chiên
+    document.addEventListener('gesturestart', e => e.preventDefault());
+
+    this.showTitleScreen();
+  }
+
+  private titleDismissed = false;
+
+  private showTitleScreen() {
+    const state = stateManager.getState();
+    const hasProgress = state.day > 1 || state.dayHistory.length > 0;
+    document.getElementById('title-screen')?.remove();
+    document.body.insertAdjacentHTML('beforeend', renderTitleScreen(state, hasProgress, music.isEnabled()));
+
+    const start = (fresh: boolean) => {
+      // Vào game trước, âm thanh sau: máy không có Web Audio cũng không bị kẹt ở màn tiêu đề
+      this.titleDismissed = true;
+      document.getElementById('title-screen')?.remove();
+      music.unlock();             // chạm đầu tiên: được phép bật âm thanh trên iOS
+      music.start(stateManager.getState().phase === 'selling' ? 'selling' : 'prep');
+      audio.playPerfect();
+      if (fresh || !hasProgress) setTimeout(() => this.openWelcomeDialog(), 250);
+    };
+
+    document.getElementById('btn-title-play')!.onclick = () => start(false);
+    const newBtn = document.getElementById('btn-title-new');
+    if (newBtn) newBtn.onclick = () => {
+      music.unlock();
+      document.getElementById('title-screen')?.remove();
+      void this.confirmDialog('Xóa tiến độ hiện tại và mở tiệm lại từ Ngày 1?', 'Chơi mới').then(ok => {
+        if (!ok) { this.showTitleScreen(); return; }
+        stateManager.resetGame();
+        this.pickDailyEvent();
+        this.render();
+        start(true);
+      });
+    };
+    const musicBtn = document.getElementById('btn-title-music')!;
+    musicBtn.onclick = () => {
+      music.setEnabled(!music.isEnabled());
+      if (!this.titleDismissed) music.stop();
+      musicBtn.textContent = music.isEnabled() ? '🎵 Nhạc nền: Bật' : '🔇 Nhạc nền: Tắt';
+    };
   }
 
   private openWelcomeDialog() {
@@ -127,6 +171,7 @@ class AppController {
   }
 
   private openMysteryGuestDialog(quest: MysteryGuestQuest) {
+    babble(quest.dialogue, 'guest');
     const html = `
       <div style="text-align: center; padding: 6px 4px;">
         <div style="font-size: 3.5rem; margin-bottom: 6px;">${quest.avatar}</div>
@@ -178,6 +223,7 @@ class AppController {
   }
 
   public closeModal() {
+    stopNarration();
     const overlay = document.getElementById('modal-container');
     if (overlay) {
       overlay.setAttribute('hidden', '');
@@ -193,9 +239,22 @@ class AppController {
       (newIdx) => this.openStoryModal(newIdx),
       () => this.closeModal()
     );
+    const episode = STORY_ACTS[actIndex];
+    const narrateBtn = document.getElementById('btn-story-narrate');
+    if (narrateBtn && episode) {
+      narrateBtn.onclick = () => narrate(revealedStory(episode, stateManager.getState()).text);
+    }
   }
 
-  public openEndingModal(endingId?: StoryEndingId) {
+  // Mở màn kết thúc. `record` = người chơi vừa ĐẠT kết thúc này (lưu vào bộ sưu tập để xem lại).
+  public openEndingModal(endingId?: StoryEndingId, record = true) {
+    if (endingId && record) {
+      stateManager.update(draft => {
+        draft.activeEnding = endingId;
+        draft.achievedEndings = [...new Set([...(draft.achievedEndings ?? []), endingId])];
+      });
+      stateManager.flush();
+    }
     const state = stateManager.getState();
     const html = renderEndingModal(state, endingId);
     this.openModal(html);
@@ -216,6 +275,7 @@ class AppController {
   }
 
   public openBunnyLetterDialog(letter: BunnyLetter, isClaimed: boolean = false) {
+    babble(letter.noteContent, 'bunny');
     const html = renderBunnyLetterModal(letter, isClaimed);
     this.openModal(html);
     bindBunnyModalEvents(
@@ -265,6 +325,7 @@ class AppController {
 
   public openBunnyGreetingDialog() {
     const quote = MysteryBunnyEngine.getRandomGreeting();
+    babble(quote, 'bunny');
     const html = `
       <div style="text-align: center; padding: 10px 4px;">
         <div style="position: relative; width: 100px; height: 100px; margin: 0 auto 10px; border-radius: 50%; padding: 3px; background: linear-gradient(135deg, #ff9800, #f57c00); box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);">
@@ -299,6 +360,7 @@ class AppController {
     });
     stateManager.flush();
 
+    music.setMode(phase === 'selling' ? 'selling' : 'prep');
     if (phase === 'selling') {
       document.body.classList.add('selling-mode');
       this.startSellingPhase();
@@ -438,6 +500,15 @@ class AppController {
       };
     }
 
+    // Về đích Chương 5: dự lễ trao giải Gà Vàng → mở kết thúc theo lựa chọn suốt hành trình
+    const finaleBtn = document.getElementById('btn-finale');
+    if (finaleBtn) {
+      finaleBtn.onclick = () => {
+        const ending = evaluateEnding(stateManager.getState());
+        if (ending) this.openEndingModal(ending);
+      };
+    }
+
     // Đặt cọc qua chương: trả tiền một lần, có xác nhận
     const depositBtn = document.getElementById('btn-deposit');
     if (depositBtn) {
@@ -514,15 +585,16 @@ class AppController {
         const chickenStock = state.inventory.chicken_meat?.amount || 0;
         if (chickenStock < 2) {
           if (state.money < 14000) {
-            // Tương trợ khu phố từ Bác Ba Tổ Trưởng nếu người chơi bị kẹt
-            stateManager.update(draft => {
-              const { chicken_meat: meat, flour } = draft.inventory;
-              if (meat) addStock(meat, 15);
-              if (flour) addStock(flour, 20);
-              draft.money = Math.max(100000, draft.money + 150000);
-            });
-            audio.playCash();
-            this.showToast('❤️ Bác Ba Tổ Trưởng tiếp tế 15 miếng gà tươi & 150k vốn! Mở bán thôi nào!');
+            // Tương trợ khu phố từ Bác Ba Tổ Trưởng nếu người chơi bị kẹt (1 lần mỗi chương)
+            let granted = false;
+            stateManager.update(draft => { granted = requestBaBaAid(draft); });
+            if (granted) {
+              audio.playCash();
+              babble('Con ơi cầm lấy mà xoay xở', 'bacba');
+              this.showToast('❤️ Bác Ba tiếp tế 15 miếng gà tươi & 150k vốn! Chương này bác chỉ giúp được một lần thôi đó.');
+            } else {
+              this.showToast('Hết gà và hết vốn… Bác Ba đã giúp một lần trong chương này rồi. Bán bớt đồ hoặc nhận thưởng Thỏ Cam nhé.');
+            }
             this.render();
             return;
           }
@@ -798,8 +870,7 @@ class AppController {
     const { order, paid, tip, burnt } = result;
     let letter: BunnyLetter | undefined;
     stateManager.update(draft => {
-      draft.money += paid + tip;
-      draft.lifetimeStats.totalRevenue += paid + tip;
+      creditSale(draft, paid, tip);
       if (order.isBunny) letter = applyBunnyReward(draft, order);
     });
 
@@ -970,6 +1041,14 @@ class AppController {
       };
     }
 
+    const musicToggleBtn = document.getElementById('btn-settings-music');
+    if (musicToggleBtn) {
+      musicToggleBtn.onclick = () => {
+        music.setEnabled(!music.isEnabled());
+        this.openSettings();
+      };
+    }
+
     const audioToggleBtn = document.getElementById('btn-settings-audio');
     if (audioToggleBtn) {
       audioToggleBtn.onclick = () => {
@@ -982,8 +1061,14 @@ class AppController {
     if (viewEndingBtn) {
       viewEndingBtn.onclick = () => {
         audio.playPop();
-        const detectedEnding = evaluateEnding(state) || 'open';
-        this.openEndingModal(detectedEnding);
+        // Chỉ xem lại kết thúc ĐÃ đạt; không cho soi trước kết thúc hay điều kiện của chúng
+        const achieved = state.achievedEndings ?? [];
+        const last = achieved[achieved.length - 1];
+        if (!last) {
+          this.showToast('Chưa có kết thúc nào. Hành trình của tiệm còn dài lắm! 🍗');
+          return;
+        }
+        this.openEndingModal(last, false);
       };
     }
 

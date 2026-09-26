@@ -197,4 +197,22 @@ for (const item of MANIFEST) {
     console.log(`✓ ${item.src} → ${OUT}/${item.out[k]} (${item.size.join('×')}, ${(bytes / 1024).toFixed(0)}KB)`);
   }
 }
+
+// ---------------------------------------------------------------------------
+// Icon app (Thêm vào Màn hình chính trên iOS/Android): Gà Bông trên nền kem, vuông, không trong suốt
+// (iOS tự bo góc; nền trong suốt sẽ thành nền đen).
+// ---------------------------------------------------------------------------
+const ICON_SRC = `${OUT}/mascot/mascot_gabong_front.png`;
+mkdirSync('public/icons', { recursive: true });
+for (const size of [180, 192, 512]) {
+  const inner = Math.round(size * 0.8);
+  const mascot = await sharp(ICON_SRC).resize(inner, inner, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).toBuffer();
+  await sharp({ create: { width: size, height: size, channels: 4, background: '#fdf3e4' } })
+    .composite([{ input: mascot, gravity: 'center' }])
+    .flatten({ background: '#fdf3e4' })
+    .png({ compressionLevel: 9 })
+    .toFile(`public/icons/icon-${size}.png`);
+  console.log(`✓ icon → public/icons/icon-${size}.png`);
+}
+
 process.exit(failed ? 1 : 0);

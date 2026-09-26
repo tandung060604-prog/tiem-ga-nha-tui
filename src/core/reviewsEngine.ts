@@ -1,7 +1,8 @@
 import { StarRating, CustomerReview, GameState, NonEmpty } from '../types/game';
 import { GENZ_REVIEW_TEMPLATES, GENZ_USERNAMES, CUST_AVATARS } from '../content/reviews';
-import { pick } from './rng';
+import { pick, weightedPick } from './rng';
 import { upgradeEffects } from './upgrades';
+import { REVIEW_HUMOR, REVIEW_BLOCKED } from '../content/reviewLabels.generated';
 
 export class ReviewsEngine {
   // Trọng số 5 tiêu chí theo GDD
@@ -93,8 +94,10 @@ export class ReviewsEngine {
       t => t.criteria === weakest && reviewStars >= t.minStars && reviewStars <= t.maxStars
     );
 
-    const chosenTemplate = matchingTemplates.length > 0
-      ? pick(matchingTemplates)
+    // Độ hài do Jev chấm sẵn (npm run jev:content): câu hài hơn được chọn nhiều hơn; câu phản cảm bị loại
+    const usable = matchingTemplates.filter(t => !REVIEW_BLOCKED.includes(t.text));
+    const chosenTemplate = usable.length > 0
+      ? weightedPick(usable, t => 1 + (REVIEW_HUMOR[t.text] ?? 1))
       : GENZ_REVIEW_TEMPLATES[0];
 
     const authorName = pick(GENZ_USERNAMES);

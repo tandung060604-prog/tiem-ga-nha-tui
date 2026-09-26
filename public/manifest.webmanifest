@@ -1,0 +1,17 @@
+{
+  "name": "Tiệm Gà Nhà Tui",
+  "short_name": "Tiệm Gà",
+  "description": "Từ xe đẩy gà rán đầu hẻm đến chuỗi gà quốc dân.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fdf3e4",
+  "theme_color": "#e63946",
+  "lang": "vi",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

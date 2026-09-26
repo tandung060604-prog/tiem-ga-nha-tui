@@ -7,6 +7,7 @@ export default defineConfig({
     open: false
   },
   build: {
-    target: 'esnext'
+    // iOS Safari 14+ (iPhone 6s trở lên chạy được iOS 15): không để cú pháp quá mới làm trắng màn hình
+    target: ['es2020', 'safari14']
   }
 });

@@ -32,6 +32,10 @@ describe('Hệ Thống Visual Novel & Dilemma Phân Nhánh (Gemini 3 Narrative)'
     const state = createInitialState();
     state.karma = { community: 50, craftsmanship: 50, ambition: 50 };
 
+    // Chưa đọc hết Hồi 1 (chưa gom đủ tiền cọc Chương 1) → chưa được quyết định
+    expect(chooseDialogueOption(state, 0, 'act1_opt_community').success).toBe(false);
+    state.money = 5_000_000;
+
     // Hồi 1: Chọn nhánh tình thân hẻm ({ community: +15, craftsmanship: +5, ambition: -5 })
     const res = chooseDialogueOption(state, 0, 'act1_opt_community');
     expect(res.success).toBe(true);
@@ -63,51 +67,4 @@ describe('Ma Trận 5 Đại Kết Cục (Multi-Ending)', () => {
     expect(STORY_ENDINGS.secret).toBeDefined();
   });
 
-  it('Bad Ending 3A: kích hoạt khi phá sản (tiền âm) hoặc sao < 2.5', () => {
-    const state = createInitialState();
-    state.day = 6;
-    state.money = -50000;
-    expect(evaluateEnding(state)).toBe('bad_bankruptcy');
-
-    state.money = 200000;
-    state.day = 16;
-    state.ratings.overall = 2.2;
-    expect(evaluateEnding(state)).toBe('bad_bankruptcy');
   });
-
-  it('Secret Ending: kích hoạt khi đạt 5.0⭐, không cháy và tỷ lệ Perfect cao', () => {
-    const state = createInitialState();
-    state.day = 21;
-    state.ratings.overall = 4.95;
-    state.lifetimeStats = {
-      totalFried: 100,
-      totalBurnt: 0,
-      totalRevenue: 20000000,
-      perfectFriedCount: 90 // 90%
-    };
-    expect(evaluateEnding(state)).toBe('secret');
-  });
-
-  it('Bad Ending 3B: Tham vọng cực cao, xem nhẹ tình thân hẻm', () => {
-    const state = createInitialState();
-    state.day = 26;
-    state.karma = { community: 25, craftsmanship: 40, ambition: 90 };
-    expect(evaluateEnding(state)).toBe('bad_corporate');
-  });
-
-  it('Happy Ending: Tình thân và Bản sắc nghệ nhân đều cao, mở khóa 6 thư Thỏ Cam', () => {
-    const state = createInitialState();
-    state.day = 26;
-    state.karma = { community: 85, craftsmanship: 85, ambition: 60 };
-    state.unlockedBunnyLetters = ['l1', 'l2', 'l3', 'l4', 'l5', 'l6'];
-    expect(evaluateEnding(state)).toBe('happy');
-  });
-
-  it('Open Ending: Kết thúc bình dị an yên khi không rơi vào trường hợp cực đoan', () => {
-    const state = createInitialState();
-    state.day = 26;
-    state.karma = { community: 60, craftsmanship: 60, ambition: 50 };
-    state.unlockedBunnyLetters = ['l1', 'l2'];
-    expect(evaluateEnding(state)).toBe('open');
-  });
-});

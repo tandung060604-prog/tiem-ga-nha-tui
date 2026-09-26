@@ -1,5 +1,6 @@
 import { NonEmpty, GameState } from '../types/game';
 import { applyKarmaChange, evaluateEnding } from './endings';
+import { chapterProgress } from '../core/progression';
 
 export interface DialogueOption {
   id: string;
@@ -189,7 +190,7 @@ Chưa dừng lại ở đó, đối thủ thuê một đội ngũ truyền thôn
       },
       {
         id: 'act4_opt_corporate',
-        label: 'Thương thảo bán 49% cổ phần cho MegaChicken để lấy 1 triệu USD và hợp tác công nghiệp hóa',
+        label: 'Ngồi xuống nghe MegaChicken ra giá: một khoản tiền lớn để đổi lấy bí quyết của tiệm',
         kicker: '💔 THƯƠNG MẠI HÓA',
         karmaEffect: { ambition: 30, community: -25, craftsmanship: -20 },
         reactionNarrative: 'Bác Ba nhìn bạn thở dài thất vọng. Hương vị quán bắt đầu vương mùi toan tính đồng tiền lạnh lẽo.'
@@ -240,6 +241,11 @@ export function chooseDialogueOption(
 
   if (episode.chapterRequirement > state.currentChapter) {
     return { success: false, message: `Chưa mở khóa Hồi ${episode.act} (Yêu cầu Chương ${episode.chapterRequirement})` };
+  }
+
+  // Hồi của chương đang chơi chỉ cho chọn khi đã đọc trọn (đã gom đủ tiền cọc chương)
+  if (episode.chapterRequirement === state.currentChapter && chapterProgress(state) < 1) {
+    return { success: false, message: 'Hãy đọc hết hồi truyện này trước khi quyết định.' };
   }
 
   const option = episode.options?.find(o => o.id === optionId);

@@ -10,18 +10,42 @@ class AudioManager {
     // AudioContext will be initialized on first user interaction
   }
 
+  private muteListeners: Array<(muted: boolean) => void> = [];
+
+  public onMuteChange(listener: (muted: boolean) => void) {
+    this.muteListeners.push(listener);
+  }
+
+  // AudioContext dùng chung (nhạc nền, giọng nhân vật). null khi không có Web Audio (vd. Node test).
+  public context(): AudioContext | null {
+    if (typeof window === 'undefined') return null;
+    this.initContext();
+    return this.ctx;
+  }
+
+  private unsupported = false;
+
+  // Không có Web Audio (trình duyệt nhúng, máy cũ, chế độ hạn chế): game vẫn chạy, chỉ im lặng
   private initContext() {
-    if (!this.ctx) {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      this.ctx = new AudioCtx();
+    if (!this.ctx && !this.unsupported) {
+      const AudioCtx = window.AudioContext
+        || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      try {
+        if (!AudioCtx) throw new Error('no Web Audio');
+        this.ctx = new AudioCtx();
+      } catch {
+        this.unsupported = true;
+        return;
+      }
     }
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume();
+    if (this.ctx && this.ctx.state === 'suspended') {
+      void this.ctx.resume().catch(() => {});
     }
   }
 
   public setMuted(muted: boolean) {
     this.isMuted = muted;
+    this.muteListeners.forEach(l => l(muted));
     if (muted && this.sizzleGain) {
       this.sizzleGain.gain.setValueAtTime(0, this.ctx?.currentTime || 0);
     }

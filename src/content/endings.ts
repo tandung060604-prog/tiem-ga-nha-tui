@@ -1,4 +1,5 @@
 import { GameState, KarmaState, StoryEnding, StoryEndingId } from '../types/game';
+import { CHAPTERS } from './chapters';
 
 export const STORY_ENDINGS: Record<StoryEndingId, StoryEnding> = {
   happy: {
@@ -31,7 +32,7 @@ export const STORY_ENDINGS: Record<StoryEndingId, StoryEnding> = {
     title: 'CỬA CUỐN ĐÓNG LẠI',
     tagline: 'Tiếng dầu sôi tắt ngấm, chỉ còn tiếng mưa rơi lộp độp trên mái hiên tôn lạnh lẽo.',
     excerpt: 'Hạn chót tiền cọc mặt bằng đã điểm. Bạn đứng trước xe đẩy xếp gọn đồ đạc trong một buổi chiều mưa nặng hạt. Bác Ba thở dài, dúi vào túi bạn vài tờ tiền lộ phí. Con hẻm 1102 vắng tiếng cười, bạn lặng lẽ rời đi...',
-    conditionDescription: 'Vỡ nợ tiền cọc mặt bằng hoặc điểm đánh giá tổng thể < 2.5 sao.',
+    conditionDescription: 'Quỹ tiệm bị âm 3 ngày liên tiếp.',
     karma: { community: 40, craftsmanship: 50, ambition: 60 }
   },
   bad_corporate: {
@@ -53,7 +54,7 @@ export const STORY_ENDINGS: Record<StoryEndingId, StoryEnding> = {
     title: 'CHIẾC VÁ VÀNG 1975',
     tagline: 'Đẳng cấp nghệ nhân ẩm thực đường phố vươn tầm di sản ẩm thực.',
     excerpt: 'Suốt chuỗi ngày kinh doanh, tiệm đạt 5.0 sao tuyệt đối, không một miếng gà cháy, tỷ lệ giòn Perfect đạt cảnh giới thượng thừa. Hiệp hội Ẩm thực Quốc tế trao tặng danh hiệu Bàn Tay Vàng. Chiếc vá gỗ của Bác Ba được đúc đồng mạ vàng trang trọng.',
-    conditionDescription: '5.0⭐ toàn diện suốt 20 ngày · 0 miếng gà cháy · Tỷ lệ Perfect ≥ 85%.',
+    conditionDescription: 'Về đích Chương 5 với ≥ 4.9⭐ · Perfect ≥ 85% · cháy ≤ 2% (≥ 200 mẻ).',
     karma: { community: 92, craftsmanship: 100, ambition: 85 }
   }
 };
@@ -69,45 +70,27 @@ export function applyKarmaChange(
   };
 }
 
+export const BANKRUPTCY_DEBT_DAYS = 3;
+export const FINALE_CHAPTER = 5;
+
+// Đỉnh hành trình: đang ở Chương 5 và đã gom đủ quỹ dự lễ trao giải Gà Vàng.
+export function finaleReady(state: GameState): boolean {
+  const finale = CHAPTERS.find(c => c.number === FINALE_CHAPTER);
+  return state.currentChapter >= FINALE_CHAPTER && !!finale && state.money >= finale.targetMoney;
+}
+
+// Kết thúc duy nhất có thể xảy ra giữa chừng là phá sản (âm quỹ nhiều ngày liền).
+// 4 kết thúc lớn chỉ mở ở đỉnh Chương 5 → người chơi đi hết cốt truyện, không bị cắt ngang ở ngày 25.
 export function evaluateEnding(state: GameState): StoryEndingId | null {
-  // 1. Secret Ending: Đỉnh cao nghệ nhân
-  if (
-    state.day >= 20 &&
-    state.ratings.overall >= 4.9 &&
-    state.lifetimeStats.totalBurnt === 0 &&
-    state.lifetimeStats.totalFried >= 30 &&
-    (state.lifetimeStats.perfectFriedCount / Math.max(1, state.lifetimeStats.totalFried)) >= 0.85
-  ) {
-    return 'secret';
-  }
+  if ((state.debtStreak ?? 0) >= BANKRUPTCY_DEBT_DAYS) return 'bad_bankruptcy';
+  if (!finaleReady(state)) return null;
 
-  // 2. Bad Ending 3A: Phá sản
-  if (state.money < 0 && state.day >= 5) {
-    return 'bad_bankruptcy';
-  }
-  if (state.day >= 15 && state.ratings.overall < 2.5) {
-    return 'bad_bankruptcy';
-  }
-
-  // Các kết thúc lớn ở cuối hành trình (Chương 5 hoặc Ngày 25+)
-  if (state.currentChapter >= 5 || state.day >= 25) {
-    // 3. Bad Ending 3B: Bán mình cho tập đoàn
-    if (state.karma.ambition >= 85 && state.karma.community < 40) {
-      return 'bad_corporate';
-    }
-
-    // 4. Happy Ending: Đại viên mãn
-    if (
-      state.karma.community >= 75 &&
-      state.karma.craftsmanship >= 75 &&
-      state.unlockedBunnyLetters.length >= 6
-    ) {
-      return 'happy';
-    }
-
-    // 5. Open Ending: Bình dị an yên
-    return 'open';
-  }
-
-  return null;
+  const { totalFried, totalBurnt, perfectFriedCount } = state.lifetimeStats;
+  const perfectRatio = perfectFriedCount / Math.max(1, totalFried);
+  const burntRatio = totalBurnt / Math.max(1, totalFried);
+  const trusted = state.integrity?.tampered !== true; // save bị sửa: không công nhận Viên mãn / Bí mật
+  if (trusted && state.ratings.overall >= 4.9 && totalFried >= 200 && perfectRatio >= 0.85 && burntRatio <= 0.02) return 'secret';
+  if (state.karma.ambition >= 85 && state.karma.community < 40) return 'bad_corporate';
+  if (trusted && state.karma.community >= 75 && state.karma.craftsmanship >= 75 && state.unlockedBunnyLetters.length >= 6) return 'happy';
+  return 'open';
 }

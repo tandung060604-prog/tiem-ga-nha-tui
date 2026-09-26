@@ -22,16 +22,24 @@ export interface DepositStatus {
   moneyOk: boolean;
   starsOk: boolean;
   isFinal: boolean;
-  cost: number;
+  cost: number;      // tiền cọc thực trả
+  required: number;  // quỹ cần có để được đặt cọc
   starsNeeded: number;
 }
+
+// Phải có đủ quỹ mục tiêu, nhưng chỉ trả 70%: 30% còn lại là vốn nhập hàng ở tiệm mới.
+// (npm run sim: trả 100% → còn ~360k, không đủ vốn nhập hàng, khách bỏ về hết → vòng xoáy phá sản.)
+export const DEPOSIT_SHARE = 0.7;
 
 export function depositStatus(state: GameState): DepositStatus {
   const chapter = currentChapterData(state);
   const isFinal = state.currentChapter >= FINAL_CHAPTER;
   const moneyOk = state.money >= chapter.targetMoney;
   const starsOk = state.ratings.overall >= chapter.targetStars;
-  return { ready: !isFinal && moneyOk && starsOk, moneyOk, starsOk, isFinal, cost: chapter.targetMoney, starsNeeded: chapter.targetStars };
+  return {
+    ready: !isFinal && moneyOk && starsOk, moneyOk, starsOk, isFinal,
+    cost: Math.round(chapter.targetMoney * DEPOSIT_SHARE), required: chapter.targetMoney, starsNeeded: chapter.targetStars
+  };
 }
 
 // Trả tiền cọc và sang chương mới. Trả về số chương mới, hoặc null nếu chưa đủ điều kiện.
@@ -40,6 +48,7 @@ export function depositForNextChapter(draft: GameState): number | null {
   if (!status.ready) return null;
   draft.money -= status.cost;
   draft.currentChapter += 1;
+  draft.depositsPaid = (draft.depositsPaid ?? 0) + 1;
   return draft.currentChapter;
 }
 

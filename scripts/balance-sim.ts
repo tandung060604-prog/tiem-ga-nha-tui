@@ -5,10 +5,11 @@ import { createInitialState } from '../src/core/state';
 import { CookingEngine, Sauce } from '../src/core/cooking';
 import { createSellingSession, gameDeltaMs, tickSelling, SellingSession } from '../src/core/sellingSim';
 import {
-  eventForDay, createCustomerSource, serveFirstOrder, applyBunnyReward, closeDay, useIngredients, recordFryerLift
+  creditSale, eventForDay, createCustomerSource, serveFirstOrder, applyBunnyReward, closeDay, useIngredients, recordFryerLift
 } from '../src/core/day';
 import { EconomyEngine } from '../src/core/economy';
 import { upgradeEffects } from '../src/core/upgrades';
+import { depositForNextChapter } from '../src/core/progression';
 import { addStock } from '../src/core/inventory';
 import { seedRandom, random } from '../src/core/rng';
 import { audio } from '../src/core/audio';
@@ -154,7 +155,7 @@ function playDay(state: GameState, p: Profile, policy: UpgradePolicy) {
     if (first && tray.some(t => t.quality !== 'raw' && first.items.some(it => it.menuItemId === t.menuItemId && !it.completed))) {
       const r = serveFirstOrder(session, tray, price, i => cook.removeFromTray(i));
       if (r.kind === 'complete') {
-        state.money += r.paid + r.tip;
+        creditSale(state, r.paid, r.tip);
         if (r.order.isBunny) applyBunnyReward(state, r.order);
       }
       continue;
@@ -180,8 +181,9 @@ function playDay(state: GameState, p: Profile, policy: UpgradePolicy) {
   }
 
   const result = closeDay(state, session, event);
+  const unlocked = depositForNextChapter(state); // người chơi ảo bấm "Đặt cọc" ngay khi đủ điều kiện
   state.day += 1;
-  return { ledger: result.ledger, unlocked: result.unlockedChapter, expected };
+  return { ledger: result.ledger, unlocked, expected };
 }
 
 // ---------------------------------------------------------------------------
@@ -193,6 +195,7 @@ const arg = (name: string, fallback: number) => {
   return i >= 0 ? Number(process.argv[i + 1]) : fallback;
 };
 const DAYS = arg('days', 60);
+const DEBUG_DAYS = process.argv.includes('--debug');
 const SEEDS = arg('seeds', 12);
 
 const median = (xs: number[]) => {
@@ -220,6 +223,9 @@ for (const policy of ['không nâng cấp', 'có nâng cấp'] as UpgradePolicy[
         if (unlocked === 2) ch2 = d;
         if (unlocked === 3) ch3 = d;
         if (moneyAt[d]) moneyAt[d]!.push(state.money);
+        if (DEBUG_DAYS && seed === 1 && p.name === 'Trung bình' && policy === 'không nâng cấp' && d >= 7 && d <= 16) {
+          console.log(`  [debug] ngày ${d} ch${state.currentChapter} tiền ${fmt(state.money)} | khách dự kiến ${expected} phục vụ ${ledger.customersServed} bỏ ${ledger.customersLost} | thu ${fmt(ledger.grossRevenue + ledger.tips)} nguyên liệu ${fmt(ledger.ingredientCost)} hết hạn ${fmt(ledger.wasteCost)} mặt bằng+điện ${fmt(ledger.rent + ledger.utilities)} lương ${fmt(ledger.wages)} lãi ${fmt(ledger.netProfit)}`);
+        }
         if (d <= 15) {
           served += ledger.customersServed; lost += ledger.customersLost;
           expectedSum += expected; profitSum += ledger.netProfit; days++;

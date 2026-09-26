@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { addStock, consumeStock, refundStock, canUnlockIngredient, unlockIngredient, ensureBatches } from '../src/core/inventory';
+import { addStock, consumeStock, canUnlockIngredient, signIngredientContract, ensureBatches } from '../src/core/inventory';
 import { createInitialState } from '../src/core/state';
 import { OrdersEngine } from '../src/core/orders';
 import { InventoryItem } from '../src/types/game';
@@ -24,46 +24,6 @@ const makeChicken = (amount = 10, currentLifeDays = 1, shelfLifeDays = 2): Inven
   };
   return item;
 };
-
-describe('Quản lý hoàn vốn kho LIFO (refundStock)', () => {
-  it('từ chối hoàn trả khi số lượng trong kho nhỏ hơn số lượng muốn hoàn', () => {
-    const item = makeChicken(3);
-    expect(refundStock(item, 5)).toBe(false);
-    expect(item.amount).toBe(3);
-  });
-
-  it('hoàn trả đúng số lượng và trừ từ lô mới nhập nhất (LIFO), bảo toàn HSD lô cũ', () => {
-    const item = makeChicken(10, 1, 2); // Lô 1: 10 cái, còn 1 ngày
-    addStock(item, 5);                  // Lô 2: 5 cái, còn 2 ngày
-
-    expect(item.amount).toBe(15);
-    expect(item.batches.length).toBe(2);
-
-    // Hoàn vốn 5 cái: phải trừ từ Lô 2 (lô mới nhất)
-    const success = refundStock(item, 5);
-    expect(success).toBe(true);
-    expect(item.amount).toBe(10);
-    expect(item.batches.length).toBe(1);
-    expect(item.batches[0]).toEqual({ amount: 10, daysLeft: 1 });
-    expect(item.currentLifeDays).toBe(1);
-  });
-
-  it('hoàn trả xuyên qua nhiều lô mới nhất nếu cần', () => {
-    const item = makeChicken(5, 1, 2); // Lô 1: 5 cái, 1 ngày
-    addStock(item, 3);                 // Lô 2: 3 cái, 2 ngày
-    addStock(item, 4);                 // Lô 3: 4 cái, 2 ngày
-
-    expect(item.amount).toBe(12);
-
-    // Hoàn trả 5 cái: trừ 4 từ Lô 3, 1 từ Lô 2
-    expect(refundStock(item, 5)).toBe(true);
-    expect(item.amount).toBe(7);
-    expect(item.batches).toEqual([
-      { amount: 5, daysLeft: 1 },
-      { amount: 2, daysLeft: 2 }
-    ]);
-  });
-});
 
 describe('Phân tầng mở khóa nguyên liệu (Progression Pacing)', () => {
   it('khởi tạo GameState Ngày 1 chỉ mở sẵn 5 nguyên liệu cốt lõi', () => {
@@ -91,7 +51,7 @@ describe('Phân tầng mở khóa nguyên liệu (Progression Pacing)', () => {
     const checkDay = canUnlockIngredient(state, 'spicy_sauce');
     expect(checkDay.canUnlock).toBe(false);
     expect(checkDay.reason).toContain('Ngày 3');
-    expect(unlockIngredient(state, 'spicy_sauce')).toBe(false);
+    expect(signIngredientContract(state, 'spicy_sauce').success).toBe(false);
 
     // Đến Ngày 3 nhưng không đủ tiền
     state.day = 3;
@@ -99,7 +59,7 @@ describe('Phân tầng mở khóa nguyên liệu (Progression Pacing)', () => {
     const checkMoney = canUnlockIngredient(state, 'spicy_sauce');
     expect(checkMoney.canUnlock).toBe(false);
     expect(checkMoney.reason).toContain('Thiếu tiền');
-    expect(unlockIngredient(state, 'spicy_sauce')).toBe(false);
+    expect(signIngredientContract(state, 'spicy_sauce').success).toBe(false);
   });
 
   it('đủ ngày và đủ tiền: trừ tiền chính xác và đổi trạng thái unlocked = true', () => {
@@ -107,7 +67,7 @@ describe('Phân tầng mở khóa nguyên liệu (Progression Pacing)', () => {
     state.day = 3;
     state.money = 100000;
 
-    const success = unlockIngredient(state, 'spicy_sauce');
+    const success = signIngredientContract(state, 'spicy_sauce').success;
     expect(success).toBe(true);
     expect(state.inventory.spicy_sauce.unlocked).toBe(true);
     expect(state.money).toBe(50000); // 100k - 50k

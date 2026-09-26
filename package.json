@@ -10,7 +10,9 @@
     "test": "vitest run",
     "sim": "tsx scripts/balance-sim.ts",
     "assets": "node scripts/process-assets.mjs",
+    "ios:check": "node scripts/ios-check.mjs",
     "ui:check": "node scripts/ui-check.mjs",
+    "jev:content": "tsx --env-file=.env scripts/jev-content.ts",
     "jev:check": "node --env-file-if-exists=.env scripts/jev-check.ts"
   },
   "devDependencies": {

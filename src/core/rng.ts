@@ -25,6 +25,19 @@ export function seedRandom(seed: number) {
   current = createRng(seed);
 }
 
+// Chọn theo trọng số (trọng số ≤ 0 = không bao giờ chọn); mảng rỗng hoặc tổng 0 → lỗi
+export function weightedPick<T>(items: readonly T[], weight: (x: T) => number): T {
+  const weights = items.map(x => Math.max(0, weight(x)));
+  const total = weights.reduce((a, b) => a + b, 0);
+  if (total <= 0) throw new Error('weightedPick() không có phần tử nào có trọng số > 0');
+  let r = random() * total;
+  for (let i = 0; i < items.length; i++) {
+    r -= weights[i] ?? 0;
+    if (r < 0) return items[i] as T;
+  }
+  return items[items.length - 1] as T;
+}
+
 // Mảng rỗng → lỗi ngay chỗ gọi, thay vì trả undefined rồi crash ở nơi khác
 export function pick<T>(items: readonly T[]): T {
   if (items.length === 0) throw new Error('pick() trên mảng rỗng');

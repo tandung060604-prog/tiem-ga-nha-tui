@@ -36,6 +36,10 @@ export interface MenuItem {
 export interface StockBatch {
   amount: number;
   daysLeft: number;
+  // Đổi trả trong ngày: số đơn vị của lô vừa MUA hôm nay còn được hoàn, và giá đã trả mỗi đơn vị.
+  // Hàng tặng lúc đầu game / hàng đã qua đêm: refundable = 0 (không hoàn được).
+  refundable?: number;
+  unitCost?: number;
 }
 
 export interface InventoryItem {
@@ -240,11 +244,17 @@ export interface GameState {
   unlockedBunnyLetters: string[];
   karma: KarmaState;
   activeEnding?: StoryEndingId | null;
+  achievedEndings?: StoryEndingId[]; // kết thúc đã đạt: chỉ những cái này được xem lại
+  debtStreak?: number;               // số ngày liên tiếp đóng cửa với quỹ âm
   chosenDialogueIds?: string[];
   lifetimeStats: {
     totalFried: number;
     totalBurnt: number;
     totalRevenue: number;
     perfectFriedCount: number;
+    totalBonus?: number; // tiền thưởng (Thỏ Cam, Bác Ba tiếp tế) — dùng cho kiểm tra sổ sách chống gian lận
   };
+  depositsPaid?: number;       // số lần đặt cọc qua chương (chương chỉ mở bằng đặt cọc)
+  baBaAidChapter?: number;     // chương gần nhất Bác Ba đã tiếp tế (1 lần/chương)
+  integrity?: { tampered: boolean; reasons: string[] };
 }

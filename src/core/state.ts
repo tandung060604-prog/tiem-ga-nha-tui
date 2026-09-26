@@ -4,8 +4,10 @@ import { INITIAL_MENU } from '../content/menu';
 import { INITIAL_UPGRADES } from '../content/upgrades';
 import { INITIAL_CANDIDATES } from '../content/staff';
 import { ensureBatches } from './inventory';
+import { signSave, auditState, flagIntegrity } from './integrity';
 
 const SAVE_KEY = 'tiem_ga_nha_tui_save_v2';
+const SIG_KEY = `${SAVE_KEY}_sig`;
 
 export function createInitialState(): GameState {
   const state: GameState = {
@@ -140,6 +142,14 @@ export function migrateSave(raw: unknown): { state: GameState; repaired: string[
   if (state.activeEnding === undefined) {
     state.activeEnding = null;
   }
+  // Save từ trước khi có sổ chống gian lận: không phạt oan người chơi cũ.
+  // Tiền thưởng đã nhận không được ghi → coi phần dư so với doanh thu là thưởng hợp lệ;
+  // chương đã mở bằng luật tự qua chương cũ → coi như đã đặt cọc.
+  if (typeof state.lifetimeStats.totalBonus !== 'number') {
+    state.lifetimeStats.totalBonus = Math.max(0, state.money - 850000 - state.lifetimeStats.totalRevenue);
+  }
+  if (typeof state.depositsPaid !== 'number') state.depositsPaid = state.currentChapter - 1;
+
   // Nạp lại trang giữa ca bán → về pha Chuẩn bị (phiên bán không được lưu)
   if (state.phase !== 'prep') state.phase = 'prep';
   return { state, repaired };
@@ -199,7 +209,9 @@ export class StateManager {
   public saveState() {
     if (!hasStorage) return;
     try {
-      localStorage.setItem(SAVE_KEY, JSON.stringify(this.state));
+      const json = JSON.stringify(this.state);
+      localStorage.setItem(SAVE_KEY, json);
+      localStorage.setItem(SIG_KEY, signSave(json)); // chữ ký chống sửa tay
     } catch (e) {
       console.error('Không thể lưu save game vào localStorage:', e);
     }
@@ -223,6 +235,12 @@ export class StateManager {
     }
     if (result) {
       if (result.repaired.length) console.warn('Save game có trường hỏng, đã sửa:', result.repaired.join(', '));
+      // Chống gian lận: chữ ký không khớp = save bị sửa ngoài game; bất biến sổ sách sai = số liệu vô lý.
+      // Save cũ chưa có chữ ký thì chấp nhận (ký lại ở lần lưu tới).
+      const sig = localStorage.getItem(SIG_KEY);
+      const reasons = auditState(result.state);
+      if (sig !== null && sig !== signSave(data)) reasons.unshift('Save bị chỉnh sửa bên ngoài game');
+      flagIntegrity(result.state, reasons);
       return result.state;
     }
     // Không cứu được (JSON cụt, sai version…): giữ bản gốc sang khóa khác trước khi tạo game mới
@@ -240,6 +258,7 @@ export class StateManager {
     this.saveTimer = null;
     if (hasStorage) {
       localStorage.removeItem(SAVE_KEY);
+      localStorage.removeItem(SIG_KEY);
       localStorage.removeItem('tiem_ga_nha_tui_save_v1');
     }
     this.state = createInitialState();

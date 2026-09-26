@@ -6,7 +6,25 @@
   <meta name="color-scheme" content="only light">
   <title>Tiệm Gà Nhà Tui - Game Quản Lý Tiệm Gà Rán</title>
   <meta name="theme-color" content="#fdf3e4">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍗</text></svg>">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <!-- iOS: thêm vào Màn hình chính → mở toàn màn như app -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Tiệm Gà">
+  <meta name="format-detection" content="telephone=no">
+  <!-- Nền tảng chạm cho iOS Safari (đặt ở đây để áp dụng trước mọi CSS khác) -->
+  <style id="ios-base">
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    html, body { overscroll-behavior: none; }
+    body { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
+    button, [role="button"], .tray-item, .customer-card, .fry-pot { touch-action: manipulation; -webkit-user-select: none; user-select: none; }
+    input, textarea { font-size: 16px; } /* < 16px: Safari tự phóng to khi gõ */
+    button, input, select, textarea { font-family: inherit; } /* Safari không cho nút kế thừa phông → hiện Times */
+    .app { min-height: 100vh; min-height: 100dvh; }
+  </style>
   <meta name="description" content="Game quản lý tiệm gà rán chạy trên trình duyệt di động: Từ xe đẩy đầu hẻm đến chuỗi gà quốc dân, review GenZ siêu hài hước!">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

@@ -1,5 +1,6 @@
 import { GameState } from '../../types/game';
 import { audio } from '../../core/audio';
+import { music } from '../../core/music';
 import { escapeHtml, SHOP_NAME_MAX } from '../escapeHtml';
 
 export function renderSettingsModal(state: GameState): string {
@@ -35,6 +36,13 @@ export function renderSettingsModal(state: GameState): string {
         </button>
       </div>
 
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.85rem; font-weight: 800; color: var(--ink);">🎵 Nhạc nền</span>
+        <button id="btn-settings-music" class="btn-sm ${music.isEnabled() ? 'primary' : ''}">
+          ${music.isEnabled() ? 'BẬT 🎵' : 'TẮT 🔇'}
+        </button>
+      </div>
+
       <!-- Progression Stats -->
       <div style="background: var(--bg); border-radius: 12px; padding: 10px; font-size: 0.78rem; display: flex; flex-direction: column; gap: 4px;">
         <div>🍗 Tổng miếng gà đã chiên: <b>${state.lifetimeStats.totalFried}</b></div>
@@ -42,10 +50,17 @@ export function renderSettingsModal(state: GameState): string {
         <div>💸 Tổng doanh thu tích lũy: <b>${state.lifetimeStats.totalRevenue.toLocaleString('vi-VN')}đ</b></div>
       </div>
 
+      ${state.integrity?.tampered ? `
+        <div class="integrity-warning" style="background: #fff3e0; border: 1.5px solid #fb8c00; border-radius: 10px; padding: 10px; font-size: 0.78rem; color: #6d3a00;">
+          <b>⚠️ Save này đã bị chỉnh sửa ngoài game</b><br/>
+          Vẫn chơi tiếp được, nhưng kết thúc Viên mãn và Bí mật sẽ không được công nhận.
+          <div style="margin-top: 4px; opacity: .8;">${state.integrity.reasons.slice(0, 3).map(r => escapeHtml(r)).join('<br/>')}</div>
+        </div>` : ''}
+
       <!-- Story Ending Preview -->
       <div style="border-top: 1px dashed var(--line); padding-top: 10px; text-align: center;">
         <button id="btn-view-ending" class="btn-sm" style="width: 100%; padding: 8px; font-weight: 800; background: linear-gradient(135deg, #ffd166, #f4a261); border-color: #e76f51; color: #431407;">
-          🏆 Xem Vận Mệnh Tiệm Gà (Ending)
+          🏆 Kết thúc đã đạt (${(state.achievedEndings ?? []).length}/5)
         </button>
       </div>
 

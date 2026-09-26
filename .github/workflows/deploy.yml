@@ -27,7 +27,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Install dependencies
@@ -35,6 +35,9 @@ jobs:
 
       - name: Generate assets
         run: npm run assets
+
+      - name: Test (không deploy nếu test hỏng)
+        run: npm test
 
       - name: Build production bundle
         run: npm run build

@@ -60,6 +60,7 @@ for (const width of WIDTHS) {
   };
 
   await page.goto(TARGET);
+  await page.locator('#btn-title-play').click(); // màn tiêu đề (chạm đầu tiên bật âm thanh iOS)
   await page.locator('#btn-welcome-start').click();
   await checkOverflow('màn Chuẩn bị');
   await page.screenshot({ path: `${OUT}/${width}-prep.png` });

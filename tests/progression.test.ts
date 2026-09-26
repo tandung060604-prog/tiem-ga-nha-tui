@@ -23,7 +23,7 @@ describe('đặt cọc qua chương', () => {
   it('đủ điều kiện: trừ đúng tiền cọc, sang chương kế', () => {
     const s = at(1, 6_000_000);
     expect(depositForNextChapter(s)).toBe(2);
-    expect(s.money).toBe(1_000_000);
+    expect(s.money).toBe(6_000_000 - 3_500_000); // chỉ trả 70% của 5 triệu, giữ vốn nhập hàng
     expect(s.currentChapter).toBe(2);
   });
 

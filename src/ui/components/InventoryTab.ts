@@ -1,6 +1,6 @@
 import { GameState } from '../../types/game';
 import { audio } from '../../core/audio';
-import { addStock, refundStock, unlockIngredient } from '../../core/inventory';
+import { addStock, refundPurchase, refundableUnits, signIngredientContract, isIngredientUnlocked, UnlockResult } from '../../core/inventory';
 
 export function renderInventoryTab(state: GameState): string {
   const items = Object.values(state.inventory);
@@ -66,7 +66,7 @@ export function renderInventoryTab(state: GameState): string {
         </div>
 
         <div class="btn-group">
-          <button class="btn-sm btn-refund" data-id="${item.id}" data-qty="5" ${item.amount < 5 ? 'disabled' : ''} title="Hoàn vốn 5 đơn vị (LIFO)">
+          <button class="btn-sm btn-refund" data-id="${item.id}" data-qty="5" ${refundableUnits(item) < 5 ? 'disabled' : ''} title="Đổi trả trong ngày: chỉ hàng vừa nhập hôm nay">
             -5<small>(+${(item.cost * 5 / 1000)}k)</small>
           </button>
           <button class="btn-sm btn-buy" data-id="${item.id}" data-qty="5" ${state.money < item.cost * 5 ? 'disabled' : ''}>
@@ -110,6 +110,10 @@ export function bindInventoryEvents(
       if (!itemId || !state.inventory[itemId]) return;
 
       const item = state.inventory[itemId];
+      if (!isIngredientUnlocked(item)) {
+        showToast('Chưa ký hợp đồng cung ứng nguyên liệu này!');
+        return;
+      }
       const totalCost = item.cost * qty;
 
       if (state.money < totalCost) {
@@ -119,10 +123,10 @@ export function bindInventoryEvents(
 
       onUpdateState(draft => {
         const targetItem = draft.inventory[itemId];
-        if (!targetItem) return;
+        if (!targetItem || draft.money < totalCost) return;
         draft.money -= totalCost;
-        // Lô mới có hạn riêng; lô cũ giữ nguyên hạn (xuất FIFO)
-        addStock(targetItem, qty);
+        // Lô mới có hạn riêng; lô cũ giữ nguyên hạn (xuất FIFO); ghi giá đã trả để đổi trả trong ngày
+        addStock(targetItem, qty, targetItem.cost);
       });
 
       audio.playCash();
@@ -141,24 +145,18 @@ export function bindInventoryEvents(
       if (!itemId || !state.inventory[itemId]) return;
 
       const item = state.inventory[itemId];
-      if (item.amount < qty) {
-        showToast('Tồn kho không đủ để hoàn trả!');
-        return;
-      }
-
-      const refundAmount = item.cost * qty;
-
+      let refunded = 0;
       onUpdateState(draft => {
-        const targetItem = draft.inventory[itemId];
-        if (!targetItem) return;
-        const ok = refundStock(targetItem, qty);
-        if (ok) {
-          draft.money += refundAmount;
-        }
+        refunded = refundPurchase(draft.inventory[itemId], qty);
+        draft.money += refunded;
       });
 
+      if (refunded === 0) {
+        showToast('Chỉ đổi trả được hàng vừa nhập hôm nay (hàng tặng hoặc đã qua đêm thì không).');
+        return;
+      }
       audio.playCash();
-      showToast(`Đã hoàn lại ${qty} ${item.name} (+${refundAmount.toLocaleString('vi-VN')}đ)`);
+      showToast(`Đã trả lại ${qty} ${item.name} (+${refunded.toLocaleString('vi-VN')}đ)`);
     });
   });
 
@@ -178,15 +176,15 @@ export function bindInventoryEvents(
         return;
       }
 
+      let result: UnlockResult | undefined;
       onUpdateState(draft => {
-        const targetItem = draft.inventory[itemId];
-        if (!targetItem) return;
-        const res = unlockIngredient(targetItem, draft.money, draft.day);
-        if (res.success) {
-          draft.money -= res.cost;
-        }
+        result = signIngredientContract(draft, itemId);
       });
 
+      if (!result?.success) {
+        showToast(result?.reason ?? 'Chưa thể ký hợp đồng này.');
+        return;
+      }
       audio.playCash();
       showToast(`🎉 Đã ký hợp đồng cung ứng: ${item.name}! Giờ bạn có thể nhập hàng.`);
     });

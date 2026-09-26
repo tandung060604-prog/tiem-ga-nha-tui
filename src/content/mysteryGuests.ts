@@ -49,7 +49,7 @@ export const MYSTERY_QUESTS: MysteryGuestQuest[] = [
     guestName: 'Môi Giới Chuỗi MegaChicken',
     avatar: '🕶️',
     title: 'Kẻ dọ thám đối thủ',
-    dialogue: '"Tập đoàn chúng tôi chú ý tới tiệm của bạn đã lâu. Hãy bán lại công thức nước sốt bí mật với giá 15.000.000đ, hoặc chuẩn bị đối đầu với 3 chi nhánh mới của chúng tôi!"',
+    dialogue: '"Tập đoàn chúng tôi chú ý tới tiệm của bạn đã lâu. Hãy bán lại công thức nước sốt bí mật với giá 15.000.000đ, hoặc tuần sau hãy nhìn sang bên kia đường mà xem!"',
     conditionDescription: 'Lựa chọn của bạn: Nhận tiền thỏa hiệp hay kiên quyết giữ bản sắc?',
     rewardDescription: 'Nhận 15.000.000đ tiền mặt (Nếu từ chối: Tăng 100% lòng trung thành của cư dân khu phố).',
     rewardType: 'money',

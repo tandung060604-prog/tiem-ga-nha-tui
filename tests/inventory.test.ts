@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { addStock, refundStock, consumeStock, unlockIngredient, ensureBatches } from '../src/core/inventory';
+import { addStock, consumeStock, unlockIngredient, ensureBatches } from '../src/core/inventory';
 import { createInitialState, migrateSave } from '../src/core/state';
 import { InventoryItem } from '../src/types/game';
 import { audio } from '../src/core/audio';
@@ -24,51 +24,6 @@ const makeItem = (amount: number, daysLeft: number, shelfLife: number = 5): Inve
   ensureBatches(item);
   return item;
 };
-
-describe('Hệ Thống Kho & Hoàn Tiền -5 (Gemini 2 Core)', () => {
-  it('refundStock hoàn trả theo LIFO và bảo toàn hạn dùng của lô cũ', () => {
-    // Ban đầu có lô cũ: 10 đơn vị, còn 1 ngày
-    const item = makeItem(10, 1, 3);
-    
-    // Nhập thêm 5 đơn vị mới (hạn 3 ngày)
-    addStock(item, 5);
-    expect(item.amount).toBe(15);
-    expect(item.batches.length).toBe(2);
-    expect(item.batches[0]).toEqual({ amount: 10, daysLeft: 1 });
-    expect(item.batches[1]).toEqual({ amount: 5, daysLeft: 3 });
-
-    // Bấm -5 hoàn trả
-    const ok = refundStock(item, 5);
-    expect(ok).toBe(true);
-    expect(item.amount).toBe(10);
-    // Lô mới bị trừ hết, lô cũ 1 ngày vẫn còn nguyên vẹn!
-    expect(item.batches.length).toBe(1);
-    expect(item.batches[0]).toEqual({ amount: 10, daysLeft: 1 });
-    expect(item.currentLifeDays).toBe(1);
-  });
-
-  it('refundStock từ chối nếu số lượng tồn kho ít hơn lượng hoàn trả', () => {
-    const item = makeItem(4, 2);
-    const ok = refundStock(item, 5);
-    expect(ok).toBe(false);
-    expect(item.amount).toBe(4);
-  });
-
-  it('refundStock với undefined hoặc null trả về false an toàn', () => {
-    expect(refundStock(undefined, 5)).toBe(false);
-  });
-
-  it('refundStock hoàn trả một phần lô mới nếu mua nhiều hơn 5', () => {
-    const item = makeItem(10, 2, 5);
-    addStock(item, 10); // batch 2 có 10 đơn vị
-    expect(item.amount).toBe(20);
-
-    const ok = refundStock(item, 5);
-    expect(ok).toBe(true);
-    expect(item.amount).toBe(15);
-    expect(item.batches[1].amount).toBe(5);
-  });
-});
 
 describe('Phân Tầng Mở Khóa Nguyên Liệu (Progression Pacing)', () => {
   it('Ngày 1 chỉ mở sẵn đúng 5 nguyên liệu cốt lõi', () => {
