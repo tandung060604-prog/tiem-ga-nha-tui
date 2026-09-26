@@ -56,7 +56,7 @@ export class EconomyEngine {
       case 2:
         return { rent: 150000, utilities: 60000 }; // Tiệm trong hẻm
       case 3:
-        return { rent: 500000, utilities: 160000 }; // Mặt tiền phố
+        return { rent: 350000, utilities: 110000 }; // Mặt tiền phố (mô phỏng: 500k+160k → Chương 3 lỗ)
       case 4:
         return { rent: 1500000, utilities: 350000 }; // Tiệm hot trend
       case 5:

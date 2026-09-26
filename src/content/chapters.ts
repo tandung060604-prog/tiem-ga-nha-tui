@@ -26,7 +26,7 @@ export const CHAPTERS: NonEmpty<Chapter> = [
     title: 'Mặt Tiền Phố',
     context: 'Cửa hàng khang trang 12 bàn ở mặt tiền đường lớn, đèn neon rực rỡ.',
     daysRange: [51, 100],
-    targetMoney: 90000000,
+    targetMoney: 60000000, // mô phỏng: người chơi trung bình có nhân viên lãi ~1,4tr/ngày ở Chương 3 (90tr: không qua nổi)
     targetStars: 4.5,
     mechanicsUnlocked: ['App giao hàng', 'Kiosk tự order', 'Marketing chuyên nghiệp', '12 Khách quen'],
     description: 'Chinh phục thực khách toàn quận, kết hợp bán tại chỗ và app giao hàng công nghệ.'

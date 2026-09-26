@@ -13,7 +13,7 @@ import { EconomyEngine } from './core/economy';
 import { RANDOM_EVENTS } from './content/events';
 import { CHAPTERS } from './content/chapters';
 import { MYSTERY_QUESTS, MysteryGuestQuest } from './content/mysteryGuests';
-import { isTriggered, depositStatus, depositForNextChapter } from './core/progression';
+import { isTriggered, depositStatus, depositForNextChapter, CHAPTER_PRICE_STEP } from './core/progression';
 
 // UI Components
 import { renderHeader, bindHeaderEvents } from './ui/components/Header';
@@ -1109,6 +1109,7 @@ class AppController {
         <div class="chapter-unlocked-kicker">MỞ KHÓA CHƯƠNG ${chapter.number}</div>
         <h2 class="chapter-unlocked-title">${chapter.title}</h2>
         <p class="chapter-unlocked-context">${chapter.context}</p>
+        <p class="chapter-unlocked-prices">🏷️ Bảng giá mới: mọi món +${Math.round((CHAPTER_PRICE_STEP - 1) * 100)}% — mặt bằng mới, giá mới, khách vẫn thấy hợp lý.</p>
         <button id="btn-chapter-continue" class="btn-big-open">Tiếp tục 👉</button>
       </div>
     `);

@@ -42,11 +42,24 @@ export function depositStatus(state: GameState): DepositStatus {
   };
 }
 
+// Bảng giá mặt bằng mới: mỗi lần lên chương, giá niêm yết (cả giá gốc) +15%, làm tròn nghìn.
+// Giá gốc tăng theo nên không bị trừ sao Giá cả. (npm run sim: không tăng giá thì lên chương chỉ thêm
+// tiền mặt bằng — cùng số khách, cùng tiền mỗi khách → Chương 3 lỗ.)
+export const CHAPTER_PRICE_STEP = 1.15;
+export function applyChapterPrices(draft: GameState) {
+  const up = (v: number) => Math.round((v * CHAPTER_PRICE_STEP) / 1000) * 1000;
+  for (const item of draft.menu) {
+    item.basePrice = up(item.basePrice);
+    item.currentPrice = up(item.currentPrice);
+  }
+}
+
 // Trả tiền cọc và sang chương mới. Trả về số chương mới, hoặc null nếu chưa đủ điều kiện.
 export function depositForNextChapter(draft: GameState): number | null {
   const status = depositStatus(draft);
   if (!status.ready) return null;
   draft.money -= status.cost;
+  applyChapterPrices(draft);
   draft.currentChapter += 1;
   draft.depositsPaid = (draft.depositsPaid ?? 0) + 1;
   return draft.currentChapter;

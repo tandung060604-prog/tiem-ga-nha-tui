@@ -71,3 +71,25 @@ describe('thư Thỏ Cam theo tiến độ chương (không lộ chuyện chươ
     expect(MysteryBunnyEngine.getScheduledLetter(s)?.id).toBe('bunny_letter_4');
   });
 });
+
+describe('bảng giá mặt bằng mới khi lên chương', () => {
+  it('giá niêm yết và giá gốc cùng +15% (không bị trừ sao Giá cả), làm tròn nghìn', () => {
+    const s = createInitialState();
+    s.money = 10_000_000;
+    s.ratings.overall = 5;
+    const before = s.menu.find(m => m.id === 'crispy_chicken')!;
+    const [base, price] = [before.basePrice, before.currentPrice];
+    expect(depositForNextChapter(s)).toBe(2);
+    const after = s.menu.find(m => m.id === 'crispy_chicken')!;
+    expect(after.basePrice).toBe(Math.round(base * 1.15 / 1000) * 1000);
+    expect(after.currentPrice).toBe(Math.round(price * 1.15 / 1000) * 1000);
+    expect(after.currentPrice % 1000).toBe(0);
+  });
+
+  it('chưa đủ điều kiện thì giá không đổi', () => {
+    const s = createInitialState();
+    const price = s.menu[0]!.currentPrice;
+    expect(depositForNextChapter(s)).toBeNull();
+    expect(s.menu[0]!.currentPrice).toBe(price);
+  });
+});

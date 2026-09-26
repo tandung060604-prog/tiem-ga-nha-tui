@@ -6,9 +6,9 @@
     "semantic_hash": ""
   },
   "src/content/chapters.ts": {
-    "mtime": 1790408587.8236182,
-    "seen": 1790408784.4138987,
-    "ast_hash": "1fceebd0c06b83dc01b6287658269198",
+    "mtime": 1790435138.6092117,
+    "seen": 1790435284.1399133,
+    "ast_hash": "7018d8d3d00de3e67d98eb3c5c6c35e1",
     "semantic_hash": ""
   },
   "src/content/characterGenerator.ts": {
@@ -36,9 +36,9 @@
     "semantic_hash": ""
   },
   "src/content/menu.ts": {
-    "mtime": 1790431007.1472523,
-    "seen": 1790431734.5078661,
-    "ast_hash": "230ed63589ed3915b98af9b78bfc56e3",
+    "mtime": 1790433183.9102025,
+    "seen": 1790435284.1399238,
+    "ast_hash": "a57f4c05f20c6c4e2378088adc85873f",
     "semantic_hash": ""
   },
   "src/content/mysteryBunny.ts": {
@@ -60,9 +60,9 @@
     "semantic_hash": ""
   },
   "src/content/staff.ts": {
-    "mtime": 1790415829.1762986,
-    "seen": 1790429693.5434997,
-    "ast_hash": "54a3a80c4734e15153fa7ff0e517bc9d",
+    "mtime": 1790432453.4874184,
+    "seen": 1790435284.139932,
+    "ast_hash": "66e03514b0caf3119743f88113e50691",
     "semantic_hash": ""
   },
   "src/content/storyNovel.ts": {
@@ -84,21 +84,21 @@
     "semantic_hash": ""
   },
   "src/core/cooking.ts": {
-    "mtime": 1790431099.6768503,
-    "seen": 1790431734.507884,
-    "ast_hash": "ff41fd15ed7437463768afb66ffaabdd",
+    "mtime": 1790432788.3944693,
+    "seen": 1790435284.1399412,
+    "ast_hash": "fed9f7464b40248a81dd125d7dd00244",
     "semantic_hash": ""
   },
   "src/core/economy.ts": {
-    "mtime": 1790414822.160037,
-    "seen": 1790414873.8506436,
-    "ast_hash": "3ab0d2622f39d5f4bb8b0caca0458949",
+    "mtime": 1790434887.3947582,
+    "seen": 1790435284.139944,
+    "ast_hash": "bb5431fae00a9f44e58874872b11ca70",
     "semantic_hash": ""
   },
   "src/core/orders.ts": {
-    "mtime": 1790431037.8970358,
-    "seen": 1790431734.5078945,
-    "ast_hash": "b711f9f5cacf37c868f63dc42fe09bbf",
+    "mtime": 1790431920.4793098,
+    "seen": 1790435284.13995,
+    "ast_hash": "f30b4e532b70ebccca7790f66512d6d0",
     "semantic_hash": ""
   },
   "src/core/reviewsEngine.ts": {
@@ -114,9 +114,9 @@
     "semantic_hash": ""
   },
   "src/main.ts": {
-    "mtime": 1790431235.7337818,
-    "seen": 1790431734.5079114,
-    "ast_hash": "2ad29ab1884d7dd1b2434d38920d4a10",
+    "mtime": 1790434893.005373,
+    "seen": 1790435284.139969,
+    "ast_hash": "22bcd0188a61a322f94ed8e19905609f",
     "semantic_hash": ""
   },
   "src/types/game.ts": {
@@ -162,9 +162,9 @@
     "semantic_hash": ""
   },
   "src/ui/components/SellingView.ts": {
-    "mtime": 1790431151.7236629,
-    "seen": 1790431734.5079262,
-    "ast_hash": "80f4f04b30aa8f438d55215beda6042d",
+    "mtime": 1790432779.946172,
+    "seen": 1790435284.1399834,
+    "ast_hash": "616829abd0ac8bd62c19b1ec95138442",
     "semantic_hash": ""
   },
   "src/ui/components/SettingsModal.ts": {
@@ -180,9 +180,9 @@
     "semantic_hash": ""
   },
   "src/ui/components/StaffTab.ts": {
-    "mtime": 1790408630.8505154,
-    "seen": 1790408784.413952,
-    "ast_hash": "020b88333811596954e70de527217162",
+    "mtime": 1790431986.2932267,
+    "seen": 1790435284.1399877,
+    "ast_hash": "bfbd8479944dc9788a31303cafa7b12d",
     "semantic_hash": ""
   },
   "src/ui/components/StoryModal.ts": {
@@ -336,9 +336,9 @@
     "semantic_hash": ""
   },
   "docs/phan-cong.md": {
-    "mtime": 1790431722.251261,
-    "seen": 1790431734.508156,
-    "ast_hash": "89e80f1129eeee726e7eb5798c6b710c",
+    "mtime": 1790433605.6021786,
+    "seen": 1790435284.1400878,
+    "ast_hash": "40d82b3fa2c0c49abdaa54f13a4b681f",
     "semantic_hash": ""
   },
   "docs/gemini/screenshots/ban-hang-390px.png": {
@@ -354,9 +354,9 @@
     "semantic_hash": ""
   },
   "src/core/sellingSim.ts": {
-    "mtime": 1790431070.3564882,
-    "seen": 1790431734.5079029,
-    "ast_hash": "6a06e489fac48ef2411cee2febce4126",
+    "mtime": 1790431920.440568,
+    "seen": 1790435284.139959,
+    "ast_hash": "efb74be69ee0ce4821b5f2145a893199",
     "semantic_hash": ""
   },
   "tests/selling-sim.test.ts": {
@@ -558,9 +558,9 @@
     "semantic_hash": ""
   },
   "src/core/day.ts": {
-    "mtime": 1790431401.371369,
-    "seen": 1790431734.507886,
-    "ast_hash": "e35e957e33003d5c6c064e8c72308cb1",
+    "mtime": 1790431920.5475285,
+    "seen": 1790435284.1399426,
+    "ast_hash": "d7e9fc039143be0027f469673302b75e",
     "semantic_hash": ""
   },
   "docs/bao-cao/mo-phong-can-bang.md": {
@@ -666,9 +666,9 @@
     "semantic_hash": ""
   },
   "src/core/progression.ts": {
-    "mtime": 1790429370.4408956,
-    "seen": 1790429693.543539,
-    "ast_hash": "b4c6e007d095319b7da23e3e612a0bcd",
+    "mtime": 1790434887.3937502,
+    "seen": 1790435284.1399515,
+    "ast_hash": "5b50b7c5323f29b44fc1b60bda8235d4",
     "semantic_hash": ""
   },
   "src/ui/components/EndingModal.ts": {
@@ -720,9 +720,9 @@
     "semantic_hash": ""
   },
   "tests/progression.test.ts": {
-    "mtime": 1790429370.4579341,
-    "seen": 1790429693.5436137,
-    "ast_hash": "5d61324ca4b42abbe09475e2e9c2568a",
+    "mtime": 1790435266.5678284,
+    "seen": 1790435284.1400113,
+    "ast_hash": "80b39953c053014675aa830e8fdeaa24",
     "semantic_hash": ""
   },
   "tests/refund.test.ts": {
@@ -1527,6 +1527,18 @@
     "mtime": 1790431238.1668527,
     "seen": 1790431734.5079622,
     "ast_hash": "9ddb404d3fe2e442511457a0c37eae95",
+    "semantic_hash": ""
+  },
+  "src/core/staff.ts": {
+    "mtime": 1790433475.3471048,
+    "seen": 1790435284.1399627,
+    "ast_hash": "7bc734b8fcc630e8bc9ef7ef2f619a7d",
+    "semantic_hash": ""
+  },
+  "tests/staff.test.ts": {
+    "mtime": 1790433449.9276884,
+    "seen": 1790435284.1400192,
+    "ast_hash": "9d955bf6f62cf328e228078f6b9400eb",
     "semantic_hash": ""
   }
 }

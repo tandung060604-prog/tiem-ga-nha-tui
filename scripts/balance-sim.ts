@@ -17,7 +17,7 @@ import { audio } from '../src/core/audio';
 import { CHAPTERS } from '../src/content/chapters';
 import { INITIAL_MENU } from '../src/content/menu';
 import { GameState, CustomerOrder, TrayItem, StaffRole } from '../src/types/game';
-import { staffEffects, tickStaff, fryingItemId, missingItems, maxStaff, FRY_RECIPES, extraTraySlots } from '../src/core/staff';
+import { staffEffects, tickStaff, fryingItemId, missingItems, maxStaff, FRY_RECIPES, extraTraySlots, severancePay } from '../src/core/staff';
 import { generateCandidate } from '../src/content/staff';
 
 audio.setMuted(true);
@@ -83,6 +83,8 @@ function buy(state: GameState, id: string, qty: number): boolean {
 }
 
 // Nhập đủ cho số khách dự kiến: mỗi order ~1,35 món, chia đều cho các món bếp làm được
+// Lượng đã dùng của từng nguyên liệu trong các ngày gần đây (người thật nhìn kho cuối ngày để nhập)
+const usageLog = new WeakMap<GameState, Record<string, number>[]>();
 function restock(state: GameState, expected: number) {
   const servable = INITIAL_MENU.filter(m => m.station && m.station !== 'combo' && m.chapter <= state.currentChapter
     && Object.keys(m.ingredients).every(id => state.inventory[id]?.unlocked !== false));
@@ -94,11 +96,13 @@ function restock(state: GameState, expected: number) {
   // Mua xoay vòng từng lô 5 cho mọi nguyên liệu (hết tiền thì món nào cũng có một ít), chừa tiền trả mặt bằng + lương
   const o = EconomyEngine.getOverheadCosts(state.currentChapter);
   const reserve = o.rent + o.utilities + EconomyEngine.calculateTotalWages(state);
+  const log = usageLog.get(state) ?? [];
+  for (const day of log) for (const [id, used] of Object.entries(day)) need[id] = Math.max(need[id] ?? 0, used * 1.2);
   for (let bought = true; bought;) {
     bought = false;
     for (const [id, target] of Object.entries(need)) {
       const item = state.inventory[id];
-      if (!item || item.amount >= Math.ceil(target * 1.15) || state.money - item.cost * 5 < reserve) continue;
+      if (!item || item.unlocked === false || item.amount >= Math.ceil(target * 1.15) || state.money - item.cost * 5 < reserve) continue;
       bought = buy(state, id, 5) || bought;
     }
   }
@@ -129,7 +133,11 @@ function playDay(state: GameState, p: Profile, policy: UpgradePolicy, staffPolic
   for (const [id, inv] of Object.entries(state.inventory)) {
     if (inv.unlocked === false && (inv.unlockCost ?? 0) <= state.money * 0.25) signIngredientContract(state, id);
   }
-  restock(state, expected);
+  // Nhập theo sức bán thật: ngày đông nhất trong 5 ngày gần đây (+40%), không vượt khách dự kiến.
+  // (Nhập theo khách dự kiến thì quá tải là hàng hết hạn hàng loạt; theo trung bình thì hết hàng → bán ít → nhập ít hơn)
+  const recent = state.dayHistory.slice(-5);
+  const peak = recent.length ? Math.max(...recent.map(l => l.customersServed + l.customersLost)) : expected;
+  restock(state, Math.min(expected, Math.ceil(peak * 1.4)));
   if (state.oilCondition !== 'clean' && state.money >= 150000 + 300000) {
     state.money -= 150000;
     state.oilCondition = 'clean';
@@ -137,12 +145,21 @@ function playDay(state: GameState, p: Profile, policy: UpgradePolicy, staffPolic
   }
   if (policy === 'có nâng cấp') buyUpgrades(state, expected);
   if (staffPolicy === 'có nhân viên') {
-    hireStaff(state);
+    // Quỹ cạn (không đủ 3 ngày chi phí cố định) → cho người mới nhất nghỉ, như người thật
+    const o = EconomyEngine.getOverheadCosts(state.currentChapter);
+    const last = state.staff[state.staff.length - 1];
+    if (last && state.money < 3 * (o.rent + o.utilities + EconomyEngine.calculateTotalWages(state))) {
+      state.money -= severancePay(last);
+      state.staff.pop();
+    } else {
+      hireStaff(state);
+    }
     for (const m of state.staff) { // thưởng nóng khi nhân viên buồn (như nút Thưởng 50k)
       if (m.mood < 60 && state.money > 1000000) { state.money -= 50000; m.mood = Math.min(100, m.mood + 25); }
     }
   }
 
+  const openingStock = Object.fromEntries(Object.entries(state.inventory).map(([id, inv]) => [id, inv.amount]));
   const session: SellingSession = createSellingSession();
   const cook = new CookingEngine();
   cook.setFryRampBonus(upgradeEffects(state.upgrades).fryRampPct);
@@ -265,6 +282,8 @@ function playDay(state: GameState, p: Profile, policy: UpgradePolicy, staffPolic
     return true;
   }
 
+  const used = Object.fromEntries(Object.entries(state.inventory).map(([id, inv]) => [id, (openingStock[id] ?? 0) - inv.amount]));
+  usageLog.set(state, [...(usageLog.get(state) ?? []), used].slice(-5));
   const result = closeDay(state, session, event);
   const unlocked = depositForNextChapter(state); // người chơi ảo bấm "Đặt cọc" ngay khi đủ điều kiện
   state.day += 1;
@@ -302,21 +321,22 @@ const POLICIES: [UpgradePolicy, StaffPolicy][] = [
 for (const pol of POLICIES) {
   const [policy, staffPolicy] = pol;
   for (const p of PROFILES) {
-    const ch2Days: number[] = [], ch3Days: number[] = [];
-    const moneyAt: Record<number, number[]> = { 5: [], 10: [], 15: [], 30: [], 60: [], 100: [] };
+    const ch2Days: number[] = [], ch3Days: number[] = [], ch4Days: number[] = [];
+    const moneyAt: Record<number, number[]> = { 5: [], 10: [], 15: [], 30: [], 60: [], 100: [], 150: [] };
     let served = 0, lost = 0, expectedSum = 0, profitSum = 0, days = 0, perfect = 0, fried = 0;
     const stars: number[] = [];
     const blank = () => ({ days: 0, expected: 0, served: 0, lost: 0, revenue: 0, ingredients: 0, wages: 0, profit: 0, stars: 0 });
-    const per: Record<number, ReturnType<typeof blank>> = { 2: blank(), 3: blank() };
+    const per: Record<number, ReturnType<typeof blank>> = { 2: blank(), 3: blank(), 4: blank() };
 
     for (let seed = 1; seed <= SEEDS; seed++) {
       seedRandom(seed * 7919);
       const state = createInitialState();
-      let ch2 = NaN, ch3 = NaN;
+      let ch2 = NaN, ch3 = NaN, ch4 = NaN;
       for (let d = 1; d <= DAYS; d++) {
         const { ledger, unlocked, expected } = playDay(state, p, policy, staffPolicy);
         if (unlocked === 2) ch2 = d;
         if (unlocked === 3) ch3 = d;
+        if (unlocked === 4) ch4 = d;
         if (moneyAt[d]) moneyAt[d]!.push(state.money);
         if (DEBUG_DAYS && seed === DEBUG_SEED && p.name === DEBUG_PROFILE && POLICIES.indexOf(pol) === DEBUG_POLICY && d >= DEBUG_FROM && d <= DEBUG_FROM + 5) {
           console.log(`  [debug] ngày ${d} ch${state.currentChapter} tiền ${fmt(state.money)} | khách dự kiến ${expected} phục vụ ${ledger.customersServed} bỏ ${ledger.customersLost} | thu ${fmt(ledger.grossRevenue + ledger.tips)} nguyên liệu ${fmt(ledger.ingredientCost)} hết hạn ${fmt(ledger.wasteCost)} mặt bằng+điện ${fmt(ledger.rent + ledger.utilities)} lương ${fmt(ledger.wages)} hoa hồng ${fmt(ledger.appCommissions)} lãi ${fmt(ledger.netProfit)} | NV ${state.staff.map(m => m.role + ':' + m.mood).join(',')} | sao ${JSON.stringify(state.ratings)}`);
@@ -337,6 +357,7 @@ for (const pol of POLICIES) {
       stars.push(state.ratings.overall);
       ch2Days.push(Number.isNaN(ch2) ? Infinity : ch2);
       ch3Days.push(Number.isNaN(ch3) ? Infinity : ch3);
+      ch4Days.push(Number.isNaN(ch4) ? Infinity : ch4);
     }
 
     const passed = ch2Days.filter(Number.isFinite).length;
@@ -345,8 +366,10 @@ for (const pol of POLICIES) {
     console.log(`  Qua Chương 1: ${passed}/${SEEDS} lượt, trung vị ngày ${Number.isFinite(m2) ? m2 : `> ${DAYS}`}` +
       `  (nhanh nhất ${Math.min(...ch2Days)}, chậm nhất ${Math.max(...ch2Days) === Infinity ? `> ${DAYS}` : Math.max(...ch2Days)})`);
     const m3 = median(ch3Days);
-    console.log(`  Qua Chương 2: trung vị ngày ${Number.isFinite(m3) ? m3 : `> ${DAYS}`}`);
-    console.log(`  Tiền (trung vị): ngày 5 ${fmt(median(moneyAt[5]!))} · ngày 10 ${fmt(median(moneyAt[10]!))} · ngày 15 ${fmt(median(moneyAt[15]!))} · ngày 30 ${fmt(median(moneyAt[30]!))} · ngày 60 ${fmt(median(moneyAt[60]!))} · ngày 100 ${fmt(median(moneyAt[100]!))}`);
+    const m4 = median(ch4Days);
+    const pass = (xs: number[]) => xs.filter(Number.isFinite).length;
+    console.log(`  Qua Chương 2: ${pass(ch3Days)}/${SEEDS}, trung vị ngày ${Number.isFinite(m3) ? m3 : `> ${DAYS}`} · Qua Chương 3: ${pass(ch4Days)}/${SEEDS}, trung vị ngày ${Number.isFinite(m4) ? m4 : `> ${DAYS}`} (GDD: 50 / 100)`);
+    console.log(`  Tiền (trung vị): ngày 5 ${fmt(median(moneyAt[5]!))} · ngày 10 ${fmt(median(moneyAt[10]!))} · ngày 15 ${fmt(median(moneyAt[15]!))} · ngày 30 ${fmt(median(moneyAt[30]!))} · ngày 60 ${fmt(median(moneyAt[60]!))} · ngày 100 ${fmt(median(moneyAt[100]!))} · ngày 150 ${fmt(median(moneyAt[150]!))}`);
     console.log(`  15 ngày đầu/ngày: khách dự kiến ${(expectedSum / days).toFixed(1)}, phục vụ ${(served / days).toFixed(1)}, bỏ về ${(lost / days).toFixed(1)}, lãi ${fmt(profitSum / days)}`);
     for (const [ch, c2] of Object.entries(per)) {
       if (!c2.days) continue;
