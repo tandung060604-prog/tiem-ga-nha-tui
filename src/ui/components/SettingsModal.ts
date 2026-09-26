@@ -57,6 +57,17 @@ export function renderSettingsModal(state: GameState): string {
           <div style="margin-top: 4px; opacity: .8;">${state.integrity.reasons.slice(0, 3).map(r => escapeHtml(r)).join('<br/>')}</div>
         </div>` : ''}
 
+      <!-- Sao lưu / khôi phục tiến trình (chuyển máy, hoặc khi trình duyệt tự xóa dữ liệu) -->
+      <div class="save-backup" style="border-top: 1px dashed var(--line); padding-top: 10px;">
+        <b style="font-size: 0.9rem;">💾 Tiến trình</b>
+        <div style="font-size: 0.74rem; color: var(--soft); margin: 2px 0 8px;">Game tự lưu trên máy này. Chép mã sao lưu để chuyển máy hoặc phòng khi trình duyệt xóa dữ liệu. Mẹo iPhone: "Thêm vào Màn hình chính" để Safari không tự xóa.</div>
+        <div style="display: flex; gap: 6px;">
+          <button id="btn-export-save" class="btn-sm" style="flex: 1; min-height: 44px;">📤 Sao lưu</button>
+          <button id="btn-import-save" class="btn-sm" style="flex: 1; min-height: 44px;">📥 Khôi phục</button>
+        </div>
+        <textarea id="save-code-box" rows="3" placeholder="Dán mã sao lưu (TGNT1.…) vào đây rồi bấm Khôi phục" style="width: 100%; box-sizing: border-box; margin-top: 8px; font-size: 16px; border: 2px solid var(--line); border-radius: 10px; padding: 8px; font-family: monospace;"></textarea>
+      </div>
+
       <!-- Story Ending Preview -->
       <div style="border-top: 1px dashed var(--line); padding-top: 10px; text-align: center;">
         <button id="btn-view-ending" class="btn-sm" style="width: 100%; padding: 8px; font-weight: 800; background: linear-gradient(135deg, #ffd166, #f4a261); border-color: #e76f51; color: #431407;">

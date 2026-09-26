@@ -39,9 +39,10 @@ function regularCustomer(state: GameState, event: GameEvent): CustomerOrder {
 
 // Nguồn khách của một ca: 2 khách lúc mở cửa (hoặc Thỏ Cam mang thư + 1 khách), sau đó
 // mỗi lượt là khách thường, Thỏ Cam ghé ngẫu nhiên tối đa 1 lần/ngày.
-export function createCustomerSource(state: GameState, event: GameEvent) {
+// `resumeBunnyVisited`: tiếp tục ca bán dở → giữ trạng thái "Thỏ Cam đã ghé hôm nay"
+export function createCustomerSource(state: GameState, event: GameEvent, resumeBunnyVisited?: boolean) {
   const letter = MysteryBunnyEngine.getScheduledLetter(state);
-  let bunnyVisited = letter !== null;
+  let bunnyVisited = resumeBunnyVisited ?? letter !== null;
 
   return {
     opening(): CustomerOrder[] {
@@ -49,6 +50,7 @@ export function createCustomerSource(state: GameState, event: GameEvent) {
         ? [OrdersEngine.generateBunnyOrder(state, letter), regularCustomer(state, event)]
         : [regularCustomer(state, event), regularCustomer(state, event)];
     },
+    bunnyVisited: () => bunnyVisited,
     next(queue: readonly CustomerOrder[]): CustomerOrder {
       if (!bunnyVisited && MysteryBunnyEngine.shouldSpawnRandomVisit(state.day) && !queue.some(o => o.isBunny)) {
         bunnyVisited = true;

@@ -57,6 +57,10 @@ Phiên làm việc: 26/09/2026, 14:35 → 15:35 (1 tiếng mỗi bên, chạy so
 
 | 20:35 | Claude → cả nhóm | **Unlock** các file đã khóa lúc 19:55. Báo cáo: `docs/bao-cao/claude-review-toan-dien.md`. Việc cho **Gemini 1 (UI)**: (1) chuyển style inline của màn tiêu đề (`src/ui/components/TitleScreen.ts`) sang CSS các class `.title-screen`, `.title-logo`, `.title-name`, `.title-tagline`, `.title-save`, `.title-actions`, `.title-hint`; (2) `.integrity-warning` (Cài đặt), `#btn-story-narrate`, `.deposit-hint`, `#btn-finale`; (3) thẻ khách trong ca bán **không hiện ảnh nhân vật** trên iPhone (xem `ui-check-out/ios-390-selling.png`) và nhãn loại khách không khớp (Bảo Châu → "Cú Đêm Cày Rank"). Kiểm thử mới: `npm run ios:check` (WebKit, 3 dòng iPhone) — chạy trên bản build (`npm run build && npx vite preview --port 3002`). |
 
+| 20:45 | Claude | **[Lock Task]** Đặt tên quán khi mở tiệm mới, lưu ca bán dở (tiếp tục sau khi thoát), sao lưu/khôi phục mã save, xin trình duyệt giữ dữ liệu lâu dài. File: `src/main.ts`, `src/core/state.ts`, `src/core/saveCode.ts` (mới), `src/core/sellingSim.ts`, `src/core/cooking.ts`, `src/ui/components/SettingsModal.ts`, `src/ui/components/ShopNameDialog.ts` (mới), `tests/**`. |
+
+| 20:51 | Claude | **Unlock.** Xong: đặt tên quán khi mở tiệm mới, tiếp tục ca bán dở sau khi thoát, mã sao lưu/khôi phục trong Cài đặt, xin trình duyệt giữ dữ liệu. Lưu ý cho Gemini 2: mọi trường mới của `GameState` PHẢI có giá trị mặc định trong `createInitialState()`, nếu không sẽ mất sau khi tải lại trang (đã xảy ra với cờ chống gian lận). Class mới cho Gemini 1: `.shop-name-dialog`, `.shop-name-chip`, `.save-backup`. |
+
 ## 4. Báo cáo cuối giờ
 - Claude: `docs/bao-cao/claude-gio-1.md`
 - Gemini: `docs/gemini/bao-cao-gio-1.md`, `docs/gemini/bao-cao-gio-2.md`

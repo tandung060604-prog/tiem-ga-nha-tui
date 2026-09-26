@@ -257,4 +257,5 @@ export interface GameState {
   depositsPaid?: number;       // số lần đặt cọc qua chương (chương chỉ mở bằng đặt cọc)
   baBaAidChapter?: number;     // chương gần nhất Bác Ba đã tiếp tế (1 lần/chương)
   integrity?: { tampered: boolean; reasons: string[] };
+  pausedShift?: import('../core/sellingSim').ShiftSnapshot | null; // ca bán dở (thoát giữa ca)
 }

@@ -11,4 +11,4 @@ export function escapeHtml(text: string): string {
   return text.replace(/[&<>"']/g, ch => ENTITIES[ch] ?? ch);
 }
 
-export const SHOP_NAME_MAX = 24;
+export { SHOP_NAME_MAX } from '../core/shopName';

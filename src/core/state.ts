@@ -63,6 +63,14 @@ export function createInitialState(): GameState {
     },
     activeEnding: null,
     chosenDialogueIds: [],
+    // Mọi trường được lưu PHẢI có mặt ở đây: migrateSave chỉ chép các khóa có trong trạng thái mặc định
+    // (thiếu → mất sau khi tải lại trang, kể cả cờ chống gian lận).
+    achievedEndings: [],
+    debtStreak: 0,
+    depositsPaid: 0,
+    baBaAidChapter: 0,
+    integrity: { tampered: false, reasons: [] },
+    pausedShift: null,
     lifetimeStats: {
       totalFried: 0,
       totalBurnt: 0,
@@ -89,7 +97,8 @@ export function migrateSave(raw: unknown): { state: GameState; repaired: string[
   for (const key of Object.keys(target)) {
     const fallback = target[key];
     const value = src[key];
-    const sameShape = fallback === null ? (value === null || typeof value === 'string')
+    // Mặc định null: nhận null, chuỗi (activeEnding) hoặc object (pausedShift — kiểm tra kỹ ở dưới)
+    const sameShape = fallback === null ? (value === null || typeof value === 'string' || (typeof value === 'object' && !Array.isArray(value)))
       : Array.isArray(fallback) ? Array.isArray(value)
       : typeof value === typeof fallback && value !== null
         && !(typeof value === 'number' && !Number.isFinite(value));
@@ -148,10 +157,14 @@ export function migrateSave(raw: unknown): { state: GameState; repaired: string[
   if (typeof state.lifetimeStats.totalBonus !== 'number') {
     state.lifetimeStats.totalBonus = Math.max(0, state.money - 850000 - state.lifetimeStats.totalRevenue);
   }
-  if (typeof state.depositsPaid !== 'number') state.depositsPaid = state.currentChapter - 1;
+  if (typeof src.depositsPaid !== 'number') state.depositsPaid = state.currentChapter - 1;
 
-  // Nạp lại trang giữa ca bán → về pha Chuẩn bị (phiên bán không được lưu)
-  if (state.phase !== 'prep') state.phase = 'prep';
+  // Thoát giữa ca bán: có ảnh chụp ca của đúng ngày này → tiếp tục ca; không có → về pha Chuẩn bị
+  const shift = state.pausedShift;
+  const shiftValid = !!shift && shift.day === state.day && Array.isArray(shift.session?.orders)
+    && typeof shift.session.gameHour === 'number' && Array.isArray(shift.cooking?.tray);
+  if (!shiftValid) state.pausedShift = null;
+  state.phase = shiftValid ? 'selling' : 'prep';
   return { state, repaired };
 }
 
@@ -251,6 +264,15 @@ export class StateManager {
     }
     console.warn('Save game không đọc được, đã sao lưu bản gốc và tạo game mới.');
     return createInitialState();
+  }
+
+  // Khôi phục từ mã sao lưu: thay toàn bộ tiến trình, ghi ngay
+  public replaceState(next: GameState) {
+    if (this.saveTimer !== null) clearTimeout(this.saveTimer);
+    this.saveTimer = null;
+    this.state = next;
+    this.saveState();
+    this.notify();
   }
 
   public resetGame(): GameState {

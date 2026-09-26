@@ -24,7 +24,13 @@ for (const deviceName of ['iPhone SE', 'iPhone 13', 'iPhone 15 Pro Max']) {
   check(await title.isVisible(), `${tag} màn tiêu đề hiện ra`);
   await page.screenshot({ path: `${OUT}/ios-${device.viewport.width}-title.png` });
   await page.locator('#btn-title-play').tap();
+  // Tiệm mới: đặt tên quán
+  const nameInput = page.locator('#input-new-shop-name');
+  await nameInput.waitFor({ timeout: 5000 });
+  await nameInput.fill('Gà Giòn Test 🍗');
+  await page.locator('#btn-confirm-shop-name').tap();
   await page.locator('#btn-welcome-start').tap({ timeout: 5000 }).catch(() => {});
+  check((await page.locator('.store-badge').textContent())?.includes('Gà Giòn Test'), `${tag} đặt tên quán hiện lên biển hiệu`);
   check(!(await title.isVisible()), `${tag} chạm Bắt đầu vào được game`);
 
   await page.locator('#btn-start-selling').tap();
@@ -40,6 +46,16 @@ for (const deviceName of ['iPhone SE', 'iPhone 13', 'iPhone 15 Pro Max']) {
   const over = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
   check(over <= 0, `${tag} không cuộn ngang`, over > 0 ? `dư ${over}px` : '');
   await page.screenshot({ path: `${OUT}/ios-${device.viewport.width}-selling.png` });
+
+  // Thoát giữa ca (đóng/tải lại trang) → mở lại → tiếp tục đúng ca, giữ tên quán
+  await page.waitForTimeout(1500);
+  const clockBefore = await page.locator('.clock b').textContent();
+  await page.reload();
+  await page.locator('#btn-title-play').tap();
+  const resumed = await page.locator('.selling-screen').waitFor({ timeout: 5000 }).then(() => true, () => false);
+  const clockAfter = resumed ? await page.locator('.clock b').textContent() : '';
+  check(resumed && (clockAfter ?? '') >= (clockBefore ?? ''), `${tag} tải lại giữa ca → tiếp tục ca bán`, `${clockBefore} → ${clockAfter}`);
+  check((await page.locator('.store-badge').textContent())?.includes('Gà Giòn Test'), `${tag} tên quán còn sau khi tải lại`);
   check(errors.length === 0, `${tag} không lỗi JS / tải file`, errors.slice(0, 3).join(' | '));
   await ctx.close();
 }

@@ -5,7 +5,9 @@ import { music, babble, narrate, stopNarration } from './core/music';
 import { renderTitleScreen } from './ui/components/TitleScreen';
 import { STORY_ACTS } from './content/storyNovel';
 import { cookingEngine, CookingEngine, Sauce } from './core/cooking';
-import { SHOP_NAME_MAX } from './ui/escapeHtml';
+import { escapeHtml } from './ui/escapeHtml';
+import { normalizeShopName, SHOP_NAME_MAX, SHOP_NAME_SUGGESTIONS } from './core/shopName';
+import { exportSaveCode, importSaveCode } from './core/saveCode';
 import { OrdersEngine } from './core/orders';
 import { EconomyEngine } from './core/economy';
 import { RANDOM_EVENTS } from './content/events';
@@ -24,6 +26,7 @@ import { renderMenuTab, bindMenuEvents } from './ui/components/MenuTab';
 import { renderSellingView, patchSellingView, sellingStructureKey } from './ui/components/SellingView';
 import { SellingSession, createSellingSession, gameDeltaMs, tickSelling } from './core/sellingSim';
 import { OPEN_HOUR, CLOSE_HOUR } from './core/clock';
+import type { ShiftSnapshot } from './core/sellingSim';
 import { creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, SAUCE_STOCK, serveFirstOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP } from './core/day';
 import { upgradeEffects } from './core/upgrades';
 import { renderSummaryModal } from './ui/components/SummaryModal';
@@ -69,14 +72,7 @@ class AppController {
   }
 
   private init() {
-    // Luôn đảm bảo nếu nạp lại trang mà đang ở pha 'selling', đưa về 'prep' để không bị màn hình trắng
-    const state = stateManager.getState();
-    if (state.phase === 'selling') {
-      stateManager.update(draft => {
-        draft.phase = 'prep';
-      });
-      document.body.classList.remove('selling-mode');
-    }
+    // Có ca bán dở (thoát app giữa ca) thì giữ nguyên, tiếp tục sau khi chạm "Chơi tiếp" ở màn tiêu đề
 
     // Pick today's random event based on day
     this.pickDailyEvent();
@@ -97,8 +93,9 @@ class AppController {
 
     // Âm thanh: tắt tiếng thì tắt nhạc; chuyển app/khóa máy thì dừng nhạc (iOS treo AudioContext)
     audio.onMuteChange(muted => (muted ? music.stop() : this.titleDismissed && music.start()));
+    window.addEventListener('pagehide', () => this.snapshotShift());
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') { music.stop(); stopNarration(); }
+      if (document.visibilityState === 'hidden') { this.snapshotShift(); music.stop(); stopNarration(); }
       else if (this.titleDismissed) music.start();
     });
     // iOS Safari bỏ qua user-scalable=no: chặn phóng to bằng 2 ngón để không vỡ bố cục khi đang chiên
@@ -111,7 +108,7 @@ class AppController {
 
   private showTitleScreen() {
     const state = stateManager.getState();
-    const hasProgress = state.day > 1 || state.dayHistory.length > 0;
+    const hasProgress = state.day > 1 || state.dayHistory.length > 0 || !!state.pausedShift;
     document.getElementById('title-screen')?.remove();
     document.body.insertAdjacentHTML('beforeend', renderTitleScreen(state, hasProgress, music.isEnabled()));
 
@@ -120,9 +117,15 @@ class AppController {
       this.titleDismissed = true;
       document.getElementById('title-screen')?.remove();
       music.unlock();             // chạm đầu tiên: được phép bật âm thanh trên iOS
-      music.start(stateManager.getState().phase === 'selling' ? 'selling' : 'prep');
+      void navigator.storage?.persist?.().catch(() => false); // xin trình duyệt không tự xóa save (iOS xóa sau ~7 ngày không mở)
+      if (!fresh && stateManager.getState().pausedShift) {
+        this.resumeShift();
+        return;
+      }
+      music.start('prep');
       audio.playPerfect();
-      if (fresh || !hasProgress) setTimeout(() => this.openWelcomeDialog(), 250);
+      // Tiệm mới: chủ tiệm tự đặt tên quán trước, rồi mới tới lời chào
+      if (fresh || !hasProgress) setTimeout(() => this.openShopNameDialog(() => this.openWelcomeDialog()), 250);
     };
 
     document.getElementById('btn-title-play')!.onclick = () => start(false);
@@ -146,11 +149,45 @@ class AppController {
     };
   }
 
+  // Đặt tên quán khi mở tiệm mới (đổi lại được trong Cài đặt)
+  private openShopNameDialog(onDone: () => void) {
+    const current = stateManager.getState().shopName;
+    this.openModal(`
+      <div class="shop-name-dialog" style="text-align: center; padding: 6px 4px;">
+        <div style="font-size: 2.6rem;">🏷️</div>
+        <h2 style="margin: 4px 0 6px; font-size: 1.35rem; color: var(--ink); font-weight: 800;">Đặt tên cho quán của bạn</h2>
+        <p style="margin: 0 0 12px; color: var(--soft); font-size: 0.85rem;">Tên này sẽ in trên biển hiệu, header và thẻ review chia sẻ.</p>
+        <input id="input-new-shop-name" type="text" maxlength="${SHOP_NAME_MAX}" value="${escapeHtml(current)}" autocomplete="off"
+          style="width: 100%; box-sizing: border-box; border: 2px solid var(--line); background: var(--bg); border-radius: 12px; padding: 12px; font-weight: 800; font-size: 16px; color: var(--ink); text-align: center;" />
+        <div class="shop-name-suggestions" style="display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 10px 0 14px;">
+          ${SHOP_NAME_SUGGESTIONS.map(n => `<button class="btn-sm shop-name-chip" data-name="${escapeHtml(n)}" style="min-height: 36px;">${escapeHtml(n)}</button>`).join('')}
+        </div>
+        <button id="btn-confirm-shop-name" class="btn-big-open" style="width: 100%; min-height: 52px;">🍗 Treo biển &amp; mở tiệm</button>
+      </div>
+    `);
+    const input = document.getElementById('input-new-shop-name') as HTMLInputElement | null;
+    document.querySelectorAll<HTMLElement>('.shop-name-chip').forEach(chip => {
+      chip.onclick = () => { if (input) input.value = chip.dataset.name ?? ''; audio.playPop(); };
+    });
+    const confirm = () => {
+      const name = normalizeShopName(input?.value ?? '');
+      stateManager.update(draft => { draft.shopName = name; });
+      stateManager.flush();
+      audio.playCash();
+      this.closeModal();
+      this.showToast(`Biển hiệu "${name}" đã được treo! 🎉`);
+      onDone();
+    };
+    const btn = document.getElementById('btn-confirm-shop-name');
+    if (btn) btn.onclick = confirm;
+    input?.addEventListener('keydown', e => { if (e.key === 'Enter') confirm(); });
+  }
+
   private openWelcomeDialog() {
     const welcomeHtml = `
       <div style="text-align: center; padding: 6px 4px;">
         <img src="${ASSETS.gabong.front}" alt="Gà Bông" width="120" height="120" style="display: block; margin: 0 auto 6px;" />
-        <h2 style="margin: 0 0 6px; font-size: 1.5rem; color: var(--ink); font-weight: 800;">Chào Mừng Đến Với Tiệm Gà Nhà Tui!</h2>
+        <h2 style="margin: 0 0 6px; font-size: 1.5rem; color: var(--ink); font-weight: 800;">Chào mừng tới ${escapeHtml(stateManager.getState().shopName)}!</h2>
         <p style="color: var(--soft); font-size: 0.85rem; line-height: 1.45; margin: 0 0 14px;">
           Hành trình của bạn bắt đầu từ chiếc xe đẩy gà rán đầu hẻm đơn sơ với số vốn <b>850.000đ</b>.<br/>
           Hãy kiểm tra kho, canh chiên gà vàng giòn <b>Perfect</b> và gom đủ <b>5.000.000đ</b> để thuê mặt bằng tiệm trong hẻm nhé!
@@ -610,6 +647,49 @@ class AppController {
   }
 
   // --- SELLING PHASE ---
+  private lastShiftSnapshotAt = 0;
+
+  // Lưu ca bán dở vào save. `immediate`: ghi ngay (trang sắp ẩn/đóng, bộ đếm lưu có thể không kịp chạy)
+  private snapshotShift(immediate = true) {
+    const session = this.sellingSession;
+    const state = stateManager.getState();
+    if (!session || state.phase !== 'selling' || session.gameHour >= CLOSE_HOUR) return;
+    this.lastShiftSnapshotAt = performance.now();
+    const shift: ShiftSnapshot = JSON.parse(JSON.stringify({
+      day: state.day,
+      session,
+      cooking: cookingEngine.snapshot(),
+      expectedCustomers: this.expectedCustomers,
+      bunnyVisited: this.customerSource?.bunnyVisited() ?? true
+    }));
+    stateManager.update(draft => { draft.pausedShift = shift; });
+    if (immediate) stateManager.flush();
+  }
+
+  // Tiếp tục ca bán dở đúng chỗ đã dừng (giờ, hàng khách, khay, chảo)
+  private resumeShift() {
+    const state = stateManager.getState();
+    const shift = state.pausedShift;
+    if (!shift) return;
+    this.stopSellingPhase();
+    this.sellingStructureKey = '';
+    this.sellingSession = shift.session;
+    this.sellingSession.isPaused = false;
+    this.expectedCustomers = shift.expectedCustomers;
+    this.customerSource = createCustomerSource(state, this.currentEvent, shift.bunnyVisited);
+    cookingEngine.setFryRampBonus(upgradeEffects(state.upgrades).fryRampPct);
+    cookingEngine.restore(shift.cooking);
+    document.body.classList.add('selling-mode');
+    music.setMode('selling');
+    music.start('selling');
+    const h = Math.floor(shift.session.gameHour);
+    const m = Math.floor((shift.session.gameHour - h) * 60);
+    this.showToast(`⏯️ Tiếp tục ca bán lúc ${h}:${String(m).padStart(2, '0')} — khách vẫn đang chờ!`);
+    this.lastTimestamp = performance.now();
+    this.render();
+    this.loopSelling(performance.now());
+  }
+
   private startSellingPhase() {
     this.stopSellingPhase(); // đảm bảo không bao giờ có 2 vòng requestAnimationFrame song song
     this.sellingStructureKey = '';
@@ -689,6 +769,7 @@ class AppController {
     }
 
     this.render();
+    if (currentTimestamp - this.lastShiftSnapshotAt > 5000) this.snapshotShift(false);
 
     if (dayOver) {
       this.finishDay();
@@ -892,6 +973,8 @@ class AppController {
   // --- FINISH DAY & SUMMARY ---
   private finishDay() {
     this.stopSellingPhase();
+    this.lastShiftSnapshotAt = 0;
+    stateManager.update(draft => { draft.pausedShift = null; });
     const session = this.sellingSession;
     if (!session) return;
 
@@ -1029,7 +1112,7 @@ class AppController {
     if (saveNameBtn) {
       saveNameBtn.onclick = () => {
         const input = document.getElementById('input-shop-name') as HTMLInputElement;
-        const name = input?.value.trim().slice(0, SHOP_NAME_MAX);
+        const name = input ? normalizeShopName(input.value) : '';
         if (name) {
           stateManager.update(draft => {
             draft.shopName = name;
@@ -1038,6 +1121,45 @@ class AppController {
           this.showToast(`Đã đổi tên tiệm thành: "${name}"! 🍗`);
           this.closeModal();
         }
+      };
+    }
+
+    // Sao lưu: xuất mã (và chép vào clipboard nếu được)
+    const box = document.getElementById('save-code-box') as HTMLTextAreaElement | null;
+    const exportBtn = document.getElementById('btn-export-save');
+    if (exportBtn && box) {
+      exportBtn.onclick = () => {
+        this.snapshotShift();
+        box.value = exportSaveCode(stateManager.getState());
+        box.select();
+        void navigator.clipboard?.writeText(box.value).then(
+          () => this.showToast('Đã chép mã sao lưu! Dán vào Ghi chú/Zalo để giữ nhé 📋'),
+          () => this.showToast('Hãy giữ lâu vào ô mã → Chọn tất cả → Sao chép.')
+        );
+      };
+    }
+    // Khôi phục: kiểm tra mã, hỏi xác nhận rồi thay toàn bộ tiến trình
+    const importBtn = document.getElementById('btn-import-save');
+    if (importBtn && box) {
+      importBtn.onclick = () => {
+        const result = importSaveCode(box.value);
+        if (!result.ok) {
+          this.showToast(`❌ ${result.reason}`);
+          return;
+        }
+        const next = result.state;
+        void this.confirmDialog(
+          `Khôi phục <b>${escapeHtml(next.shopName)}</b> · Ngày ${next.day} · Chương ${next.currentChapter}? Tiến trình hiện tại trên máy này sẽ bị thay thế.${result.tampered ? '<br/><br/>⚠️ Mã đã bị chỉnh sửa: tiến trình sẽ bị đánh dấu.' : ''}`,
+          'Khôi phục'
+        ).then(ok => {
+          if (!ok) return;
+          this.stopSellingPhase();
+          this.sellingSession = null;
+          stateManager.replaceState(next);
+          this.pickDailyEvent();
+          this.setPhase('prep');
+          this.showToast(`Đã khôi phục ${next.shopName} — Ngày ${next.day}! 🎉`);
+        });
       };
     }
 

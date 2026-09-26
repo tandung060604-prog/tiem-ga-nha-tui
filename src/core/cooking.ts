@@ -9,6 +9,12 @@ export interface CookingState {
   progress: number; // 0 to 100
 }
 
+export interface CookingSnapshot {
+  cook: CookingState;
+  tray: TrayItem[];
+  seasoning: Sauce | null;
+}
+
 export class CookingEngine {
   private cookState: CookingState = {
     isFrying: false,
@@ -22,6 +28,23 @@ export class CookingEngine {
 
   public setFryRampBonus(pct: number) {
     this.fryRampPct = Math.max(0, pct);
+  }
+
+  // Chụp / khôi phục chảo + khay cho "ca bán dở" (thoát app giữa ca rồi quay lại). Âm thanh chiên
+  // không khôi phục ở đây: vòng lặp bán hàng tự bật lại khi chảo đang chiên.
+  public snapshot(): CookingSnapshot {
+    return {
+      cook: { ...this.cookState },
+      tray: this.tray.map(t => ({ ...t })),
+      seasoning: this.activeSeasoning
+    };
+  }
+
+  public restore(s: CookingSnapshot) {
+    this.cookState = { ...s.cook };
+    this.tray = s.tray.map(t => ({ ...t })).slice(0, CookingEngine.TRAY_SIZE);
+    this.activeSeasoning = s.seasoning;
+    if (this.cookState.isFrying) audio.startSizzle();
   }
 
   public getCookState(): CookingState {

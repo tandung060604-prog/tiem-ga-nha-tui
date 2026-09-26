@@ -1,5 +1,6 @@
 import { CustomerOrder } from '../types/game';
 import { EconomyEngine } from './economy';
+import type { CookingSnapshot } from './cooking';
 import { OPEN_HOUR, CLOSE_HOUR, GAME_HOUR_MS, isRushHour } from './clock';
 
 // Mô phỏng ca bán, không đụng DOM/âm thanh: main.ts gọi mỗi frame rồi tự xử lý các sự kiện
@@ -43,6 +44,15 @@ export function createSellingSession(): SellingSession {
     totalFriedCount: 0,
     topSellerId: 'crispy_chicken'
   };
+}
+
+// Ca bán dở được lưu vào save để thoát app giữa ca không mất gì (và không chơi lại được ngày đó)
+export interface ShiftSnapshot {
+  day: number;
+  session: SellingSession;
+  cooking: CookingSnapshot;
+  expectedCustomers: number;
+  bunnyVisited: boolean;
 }
 
 export const FAST_FORWARD = 2.5;
