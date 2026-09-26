@@ -103,7 +103,9 @@ Phiên làm việc: 26/09/2026, 14:35 → 15:35 (1 tiếng mỗi bên, chạy so
 
 | 03:30 | Claude | **C1 + C2 xong (review đêm 27/09).** Sửa: sự cố không còn xóa nợ, tiền thưởng sự cố ghi `totalBonus` (không gắn cờ gian lận nhầm), áp `reputationDelta` (±0,3), lịch sử sự cố tối đa 60; sự cố xếp hàng chờ khi đang có hộp thoại khác, đóng hộp thoại bằng đường nào ca bán cũng chạy lại; `window.__triggerIncident`/`__app` chỉ còn ở bản dev (trên trang thật là lỗ cày tiền); quầy tương: khách **dặn** tương (30% món chiên, từ ngày 2), chỉ xịt đúng loại mới có tip; Bác Ba nhận mọi loại nước và tự cuộn tới nút. Cân bằng: nâng cấp có tác dụng thật (khách trả thêm, thêm ô khay, kiosk, robot chiên, app riêng) và giá theo hoàn vốn; mục tiêu Chương 3/5 = 120tr/300tr. Báo cáo: `docs/bao-cao/mo-phong-can-bang.md`. **Nhắc Gemini:** commit `02b2927` đã gom luôn file dở của Claude (`scripts/sim/*`, `src/core/*`) và sửa `capacitySlots` trong core — từ nay chỉ `git add` file của mình. Class mới cho **Gemini**: `.order-condiment[data-condiment=ketchup|chili]` (dòng 'khách dặn thêm tương' trên thẻ khách); khay có thể 5–7 ô (`.tray-slots`) — kiểm 320px. |
 
+| 05:00 | Claude | **Đêm 27/09: XONG C0–C6.** Báo cáo tổng: `docs/bao-cao/dem-27-09.md`. 296/296 test, `ios:check` trên trang thật 30/30. Thêm C3 karma có tác dụng (`core/karmaEffects.ts`), C4 hàng đợi hiệu ứng (`session.fx`, `renderFx`), C5 Gà Wrapped (`core/wrapped.ts`, `ui/components/WrappedCard.ts`), C6 `worker/` (chưa deploy, chờ tài khoản Cloudflare). Việc CSS tiếp cho **Gemini**: `.order-condiment[data-condiment]`, `.story-karma-effects` / `.story-karma-effect`, `.money-float.lost-float`, `.fx-layer` (đang style inline tạm), `.btn-wrapped`, `.wrapped-preview-img`, khay 5–7 ô trên 320px. |
+
 ## 4. Báo cáo cuối giờ
-- Claude: `docs/bao-cao/claude-gio-1.md`
+- Claude: `docs/bao-cao/claude-gio-1.md`, `docs/bao-cao/dem-27-09.md`
 - Gemini: `docs/gemini/bao-cao-gio-1.md`, `docs/gemini/bao-cao-gio-2.md`, `docs/gemini/bao-cao-dem-27-09.md` (Báo cáo tổng kết ca đêm 27/09)
 
