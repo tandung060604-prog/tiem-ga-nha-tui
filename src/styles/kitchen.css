@@ -657,3 +657,166 @@
   background: #fff3e6;
   color: var(--orange);
 }
+
+/* ==========================================================================
+   Raw Prep Baskets & Food Concept Visualization
+   ========================================================================== */
+
+.prep-baskets-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.prep-baskets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+}
+
+.prep-baskets-title {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #5c351f;
+  white-space: nowrap;
+}
+
+.prep-baskets-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.prep-basket-btn {
+  min-height: 48px;
+  min-width: 44px;
+  background: #fffdfa;
+  border: 1.5px solid #d4bda0;
+  border-radius: 9px;
+  padding: 3px 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  box-shadow: 0 2px 0 #bda282;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.prep-basket-btn:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 #bda282;
+}
+
+.prep-basket-btn.primary {
+  background: #fffbf5;
+  border-color: #f4a261;
+  box-shadow: 0 2px 0 #d87e35;
+}
+
+.prep-basket-btn.drink {
+  background: #f4f8fe;
+  border-color: #a4c8f0;
+  box-shadow: 0 2px 0 #7caee3;
+}
+
+.prep-basket-btn:disabled {
+  opacity: 0.55;
+  filter: grayscale(40%);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 1px 0 #ccc;
+}
+
+.prep-basket-img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15));
+}
+
+.prep-basket-details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.15;
+}
+
+.prep-basket-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prep-basket-qty {
+  font-size: 0.56rem;
+  font-weight: 700;
+  color: var(--soft);
+}
+
+/* Addon sauce pot thumbnails */
+.addon-pot-img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* Order Food Thumbnails in speech bubble */
+.order-food-thumb {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 4px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
+  flex-shrink: 0;
+}
+
+.order-food-emoji {
+  margin-right: 3px;
+}
+
+/* Tray food frame & concept display */
+.tray-food-frame {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2px;
+}
+
+.tray-item .t-img {
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  min-height: 46px;
+  max-width: 46px;
+  max-height: 46px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  flex-shrink: 0;
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,0.16));
+}
+
+.tray-item .t-quality-pill {
+  font-size: 0.55rem;
+  font-weight: 800;
+  padding: 1px 4px;
+  border-radius: 4px;
+  margin-top: 1px;
+}
+

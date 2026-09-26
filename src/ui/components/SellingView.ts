@@ -315,9 +315,13 @@ export function renderSellingView(state: GameState, session: SellingSession): st
     const itemsHtml = comboHtml + ord.items.map(it => {
       const menuItem = state.menu.find(m => m.id === it.menuItemId);
       const name = menuItem ? menuItem.name : it.menuItemId;
+      const img = foodImage(it.menuItemId, 'perfect');
       return `
         <div class="order-row">
-          <span class="order-item-title">${menuItem ? menuItem.icon : '🍗'} ${it.count > 1 ? `${it.served}/${it.count}` : '1x'} ${name}</span>
+          <span class="order-item-title">
+            ${img ? `<img src="${img}" class="order-food-thumb" alt="${name}" />` : `<span class="order-food-emoji">${menuItem ? menuItem.icon : '🍗'}</span>`}
+            ${it.count > 1 ? `${it.served}/${it.count}` : '1x'} ${name}
+          </span>
           <span class="order-check ${it.completed ? 'done' : ''}">${it.completed ? '✓' : '○'}</span>
         </div>
       `;
@@ -374,6 +378,10 @@ export function renderSellingView(state: GameState, session: SellingSession): st
   const tray = cookingEngine.getTray();
   const oilCondition = state.oilCondition;
 
+  const chickenStock = state.inventory.chicken_meat?.amount ?? 0;
+  const friesStock = state.inventory.potato_cheese?.amount ?? 0;
+  const drinkStock = state.inventory.soft_drink?.amount ?? 0;
+
   const potProgressPercent = Math.min(100, Math.round(cookState.progress));
   const oilLabel = oilCondition === 'clean' ? 'Vàng óng (Thơm lừng)' : oilCondition === 'medium' ? 'Nâu hổ phách' : 'Đen khét (Bốc khói!)';
 
@@ -423,8 +431,10 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       const qClass = isDrink ? 'good' : item.quality;
       const qText = isDrink ? 'ƯỚP LẠNH ❄️' : TRAY_QUALITY_LABEL[item.quality];
       return `
-        <div class="tray-item" data-tray-idx="${slotIdx}" title="Bấm để vứt nếu bị cháy">
-          ${img ? `<img class="t-icon t-img" src="${img}" alt="${item.name}" width="36" height="36" />` : `<span class="t-icon">${item.icon}</span>`}
+        <div class="tray-item" data-tray-idx="${slotIdx}" title="Bấm để vớt hoặc vứt">
+          <div class="tray-food-frame">
+            ${img ? `<img class="t-icon t-img" src="${img}" alt="${item.name}" width="52" height="52" />` : `<span class="t-icon">${item.icon}</span>`}
+          </div>
           <span class="t-name">${item.name}</span>
           <span class="t-quality ${qClass}">${qText}</span>
         </div>
@@ -503,13 +513,47 @@ export function renderSellingView(state: GameState, session: SellingSession): st
               </div>
             </div>
 
-            <!-- Real Action Buttons -->
-            <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin-top: 2px;">
-              <button id="btn-fry-chicken" class="btn-sm primary" ${cookState.isFrying ? 'disabled' : ''}>+ Gà Rán</button>
-              <button id="btn-fry-fries" class="btn-sm" ${cookState.isFrying ? 'disabled' : ''}>+ Khoai</button>
-              ${stationOpen(state, 3, ['chicken_meat', 'flour']) ? `<button id="btn-fry-popcorn" class="btn-sm" ${cookState.isFrying ? 'disabled' : ''}>+ Gà viên</button>` : ''}
-              <button id="btn-add-drink" class="btn-sm">🥤 Nước</button>
-              <button id="btn-change-oil" class="oil-change-btn">Thay dầu (150k)</button>
+            <!-- Khay Đựng Đồ Ăn Chưa Chế Biến (Raw Prep Containers) -->
+            <div class="prep-baskets-section">
+              <div class="prep-baskets-header">
+                <span class="prep-baskets-title">🧺 Khay Nguyên Liệu Sẵn Sàng</span>
+                <button id="btn-change-oil" class="oil-change-btn">Thay dầu (150k)</button>
+              </div>
+              <div class="prep-baskets-grid">
+                <button id="btn-fry-chicken" class="prep-basket-btn primary ${cookState.isFrying ? 'disabled' : ''}" ${cookState.isFrying ? 'disabled' : ''} title="Thả gà tươi tẩm bột vào chảo chiên">
+                  <img src="${ASSETS.kitchen.prepChicken}" alt="Rổ Gà Tươi" class="prep-basket-img" />
+                  <div class="prep-basket-details">
+                    <span class="prep-basket-label">+ Gà Tươi</span>
+                    <span class="prep-basket-qty">Còn: ${chickenStock}</span>
+                  </div>
+                </button>
+
+                <button id="btn-fry-fries" class="prep-basket-btn ${cookState.isFrying ? 'disabled' : ''}" ${cookState.isFrying ? 'disabled' : ''} title="Thả khoai tây cắt sợi vào chảo chiên">
+                  <img src="${ASSETS.kitchen.prepFries}" alt="Khay Khoai Tươi" class="prep-basket-img" />
+                  <div class="prep-basket-details">
+                    <span class="prep-basket-label">+ Khoai Tươi</span>
+                    <span class="prep-basket-qty">Còn: ${friesStock}</span>
+                  </div>
+                </button>
+
+                ${stationOpen(state, 3, ['chicken_meat', 'flour']) ? `
+                  <button id="btn-fry-popcorn" class="prep-basket-btn ${cookState.isFrying ? 'disabled' : ''}" ${cookState.isFrying ? 'disabled' : ''} title="Chiên gà viên popcorn">
+                    <img src="${ASSETS.food.popcornChicken}" alt="Gà Viên" class="prep-basket-img" />
+                    <div class="prep-basket-details">
+                      <span class="prep-basket-label">+ Gà Viên</span>
+                      <span class="prep-basket-qty">Chảo</span>
+                    </div>
+                  </button>
+                ` : ''}
+
+                <button id="btn-add-drink" class="prep-basket-btn drink" title="Lấy lon nước ngọt lạnh ra khay">
+                  <img src="${ASSETS.kitchen.prepSoda}" alt="Thùng Nước Lạnh" class="prep-basket-img" />
+                  <div class="prep-basket-details">
+                    <span class="prep-basket-label">🥤 Nước Lạnh</span>
+                    <span class="prep-basket-qty">Còn: ${drinkStock}</span>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -527,10 +571,12 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             <!-- Seasoning Addons (món sốt mở từ chương 2) -->
             ${state.currentChapter < 2 ? '' : `<div class="addon-station">
               <button id="btn-season-spicy" class="addon-btn ${cookingEngine.getActiveSeasoning() === 'spicy' ? 'active' : ''}">
-                🌶️ Sốt Cay
+                <img src="${ASSETS.kitchen.prepSpicyPot}" class="addon-pot-img" alt="Hũ Sốt Cay" />
+                <span>🌶️ Sốt Cay</span>
               </button>
               <button id="btn-season-honey" class="addon-btn ${cookingEngine.getActiveSeasoning() === 'honey' ? 'active' : ''}">
-                🍯 Bơ Tỏi
+                <img src="${ASSETS.kitchen.prepHoneyPot}" class="addon-pot-img" alt="Hũ Bơ Tỏi" />
+                <span>🍯 Bơ Tỏi</span>
               </button>
             </div>`}
 

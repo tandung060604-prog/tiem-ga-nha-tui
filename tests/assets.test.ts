@@ -19,9 +19,13 @@ describe('ảnh món theo chất lượng', () => {
     expect(foodImage('crispy_chicken', 'perfect')).toContain('perfect');
     expect(foodImage('crispy_chicken', 'good')).toContain('perfect');
   });
-  it('khoai, nước có ảnh; món chưa có ảnh trả null để dùng emoji', () => {
+  it('mọi món trong thực đơn đều có ảnh concept chất lượng cao', () => {
     expect(foodImage('shake_fries', 'perfect')).toContain('fries');
     expect(foodImage('soda', 'good')).toContain('soda');
-    expect(foodImage('spicy_chicken', 'perfect')).toBeNull();
+    expect(foodImage('spicy_chicken', 'perfect')).toContain('spicy');
+    expect(foodImage('honey_garlic_chicken', 'perfect')).toContain('honey');
+    expect(foodImage('chicken_burger', 'perfect')).toContain('burger');
+    expect(foodImage('korean_tokbokki_chicken', 'perfect')).toContain('tokbokki');
+    expect(foodImage('unknown_food_xyz', 'perfect')).toBeNull();
   });
 });

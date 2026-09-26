@@ -100,14 +100,30 @@ export const ASSETS = {
     panEmpty: url('assets/kitchen/kitchen_pan_empty.png'),
     oilClean: url('assets/kitchen/kitchen_oil_clean.png'),
     oilMedium: url('assets/kitchen/kitchen_oil_medium.png'),
-    oilDirty: url('assets/kitchen/kitchen_oil_dirty.png')
+    oilDirty: url('assets/kitchen/kitchen_oil_dirty.png'),
+    prepChicken: url('assets/kitchen/prep_basket_raw_chicken.png'),
+    prepFries: url('assets/kitchen/prep_tray_raw_fries.png'),
+    prepSoda: url('assets/kitchen/prep_crate_cold_soda.png'),
+    prepSpicyPot: url('assets/kitchen/prep_pot_spicy_sauce.png'),
+    prepHoneyPot: url('assets/kitchen/prep_pot_honey_sauce.png')
   },
   food: {
     crispyChickenPerfect: url('assets/food/food_crispy_chicken_perfect.png'),
     crispyChickenRaw: url('assets/food/food_crispy_chicken_raw.png'),
     crispyChickenBurnt: url('assets/food/food_crispy_chicken_burnt.png'),
+    spicyChicken: url('assets/food/food_spicy_chicken.png'),
+    honeyGarlicChicken: url('assets/food/food_honey_garlic_chicken.png'),
+    popcornChicken: url('assets/food/food_popcorn_chicken.png'),
     shakeFries: url('assets/food/food_shake_fries.png'),
-    soda: url('assets/food/food_soda.png')
+    soda: url('assets/food/food_soda.png'),
+    pastaBeef: url('assets/food/food_pasta_beef.png'),
+    biscuitHoney: url('assets/food/food_biscuit_honey.png'),
+    chickenBurger: url('assets/food/food_chicken_burger.png'),
+    peachTea: url('assets/food/food_peach_tea.png'),
+    chickenRice: url('assets/food/food_chicken_rice.png'),
+    tokbokkiChicken: url('assets/food/food_korean_tokbokki_chicken.png'),
+    sundaeIcecream: url('assets/food/food_sundae_icecream.png'),
+    familyBucket: url('assets/food/food_family_bucket.png')
   },
   ui: {
     bunnyNote: url('assets/ui/ui_bunny_note.png'),
@@ -129,10 +145,32 @@ export function foodImage(menuItemId: string, quality: QualityRating): string | 
       return quality === 'raw' ? ASSETS.food.crispyChickenRaw
         : quality === 'burnt' ? ASSETS.food.crispyChickenBurnt
         : ASSETS.food.crispyChickenPerfect;
+    case 'spicy_chicken':
+      return quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.spicyChicken;
+    case 'honey_garlic_chicken':
+      return quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.honeyGarlicChicken;
+    case 'popcorn_chicken':
+      return quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.popcornChicken;
     case 'shake_fries':
-      return ASSETS.food.shakeFries;
+      return quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.shakeFries;
     case 'soda':
       return ASSETS.food.soda;
+    case 'pasta_beef':
+      return ASSETS.food.pastaBeef;
+    case 'biscuit_honey':
+      return ASSETS.food.biscuitHoney;
+    case 'chicken_burger':
+      return ASSETS.food.chickenBurger;
+    case 'peach_tea':
+      return ASSETS.food.peachTea;
+    case 'chicken_rice':
+      return ASSETS.food.chickenRice;
+    case 'korean_tokbokki_chicken':
+      return ASSETS.food.tokbokkiChicken;
+    case 'sundae_icecream':
+      return ASSETS.food.sundaeIcecream;
+    case 'family_bucket':
+      return ASSETS.food.familyBucket;
     default:
       return null;
   }
