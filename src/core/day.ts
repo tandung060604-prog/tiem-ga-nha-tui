@@ -12,6 +12,8 @@ import {
 import { upgradeEffects } from './upgrades';
 import { staffEffects, endShiftForStaff, FRY_RECIPES } from './staff';
 import { karmaEffects } from './karmaEffects';
+import { averagePriceRatio, communityDriftFromPrice } from './pricing';
+import { applyKarmaChange } from '../content/endings';
 import { auditState, flagIntegrity } from './integrity';
 import { SellingSession, pushFx } from './sellingSim';
 import { random } from './rng';
@@ -335,6 +337,9 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   draft.lifetimeStats.totalBurnt += session.burntCount;
   draft.lifetimeStats.perfectFriedCount += session.perfectCount;
   endShiftForStaff(draft.staff);
+  // Giá chặt chém → cả hẻm bàn tán (Tình Hẻm giảm, ảnh hưởng kết thúc); giá bình dân → được thương
+  const priceDrift = communityDriftFromPrice(averagePriceRatio(draft));
+  if (priceDrift !== 0) draft.karma = applyKarmaChange(draft.karma, { community: priceDrift });
 
   flagIntegrity(draft, auditState(draft)); // chống gian lận: sổ sách phải hợp lý sau mỗi ngày
 

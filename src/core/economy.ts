@@ -1,5 +1,6 @@
 import { staffEffects } from './staff';
 import { karmaEffects } from './karmaEffects';
+import { averagePriceRatio, customerMultiplierFromPrice } from './pricing';
 import { GameState, DayLedger } from '../types/game';
 import { upgradeEffects } from './upgrades';
 import { GAME_HOUR_MS, OFF_PEAK_HOURS, RUSH_HOURS, isWeekend, WEEKEND_CUSTOMER_MULTIPLIER } from './clock';
@@ -37,7 +38,10 @@ export class EconomyEngine {
     // Thứ Bảy, Chủ Nhật khách đông hơn ngày thường
     const weekendMultiplier = isWeekend(state.day) ? WEEKEND_CUSTOMER_MULTIPLIER : 1;
 
-    const total = Math.round(base * starMultiplier * marketingMultiplier * weatherMultiplier * weekendMultiplier);
+    // Tiếng giá của quán: đắt → ít người ghé, rẻ → đông hơn (core/pricing.ts)
+    const priceMultiplier = customerMultiplierFromPrice(averagePriceRatio(state));
+
+    const total = Math.round(base * starMultiplier * marketingMultiplier * weatherMultiplier * weekendMultiplier * priceMultiplier);
     return Math.max(8, total);
   }
 

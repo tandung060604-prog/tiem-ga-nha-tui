@@ -1,4 +1,5 @@
 import { StarRating, CustomerReview, GameState, NonEmpty } from '../types/game';
+import { averagePriceRatio, pricingTarget } from './pricing';
 import { GENZ_REVIEW_TEMPLATES, GENZ_USERNAMES, CUST_AVATARS } from '../content/reviews';
 import { pick, weightedPick } from './rng';
 import { upgradeEffects } from './upgrades';
@@ -76,12 +77,10 @@ export class ReviewsEngine {
     r.space = Math.round((r.space * 0.8 + targetSpaceScore * 0.2) * 10) / 10;
 
     // 5. Giá cả (15%): So sánh giá bán với giá gốc
-    let pricingScore = 4.4;
-    currentState.menu.forEach(item => {
-      if (item.currentPrice > item.basePrice * 1.25) pricingScore -= 0.6;
-      if (item.currentPrice < item.basePrice) pricingScore += 0.2;
-    });
-    r.pricing = Math.max(2.0, Math.min(5.0, pricingScore));
+    // Theo giá trung bình các món đang bán so với giá gốc (core/pricing.ts), nhích dần 40%/ngày về đích.
+    // Trước: trừ bậc thang 0,6 sao cho MỖI món vượt 125%, tính cả món chưa mở; không có mức giữa.
+    const pricingGoal = pricingTarget(averagePriceRatio(currentState));
+    r.pricing = Math.round((r.pricing + (pricingGoal - r.pricing) * 0.4) * 100) / 100;
 
     r.overall = this.calculateOverallStars(r);
 

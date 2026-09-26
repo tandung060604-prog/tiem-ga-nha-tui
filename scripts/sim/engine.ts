@@ -11,6 +11,7 @@ import {
 } from '../../src/core/day';
 import { EconomyEngine } from '../../src/core/economy';
 import { upgradeEffects } from '../../src/core/upgrades';
+import { priceLimits } from '../../src/core/pricing';
 import { depositForNextChapter } from '../../src/core/progression';
 import { addStock, signIngredientContract } from '../../src/core/inventory';
 import { seedRandom, random } from '../../src/core/rng';
@@ -128,8 +129,19 @@ function buyUpgrades(state: GameState, expected: number) {
 // Một ca bán
 // ---------------------------------------------------------------------------
 
+// Chính sách giá của người chơi ảo: đặt mọi món = giá gốc × hệ số (kẹp trong khoảng luật cho phép)
+let PRICE_POLICY = 1;
+export function setPricePolicy(mult: number) { PRICE_POLICY = mult; }
+function applyPricePolicy(state: GameState) {
+  for (const item of state.menu) {
+    const { min, max } = priceLimits(item);
+    item.currentPrice = Math.max(min, Math.min(max, Math.round((item.basePrice * PRICE_POLICY) / 1000) * 1000));
+  }
+}
+
 export function playDay(state: GameState, p: Profile, policy: UpgradePolicy, staffPolicy: StaffPolicy) {
   const event = eventForDay(state.day);
+  applyPricePolicy(state);
   const expected = EconomyEngine.calculateDailyCustomerCount(state, event.effect.customerMultiplier ?? 1);
   for (const [id, inv] of Object.entries(state.inventory)) {
     if (inv.unlocked === false && (inv.unlockCost ?? 0) <= state.money * 0.25) signIngredientContract(state, id);

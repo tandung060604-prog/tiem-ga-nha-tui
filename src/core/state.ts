@@ -5,6 +5,7 @@ import { INITIAL_UPGRADES } from '../content/upgrades';
 import { INITIAL_CANDIDATES } from '../content/staff';
 import { ensureBatches } from './inventory';
 import { signSave, auditState, flagIntegrity } from './integrity';
+import { priceLimits } from './pricing';
 
 const SAVE_KEY = 'tiem_ga_nha_tui_save_v2';
 const SIG_KEY = `${SAVE_KEY}_sig`;
@@ -124,6 +125,12 @@ export function migrateSave(raw: unknown): { state: GameState; repaired: string[
       state.ratings[c] = defaults.ratings[c];
       repaired.push(`ratings.${c}`);
     }
+  }
+  // Giá: save cũ có thể vượt trần 150% / dưới sàn 70% giá gốc (trước đây +2k không giới hạn) → kéo về khoảng cho phép
+  for (const item of state.menu) {
+    const { min, max } = priceLimits(item);
+    const fixed = Math.max(min, Math.min(max, item.currentPrice));
+    if (fixed !== item.currentPrice) { item.currentPrice = fixed; repaired.push(`menu.${item.id}.price`); }
   }
   // Kho: mọi nguyên liệu của content phải có mặt và có số lượng hợp lệ
   for (const [id, item] of Object.entries(defaults.inventory)) {

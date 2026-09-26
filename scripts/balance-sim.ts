@@ -3,7 +3,7 @@
 import { createInitialState } from '../src/core/state';
 import { seedRandom } from '../src/core/rng';
 import { CHAPTERS } from '../src/content/chapters';
-import { PROFILES, playDay, UpgradePolicy, StaffPolicy } from './sim/engine';
+import { PROFILES, playDay, UpgradePolicy, StaffPolicy, setPricePolicy } from './sim/engine';
 // ---------------------------------------------------------------------------
 // Chạy & báo cáo
 // ---------------------------------------------------------------------------
@@ -32,6 +32,7 @@ console.log(`Mô phỏng ${SEEDS} lượt × ${DAYS} ngày · mục tiêu Chươ
 const POLICIES: [UpgradePolicy, StaffPolicy][] = [
   ['không nâng cấp', 'không nhân viên'], ['không nâng cấp', 'có nhân viên'], ['có nâng cấp', 'không nhân viên'], ['có nâng cấp', 'có nhân viên']
 ];
+setPricePolicy(arg('price', 1)); // --price 1.3: mọi món 130% giá gốc (luật kẹp 70–150%)
 const ONLY_POLICY = arg('policy', -1); // --policy 3: chỉ chạy một chính sách (mô phỏng dài cho nhanh)
 for (const pol of POLICIES.filter((_, i) => ONLY_POLICY < 0 || i === ONLY_POLICY)) {
   const [policy, staffPolicy] = pol;
@@ -40,6 +41,7 @@ for (const pol of POLICIES.filter((_, i) => ONLY_POLICY < 0 || i === ONLY_POLICY
     const moneyAt: Record<number, number[]> = { 5: [], 10: [], 15: [], 30: [], 60: [], 100: [], 150: [], 210: [], 300: [] };
     let served = 0, lost = 0, expectedSum = 0, profitSum = 0, days = 0, perfect = 0, fried = 0;
     const stars: number[] = [];
+    const community: number[] = [];
     const blank = () => ({ days: 0, expected: 0, served: 0, lost: 0, revenue: 0, ingredients: 0, wages: 0, profit: 0, stars: 0 });
     const per: Record<number, ReturnType<typeof blank>> = { 2: blank(), 3: blank(), 4: blank(), 5: blank() };
 
@@ -71,6 +73,7 @@ for (const pol of POLICIES.filter((_, i) => ONLY_POLICY < 0 || i === ONLY_POLICY
       perfect += state.lifetimeStats.perfectFriedCount;
       fried += state.lifetimeStats.totalFried;
       stars.push(state.ratings.overall);
+      community.push(state.karma.community);
       ch2Days.push(Number.isNaN(ch2) ? Infinity : ch2);
       ch3Days.push(Number.isNaN(ch3) ? Infinity : ch3);
       ch4Days.push(Number.isNaN(ch4) ? Infinity : ch4);
@@ -79,7 +82,7 @@ for (const pol of POLICIES.filter((_, i) => ONLY_POLICY < 0 || i === ONLY_POLICY
 
     const passed = ch2Days.filter(Number.isFinite).length;
     const m2 = median(ch2Days);
-    console.log(`■ ${p.name} · ${policy} · ${staffPolicy}`);
+    console.log(`■ ${p.name} · ${policy} · ${staffPolicy}${arg('price', 1) !== 1 ? ` · giá ×${arg('price', 1)}` : ''}`);
     console.log(`  Qua Chương 1: ${passed}/${SEEDS} lượt, trung vị ngày ${Number.isFinite(m2) ? m2 : `> ${DAYS}`}` +
       `  (nhanh nhất ${Math.min(...ch2Days)}, chậm nhất ${Math.max(...ch2Days) === Infinity ? `> ${DAYS}` : Math.max(...ch2Days)})`);
     const m3 = median(ch3Days);
@@ -93,6 +96,7 @@ for (const pol of POLICIES.filter((_, i) => ONLY_POLICY < 0 || i === ONLY_POLICY
       const a = (v: number) => v / c2.days;
       console.log(`  Chương ${ch}/ngày: khách dự kiến ${a(c2.expected).toFixed(1)}, phục vụ ${a(c2.served).toFixed(1)}, bỏ ${a(c2.lost).toFixed(1)} | thu ${fmt(a(c2.revenue))} hàng ${fmt(a(c2.ingredients))} lương ${fmt(a(c2.wages))} lãi ${fmt(a(c2.profit))} | sao TB ${a(c2.stars).toFixed(2)}`);
     }
+    console.log(`  Cuối kỳ: sao ${median(stars).toFixed(2)} · Tình Hẻm ${median(community).toFixed(0)} (Hạnh phúc cần ≥75, Tập đoàn khi <40)`);
     console.log(`  Tỉ lệ Perfect ${(100 * perfect / Math.max(1, fried)).toFixed(0)}% · sao cuối ${median(stars).toFixed(1)}\n`);
   }
 }

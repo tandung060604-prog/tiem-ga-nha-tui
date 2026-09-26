@@ -76,6 +76,10 @@ for (const deviceName of ['iPhone SE', 'iPhone 13', 'iPhone 15 Pro Max']) {
 
   const broken = await page.evaluate(() => [...document.images].filter(i => i.complete && i.naturalWidth === 0).map(i => i.getAttribute('src')));
   check(broken.length === 0, `${tag} mọi ảnh tải được`, broken.slice(0, 3).join(', '));
+  // Ảnh món trong thẻ khách phải là ảnh nhỏ (commit 02b2927 làm mất CSS → ảnh 256px che nửa màn hình)
+  const bigThumbs = await page.evaluate(() => [...document.querySelectorAll('.customer-card .order-row img')]
+    .map(i => i.getBoundingClientRect()).filter(r => r.width > 56 || r.height > 56).length);
+  check(bigThumbs === 0, `${tag} ảnh món trong thẻ khách ≤ 56px`, bigThumbs ? `${bigThumbs} ảnh quá to` : '');
   const over = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
   check(over <= 0, `${tag} không cuộn ngang`, over > 0 ? `dư ${over}px` : '');
   await page.screenshot({ path: `${OUT}/ios-${device.viewport.width}-selling.png` });

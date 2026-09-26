@@ -424,7 +424,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       return `
         <div class="order-row">
           <span class="order-item-title">
-            ${img ? `<img src="${img}" class="order-food-thumb" alt="${name}" />` : `<span class="order-food-emoji">${menuItem ? menuItem.icon : '🍗'}</span>`}
+            ${img ? `<img src="${img}" class="order-food-thumb" alt="${name}" width="28" height="28" style="width: 28px; height: 28px; object-fit: contain; vertical-align: middle; flex: none;" />` : `<span class="order-food-emoji">${menuItem ? menuItem.icon : '🍗'}</span>`}
             ${it.count > 1 ? `${it.served}/${it.count}` : '1x'} ${name}
             ${it.condiment ? `<span class="order-condiment" data-condiment="${it.condiment}">${it.condiment === 'ketchup' ? '🍅 + tương cà' : '🌶️ + tương ớt'}</span>` : ''}
           </span>

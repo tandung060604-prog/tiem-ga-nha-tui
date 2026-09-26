@@ -1,5 +1,6 @@
 import { staffEffects, FRY_RECIPES } from './staff';
 import { karmaEffects } from './karmaEffects';
+import { demandWeight, patienceFactorFromPrice, priceRatio } from './pricing';
 
 export const CONDIMENT_REQUEST_CHANCE = 0.3;
 import { BaseMenuItemId, CustomerOrder, GameState } from '../types/game';
@@ -7,7 +8,7 @@ import { CharacterGenerator } from '../content/characterGenerator';
 import { BunnyLetter } from '../content/mysteryBunny';
 import { INITIAL_MENU } from '../content/menu';
 import { upgradeEffects } from './upgrades';
-import { pick, random } from './rng';
+import { random, weightedPick } from './rng';
 import { ASSETS } from '../content/assets';
 
 // Món khách được gọi = món có trạm trong bếp (đọc từ content, không từ save cũ).
@@ -42,21 +43,26 @@ export class OrdersEngine {
       else selectedItems.push({ menuItemId, count, served: 0, completed: false });
     };
     let totalPrice = 0;
+    let baseTotal = 0;   // tổng giá gốc (món lẻ) → mức giá của đơn
+    let orderRatio = 1;
     let comboName: string | undefined;
 
-    const combo = combos.length > 0 && random() < 0.18 ? pick(combos) : undefined;
+    // Giá đắt → combo đó ít được chọn (core/pricing.ts)
+    const combo = combos.length > 0 && random() < 0.18 ? weightedPick(combos, m => demandWeight(priceRatio(m))) : undefined;
     if (combo) {
       // Combo: nhận từng món, trả giá combo
       for (const c of content.get(combo.id)?.components ?? []) addItem(c.menuItemId, c.count);
       totalPrice = Math.round(combo.currentPrice * priceMultiplier);
+      orderRatio = priceRatio(combo);
       comboName = combo.name;
     } else {
       // 1 - 2 món lẻ
       const itemCount = random() < 0.65 ? 1 : 2;
       for (let i = 0; i < itemCount; i++) {
-        const item = pick(pool);
+        const item = weightedPick(pool, m => demandWeight(priceRatio(m))); // món đắt ít người gọi
         addItem(item.id, 1);
         totalPrice += Math.round(item.currentPrice * priceMultiplier);
+        baseTotal += item.basePrice;
       }
     }
     // Khách dặn thêm tương cho món chiên (từ ngày 2: ngày đầu Bác Ba đang dạy thao tác cơ bản)
@@ -81,7 +87,10 @@ export class OrdersEngine {
     const patienceBoost = 1 + (upgradeEffects(state.upgrades).patiencePct + (isDelivery ? team.deliveryPatiencePct : team.walkInPatiencePct)
       + karmaEffects(state.karma).patiencePct) / 100; // Tình Hẻm (core/karmaEffects.ts)
     const orderSizeBonus = Math.min(30, extraItems * 5); // order nhiều món (combo) chờ được lâu hơn
-    const patienceMax = Math.max(18, Math.round((28 + random() * 12 + spaceBonus + orderSizeBonus) * char.patienceMultiplier * patienceBoost));
+    // Thấy đắt thì khách mất kiên nhẫn nhanh (core/pricing.ts): giá chặt chém → khách bỏ về giữa chừng
+    if (baseTotal > 0) orderRatio = totalPrice / (baseTotal * priceMultiplier);
+    const priceTolerance = patienceFactorFromPrice(orderRatio);
+    const patienceMax = Math.max(12, Math.round((28 + random() * 12 + spaceBonus + orderSizeBonus) * char.patienceMultiplier * patienceBoost * priceTolerance));
 
     return {
       id: 'ord_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),

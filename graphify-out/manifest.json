@@ -90,27 +90,27 @@
     "semantic_hash": ""
   },
   "src/core/economy.ts": {
-    "mtime": 1790449688.4256988,
-    "seen": 1790449815.024883,
-    "ast_hash": "433c9403f30e4c413017c94a364db5da",
+    "mtime": 1790465279.3592153,
+    "seen": 1790466297.1777897,
+    "ast_hash": "238f6eeb644abaa45145dfce8c1c2d82",
     "semantic_hash": ""
   },
   "src/core/orders.ts": {
-    "mtime": 1790449688.3936412,
-    "seen": 1790449815.0248911,
-    "ast_hash": "8c8e807574616473e0dd5edb0fc7f541",
+    "mtime": 1790465492.720354,
+    "seen": 1790466297.1777966,
+    "ast_hash": "f5c8934275a357e4892018815eec773f",
     "semantic_hash": ""
   },
   "src/core/reviewsEngine.ts": {
-    "mtime": 1790431448.5078442,
-    "seen": 1790431734.5078974,
-    "ast_hash": "a0d056f5779d5bc939e55bd6a9bab935",
+    "mtime": 1790465288.1585174,
+    "seen": 1790466297.177801,
+    "ast_hash": "52f7dee3c9e8869bc8603ba613e6a078",
     "semantic_hash": ""
   },
   "src/core/state.ts": {
-    "mtime": 1790443930.50817,
-    "seen": 1790449302.514736,
-    "ast_hash": "3e254544abb7898d4032694348c52c6f",
+    "mtime": 1790465350.3376179,
+    "seen": 1790466297.1778092,
+    "ast_hash": "b344d7ba4c59d6ffd82ca1711a4452d5",
     "semantic_hash": ""
   },
   "src/main.ts": {
@@ -150,9 +150,9 @@
     "semantic_hash": ""
   },
   "src/ui/components/MenuTab.ts": {
-    "mtime": 1790414055.1471617,
-    "seen": 1790414243.5964363,
-    "ast_hash": "17674ece2baeef4c576c494506cfffd5",
+    "mtime": 1790465324.3920336,
+    "seen": 1790466297.1778264,
+    "ast_hash": "eddacbbdb00e1ff44d91fe72d0b28403",
     "semantic_hash": ""
   },
   "src/ui/components/ReviewsTab.ts": {
@@ -162,9 +162,9 @@
     "semantic_hash": ""
   },
   "src/ui/components/SellingView.ts": {
-    "mtime": 1790449886.0655332,
-    "seen": 1790450045.8162553,
-    "ast_hash": "f866526c080fa25784ae43a572863ec1",
+    "mtime": 1790465962.373753,
+    "seen": 1790466297.1778286,
+    "ast_hash": "09875e6b16dd6dcd9b175c6beb602a4f",
     "semantic_hash": ""
   },
   "src/ui/components/SettingsModal.ts": {
@@ -336,9 +336,9 @@
     "semantic_hash": ""
   },
   "docs/phan-cong.md": {
-    "mtime": 1790449623.536676,
-    "seen": 1790449627.8677964,
-    "ast_hash": "15f2ad37955ffa28a3167d6db8e1e71f",
+    "mtime": 1790465314.158165,
+    "seen": 1790466297.1779487,
+    "ast_hash": "7c8df33a504913a3187ad6e17bdc2694",
     "semantic_hash": ""
   },
   "docs/gemini/screenshots/ban-hang-390px.png": {
@@ -558,9 +558,9 @@
     "semantic_hash": ""
   },
   "src/core/day.ts": {
-    "mtime": 1790450117.8989472,
-    "seen": 1790451194.64809,
-    "ast_hash": "823d0f858af1adc8524ed8ceddacdafc",
+    "mtime": 1790465288.174753,
+    "seen": 1790466297.177788,
+    "ast_hash": "046903c5b7aa703282b228a21e73728c",
     "semantic_hash": ""
   },
   "docs/bao-cao/mo-phong-can-bang.md": {
@@ -2037,6 +2037,36 @@
     "mtime": 1790451287.2008338,
     "seen": 1790452062.0072484,
     "ast_hash": "eaac8f4cd048418d3b44596b8c4bb295",
+    "semantic_hash": ""
+  },
+  "src/core/pricing.ts": {
+    "mtime": 1790466105.8252285,
+    "seen": 1790466297.177798,
+    "ast_hash": "9bd71b0edd8169f260f144fd379aaefc",
+    "semantic_hash": ""
+  },
+  "tests/pricing.test.ts": {
+    "mtime": 1790466105.826225,
+    "seen": 1790466297.1778595,
+    "ast_hash": "1500b43538fd7ac83377dc8f37fdde38",
+    "semantic_hash": ""
+  },
+  "docs/bao-cao/dem-27-09.md": {
+    "mtime": 1790452262.3751116,
+    "seen": 1790466297.177921,
+    "ast_hash": "dfb9d4595fa303a231e98fe1b19f1f91",
+    "semantic_hash": ""
+  },
+  "docs/gemini/bao-cao-vong-2.md": {
+    "mtime": 1790465301.5699406,
+    "seen": 1790466297.1779306,
+    "ast_hash": "1b605b6d765d2f024d95abd6d72923bb",
+    "semantic_hash": ""
+  },
+  "docs/gemini/preview-vong-2.html": {
+    "mtime": 1790465275.4199648,
+    "seen": 1790466297.177945,
+    "ast_hash": "71e1574a48df2aa65e78aca079be5f65",
     "semantic_hash": ""
   }
 }
