@@ -261,7 +261,7 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   const inspected = event.effect.inspection === true;
   const oil = draft.oilCondition;
   const fine = inspected && oil === 'dirty' ? INSPECTION_FINE : 0;
-  const team = staffEffects(draft.staff);
+  const team = staffEffects(draft.staff, 12, draft.upgrades);
 
   const ledger = EconomyEngine.finalizeDayLedger(
     draft.day, session.grossRevenue, session.tips, session.ingredientCost, expiredValue,

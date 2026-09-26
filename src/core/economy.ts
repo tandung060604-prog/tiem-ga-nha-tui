@@ -60,7 +60,7 @@ export class EconomyEngine {
       case 4:
         return { rent: 1500000, utilities: 350000 }; // Tiệm hot trend
       case 5:
-        return { rent: 4500000, utilities: 950000 }; // Chuỗi 5 chi nhánh
+        return { rent: 2400000, utilities: 600000 }; // Chuỗi 5 chi nhánh (mô phỏng: 5,45tr/ngày → Chương 5 lỗ)
       default:
         return { rent: 0, utilities: 25000 };
     }

@@ -32,25 +32,27 @@ console.log(`Mô phỏng ${SEEDS} lượt × ${DAYS} ngày · mục tiêu Chươ
 const POLICIES: [UpgradePolicy, StaffPolicy][] = [
   ['không nâng cấp', 'không nhân viên'], ['không nâng cấp', 'có nhân viên'], ['có nâng cấp', 'không nhân viên'], ['có nâng cấp', 'có nhân viên']
 ];
-for (const pol of POLICIES) {
+const ONLY_POLICY = arg('policy', -1); // --policy 3: chỉ chạy một chính sách (mô phỏng dài cho nhanh)
+for (const pol of POLICIES.filter((_, i) => ONLY_POLICY < 0 || i === ONLY_POLICY)) {
   const [policy, staffPolicy] = pol;
   for (const p of PROFILES) {
-    const ch2Days: number[] = [], ch3Days: number[] = [], ch4Days: number[] = [];
-    const moneyAt: Record<number, number[]> = { 5: [], 10: [], 15: [], 30: [], 60: [], 100: [], 150: [] };
+    const ch2Days: number[] = [], ch3Days: number[] = [], ch4Days: number[] = [], ch5Days: number[] = [];
+    const moneyAt: Record<number, number[]> = { 5: [], 10: [], 15: [], 30: [], 60: [], 100: [], 150: [], 210: [], 300: [] };
     let served = 0, lost = 0, expectedSum = 0, profitSum = 0, days = 0, perfect = 0, fried = 0;
     const stars: number[] = [];
     const blank = () => ({ days: 0, expected: 0, served: 0, lost: 0, revenue: 0, ingredients: 0, wages: 0, profit: 0, stars: 0 });
-    const per: Record<number, ReturnType<typeof blank>> = { 2: blank(), 3: blank(), 4: blank() };
+    const per: Record<number, ReturnType<typeof blank>> = { 2: blank(), 3: blank(), 4: blank(), 5: blank() };
 
     for (let seed = 1; seed <= SEEDS; seed++) {
       seedRandom(seed * 7919);
       const state = createInitialState();
-      let ch2 = NaN, ch3 = NaN, ch4 = NaN;
+      let ch2 = NaN, ch3 = NaN, ch4 = NaN, ch5 = NaN;
       for (let d = 1; d <= DAYS; d++) {
         const { ledger, unlocked, expected } = playDay(state, p, policy, staffPolicy);
         if (unlocked === 2) ch2 = d;
         if (unlocked === 3) ch3 = d;
         if (unlocked === 4) ch4 = d;
+        if (unlocked === 5) ch5 = d;
         if (moneyAt[d]) moneyAt[d]!.push(state.money);
         if (DEBUG_DAYS && seed === DEBUG_SEED && p.name === DEBUG_PROFILE && POLICIES.indexOf(pol) === DEBUG_POLICY && d >= DEBUG_FROM && d <= DEBUG_FROM + 5) {
           console.log(`  [debug] ngày ${d} ch${state.currentChapter} tiền ${fmt(state.money)} | khách dự kiến ${expected} phục vụ ${ledger.customersServed} bỏ ${ledger.customersLost} | thu ${fmt(ledger.grossRevenue + ledger.tips)} nguyên liệu ${fmt(ledger.ingredientCost)} hết hạn ${fmt(ledger.wasteCost)} mặt bằng+điện ${fmt(ledger.rent + ledger.utilities)} lương ${fmt(ledger.wages)} hoa hồng ${fmt(ledger.appCommissions)} lãi ${fmt(ledger.netProfit)} | NV ${state.staff.map(m => m.role + ':' + m.mood).join(',')} | sao ${JSON.stringify(state.ratings)}`);
@@ -72,6 +74,7 @@ for (const pol of POLICIES) {
       ch2Days.push(Number.isNaN(ch2) ? Infinity : ch2);
       ch3Days.push(Number.isNaN(ch3) ? Infinity : ch3);
       ch4Days.push(Number.isNaN(ch4) ? Infinity : ch4);
+      ch5Days.push(Number.isNaN(ch5) ? Infinity : ch5);
     }
 
     const passed = ch2Days.filter(Number.isFinite).length;
@@ -82,8 +85,8 @@ for (const pol of POLICIES) {
     const m3 = median(ch3Days);
     const m4 = median(ch4Days);
     const pass = (xs: number[]) => xs.filter(Number.isFinite).length;
-    console.log(`  Qua Chương 2: ${pass(ch3Days)}/${SEEDS}, trung vị ngày ${Number.isFinite(m3) ? m3 : `> ${DAYS}`} · Qua Chương 3: ${pass(ch4Days)}/${SEEDS}, trung vị ngày ${Number.isFinite(m4) ? m4 : `> ${DAYS}`} (GDD: 50 / 100)`);
-    console.log(`  Tiền (trung vị): ngày 5 ${fmt(median(moneyAt[5]!))} · ngày 10 ${fmt(median(moneyAt[10]!))} · ngày 15 ${fmt(median(moneyAt[15]!))} · ngày 30 ${fmt(median(moneyAt[30]!))} · ngày 60 ${fmt(median(moneyAt[60]!))} · ngày 100 ${fmt(median(moneyAt[100]!))} · ngày 150 ${fmt(median(moneyAt[150]!))}`);
+    console.log(`  Qua Chương 2: ${pass(ch3Days)}/${SEEDS}, trung vị ngày ${Number.isFinite(m3) ? m3 : `> ${DAYS}`} · Qua Chương 3: ${pass(ch4Days)}/${SEEDS}, trung vị ngày ${Number.isFinite(m4) ? m4 : `> ${DAYS}`} (GDD: 50 / 100)` + ` · Qua Chương 4: ${pass(ch5Days)}/${SEEDS}, trung vị ngày ${Number.isFinite(median(ch5Days)) ? median(ch5Days) : `> ${DAYS}`} (GDD: 150)`);
+    console.log(`  Tiền (trung vị): ngày 5 ${fmt(median(moneyAt[5]!))} · ngày 10 ${fmt(median(moneyAt[10]!))} · ngày 15 ${fmt(median(moneyAt[15]!))} · ngày 30 ${fmt(median(moneyAt[30]!))} · ngày 60 ${fmt(median(moneyAt[60]!))} · ngày 100 ${fmt(median(moneyAt[100]!))} · ngày 150 ${fmt(median(moneyAt[150]!))} · ngày 210 ${fmt(median(moneyAt[210]!))} · ngày 300 ${fmt(median(moneyAt[300]!))}`);
     console.log(`  15 ngày đầu/ngày: khách dự kiến ${(expectedSum / days).toFixed(1)}, phục vụ ${(served / days).toFixed(1)}, bỏ về ${(lost / days).toFixed(1)}, lãi ${fmt(profitSum / days)}`);
     for (const [ch, c2] of Object.entries(per)) {
       if (!c2.days) continue;

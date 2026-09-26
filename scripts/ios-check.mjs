@@ -49,12 +49,18 @@ for (const deviceName of ['iPhone SE', 'iPhone 13', 'iPhone 15 Pro Max']) {
     if (sel) {
       if (hint.button && hint.text.startsWith('Giỏi lắm')) tutorialDone = true;
       await page.locator(sel).first().scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => {});
+      await page.waitForTimeout(450); // Bác Ba cuộn mượt tới nút: đợi cuộn xong mới lấy tọa độ
       const box = await page.locator(sel).first().boundingBox();
       if (box) await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
     }
     await page.waitForTimeout(250);
   }
-  check(tutorialDone && !(await page.locator('#tutorial-layer').count()), `${tag} làm theo Bác Ba tới hết hướng dẫn`, `${steps.length} bước: ${steps.join(' / ')}`);
+  const stuck = tutorialDone ? '' : await page.evaluate(() => JSON.stringify({
+    modal: document.getElementById('modal-container')?.hasAttribute('hidden') === false ? document.getElementById('modal-content')?.textContent?.trim().slice(0, 60) : null,
+    tray: [...document.querySelectorAll('.tray-item .t-name')].map(e => e.textContent),
+    target: document.querySelector('.tutorial-target')?.id ?? null
+  }));
+  check(tutorialDone && !(await page.locator('#tutorial-layer').count()), `${tag} làm theo Bác Ba tới hết hướng dẫn`, `${steps.length} bước: ${steps.join(' / ')} ${stuck}`);
   let tapsOk = true;
   for (const id of ['#btn-add-drink', '#btn-fry-chicken']) {
     try { await page.locator(id).tap({ timeout: 3000 }); } catch (e) {

@@ -9,7 +9,11 @@ function effectsSummary(e: UpgradeEffects): string {
     e.oilLifePct ? `dầu bền +${e.oilLifePct}%` : '',
     e.patiencePct ? `khách chờ lâu +${e.patiencePct}%` : '',
     e.customersPct ? `khách/ngày +${e.customersPct}%` : '',
-    e.autoLift ? 'tự nhấc giỏ khi Perfect' : ''
+    e.autoLift ? 'tự nhấc giỏ khi Perfect' : '',
+    e.pricePremiumPct ? `khách trả thêm ${e.pricePremiumPct}%` : '',
+    e.traySlots ? `khay +${e.traySlots} ô` : '',
+    e.selfServe ? 'khách tự nhận món (kiosk)' : '',
+    e.ownDeliveryApp ? 'không mất hoa hồng app' : ''
   ].filter(Boolean);
   return `⚡ Đang có hiệu lực: ${parts.length ? parts.join(' · ') : 'chưa có (mua nâng cấp đầu tiên nhé!)'}`;
 }

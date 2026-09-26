@@ -18,7 +18,7 @@ import { audio } from '../../src/core/audio';
 import { CHAPTERS } from '../../src/content/chapters';
 import { INITIAL_MENU } from '../../src/content/menu';
 import { GameState, CustomerOrder, TrayItem, StaffRole } from '../../src/types/game';
-import { staffEffects, tickStaff, fryingItemId, missingItems, maxStaff, FRY_RECIPES, extraTraySlots, severancePay, traySizeFor } from '../../src/core/staff';
+import { staffEffects, tickStaff, fryingItemId, missingItems, maxStaff, FRY_RECIPES, extraTraySlots, severancePay, traySizeFor, hasAutoWork } from '../../src/core/staff';
 import { generateCandidate } from '../../src/content/staff';
 
 audio.setMuted(true);
@@ -169,6 +169,7 @@ export function playDay(state: GameState, p: Profile, policy: UpgradePolicy, sta
   session.orders.push(...source.opening());
 
   const STEP = 100;
+  const { autoLift } = upgradeEffects(state.upgrades);
   let busyMs = 0;
   let liftAt = 0;
   const price = (id: string) => state.menu.find(m => m.id === id)?.currentPrice ?? 0;
@@ -176,13 +177,17 @@ export function playDay(state: GameState, p: Profile, policy: UpgradePolicy, sta
   for (let dayOver = false; !dayOver;) {
     const dt = gameDeltaMs(session, STEP);
     const cooked = cook.updateFrying(dt);
-    if (cooked.finished && cooked.quality === 'burnt') recordFryerLift(state, session, cook.liftFryer());
+    // Dây chuyền tự động (Bếp cấp 6): tự nhấc giỏ ở giữa vùng Perfect, giống main.ts
+    if (autoLift && cook.getCookState().isFrying && cook.getCookState().progress >= CookingEngine.AUTO_LIFT_AT) {
+      recordFryerLift(state, session, cook.liftFryer());
+    } else if (cooked.finished && cooked.quality === 'burnt') recordFryerLift(state, session, cook.liftFryer());
     for (const e of tickSelling(session, dt, { expectedCustomers: expected, spawnCustomer: () => source.next(session.orders) })) {
       if (e.type === 'dayOver') dayOver = true;
     }
-    if (state.staff.length > 0 || upgradeEffects(state.upgrades).selfServe) {
+    const eff = staffEffects(state.staff, session.gameHour, state.upgrades);
+    if (hasAutoWork(eff)) {
       const cs = cook.getCookState();
-      const staffEvents = tickStaff(session, cook.getTray(), dt, staffEffects(state.staff, session.gameHour, state.upgrades),
+      const staffEvents = tickStaff(session, cook.getTray(), dt, eff,
         cs.isFrying ? fryingItemId(cs.fryingType, cook.getActiveSeasoning()) : null,
         { use: ids => useIngredients(state, session, ids), place: item => cook.addToTray(item), pour: d => makeDrink(state, session, cook, d) === 'ok', traySize: cook.getTraySize() });
       for (const e of staffEvents) {

@@ -28,7 +28,7 @@ import { SellingSession, createSellingSession, gameDeltaMs, tickSelling } from '
 import { OPEN_HOUR, CLOSE_HOUR } from './core/clock';
 import type { ShiftSnapshot } from './core/sellingSim';
 import { DRINK_RECIPES, TIMER_RECIPES, timerPhase, TimerStationId, AssemblyId, DrinkId, isTimerStationId, isAssemblyId, isDrinkId } from './core/stations';
-import { staffEffects, tickStaff, fryingItemId, extraTraySlots } from './core/staff';
+import { staffEffects, tickStaff, fryingItemId, traySizeFor, hasAutoWork } from './core/staff';
 import { TutorialState, tutorialStep, tutorialHint, shouldRunTutorial } from './core/tutorial';
 import { syncTutorialLayer } from './ui/components/TutorialLayer';
 import { recordHelperFry, StationResult, startTimerStation, pullTimerStation, assembleAtCounter, makeDrink, creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, SAUCE_STOCK, serveFirstOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP } from './core/day';
@@ -840,7 +840,7 @@ class AppController {
     this.expectedCustomers = shift.expectedCustomers;
     this.customerSource = createCustomerSource(state, this.currentEvent, shift.bunnyVisited);
     cookingEngine.setFryRampBonus(upgradeEffects(state.upgrades).fryRampPct);
-    cookingEngine.setTraySize(CookingEngine.TRAY_SIZE + extraTraySlots(state.staff));
+    cookingEngine.setTraySize(traySizeFor(state));
     cookingEngine.restore(shift.cooking);
     document.body.classList.add('selling-mode');
     music.setMode('selling');
@@ -860,7 +860,7 @@ class AppController {
     cookingEngine.setFryRampBonus(upgradeEffects(stateManager.getState().upgrades).fryRampPct);
     cookingEngine.clearTray();
     const state = stateManager.getState();
-    cookingEngine.setTraySize(CookingEngine.TRAY_SIZE + extraTraySlots(state.staff));
+    cookingEngine.setTraySize(traySizeFor(state));
     this.customerSource = createCustomerSource(state, this.currentEvent);
     this.sellingSession.orders.push(...this.customerSource.opening());
     if (shouldRunTutorial(state)) {
@@ -974,10 +974,11 @@ class AppController {
 
   private tickStaff(session: SellingSession, gameDt: number) {
     const state = stateManager.getState();
-    if (state.staff.length === 0 || gameDt <= 0) return;
+    const eff = staffEffects(state.staff, session.gameHour, state.upgrades);
+    if (!hasAutoWork(eff) || gameDt <= 0) return;
     const cook = cookingEngine.getCookState();
     const playerFrying = cook.isFrying ? fryingItemId(cook.fryingType, cookingEngine.getActiveSeasoning()) : null;
-    const events = tickStaff(session, cookingEngine.getTray(), gameDt, staffEffects(state.staff, session.gameHour), playerFrying, {
+    const events = tickStaff(session, cookingEngine.getTray(), gameDt, eff, playerFrying, {
       // hết hàng thì khỏi mở stateManager.update mỗi frame
       use: ids => ids.every(id => (state.inventory[id]?.amount ?? 0) >= 1) && this.useIngredients([...ids]),
       place: item => cookingEngine.addToTray(item),

@@ -16,6 +16,7 @@ type Upgrades = { [id: string]: UpgradeBranch };
 
 export const MAX_HELPER_FRYERS = 2;
 export const SELF_SERVE_MS = 2000;
+export const ROBOT_CYCLE_MS = 4200;
 export const BASE_APP_COMMISSION = 0.08;
 // Quán càng lớn càng chứa được nhiều người (Chương 2: 3 người … Chương 5: 6 người)
 export const maxStaff = (chapter: number) => (chapter < 2 ? 0 : chapter + 1);
@@ -110,6 +111,11 @@ export function staffEffects(staff: readonly StaffMember[], gameHour = 12, upgra
       };
     });
 
+  // Dây chuyền chiên tự động (Bếp cấp 6): một giỏ robot chạy riêng, không cần người đứng
+  if (up?.autoLift) {
+    cooks.push({ staffId: 'robot', name: 'Robot Dây Chuyền', cycleMs: Math.round(ROBOT_CYCLE_MS / kitchenSpeed), perfectChance: 0.95, burntChance: 0 });
+  }
+
   const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
   const waiters = ofRole('waiter');
   const drivers = ofRole('delivery');
@@ -119,7 +125,8 @@ export function staffEffects(staff: readonly StaffMember[], gameHour = 12, upgra
     cooks,
     walkInPatiencePct: Math.min(40, sum(ofRole('cashier').map(m => 25 * power(m, 'attitude', boost)))),
     deliveryPatiencePct: Math.min(50, sum(drivers.map(m => 35 * power(m, 'speed', boost)))),
-    commissionRate: BASE_APP_COMMISSION * (1 - Math.min(0.6, sum(drivers.map(m => 0.5 * power(m, 'skill', boost))))),
+    // App giao hàng riêng (Vận hành cấp 5): không mất hoa hồng app ngoài
+    commissionRate: up?.ownDeliveryApp ? 0 : BASE_APP_COMMISSION * (1 - Math.min(0.6, sum(drivers.map(m => 0.5 * power(m, 'skill', boost))))),
     // Kiosk tự order (Vận hành cấp 4): khách tự lấy món như có phục vụ (chậm hơn phục vụ giỏi)
     waiterServeMs: waiters.length ? Math.round(Math.max(600, 2600 - 1600 * fastestWaiter)) : up?.selfServe ? SELF_SERVE_MS : null,
     hygienePerDay: Math.min(0.12, sum(waiters.map(m => 0.06 * power(m, 'attitude', boost)))),
@@ -127,6 +134,9 @@ export function staffEffects(staff: readonly StaffMember[], gameHour = 12, upgra
     hasSecurity: staff.some(m => m.role === 'security' && m.mood > 20)
   };
 }
+
+// Có ai tự làm việc trong ca không (phụ bếp, robot, phục vụ, kiosk) → khỏi chạy tickStaff khi không có
+export const hasAutoWork = (eff: StaffEffects) => eff.cooks.length > 0 || eff.waiterServeMs !== null;
 
 // Một dòng mô tả tác dụng cho tab Nhân viên (tính với cả đội hiện tại, có quản lý hay không)
 export function describeStaffEffect(member: StaffMember, team: readonly StaffMember[]): string {

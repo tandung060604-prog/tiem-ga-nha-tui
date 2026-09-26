@@ -26,8 +26,9 @@ export const CHAPTERS: NonEmpty<Chapter> = [
     title: 'Mặt Tiền Phố',
     context: 'Cửa hàng khang trang 12 bàn ở mặt tiền đường lớn, đèn neon rực rỡ.',
     daysRange: [51, 100],
-    targetMoney: 60000000, // mô phỏng: người chơi trung bình có nhân viên lãi ~1,4tr/ngày ở Chương 3 (90tr: không qua nổi)
-    targetStars: 4.5,
+    // Mô phỏng (npm run sim): trung bình có nhân viên + nâng cấp lãi ~3,8tr/ngày, không nâng cấp ~1,4tr/ngày
+    targetMoney: 120000000,
+    targetStars: 4.4, // 4.5: người chơi vụng dừng ở 4,40 dù có đủ nhân viên, nâng cấp
     mechanicsUnlocked: ['App giao hàng', 'Kiosk tự order', 'Marketing chuyên nghiệp', '12 Khách quen'],
     description: 'Chinh phục thực khách toàn quận, kết hợp bán tại chỗ và app giao hàng công nghệ.'
   },
@@ -37,7 +38,7 @@ export const CHAPTERS: NonEmpty<Chapter> = [
     context: 'Cạnh tranh trực tiếp với 3 chuỗi gà rán lớn mở đối diện, biến tiệm thành hiện tượng GenZ.',
     daysRange: [101, 150],
     targetMoney: 250000000,
-    targetStars: 4.6,
+    targetStars: 4.5, // 4.6: người chơi vụng đủ tiền mà kẹt sao mãi (mô phỏng)
     mechanicsUnlocked: ['Chiến dịch Limited', 'Livestream KOL', 'Xử lý khủng hoảng', 'Tua nhanh ngày êm'],
     description: 'Chiến thắng thị phần trước các ông lớn gà rán bằng sự sáng tạo và linh hồn Việt.'
   },
@@ -46,8 +47,8 @@ export const CHAPTERS: NonEmpty<Chapter> = [
     title: 'Chuỗi Gà Quốc Dân',
     context: '5 chi nhánh phủ khắp các quận trung tâm, bếp trung tâm điều phối chuyên nghiệp.',
     daysRange: [151, 210],
-    targetMoney: 800000000,
-    targetStars: 4.7,
+    targetMoney: 300000000, // 800tr: mô phỏng ~400 ngày mới tới, khung Chương 5 chỉ 60 ngày
+    targetStars: 4.6,
     mechanicsUnlocked: ['Quản lý 5 chi nhánh', 'Bếp trung tâm', 'CEO Xuống bếp', 'Cúp Gà Vàng'],
     description: 'Trở thành thương hiệu gà rán quốc dân được yêu thích nhất cả nước!'
   }
