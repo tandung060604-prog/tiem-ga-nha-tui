@@ -112,7 +112,7 @@ export function sellingStructureKey(state: GameState, session: SellingSession): 
   const quality = cookingEngine.calculateCurrentQuality();
   return JSON.stringify([
     session.orders.map(o => [o.id, o.items.map(it => it.served)]),
-    cookingEngine.getTray().map(t => t.id),
+    cookingEngine.getTray().map(t => t.id + (t.condiment ?? '')),
     cook.isFrying, cook.fryingType, quality, cookingEngine.getActiveSeasoning(),
     state.oilCondition, state.currentChapter,
     session.isFastForward, isRushHour(session.gameHour),
@@ -449,6 +449,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <span class="order-item-title">
             ${img ? `<img src="${img}" class="order-food-thumb" alt="${name}" />` : `<span class="order-food-emoji">${menuItem ? menuItem.icon : '🍗'}</span>`}
             ${it.count > 1 ? `${it.served}/${it.count}` : '1x'} ${name}
+            ${it.condiment ? `<span class="order-condiment" data-condiment="${it.condiment}">${it.condiment === 'ketchup' ? '🍅 + tương cà' : '🌶️ + tương ớt'}</span>` : ''}
           </span>
           <span class="order-check ${it.completed ? 'done' : ''}">${it.completed ? '✓' : '○'}</span>
         </div>

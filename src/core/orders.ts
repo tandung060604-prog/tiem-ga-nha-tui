@@ -1,4 +1,6 @@
-import { staffEffects } from './staff';
+import { staffEffects, FRY_RECIPES } from './staff';
+
+export const CONDIMENT_REQUEST_CHANCE = 0.3;
 import { BaseMenuItemId, CustomerOrder, GameState } from '../types/game';
 import { CharacterGenerator } from '../content/characterGenerator';
 import { BunnyLetter } from '../content/mysteryBunny';
@@ -54,6 +56,14 @@ export class OrdersEngine {
         const item = pick(pool);
         addItem(item.id, 1);
         totalPrice += Math.round(item.currentPrice * priceMultiplier);
+      }
+    }
+    // Khách dặn thêm tương cho món chiên (từ ngày 2: ngày đầu Bác Ba đang dạy thao tác cơ bản)
+    if (state.day > 1) {
+      for (const it of selectedItems) {
+        if (FRY_RECIPES[it.menuItemId] && random() < CONDIMENT_REQUEST_CHANCE) {
+          it.condiment = it.menuItemId === 'shake_fries' || random() < 0.5 ? 'ketchup' : 'chili';
+        }
       }
     }
     const extraItems = selectedItems.reduce((n, it) => n + it.count, 0) - 1;

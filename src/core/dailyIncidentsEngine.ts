@@ -2,6 +2,10 @@ import { DailyIncident, GameState, IncidentChoice } from '../types/game';
 import { DAILY_INCIDENTS } from '../content/dailyIncidents';
 import { applyKarmaChange } from '../content/endings';
 import { pick, random } from './rng';
+import { ReviewsEngine } from './reviewsEngine';
+
+export const MAX_REPUTATION_DELTA = 0.3;
+export const MAX_RESOLVED_HISTORY = 60;
 
 export interface IncidentResolutionResult {
   succeeded: boolean;
@@ -94,8 +98,19 @@ export function resolveIncidentChoice(
   // Áp dụng thay đổi Karma
   draft.karma = applyKarmaChange(draft.karma, choice.karmaDelta);
 
-  // Áp dụng thay đổi tiền mặt
-  draft.money = Math.max(0, draft.money + finalMoneyDelta);
+  // Tiền: KHÔNG kẹp về 0 (trước đây kẹp → sự cố xóa nợ, phá luật phá sản 3 ngày âm quỹ).
+  // Tiền thưởng ghi vào totalBonus để kiểm tra sổ sách chống gian lận không gắn cờ nhầm người chơi thật thà.
+  draft.money += finalMoneyDelta;
+  if (finalMoneyDelta > 0) draft.lifetimeStats.totalBonus = (draft.lifetimeStats.totalBonus ?? 0) + finalMoneyDelta;
+
+  // Danh tiếng: cộng/trừ đều mọi tiêu chí sao, tối đa ±0,3 mỗi sự cố
+  const rep = Math.max(-MAX_REPUTATION_DELTA, Math.min(MAX_REPUTATION_DELTA, succeeded ? choice.reputationDelta ?? 0 : 0));
+  if (rep !== 0) {
+    for (const c of ['taste', 'speed', 'hygiene', 'space', 'pricing'] as const) {
+      draft.ratings[c] = Math.max(1, Math.min(5, draft.ratings[c] + rep));
+    }
+    draft.ratings.overall = ReviewsEngine.calculateOverallStars(draft.ratings);
+  }
 
   // Cập nhật lịch sử sự kiện
   if (!draft.seenIncidentIds) draft.seenIncidentIds = [];
@@ -110,6 +125,8 @@ export function resolveIncidentChoice(
     day: draft.day,
     succeeded
   });
+  // Save không phình mãi: chỉ giữ lịch sử gần đây (Sổ Tay Hẻm dùng seenIncidentIds)
+  if (draft.resolvedIncidents.length > MAX_RESOLVED_HISTORY) draft.resolvedIncidents.splice(0, draft.resolvedIncidents.length - MAX_RESOLVED_HISTORY);
 
   draft.todayIncidentsCount = (draft.todayIncidentsCount ?? 0) + 1;
 

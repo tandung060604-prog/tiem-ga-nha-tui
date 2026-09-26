@@ -9,6 +9,8 @@ export type QualityRating = 'raw' | 'perfect' | 'good' | 'burnt';
 
 export type OilCondition = 'clean' | 'medium' | 'dirty';
 
+export type Condiment = 'ketchup' | 'chili';
+
 // Món có sẵn trong content; món combo người chơi tự tạo có id tự sinh (string).
 export type BaseMenuItemId =
   | 'crispy_chicken' | 'shake_fries' | 'soda' | 'seven_up' | 'fanta_orange'
@@ -132,7 +134,8 @@ export interface CustomerOrder {
   isBunny?: boolean;
   bunnyLetterId?: string;
   archetypeBadge?: string;
-  items: { menuItemId: string; count: number; served: number; completed: boolean }[];
+  // condiment: khách dặn thêm tương (chỉ xịt đúng loại khách dặn mới có tip); condimentServed: số phần đã xịt đúng
+  items: { menuItemId: string; count: number; served: number; completed: boolean; condiment?: Condiment; condimentServed?: number }[];
   patienceMax: number;
   patienceCurrent: number;
   totalPrice: number;
@@ -148,7 +151,7 @@ export interface TrayItem {
   name: string;
   icon: string;
   quality: QualityRating;
-  condiment?: 'ketchup' | 'chili' | null;
+  condiment?: Condiment | null;
 }
 
 export interface DayLedger {

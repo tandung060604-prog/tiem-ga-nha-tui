@@ -31,7 +31,7 @@ import { DRINK_RECIPES, TIMER_RECIPES, timerPhase, TimerStationId, AssemblyId, D
 import { staffEffects, tickStaff, fryingItemId, traySizeFor, hasAutoWork } from './core/staff';
 import { TutorialState, tutorialStep, tutorialHint, shouldRunTutorial } from './core/tutorial';
 import { syncTutorialLayer } from './ui/components/TutorialLayer';
-import { recordHelperFry, StationResult, startTimerStation, pullTimerStation, assembleAtCounter, makeDrink, creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, SAUCE_STOCK, serveFirstOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP } from './core/day';
+import { squeezeCondiment, recordHelperFry, StationResult, startTimerStation, pullTimerStation, assembleAtCounter, makeDrink, creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, SAUCE_STOCK, serveFirstOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP } from './core/day';
 import { upgradeEffects } from './core/upgrades';
 import { renderSummaryModal } from './ui/components/SummaryModal';
 import { renderSettingsModal } from './ui/components/SettingsModal';
@@ -124,12 +124,15 @@ class AppController {
     // iOS Safari bỏ qua user-scalable=no: chặn phóng to bằng 2 ngón để không vỡ bố cục khi đang chiên
     document.addEventListener('gesturestart', e => e.preventDefault());
 
-    (window as any).__app = this;
-    (window as any).__triggerIncident = (id?: string) => {
-      const inc = id ? DAILY_INCIDENTS.find(i => i.id === id) : pickDailyIncident(stateManager.getState(), 'morning');
-      if (inc) this.openDailyIncidentDialog(inc);
-      return inc;
-    };
+    // Móc gỡ lỗi chỉ có ở bản dev: trên trang thật, gọi sự cố từ console là cày tiền thưởng vô hạn
+    if (import.meta.env?.DEV) {
+      (window as any).__app = this;
+      (window as any).__triggerIncident = (id?: string) => {
+        const inc = id ? DAILY_INCIDENTS.find(i => i.id === id) : pickDailyIncident(stateManager.getState(), 'morning');
+        if (inc) this.openDailyIncidentDialog(inc);
+        return inc;
+      };
+    }
 
     this.showTitleScreen();
   }
@@ -327,6 +330,26 @@ class AppController {
     if (overlay) {
       overlay.setAttribute('hidden', '');
     }
+    // Ca bán bị dừng vì sự cố: đóng modal bằng bất kỳ đường nào cũng phải cho ca chạy lại
+    if (this.incidentPausedSelling && this.sellingSession) {
+      this.sellingSession.isPaused = false;
+      this.lastTimestamp = performance.now();
+    }
+    this.incidentPausedSelling = false;
+    const next = this.modalQueue.shift();
+    if (next) setTimeout(() => this.whenModalFree(next), 250);
+  }
+
+  // Sự cố không được đè lên hộp thoại đang mở (lên chương, thư Thỏ Cam, truyện): xếp hàng chờ đóng
+  private modalQueue: Array<() => void> = [];
+  private incidentPausedSelling = false;
+  private isModalOpen(): boolean {
+    const overlay = document.getElementById('modal-container');
+    return !!overlay && !overlay.hasAttribute('hidden');
+  }
+  private whenModalFree(open: () => void) {
+    if (this.isModalOpen()) this.modalQueue.push(open);
+    else open();
   }
 
   public openDailyIncidentDialog(incident: DailyIncident, onDone?: () => void) {
@@ -334,6 +357,7 @@ class AppController {
     const wasSelling = state.phase === 'selling' && !!this.sellingSession;
     if (wasSelling && this.sellingSession) {
       this.sellingSession.isPaused = true;
+      this.incidentPausedSelling = true;
     }
     babble(incident.dialogue, 'guest');
     const promptHtml = renderIncidentPrompt(incident, state);
@@ -961,7 +985,10 @@ class AppController {
       session.midIncidentTriggered = true;
       const shiftIncident = pickDailyIncident(stateManager.getState(), 'shift');
       if (shiftIncident) {
-        this.openDailyIncidentDialog(shiftIncident);
+        // Đang có hộp thoại khác → chờ; tới lượt mà ca đã hết thì bỏ qua
+        this.whenModalFree(() => {
+          if (stateManager.getState().phase === 'selling' && this.sellingSession) this.openDailyIncidentDialog(shiftIncident);
+        });
       }
     }
 
@@ -1180,16 +1207,16 @@ class AppController {
       case 'squeeze-chili': {
         const sauce = action === 'squeeze-ketchup' ? 'ketchup' : 'chili';
         const sauceName = sauce === 'ketchup' ? 'Tương Cà' : 'Tương Ớt';
-        const tray = cookingEngine.getTray();
-        // Tìm món trong khay chưa có tương (ưu tiên món chiên/món ăn kèm)
-        const target = tray.find(item => item.menuItemId !== 'soda' && item.menuItemId !== 'seven_up' && item.menuItemId !== 'fanta_orange' && !item.condiment);
-        if (!target) {
+        // Luật ở core/day.ts: ưu tiên món khách dặn đúng loại tương; chỉ món được dặn mới có tip
+        const squeezed = squeezeCondiment(cookingEngine.getTray(), session.orders, sauce);
+        if (!squeezed) {
           this.showToast(`Chưa có món chiên nào trong khay để xịt ${sauceName}!`);
           return;
         }
-        target.condiment = sauce;
         audio.playPop();
-        this.showToast(`${sauce === 'ketchup' ? '🍅' : '🌶️'} Đã xịt ${sauceName} lên ${target.name}! (+Hương vị & Tip)`);
+        this.showToast(squeezed.requested
+          ? `${sauce === 'ketchup' ? '🍅' : '🌶️'} Xịt ${sauceName} lên ${squeezed.item.name} đúng ý khách! (+tip)`
+          : `${sauce === 'ketchup' ? '🍅' : '🌶️'} Đã xịt ${sauceName} lên ${squeezed.item.name} (khách không dặn, không có tip)`);
         break;
       }
 
@@ -1410,7 +1437,7 @@ class AppController {
         setTimeout(() => {
           const morningIncident = pickDailyIncident(stateManager.getState(), 'morning');
           if (morningIncident) {
-            this.openDailyIncidentDialog(morningIncident);
+            this.whenModalFree(() => this.openDailyIncidentDialog(morningIncident));
           }
         }, 500);
       };

@@ -1,4 +1,4 @@
-import { CustomerOrder, CustomerReview, DayLedger, GameEvent, GameState, QualityRating, TrayItem } from '../types/game';
+import { Condiment, CustomerOrder, CustomerReview, DayLedger, GameEvent, GameState, QualityRating, TrayItem } from '../types/game';
 import { RANDOM_EVENTS } from '../content/events';
 import { BUNNY_LETTERS, BunnyLetter, MysteryBunnyEngine } from '../content/mysteryBunny';
 import { OrdersEngine } from './orders';
@@ -10,7 +10,7 @@ import {
   TIMER_RECIPES, TimerStationId, collectTimer, DRINK_RECIPES, DrinkId, ASSEMBLY_RECIPES, AssemblyId, assemble, assemblyBaseIndex
 } from './stations';
 import { upgradeEffects } from './upgrades';
-import { staffEffects, endShiftForStaff } from './staff';
+import { staffEffects, endShiftForStaff, FRY_RECIPES } from './staff';
 import { auditState, flagIntegrity } from './integrity';
 import { SellingSession } from './sellingSim';
 import { random } from './rng';
@@ -26,6 +26,24 @@ export function perfectTip(streak: number): number {
   return Math.round(PERFECT_TIP * (1 + Math.min(Math.max(streak - 1, 0), 8) * 0.25) * 2.5);
 }
 export const BUNNY_VISIT_TIP = 35000;
+export const CONDIMENT_TIP = 2000;
+
+// Quầy tương: xịt lên món trong khay. Ưu tiên món khách đầu hàng dặn đúng loại tương này; không ai dặn thì
+// xịt lên món chiên đầu tiên chưa có tương (không có tip). Trả về món vừa xịt, hoặc null nếu không có món.
+export function squeezeCondiment(tray: TrayItem[], orders: readonly CustomerOrder[], sauce: Condiment): { item: TrayItem; requested: boolean } | null {
+  const fried = (t: TrayItem) => !!FRY_RECIPES[t.menuItemId] && !t.condiment && t.quality !== 'raw';
+  for (const order of orders.slice(0, 2)) {
+    for (const line of order.items) {
+      if (line.condiment !== sauce || (line.condimentServed ?? 0) >= line.count) continue;
+      const item = tray.find(t => fried(t) && t.menuItemId === line.menuItemId);
+      if (item) { item.condiment = sauce; return { item, requested: true }; }
+    }
+  }
+  const item = tray.find(fried);
+  if (!item) return null;
+  item.condiment = sauce;
+  return { item, requested: false };
+}
 
 export function eventForDay(day: number): GameEvent {
   return RANDOM_EVENTS[(day - 1) % RANDOM_EVENTS.length] ?? RANDOM_EVENTS[0];
@@ -198,7 +216,12 @@ export function serveFirstOrder(
     OrdersEngine.matchItemToOrder(order, item.menuItemId);
     if (item.quality === 'burnt') order.burntPenalty = (order.burntPenalty ?? 0) + Math.round(prices(item.menuItemId) / 2);
     if (item.quality === 'perfect') order.perfectBonus = (order.perfectBonus ?? 0) + perfectTip(session.perfectStreak);
-    if (item.condiment) order.perfectBonus = (order.perfectBonus ?? 0) + 2000;
+    // Tip tương: chỉ khi khách DẶN đúng loại đó cho món này (trước đây món nào có tương cũng +2k → xịt bừa cày tiền)
+    const wantsSauce = item.condiment && order.items.find(it => it.menuItemId === item.menuItemId && it.condiment === item.condiment && (it.condimentServed ?? 0) < it.count);
+    if (wantsSauce) {
+      wantsSauce.condimentServed = (wantsSauce.condimentServed ?? 0) + 1;
+      order.perfectBonus = (order.perfectBonus ?? 0) + CONDIMENT_TIP;
+    }
     removeAt(i);
     matched = true;
   }
