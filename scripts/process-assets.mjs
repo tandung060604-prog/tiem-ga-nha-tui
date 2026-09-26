@@ -5,8 +5,8 @@
 // Cách tách nền: loang từ mép ảnh vào, chỉ xóa vùng trắng THÔNG RA MÉP; dừng ở nét viền nâu.
 // Nhờ vậy phần trắng bên trong nhân vật (thân thỏ, mũ đầu bếp, khăn vai) được giữ.
 import sharp from 'sharp';
-import { mkdirSync } from 'node:fs';
-import { dirname } from 'node:path';
+import { mkdirSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 
 const SRC = 'assets-src';
 const OUT = 'public/assets';
@@ -176,7 +176,7 @@ async function exportFigure(img, label, fig, [w, h], outFile) {
   mkdirSync(dirname(`${OUT}/${outFile}`), { recursive: true });
   const info = await sharp(buf, { raw: { width: cw, height: ch, channels: 4 } })
     .resize(w, h, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
-    .png({ compressionLevel: 9, palette: true, quality: 90 })
+    .png({ compressionLevel: 9, palette: true, quality: 75, colours: 192, effort: 9 })
     .toFile(`${OUT}/${outFile}`);
   return info.size;
 }
@@ -210,9 +210,41 @@ for (const size of [180, 192, 512]) {
   await sharp({ create: { width: size, height: size, channels: 4, background: '#fdf3e4' } })
     .composite([{ input: mascot, gravity: 'center' }])
     .flatten({ background: '#fdf3e4' })
-    .png({ compressionLevel: 9 })
+    .png({ compressionLevel: 9, palette: true, quality: 80, effort: 9 })
     .toFile(`public/icons/icon-${size}.png`);
   console.log(`✓ icon → public/icons/icon-${size}.png`);
 }
+
+// ---------------------------------------------------------------------------
+// Nén ảnh toàn bộ public/assets: đảm bảo mọi PNG ≤ 40KB (ảnh 256px) và tổng thư mục ≤ 4MB
+// ---------------------------------------------------------------------------
+function walkDir(dir) {
+  let list = [];
+  for (const f of readdirSync(dir)) {
+    const full = join(dir, f);
+    if (statSync(full).isDirectory()) list = list.concat(walkDir(full));
+    else list.push(full);
+  }
+  return list;
+}
+
+const allPngs = walkDir(OUT).filter(f => f.endsWith('.png'));
+console.log(`\n--- Tối ưu hóa & nén palette toàn bộ ${allPngs.length} PNGs trong ${OUT} ---`);
+let savedBytes = 0;
+let totalBytes = 0;
+for (const p of allPngs) {
+  const orig = statSync(p).size;
+  const opt = await sharp(p)
+    .png({ palette: true, quality: 75, colours: 192, effort: 9 })
+    .toBuffer();
+  if (opt.length < orig) {
+    writeFileSync(p, opt);
+    savedBytes += (orig - opt.length);
+    totalBytes += opt.length;
+  } else {
+    totalBytes += orig;
+  }
+}
+console.log(`✓ Đã nén giảm ${(savedBytes / 1024 / 1024).toFixed(2)} MB. Tổng kích thước PNG: ${(totalBytes / 1024 / 1024).toFixed(2)} MB\n`);
 
 process.exit(failed ? 1 : 0);

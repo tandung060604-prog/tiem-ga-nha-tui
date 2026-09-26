@@ -140,7 +140,6 @@ export const ASSETS = {
     stickerCat: url('assets/ui/sticker_cat.png'),
     stickerLantern: url('assets/ui/sticker_lantern.png'),
     stickerDaisy: url('assets/ui/sticker_daisy.png'),
-    landingBg: url('assets/ui/landing_bg.jpg'),
     landingVnBg: url('assets/ui/landing_vn_bg.jpg')
   }
 } as const;
