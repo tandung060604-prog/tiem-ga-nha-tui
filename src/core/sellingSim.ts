@@ -31,6 +31,8 @@ export interface SellingSession {
   totalFriedCount: number;
   topSellerId: string;
   midIncidentTriggered?: boolean;
+  soldCounts?: Record<string, number>; // số món đã giao theo loại → món bán chạy
+  bestStreak?: number;                 // chuỗi Perfect dài nhất trong ca
 }
 
 // Hiệu ứng "đã tay": core ghi lại chuyện vừa xảy ra, giao diện rút ra (drainFx) để vẽ đúng một lần.

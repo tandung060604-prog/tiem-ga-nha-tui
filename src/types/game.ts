@@ -170,6 +170,11 @@ export interface DayLedger {
   customersLost: number;
   burntCount: number;
   topSellerId: string;
+  // Cho Gà Wrapped hằng tuần (save cũ không có)
+  topSellerCount?: number;
+  bestStreak?: number;
+  friedCount?: number;
+  perfectCount?: number;
 }
 
 export interface GameEvent {

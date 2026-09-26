@@ -1,3 +1,4 @@
+import { isWrappedDay, weeklyWrapped } from '../../core/wrapped';
 import { GameState, DayLedger, CustomerReview } from '../../types/game';
 
 export function renderSummaryModal(
@@ -7,36 +8,19 @@ export function renderSummaryModal(
   advisorTip: string
 ): string {
   const isProfit = ledger.netProfit >= 0;
-  const isWrappedDay = ledger.day % 7 === 0;
-  const weekNumber = Math.floor(ledger.day / 7);
-
-  // Tính toán số liệu Gà Wrapped nếu tròn 7 ngày
-  let weekRevenue = 0;
-  let weekBurnt = 0;
-  let weekCustomers = 0;
-  if (isWrappedDay) {
-    const recent7Days = state.dayHistory.slice(-7);
-    recent7Days.forEach(d => {
-      weekRevenue += d.grossRevenue;
-      weekBurnt += d.burntCount;
-      weekCustomers += d.customersServed;
-    });
-    // Cộng thêm ngày hôm nay
-    weekRevenue += ledger.grossRevenue;
-    weekBurnt += ledger.burntCount;
-    weekCustomers += ledger.customersServed;
-  }
+  // Gà Wrapped mỗi 7 ngày: cùng số liệu với thẻ chia sẻ (core/wrapped.ts). Trước đây cộng hôm nay 2 lần.
+  const wrapped = isWrappedDay(ledger.day) ? weeklyWrapped(state, ledger.day) : null;
 
   return `
     <div class="summary-container">
       <h2 class="summary-title">🎉 Tổng Kết Ngày ${ledger.day}</h2>
       <div class="summary-subtitle">Ca bán hoàn thành xuất sắc! Dưới đây là sổ sách hôm nay:</div>
 
-      ${isWrappedDay ? `
+      ${wrapped ? `
         <!-- Gà Wrapped Cuối Tuần (Viral Threads Feature từ GDD) -->
         <div style="background: linear-gradient(135deg, #ff7675, #d63031); color: #fff; border-radius: var(--radius-md); padding: 14px; box-shadow: 0 4px 14px rgba(214, 48, 49, 0.35); text-align: left; margin-bottom: 8px;">
           <div style="font-weight: 800; font-size: 1.15rem; display: flex; align-items: center; justify-content: space-between;">
-            <span>🎁 GÀ WRAPPED · TUẦN ${weekNumber}</span>
+            <span>🎁 GÀ WRAPPED · TUẦN ${wrapped.week}</span>
             <span style="font-size: 0.72rem; background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 12px;">ĐẶC BIỆT 7 NGÀY</span>
           </div>
           <div style="font-size: 0.8rem; margin: 4px 0 10px; opacity: 0.9;">
@@ -45,15 +29,15 @@ export function renderSummaryModal(
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; text-align: center;">
             <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 6px;">
               <small style="font-size: 0.68rem; display: block; opacity: 0.85;">Doanh Thu</small>
-              <b style="font-size: 0.95rem;">+${(weekRevenue / 1000).toLocaleString('vi-VN')}k</b>
+              <b style="font-size: 0.95rem;">+${Math.round(wrapped.revenue / 1000).toLocaleString('vi-VN')}k</b>
             </div>
             <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 6px;">
               <small style="font-size: 0.68rem; display: block; opacity: 0.85;">Khách Phục Vụ</small>
-              <b style="font-size: 0.95rem;">${weekCustomers} khách</b>
+              <b style="font-size: 0.95rem;">${wrapped.served} khách</b>
             </div>
             <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 6px;">
-              <small style="font-size: 0.68rem; display: block; opacity: 0.85;">Gà Bị Cháy</small>
-              <b style="font-size: 0.95rem;">${weekBurnt} miếng 🍗</b>
+              <small style="font-size: 0.68rem; display: block; opacity: 0.85;">Gà Perfect</small>
+              <b style="font-size: 0.95rem;">${wrapped.perfectPct}% 🍗</b>
             </div>
           </div>
         </div>
@@ -166,11 +150,16 @@ export function renderSummaryModal(
         <div><b>Cố vấn gợi ý:</b> ${advisorTip}</div>
       </div>
 
+      <div id="wrapped-preview"></div>
+
       <!-- Action Buttons -->
       <div class="summary-actions">
         <button id="btn-share-card" class="btn-share-threads">
           <span>📸</span> Tải Thẻ Review / Chia Sẻ Lên Threads
         </button>
+        ${wrapped ? `<button id="btn-wrapped" class="btn-share-threads btn-wrapped">
+          <span>🎁</span> Gà Wrapped tuần ${wrapped.week} — tạo thẻ & chia sẻ
+        </button>` : ''}
         <button id="btn-start-next-day" class="btn-next-day">
           👉 BẮT ĐẦU NGÀY ${ledger.day + 1}
         </button>

@@ -31,6 +31,9 @@ import { DRINK_RECIPES, TIMER_RECIPES, timerPhase, TimerStationId, AssemblyId, D
 import { staffEffects, tickStaff, fryingItemId, traySizeFor, hasAutoWork } from './core/staff';
 import { TutorialState, tutorialStep, tutorialHint, shouldRunTutorial } from './core/tutorial';
 import { syncTutorialLayer } from './ui/components/TutorialLayer';
+import { weeklyWrapped } from './core/wrapped';
+import { drawWrapped, shareWrapped, shareImage } from './ui/components/WrappedCard';
+
 import { squeezeCondiment, recordHelperFry, StationResult, startTimerStation, pullTimerStation, assembleAtCounter, makeDrink, creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, SAUCE_STOCK, serveFirstOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP } from './core/day';
 import { upgradeEffects } from './core/upgrades';
 import { renderSummaryModal } from './ui/components/SummaryModal';
@@ -923,7 +926,8 @@ class AppController {
     const session = this.sellingSession;
     if (!session || stateManager.getState().phase !== 'selling') return;
 
-    const gameDt = gameDeltaMs(session, currentTimestamp - this.lastTimestamp);
+    // Đang đọc hộp thoại (thư Thỏ Cam, sự cố, khách bí ẩn…) → ca bán đứng yên, khách không mất kiên nhẫn sau lưng
+    const gameDt = this.isModalOpen() ? 0 : gameDeltaMs(session, currentTimestamp - this.lastTimestamp);
     this.lastTimestamp = currentTimestamp;
 
     // Chảo chiên chạy cùng nhịp thời gian game (tua nhanh thì chín nhanh)
@@ -1426,6 +1430,7 @@ class AppController {
   }
 
   private bindSummaryEvents(ledger: DayLedger, review: CustomerReview) {
+    this.bindWrappedButton();
     // Nút Bắt đầu Ngày mới
     const nextDayBtn = document.getElementById('btn-start-next-day');
     if (nextDayBtn) {
@@ -1467,31 +1472,32 @@ class AppController {
           return;
         }
 
-        // Tải ảnh về máy
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `TiemGaNhaTui_Review_Ngay_${state.day}.png`;
-        a.click();
-        URL.revokeObjectURL(url);
-
-        // Mở Web Share API nếu hỗ trợ
-        if (navigator.share) {
-          try {
-            const file = new File([blob], `TiemGa_Ngay_${state.day}.png`, { type: 'image/png' });
-            await navigator.share({
-              title: 'Tiệm Gà Nhà Tui - Review Khách Hàng',
-              text: `Khách vừa review tiệm gà của tui nè: "${review.comment}" ⭐ ${review.stars}/5 sao! Chơi ngay nha!`,
-              files: [file]
-            });
-          } catch {
-            // Người dùng hủy chia sẻ
-          }
-        } else {
-          this.showToast('Đã tải ảnh thẻ review về máy thành công! Hãy đăng lên Threads nhé! 📸');
-        }
+        const outcome = await shareImage(blob, `TiemGaNhaTui_Review_Ngay_${state.day}.png`, 'Tiệm Gà Nhà Tui - Review Khách Hàng',
+          `Khách vừa review tiệm gà của tui nè: "${review.comment}" ⭐ ${review.stars}/5 sao! Chơi ngay nha!`);
+        if (outcome === 'downloaded') this.showToast('Đã tải ảnh thẻ review về máy! Hãy đăng lên Threads nhé! 📸');
       };
     }
+  }
+
+  // Gà Wrapped mỗi 7 ngày: vẽ thẻ tuần (core/wrapped.ts + ui/components/WrappedCard.ts), xem trước rồi chia sẻ
+  private bindWrappedButton() {
+    const btn = document.getElementById('btn-wrapped') as HTMLButtonElement | null;
+    if (!btn) return;
+    btn.onclick = async () => {
+      const data = weeklyWrapped(stateManager.getState());
+      if (!data) return;
+      btn.disabled = true;
+      this.showToast('Đang gói Gà Wrapped của tuần… 🎁');
+      try {
+        const canvas = await drawWrapped(data);
+        const preview = document.getElementById('wrapped-preview');
+        if (preview) preview.innerHTML = `<img src="${canvas.toDataURL('image/png')}" alt="Gà Wrapped tuần ${data.week}" class="wrapped-preview-img" style="width: 100%; border-radius: 14px; margin-top: 10px;">`;
+        const outcome = await shareWrapped(canvas, data);
+        if (outcome === 'downloaded') this.showToast('Đã lưu ảnh Gà Wrapped về máy! 📸');
+      } finally {
+        btn.disabled = false;
+      }
+    };
   }
 
   // --- SETTINGS MODAL ---

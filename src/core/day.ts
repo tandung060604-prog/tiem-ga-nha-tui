@@ -111,6 +111,7 @@ export function recordFryerLift(
   if (session && result.quality === 'perfect') {
     session.perfectCount += 1;
     session.perfectStreak += 1;
+    session.bestStreak = Math.max(session.bestStreak ?? 0, session.perfectStreak);
     if (session.perfectStreak >= 2) pushFx(session, { kind: 'streak', streak: session.perfectStreak, tip: perfectTip(session.perfectStreak) });
   }
   if (session && result.quality === 'burnt') session.burntCount += 1;
@@ -216,6 +217,7 @@ export function serveFirstOrder(
       continue;
     }
     OrdersEngine.matchItemToOrder(order, item.menuItemId);
+    (session.soldCounts ??= {})[item.menuItemId] = (session.soldCounts[item.menuItemId] ?? 0) + 1;
     if (item.quality === 'burnt') order.burntPenalty = (order.burntPenalty ?? 0) + Math.round(prices(item.menuItemId) / 2);
     if (item.quality === 'perfect') order.perfectBonus = (order.perfectBonus ?? 0) + perfectTip(session.perfectStreak);
     // Tip tương: chỉ khi khách DẶN đúng loại đó cho món này (trước đây món nào có tương cũng +2k → xịt bừa cày tiền)
@@ -290,6 +292,9 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   const team = staffEffects(draft.staff, 12, draft.upgrades);
   const karma = karmaEffects(draft.karma);
 
+  // Món bán chạy nhất trong ca (trước đây topSellerId không bao giờ được cập nhật → luôn là Gà Giòn)
+  const sold = Object.entries(session.soldCounts ?? {}).sort((a, b) => b[1] - a[1])[0];
+  if (sold) session.topSellerId = sold[0];
   const ledger = EconomyEngine.finalizeDayLedger(
     draft.day, session.grossRevenue, session.tips, session.ingredientCost, expiredValue,
     EconomyEngine.calculateTotalWages(draft), draft.currentChapter,
@@ -316,6 +321,10 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
     newRatings.overall = ReviewsEngine.calculateOverallStars(newRatings);
   }
 
+  ledger.topSellerCount = sold?.[1] ?? 0;
+  ledger.bestStreak = session.bestStreak ?? 0;
+  ledger.friedCount = session.totalFriedCount;
+  ledger.perfectCount = session.perfectCount;
   draft.money -= EconomyEngine.closingCharges(ledger);
   draft.debtStreak = draft.money < 0 ? (draft.debtStreak ?? 0) + 1 : 0; // phá sản khi âm quỹ nhiều ngày liền
   draft.ratings = newRatings;

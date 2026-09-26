@@ -114,15 +114,15 @@
     "semantic_hash": ""
   },
   "src/main.ts": {
-    "mtime": 1790449910.3095882,
-    "seen": 1790450045.8162425,
-    "ast_hash": "41051a329b92f980e7d7aed4ed4665bc",
+    "mtime": 1790450652.4230027,
+    "seen": 1790451194.64812,
+    "ast_hash": "60428596039c91e434c6d9e8d25723f0",
     "semantic_hash": ""
   },
   "src/types/game.ts": {
-    "mtime": 1790449444.9942865,
-    "seen": 1790449627.8676684,
-    "ast_hash": "4c59155f208a3625b3f00d846262bdc4",
+    "mtime": 1790450082.9238992,
+    "seen": 1790451194.648121,
+    "ast_hash": "ff1b0d310c4f5a2701c2c670eada779f",
     "semantic_hash": ""
   },
   "src/ui/components/BunnyModal.ts": {
@@ -192,9 +192,9 @@
     "semantic_hash": ""
   },
   "src/ui/components/SummaryModal.ts": {
-    "mtime": 1790408283.2936423,
-    "seen": 1790408784.413955,
-    "ast_hash": "28604fccb47532e5068205f36ef5d723",
+    "mtime": 1790450273.428122,
+    "seen": 1790451194.6481419,
+    "ast_hash": "903b78f806e6b48db8f522999beb9dea",
     "semantic_hash": ""
   },
   "src/ui/components/UpgradesTab.ts": {
@@ -354,9 +354,9 @@
     "semantic_hash": ""
   },
   "src/core/sellingSim.ts": {
-    "mtime": 1790449857.38248,
-    "seen": 1790450045.8162322,
-    "ast_hash": "da5ebeb9f8263bf248f2bf5ec7c664af",
+    "mtime": 1790450117.845815,
+    "seen": 1790451194.648107,
+    "ast_hash": "e4e41efec6facc91b3fd31d39b6f1150",
     "semantic_hash": ""
   },
   "tests/selling-sim.test.ts": {
@@ -558,9 +558,9 @@
     "semantic_hash": ""
   },
   "src/core/day.ts": {
-    "mtime": 1790449857.4099708,
-    "seen": 1790450045.8162165,
-    "ast_hash": "3f7831bd8182a4f4ca7be6c63f2b15d5",
+    "mtime": 1790450117.8989472,
+    "seen": 1790451194.64809,
+    "ast_hash": "823d0f858af1adc8524ed8ceddacdafc",
     "semantic_hash": ""
   },
   "docs/bao-cao/mo-phong-can-bang.md": {
@@ -1989,6 +1989,24 @@
     "mtime": 1790449928.2581942,
     "seen": 1790450045.8162768,
     "ast_hash": "c5380543c788c1f526e0f35f1bdd994a",
+    "semantic_hash": ""
+  },
+  "src/core/wrapped.ts": {
+    "mtime": 1790450143.0486915,
+    "seen": 1790451194.6481178,
+    "ast_hash": "e89cb8900917ac142d8e855b1093db5a",
+    "semantic_hash": ""
+  },
+  "src/ui/components/WrappedCard.ts": {
+    "mtime": 1790450920.4541662,
+    "seen": 1790451194.6481478,
+    "ast_hash": "8a8758c40ae68844d8412ddcf1474809",
+    "semantic_hash": ""
+  },
+  "tests/wrapped.test.ts": {
+    "mtime": 1790450295.8245046,
+    "seen": 1790451194.6481876,
+    "ast_hash": "c2a9df1b4e03d77b8d7bdb3b7e22f67d",
     "semantic_hash": ""
   }
 }
