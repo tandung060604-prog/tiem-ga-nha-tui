@@ -2697,3 +2697,242 @@ body.selling-mode .awning::after {
   border-top: 1px solid #f1e4d4;
   padding-top: 4px;
 }
+
+/* ==========================================================================
+   STAFF TAB & ROSTER (Tối ưu giao diện chống chật chữ trên 360px & 390px)
+   ========================================================================== */
+
+.staff-roster {
+  margin-bottom: 16px;
+}
+
+.staff-roster .item-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  background: #ffffff;
+  border: 1.5px solid var(--line);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.staff-roster .item-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.staff-roster .btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+  min-width: 82px;
+}
+
+.staff-roster .btn-group button {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 0.72rem;
+  font-weight: 750;
+  min-height: 32px;
+  line-height: 1.2;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.candidate-row {
+  background: #faf4ea;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  padding: 8px 10px;
+  border: 1.5px solid #ede1cb;
+}
+
+.candidate-row .item-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.staff-stats {
+  font-size: 0.72rem;
+  color: var(--soft);
+  margin-top: 2px;
+  line-height: 1.35;
+}
+
+.staff-effect {
+  font-size: 0.72rem;
+  color: #27ae60;
+  font-weight: 750;
+  margin-top: 2px;
+  line-height: 1.35;
+}
+
+.staff-trait {
+  font-size: 0.7rem;
+  color: #8e44ad;
+  font-weight: 700;
+  margin-top: 1px;
+  line-height: 1.35;
+}
+
+.btn-fire {
+  background: #fff5f5;
+  color: #c0392b;
+  border: 1.5px solid #f5b7b1;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(192, 57, 43, 0.1);
+}
+
+.btn-fire:hover {
+  background: #fadbd8;
+}
+
+.btn-bonus {
+  background: #fdfefe;
+  color: #2e7d32;
+  border: 1.5px solid #a9dfbf;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(46, 125, 50, 0.1);
+}
+
+.btn-bonus:hover {
+  background: #eafaf1;
+}
+
+.shelf-tag-role {
+  background: #eafaf1;
+  color: #27ae60;
+  font-weight: 750;
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 6px;
+  margin-left: 4px;
+  display: inline-block;
+}
+
+.candidates-title {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-refresh-cand {
+  font-size: 0.7rem;
+  padding: 3px 8px;
+}
+
+.staff-empty-hint {
+  font-size: 0.82rem;
+  color: var(--soft);
+  text-align: center;
+  padding: 12px;
+}
+
+/* ==========================================================================
+   CHAPTER UNLOCKED PRICES (Bảng giá mới khi sang chương)
+   ========================================================================== */
+
+.chapter-unlocked-prices {
+  background: #fff8e1;
+  border: 1.5px dashed #f57f17;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 750;
+  color: #824700;
+  margin: 12px 0;
+  font-size: 0.86rem;
+  text-align: center;
+  line-height: 1.45;
+  box-shadow: 0 2px 8px rgba(245, 127, 23, 0.15);
+}
+
+/* ==========================================================================
+   MODAL SỰ CỐ VỪA KHÍT 320PX (iPhone SE, Android màn hẹp)
+   ========================================================================== */
+
+@media (max-width: 350px) {
+  .modal-box {
+    padding: 12px 8px;
+    width: 96%;
+    max-width: 310px;
+  }
+
+  .incident-dialog {
+    padding: 2px 0;
+  }
+
+  .incident-avatar-wrap {
+    width: 68px;
+    height: 68px;
+    margin-bottom: 8px;
+  }
+
+  .incident-chibi-circle {
+    width: 64px;
+    height: 64px;
+    border-width: 2.5px;
+  }
+
+  .chibi-avatar-img {
+    width: 52px;
+    height: 52px;
+  }
+
+  .incident-heart-badge {
+    top: -6px;
+    font-size: 1.15rem;
+  }
+
+  .incident-pill-badge {
+    font-size: 0.7rem;
+    padding: 3px 12px;
+    letter-spacing: 0.3px;
+  }
+
+  .incident-main-title {
+    font-size: 1.12rem;
+    line-height: 1.2;
+  }
+
+  .incident-char-subtitle {
+    font-size: 0.72rem;
+    margin-bottom: 8px;
+  }
+
+  .incident-story-desc {
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+
+  .incident-quote-card {
+    padding: 6px 8px;
+    font-size: 0.78rem;
+  }
+
+  .incident-choices-list {
+    gap: 8px;
+  }
+
+  .incident-choice-btn {
+    padding: 8px 10px;
+    min-height: 48px;
+    border-radius: 14px;
+  }
+
+  .choice-tier1 {
+    font-size: 0.92rem;
+  }
+
+  .choice-tier2 {
+    font-size: 0.7rem;
+  }
+}

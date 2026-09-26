@@ -30,16 +30,16 @@ export function renderStaffTab(state: GameState): string {
         <div class="item-meta">
           <div class="item-name">
             ${member.name}
-            <span class="shelf-tag" style="background:#eafaf1;color:#27ae60;">${roleInfo.name}</span>
+            <span class="shelf-tag shelf-tag-role">${roleInfo.name}</span>
           </div>
           <div class="item-sub">
             Lương: <b>${member.hourlyWage.toLocaleString('vi-VN')}đ/h</b> · Tâm trạng: ${member.mood}%
           </div>
-          <div style="font-size: 0.72rem; color: var(--soft); margin-top: 2px;">
+          <div class="staff-stats">
             Tốc độ: <b>${member.speed}</b> | Tay nghề: <b>${member.skill}</b> | Thái độ: <b>${member.attitude}</b>
           </div>
-          <div class="staff-effect" style="font-size: 0.72rem; color: #27ae60; font-weight: 700; margin-top: 2px;">⚙️ ${describeStaffEffect(member, state.staff)}</div>
-          ${traitInfo ? `<div style="font-size: 0.7rem; color: #8e44ad; font-weight: 700; margin-top: 1px;">✨ ${traitInfo.name}: ${traitInfo.desc}</div>` : ''}
+          <div class="staff-effect">⚙️ ${describeStaffEffect(member, state.staff)}</div>
+          ${traitInfo ? `<div class="staff-trait">✨ ${traitInfo.name}: ${traitInfo.desc}</div>` : ''}
         </div>
 
         <div class="btn-group">
@@ -62,22 +62,22 @@ export function renderStaffTab(state: GameState): string {
     const traitInfo = STAFF_TRAITS.find(t => cand.traits.includes(t.id));
 
     return `
-      <div class="item-row" style="background: #faf4ea; border-radius: 10px; margin-bottom: 6px; padding: 8px;">
+      <div class="item-row candidate-row">
         <div class="item-icon">${cand.avatar}</div>
 
         <div class="item-meta">
           <div class="item-name">
             ${cand.name}
-            <span class="shelf-tag">${roleInfo.name}</span>
+            <span class="shelf-tag shelf-tag-role">${roleInfo.name}</span>
           </div>
           <div class="item-sub">
             Lương đề xuất: <b>${cand.hourlyWage.toLocaleString('vi-VN')}đ/h</b>
           </div>
-          <div style="font-size: 0.72rem; color: var(--soft);">
+          <div class="staff-stats">
             Tốc độ: <b>${cand.speed}</b> · Tay nghề: <b>${cand.skill}</b> · Thái độ: <b>${cand.attitude}</b>
           </div>
-          <div class="staff-effect" style="font-size: 0.72rem; color: #27ae60; font-weight: 700;">⚙️ ${describeStaffEffect(cand, state.staff)}</div>
-          ${traitInfo ? `<div style="font-size: 0.7rem; color: #8e44ad; font-weight: 700;">✨ ${traitInfo.name}</div>` : ''}
+          <div class="staff-effect">⚙️ ${describeStaffEffect(cand, state.staff)}</div>
+          ${traitInfo ? `<div class="staff-trait">✨ ${traitInfo.name}</div>` : ''}
         </div>
 
         <div>
@@ -97,13 +97,13 @@ export function renderStaffTab(state: GameState): string {
       Lương trả cuối mỗi ngày (ca 8 tiếng). Tâm trạng giảm dần sau mỗi ca: nhân viên buồn làm việc kém hơn, thưởng nóng để vui lại.${full ? ' <b>Quán đã đủ chỗ</b> — lên chương để có thêm chỗ.' : ''}
     </div>
     
-    <div class="staff-roster" style="margin-bottom: 16px;">
-      ${state.staff.length > 0 ? staffRows : '<div style="font-size: 0.82rem; color: var(--soft); text-align: center; padding: 12px;">Chưa có nhân viên nào. Hãy tuyển dụng ở danh sách bên dưới!</div>'}
+    <div class="staff-roster">
+      ${state.staff.length > 0 ? staffRows : '<div class="staff-empty-hint">Chưa có nhân viên nào. Hãy tuyển dụng ở danh sách bên dưới!</div>'}
     </div>
 
-    <div class="sec-title" style="margin-top: 14px; border-top: 1px solid var(--line); padding-top: 10px;">
+    <div class="sec-title candidates-title">
       <span>📝 Nhóm Tìm Việc (Ứng Viên Mới)</span>
-      <button id="btn-refresh-candidates" class="btn-sm" style="font-size: 0.7rem;">Đăng tin mới (50k)</button>
+      <button id="btn-refresh-candidates" class="btn-sm btn-refresh-cand">Đăng tin mới (50k)</button>
     </div>
     <div class="candidates-list">
       ${candidateRows}

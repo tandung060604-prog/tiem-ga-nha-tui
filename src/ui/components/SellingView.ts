@@ -470,8 +470,8 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <span>🕒 Giờ mở bán: <b>${formattedTime}</b></span>
         </div>
         ${rush ? '<span class="rush-badge">🔥 CA CAO ĐIỂM!</span>' : `<span class="session-ambience">${timePeriodLabel}</span>`}
-        <div style="display: flex; gap: 6px;">
-          <button id="btn-toggle-fast" class="btn-sm" style="font-size: 0.7rem; padding: 2px 8px;">
+        <div class="hud-actions">
+          <button id="btn-toggle-fast" class="btn-sm btn-toggle-fast">
             ${session.isFastForward ? '⏩ Tua x2' : '▶️ 1x'}
           </button>
         </div>
@@ -715,7 +715,7 @@ function renderStationStrip(state: GameState, session: SellingSession): string {
     ...openDrinks(state).map(id => `<button id="btn-drink-${id}" class="btn-sm station-btn">${DRINK_RECIPES[id].icon} ${DRINK_RECIPES[id].label}</button>`)
   ];
   if (buttons.length === 0) return '';
-  return `<div class="station-strip" style="display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0;">${buttons.join('')}</div>`;
+  return `<div class="station-strip">${buttons.join('')}</div>`;
 }
 
 // ---------------------------------------------------------------------------
@@ -735,6 +735,6 @@ function renderStaffStrip(state: GameState, session: SellingSession): string {
   });
   if (eff.waiterServeMs !== null) chips.push('<span class="staff-chip">🧹 Phục vụ rót nước & lên món</span>');
   if (chips.length === 0) return '';
-  return `<div class="staff-strip" style="display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0; font-size: 0.72rem;">${chips.join('')}</div>`;
+  return `<div class="staff-strip">${chips.join('')}</div>`;
 }
 const FRY_ICON: Record<string, string> = { crispy_chicken: '🍗', spicy_chicken: '🌶️', honey_garlic_chicken: '🍯', shake_fries: '🍟', popcorn_chicken: '🍿' };
