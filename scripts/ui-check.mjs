@@ -82,6 +82,8 @@ for (const width of WIDTHS) {
 
   // Bấm nút thật + món trong khay nhìn thấy được
   try {
+    const tutNext = page.locator('#btn-tutorial-next');
+    if (await tutNext.isVisible().catch(() => false)) await tutNext.click();
     await page.locator('#btn-add-drink').click({ timeout: 3000 });
     record('PASS', width, 'nút bấm ăn (click thật)');
   } catch (e) {

@@ -20,6 +20,7 @@ export interface SellingSession {
   timers: TimerStations; // nồi mì, lò bánh (null = rảnh)
   helpers: (HelperFry | null)[]; // giỏ chiên của phụ bếp (core/staff.ts)
   waiterMs: number;              // phục vụ đang chờ lên món bao lâu
+  tutorial?: boolean;            // Bác Ba đang hướng dẫn: đồng hồ + khách đứng yên, chảo vẫn chạy
   lostCount: number;
   grossRevenue: number;
   tips: number;
@@ -86,6 +87,7 @@ export function gameDeltaMs(session: SellingSession, realDtMs: number): number {
 
 export function tickSelling(session: SellingSession, gameDt: number, ctx: TickContext): TickEvent[] {
   const events: TickEvent[] = [];
+  if (session.tutorial) return events;
 
   session.gameHour += gameDt / GAME_HOUR_MS;
   tickTimers(session.timers, gameDt);

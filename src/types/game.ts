@@ -260,4 +260,5 @@ export interface GameState {
   baBaAidChapter?: number;     // chương gần nhất Bác Ba đã tiếp tế (1 lần/chương)
   integrity?: { tampered: boolean; reasons: string[] };
   pausedShift?: import('../core/sellingSim').ShiftSnapshot | null; // ca bán dở (thoát giữa ca)
+  tutorialDone?: boolean;      // Bác Ba đã dẫn ca đầu (core/tutorial.ts)
 }

@@ -29,6 +29,8 @@ import { OPEN_HOUR, CLOSE_HOUR } from './core/clock';
 import type { ShiftSnapshot } from './core/sellingSim';
 import { DRINK_RECIPES, TIMER_RECIPES, timerPhase, TimerStationId, AssemblyId, DrinkId, isTimerStationId, isAssemblyId, isDrinkId } from './core/stations';
 import { staffEffects, tickStaff, fryingItemId, extraTraySlots } from './core/staff';
+import { TutorialState, tutorialStep, tutorialHint, shouldRunTutorial } from './core/tutorial';
+import { syncTutorialLayer } from './ui/components/TutorialLayer';
 import { recordHelperFry, StationResult, startTimerStation, pullTimerStation, assembleAtCounter, makeDrink, creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, SAUCE_STOCK, serveFirstOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP } from './core/day';
 import { upgradeEffects } from './core/upgrades';
 import { renderSummaryModal } from './ui/components/SummaryModal';
@@ -665,6 +667,28 @@ class AppController {
 
   // --- SELLING PHASE ---
   private lastShiftSnapshotAt = 0;
+  private tutorial: TutorialState | null = null; // Bác Ba dẫn ca đầu
+
+  // Tính bước hướng dẫn từ trạng thái ca bán, vẽ bong bóng. Bước 'done' → đồng hồ chạy lại ngay.
+  private updateTutorial(session: SellingSession) {
+    if (!this.tutorial) return;
+    const step = tutorialStep(this.tutorial, session, cookingEngine.getCookState(), cookingEngine.getTray());
+    session.tutorial = step !== 'done';
+    syncTutorialLayer(tutorialHint(step), {
+      onButton: () => {
+        if (step === 'intro' && this.tutorial) this.tutorial.introSeen = true;
+        else this.endTutorial();
+      },
+      onSkip: () => this.endTutorial()
+    });
+  }
+
+  private endTutorial() {
+    this.tutorial = null;
+    if (this.sellingSession) this.sellingSession.tutorial = false;
+    syncTutorialLayer(null, { onButton: () => {}, onSkip: () => {} });
+    stateManager.update(draft => { draft.tutorialDone = true; });
+  }
   private timerAlerted = new Set<TimerStationId>();
 
   // Lưu ca bán dở vào save. `immediate`: ghi ngay (trang sắp ẩn/đóng, bộ đếm lưu có thể không kịp chạy)
@@ -693,6 +717,7 @@ class AppController {
     this.sellingStructureKey = '';
     this.sellingSession = shift.session;
     this.sellingSession.isPaused = false;
+    this.tutorial = shift.session.tutorial ? { introSeen: true, servedAtStart: shift.session.servedCount } : null;
     this.expectedCustomers = shift.expectedCustomers;
     this.customerSource = createCustomerSource(state, this.currentEvent, shift.bunnyVisited);
     cookingEngine.setFryRampBonus(upgradeEffects(state.upgrades).fryRampPct);
@@ -719,6 +744,10 @@ class AppController {
     cookingEngine.setTraySize(CookingEngine.TRAY_SIZE + extraTraySlots(state.staff));
     this.customerSource = createCustomerSource(state, this.currentEvent);
     this.sellingSession.orders.push(...this.customerSource.opening());
+    if (shouldRunTutorial(state)) {
+      this.tutorial = { introSeen: false, servedAtStart: 0 };
+      this.sellingSession.tutorial = true;
+    }
 
     // Số khách cả ngày: khách nền theo chương × sao × marketing × sự kiện (GDD)
     this.expectedCustomers = EconomyEngine.calculateDailyCustomerCount(state, this.currentEvent.effect.customerMultiplier ?? 1);
@@ -739,6 +768,7 @@ class AppController {
   }
 
   private stopSellingPhase() {
+    syncTutorialLayer(null, { onButton: () => {}, onSkip: () => {} });
     if (this.animFrameId) {
       cancelAnimationFrame(this.animFrameId);
       this.animFrameId = null;
@@ -804,6 +834,7 @@ class AppController {
     }
 
     this.render();
+    this.updateTutorial(session); // sau render: viền sáng gắn vào nút vừa dựng
     if (currentTimestamp - this.lastShiftSnapshotAt > 5000) this.snapshotShift(false);
 
     if (dayOver) {
@@ -1075,6 +1106,7 @@ class AppController {
 
   // --- FINISH DAY & SUMMARY ---
   private finishDay() {
+    if (this.tutorial) this.endTutorial();
     this.stopSellingPhase();
     this.lastShiftSnapshotAt = 0;
     stateManager.update(draft => { draft.pausedShift = null; });

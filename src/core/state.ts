@@ -71,6 +71,7 @@ export function createInitialState(): GameState {
     baBaAidChapter: 0,
     integrity: { tampered: false, reasons: [] },
     pausedShift: null,
+    tutorialDone: false,
     lifetimeStats: {
       totalFried: 0,
       totalBurnt: 0,
@@ -107,6 +108,8 @@ export function migrateSave(raw: unknown): { state: GameState; repaired: string[
   }
 
   const defaults = createInitialState();
+  // Save từ trước khi có hướng dẫn: đã qua ngày 1 thì coi như đã học, không bật lại
+  if (typeof src.tutorialDone !== 'boolean') state.tutorialDone = typeof src.day === 'number' && src.day > 1;
   if (!Number.isInteger(state.day) || state.day < 1) { state.day = defaults.day; repaired.push('day'); }
   if (!Number.isInteger(state.currentChapter) || state.currentChapter < 1 || state.currentChapter > 5) {
     state.currentChapter = defaults.currentChapter;

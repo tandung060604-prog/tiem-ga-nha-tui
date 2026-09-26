@@ -35,6 +35,9 @@ for (const deviceName of ['iPhone SE', 'iPhone 13', 'iPhone 15 Pro Max']) {
 
   await page.locator('#btn-start-selling').tap();
   await page.locator('.selling-screen').waitFor();
+  // Tiệm mới ngày 1: Bác Ba mở đầu hướng dẫn → bấm qua lời mở đầu để vào thao tác
+  const tutNext = page.locator('#btn-tutorial-next');
+  if (await tutNext.isVisible().catch(() => false)) await tutNext.tap();
   let tapsOk = true;
   for (const id of ['#btn-add-drink', '#btn-fry-chicken']) {
     try { await page.locator(id).tap({ timeout: 3000 }); } catch { tapsOk = false; }
