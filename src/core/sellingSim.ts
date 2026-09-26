@@ -21,6 +21,7 @@ export interface SellingSession {
   helpers: (HelperFry | null)[]; // giỏ chiên của phụ bếp (core/staff.ts)
   waiterMs: number;              // phục vụ đang chờ lên món bao lâu
   tutorial?: boolean;            // Bác Ba đang hướng dẫn: đồng hồ + khách đứng yên, chảo vẫn chạy
+  fx?: FxEvent[];                // hiệu ứng chờ giao diện vẽ (tiền bay, chuỗi Perfect, khách bỏ về) — drainFx()
   lostCount: number;
   grossRevenue: number;
   tips: number;
@@ -30,6 +31,24 @@ export interface SellingSession {
   totalFriedCount: number;
   topSellerId: string;
   midIncidentTriggered?: boolean;
+}
+
+// Hiệu ứng "đã tay": core ghi lại chuyện vừa xảy ra, giao diện rút ra (drainFx) để vẽ đúng một lần.
+// Không suy ngược từ doanh thu (bỏ sót lần bán đầu, lệch khi tiếp tục ca dở).
+export type FxEvent =
+  | { kind: 'cash'; paid: number; tip: number }
+  | { kind: 'streak'; streak: number; tip: number } // chuỗi Perfect ≥ 2 và tip mẻ tiếp theo
+  | { kind: 'lost' };
+
+const MAX_PENDING_FX = 20;
+export function pushFx(session: SellingSession, fx: FxEvent) {
+  (session.fx ??= []).push(fx);
+  if (session.fx.length > MAX_PENDING_FX) session.fx.splice(0, session.fx.length - MAX_PENDING_FX);
+}
+export function drainFx(session: SellingSession): FxEvent[] {
+  const out = session.fx ?? [];
+  session.fx = [];
+  return out;
 }
 
 export function createSellingSession(): SellingSession {
@@ -100,6 +119,7 @@ export function tickSelling(session: SellingSession, gameDt: number, ctx: TickCo
       stillWaiting.push(order);
     } else {
       session.lostCount += 1;
+      pushFx(session, { kind: 'lost' });
       events.push({ type: 'customerLeft', order });
     }
   }

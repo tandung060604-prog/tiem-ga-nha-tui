@@ -114,9 +114,9 @@
     "semantic_hash": ""
   },
   "src/main.ts": {
-    "mtime": 1790449445.0743232,
-    "seen": 1790449627.8676672,
-    "ast_hash": "3e4b7d518057b726142273a6269f39ee",
+    "mtime": 1790449910.3095882,
+    "seen": 1790450045.8162425,
+    "ast_hash": "41051a329b92f980e7d7aed4ed4665bc",
     "semantic_hash": ""
   },
   "src/types/game.ts": {
@@ -162,9 +162,9 @@
     "semantic_hash": ""
   },
   "src/ui/components/SellingView.ts": {
-    "mtime": 1790449456.6067367,
-    "seen": 1790449627.8676822,
-    "ast_hash": "ce193edcbbcbf45f000bdd9ee41868e4",
+    "mtime": 1790449886.0655332,
+    "seen": 1790450045.8162553,
+    "ast_hash": "f866526c080fa25784ae43a572863ec1",
     "semantic_hash": ""
   },
   "src/ui/components/SettingsModal.ts": {
@@ -354,9 +354,9 @@
     "semantic_hash": ""
   },
   "src/core/sellingSim.ts": {
-    "mtime": 1790444112.9824247,
-    "seen": 1790449302.514732,
-    "ast_hash": "adb044bb9fae72b3bb08d6ec4a36fa22",
+    "mtime": 1790449857.38248,
+    "seen": 1790450045.8162322,
+    "ast_hash": "da5ebeb9f8263bf248f2bf5ec7c664af",
     "semantic_hash": ""
   },
   "tests/selling-sim.test.ts": {
@@ -558,9 +558,9 @@
     "semantic_hash": ""
   },
   "src/core/day.ts": {
-    "mtime": 1790449688.4725406,
-    "seen": 1790449815.024881,
-    "ast_hash": "44cdfa7802dfaf42835611f275dc2987",
+    "mtime": 1790449857.4099708,
+    "seen": 1790450045.8162165,
+    "ast_hash": "3f7831bd8182a4f4ca7be6c63f2b15d5",
     "semantic_hash": ""
   },
   "docs/bao-cao/mo-phong-can-bang.md": {
@@ -1983,6 +1983,12 @@
     "mtime": 1790449716.454451,
     "seen": 1790449815.0249574,
     "ast_hash": "0d331ff09d5b7abc26d62147f202d5b5",
+    "semantic_hash": ""
+  },
+  "tests/fx.test.ts": {
+    "mtime": 1790449928.2581942,
+    "seen": 1790450045.8162768,
+    "ast_hash": "c5380543c788c1f526e0f35f1bdd994a",
     "semantic_hash": ""
   }
 }

@@ -23,8 +23,8 @@ import { renderUpgradesTab, bindUpgradesEvents } from './ui/components/UpgradesT
 import { renderStaffTab, bindStaffEvents } from './ui/components/StaffTab';
 import { renderReviewsTab, bindReviewsEvents } from './ui/components/ReviewsTab';
 import { renderMenuTab, bindMenuEvents } from './ui/components/MenuTab';
-import { renderSellingView, patchSellingView, sellingStructureKey } from './ui/components/SellingView';
-import { SellingSession, createSellingSession, gameDeltaMs, tickSelling } from './core/sellingSim';
+import { renderSellingView, patchSellingView, sellingStructureKey, renderFx } from './ui/components/SellingView';
+import { SellingSession, createSellingSession, gameDeltaMs, tickSelling, drainFx } from './core/sellingSim';
 import { OPEN_HOUR, CLOSE_HOUR } from './core/clock';
 import type { ShiftSnapshot } from './core/sellingSim';
 import { DRINK_RECIPES, TIMER_RECIPES, timerPhase, TimerStationId, AssemblyId, DrinkId, isTimerStationId, isAssemblyId, isDrinkId } from './core/stations';
@@ -978,6 +978,12 @@ class AppController {
 
     this.render();
     this.updateTutorial(session); // sau render: viền sáng gắn vào nút vừa dựng
+    // Hiệu ứng "đã tay" do core ghi lại (tiền vào, chuỗi Perfect, khách bỏ về): vẽ đúng một lần
+    const fx = drainFx(session);
+    if (fx.length) {
+      renderFx(fx);
+      if (fx.some(f => f.kind === 'cash' || f.kind === 'streak')) this.haptic(12);
+    }
     if (currentTimestamp - this.lastShiftSnapshotAt > 5000) this.snapshotShift(false);
 
     // Sự kiện 2 trong ngày: Tình huống bất ngờ giữa ca bán (giờ cao điểm, không bật lúc đang có tutorial)
@@ -1030,6 +1036,12 @@ class AppController {
           assertNever(ev);
       }
     }
+  }
+
+  // Rung nhẹ trên máy có Vibration API (Android). iPhone Safari không có API này → chỉ còn âm thanh.
+  private haptic(ms: number) {
+    if (!stateManager.getState().soundEnabled) return;
+    try { navigator.vibrate?.(ms); } catch { /* một số trình duyệt ném lỗi khi chưa có thao tác người dùng */ }
   }
 
   private useIngredients(ids: string[]): boolean {

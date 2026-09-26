@@ -90,15 +90,15 @@
     "semantic_hash": ""
   },
   "src/core/economy.ts": {
-    "mtime": 1790447392.577742,
-    "seen": 1790449302.514717,
-    "ast_hash": "abfef36f7ca87dffe06e7a82474331ef",
+    "mtime": 1790449688.4256988,
+    "seen": 1790449815.024883,
+    "ast_hash": "433c9403f30e4c413017c94a364db5da",
     "semantic_hash": ""
   },
   "src/core/orders.ts": {
-    "mtime": 1790449445.017894,
-    "seen": 1790449627.8676488,
-    "ast_hash": "0a27947e5eaa01ec04c034722fbe0f11",
+    "mtime": 1790449688.3936412,
+    "seen": 1790449815.0248911,
+    "ast_hash": "8c8e807574616473e0dd5edb0fc7f541",
     "semantic_hash": ""
   },
   "src/core/reviewsEngine.ts": {
@@ -186,9 +186,9 @@
     "semantic_hash": ""
   },
   "src/ui/components/StoryModal.ts": {
-    "mtime": 1790448296.9859343,
-    "seen": 1790449302.5147607,
-    "ast_hash": "9656922f763113fce26ebf35b783beed",
+    "mtime": 1790449734.826228,
+    "seen": 1790449815.0249329,
+    "ast_hash": "f0e16e768cf41b30ef2247ff57d9204b",
     "semantic_hash": ""
   },
   "src/ui/components/SummaryModal.ts": {
@@ -558,9 +558,9 @@
     "semantic_hash": ""
   },
   "src/core/day.ts": {
-    "mtime": 1790449445.051641,
-    "seen": 1790449627.8676407,
-    "ast_hash": "711aa19f9809e51ebd9e6e311408664f",
+    "mtime": 1790449688.4725406,
+    "seen": 1790449815.024881,
+    "ast_hash": "44cdfa7802dfaf42835611f275dc2987",
     "semantic_hash": ""
   },
   "docs/bao-cao/mo-phong-can-bang.md": {
@@ -1971,6 +1971,18 @@
     "mtime": 1790449488.420057,
     "seen": 1790449627.867717,
     "ast_hash": "503f0de0357b14baaf648cf961d85110",
+    "semantic_hash": ""
+  },
+  "src/core/karmaEffects.ts": {
+    "mtime": 1790449670.7836,
+    "seen": 1790449815.0248878,
+    "ast_hash": "481a1ef95bf7c23ea4aa6d14036afaf5",
+    "semantic_hash": ""
+  },
+  "tests/karma-effects.test.ts": {
+    "mtime": 1790449716.454451,
+    "seen": 1790449815.0249574,
+    "ast_hash": "0d331ff09d5b7abc26d62147f202d5b5",
     "semantic_hash": ""
   }
 }

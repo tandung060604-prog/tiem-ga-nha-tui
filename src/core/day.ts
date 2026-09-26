@@ -13,7 +13,7 @@ import { upgradeEffects } from './upgrades';
 import { staffEffects, endShiftForStaff, FRY_RECIPES } from './staff';
 import { karmaEffects } from './karmaEffects';
 import { auditState, flagIntegrity } from './integrity';
-import { SellingSession } from './sellingSim';
+import { SellingSession, pushFx } from './sellingSim';
 import { random } from './rng';
 
 // Luật của một ngày (sự kiện, khách, giao món, chốt sổ), không DOM/âm thanh.
@@ -111,6 +111,7 @@ export function recordFryerLift(
   if (session && result.quality === 'perfect') {
     session.perfectCount += 1;
     session.perfectStreak += 1;
+    if (session.perfectStreak >= 2) pushFx(session, { kind: 'streak', streak: session.perfectStreak, tip: perfectTip(session.perfectStreak) });
   }
   if (session && result.quality === 'burnt') session.burntCount += 1;
   if (session && result.quality !== 'perfect') session.perfectStreak = 0; // chỉ Perfect mới giữ chuỗi
@@ -237,6 +238,7 @@ export function serveFirstOrder(
   const tip = (order.patienceCurrent / order.patienceMax > 0.6 ? FAST_SERVICE_TIP : 0) + (order.perfectBonus ?? 0);
   session.grossRevenue += paid;
   session.tips += tip;
+  pushFx(session, { kind: 'cash', paid, tip });
   return { kind: 'complete', order, paid, tip, burnt: (order.burntPenalty ?? 0) > 0 };
 }
 

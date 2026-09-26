@@ -1,11 +1,11 @@
 import { staffEffects } from '../../core/staff';
 import { GameState, CustomerOrder, QualityRating } from '../../types/game';
 import { cookingEngine } from '../../core/cooking';
-import { SellingSession } from '../../core/sellingSim';
+import { SellingSession, FxEvent } from '../../core/sellingSim';
 import { isRushHour } from '../../core/clock';
 import { foodImage, ASSETS } from '../../content/assets';
 import { TIMER_RECIPES, TimerStationId, timerPhase, DRINK_RECIPES, DrinkId, ASSEMBLY_RECIPES, AssemblyId, assemblyBaseIndex } from '../../core/stations';
-import { stationOpen } from '../../core/day';
+import { stationOpen, perfectTip } from '../../core/day';
 import { escapeHtml } from '../escapeHtml';
 
 export type { SellingSession };
@@ -50,61 +50,41 @@ export function getMoodThought(mood: CustomerMood, order?: CustomerOrder): strin
   }
 }
 
-let prevGrossRevenue = 0;
-let prevTips = 0;
-let prevSessionTime = 0;
-
-function checkAndSpawnFloatingMoney(root: HTMLElement, session: SellingSession): void {
-  const layer = root.querySelector<HTMLElement>('#floating-money-layer');
-  if (!layer) return;
-
-  // Reset if new session starts
-  if (session.gameHour < prevSessionTime) {
-    prevGrossRevenue = session.grossRevenue;
-    prevTips = session.tips;
-    prevSessionTime = session.gameHour;
-    return;
+// Tiền bay / khách bỏ về: vẽ từ hàng đợi hiệu ứng của core (drainFx trong main.ts), trên một lớp cố định
+// NGOÀI #main-view → không bị mất khi màn bán hàng dựng lại HTML (mỗi lần giao món).
+// Class cho CSS: .money-float, .tip-float, .lost-float (layer: .fx-layer)
+export function renderFx(events: readonly FxEvent[]): void {
+  let layer = document.getElementById('fx-layer');
+  if (!layer) {
+    layer = document.createElement('div');
+    layer.id = 'fx-layer';
+    layer.className = 'fx-layer floating-money-layer';
+    layer.setAttribute('aria-hidden', 'true');
+    layer.setAttribute('style', 'position: fixed; inset: 0; pointer-events: none; z-index: 40; overflow: hidden;');
+    document.body.appendChild(layer);
   }
-  prevSessionTime = session.gameHour;
-
-  // Initialize tracking on first tick
-  if (prevGrossRevenue === 0 && prevTips === 0 && session.grossRevenue > 0) {
-    prevGrossRevenue = session.grossRevenue;
-    prevTips = session.tips;
-    return;
-  }
-
-  if (session.grossRevenue > prevGrossRevenue || session.tips > prevTips) {
-    const revGain = session.grossRevenue - prevGrossRevenue;
-    const tipGain = session.tips - prevTips;
-    const totalGain = revGain + tipGain;
-
-    if (totalGain > 0) {
-      const moneyEl = document.createElement('div');
-      moneyEl.className = 'money-float';
-      const rndLeft = 20 + Math.random() * 35;
-      moneyEl.style.left = `${rndLeft}%`;
-      moneyEl.style.top = '115px';
-      moneyEl.textContent = `+${totalGain.toLocaleString('vi-VN')}đ 💵`;
-      layer.appendChild(moneyEl);
-
-      if (tipGain > 0) {
-        const tipEl = document.createElement('div');
-        tipEl.className = 'money-float tip-float';
-        tipEl.style.left = `${rndLeft + 4}%`;
-        tipEl.style.top = '145px';
-        tipEl.textContent = `+${tipGain.toLocaleString('vi-VN')}đ tip ✨`;
-        layer.appendChild(tipEl);
-        setTimeout(() => tipEl.remove(), 1150);
-      }
-
-      setTimeout(() => moneyEl.remove(), 1150);
+  const spawn = (cls: string, text: string, left: number, top: string) => {
+    const el = document.createElement('div');
+    el.className = cls;
+    el.style.left = `${left}%`;
+    el.style.top = top;
+    el.textContent = text;
+    layer!.appendChild(el);
+    setTimeout(() => el.remove(), 1150);
+  };
+  for (const fx of events) {
+    const left = 20 + Math.random() * 35;
+    if (fx.kind === 'cash') {
+      spawn('money-float', `+${fx.paid.toLocaleString('vi-VN')}đ 💵`, left, 'calc(env(safe-area-inset-top) + 72px)');
+      if (fx.tip > 0) spawn('money-float tip-float', `+${fx.tip.toLocaleString('vi-VN')}đ tip ✨`, left + 4, 'calc(env(safe-area-inset-top) + 102px)');
+    } else if (fx.kind === 'lost') {
+      spawn('money-float lost-float', '😤 Khách bỏ về', left, 'calc(env(safe-area-inset-top) + 140px)');
     }
-
-    prevGrossRevenue = session.grossRevenue;
-    prevTips = session.tips;
   }
 }
+
+// Tip của mẻ Perfect kế tiếp (đúng công thức core/day.ts perfectTip), hiển thị dạng "6,3k"
+const streakTipLabel = (streak: number) => `+${(perfectTip(streak) / 1000).toLocaleString('vi-VN', { maximumFractionDigits: 1 })}k tip`;
 
 // Mọi thứ làm thay đổi CẤU TRÚC màn bán hàng. Khác key cũ → dựng lại HTML; giống → chỉ patch.
 export function sellingStructureKey(state: GameState, session: SellingSession): string {
@@ -222,12 +202,11 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
     if (streak !== currentStreak) {
       streakContainer.dataset.streak = String(streak);
       if (streak >= 2) {
-        const bonusTip = Math.round((1 + Math.min(streak - 1, 8) * 0.25) * 2.5);
         streakContainer.innerHTML = `
           <div class="streak-flame ${streak >= 5 ? 'super-fire' : ''}" data-streak="${streak}">
             <span class="flame-icon">🔥</span>
             <span class="streak-count">Chuỗi x${streak} PERFECT!</span>
-            <span class="streak-bonus">+${bonusTip}k tip</span>
+            <span class="streak-bonus">${streakTipLabel(streak)}</span>
           </div>
         `;
       } else {
@@ -237,7 +216,6 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
   }
 
   // Floating money on collect
-  checkAndSpawnFloatingMoney(root, session);
 }
 
 function potHint(): string {
@@ -652,7 +630,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
                 <div class="streak-flame ${session.perfectStreak >= 5 ? 'super-fire' : ''}" data-streak="${session.perfectStreak}">
                   <span class="flame-icon">🔥</span>
                   <span class="streak-count">Chuỗi x${session.perfectStreak} PERFECT!</span>
-                  <span class="streak-bonus">+${Math.round((1 + Math.min(session.perfectStreak - 1, 8) * 0.25) * 2.5)}k tip</span>
+                  <span class="streak-bonus">${streakTipLabel(session.perfectStreak)}</span>
                 </div>
               ` : ''}
             </div>
