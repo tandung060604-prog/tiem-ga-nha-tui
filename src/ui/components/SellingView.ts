@@ -416,16 +416,18 @@ export function renderSellingView(state: GameState, session: SellingSession): st
     const mood = getCustomerMood(ord);
     const thought = getMoodThought(mood, ord);
 
-    const comboHtml = ord.comboName ? `<div class="order-combo" style="font-size: .72rem; font-weight: 800; color: var(--red);">🍱 ${escapeHtml(ord.comboName)}</div>` : '';
+    const comboHtml = ord.comboName ? `<div class="order-combo">🍱 ${escapeHtml(ord.comboName)}</div>` : '';
     const itemsHtml = comboHtml + ord.items.map(it => {
       const menuItem = state.menu.find(m => m.id === it.menuItemId);
       const name = menuItem ? menuItem.name : it.menuItemId;
       const img = foodImage(it.menuItemId, 'perfect');
+      const qtyText = it.count > 1 ? (it.served > 0 ? `${it.served}/${it.count}` : `${it.count}×`) : '1×';
       return `
         <div class="order-row">
           <span class="order-item-title">
-            ${img ? `<img src="${img}" class="order-food-thumb" alt="${name}" width="28" height="28" style="width: 28px; height: 28px; object-fit: contain; vertical-align: middle; flex: none;" />` : `<span class="order-food-emoji">${menuItem ? menuItem.icon : '🍗'}</span>`}
-            ${it.count > 1 ? `${it.served}/${it.count}` : '1x'} ${name}
+            ${img ? `<img src="${img}" class="order-food-thumb" alt="${escapeHtml(name)}" width="28" height="28" />` : `<span class="order-food-emoji">${menuItem ? menuItem.icon : '🍗'}</span>`}
+            <span class="order-qty">${qtyText}</span>
+            <span class="order-food-name">${escapeHtml(name)}</span>
             ${it.condiment ? `<span class="order-condiment" data-condiment="${it.condiment}">${it.condiment === 'ketchup' ? '🍅 + tương cà' : '🌶️ + tương ớt'}</span>` : ''}
           </span>
           <span class="order-check ${it.completed ? 'done' : ''}">${it.completed ? '✓' : '○'}</span>
