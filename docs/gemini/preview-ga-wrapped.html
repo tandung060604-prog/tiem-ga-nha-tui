@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mẫu Thẻ Gà Wrapped (1080×1350) — Tiệm Gà Nhà Tui</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800;900&family=Be+Vietnam+Pro:ital,wght@0,500;0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/styles/variables.css">
+  <link rel="stylesheet" href="../../src/styles/main.css">
+  <link rel="stylesheet" href="../../src/styles/share.css">
+  <style>
+    body {
+      background: #1a1416;
+      margin: 0;
+      padding: 30px 16px;
+      font-family: var(--font-body, "Be Vietnam Pro", sans-serif);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #fff;
+    }
+
+    .preview-controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      background: #2b1d1f;
+      padding: 10px 20px;
+      border-radius: 999px;
+      border: 1.5px solid #4a2f34;
+      align-items: center;
+    }
+
+    .btn-ctrl {
+      background: #e63946;
+      color: #fff;
+      border: none;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .btn-ctrl.secondary {
+      background: #4a2f34;
+    }
+
+    /* Scaled viewport container */
+    .viewport-box {
+      border: 3px dashed #ffd166;
+      border-radius: 40px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+      position: relative;
+      transition: all 0.3s ease;
+      transform-origin: top center;
+    }
+
+    .viewport-box.fit-screen {
+      transform: scale(0.48);
+      margin-bottom: -680px;
+    }
+
+    .viewport-box.fit-mobile {
+      transform: scale(0.33);
+      margin-bottom: -880px;
+    }
+
+    .viewport-box.fit-full {
+      transform: scale(1);
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 style="font-family: 'Baloo 2', sans-serif; color: #ffd166; margin: 0 0 6px; font-size: 2.2rem; text-align: center;">
+    🍗 GÀ WRAPPED 1080×1350 — DESIGN SPECIFICATION
+  </h1>
+  <p style="color: #d6c5b6; font-size: 0.95rem; margin: 0 0 20px; text-align: center;">
+    Mẫu chuẩn HTML/CSS dành cho Claude Lead vẽ Canvas 2D ở C5 (Tỷ lệ 4:5 chia sẻ Threads/Instagram)
+  </p>
+
+  <div class="preview-controls">
+    <span style="font-size: 0.85rem; color: #fdf3e4;">Thu phóng xem trước:</span>
+    <button class="btn-ctrl secondary" onclick="setScale('fit-mobile')">📱 Màn Hình 360px (x0.33)</button>
+    <button class="btn-ctrl" onclick="setScale('fit-screen')">💻 Màn Hình Laptop (x0.48)</button>
+    <button class="btn-ctrl secondary" onclick="setScale('fit-full')">🔍 Gốc 1080×1350 (x1.0)</button>
+  </div>
+
+  <div id="viewport" class="viewport-box fit-screen">
+    <!-- THẺ GÀ WRAPPED 1080×1350 NGUYÊN BẢN -->
+    <div class="wrapped-card">
+      <!-- Mái hiên sọc đỏ trắng K-Chicken -->
+      <div class="wrapped-awning"></div>
+
+      <!-- 1. Header quán & Logo -->
+      <div class="wrapped-header-row">
+        <div class="wrapped-shop-badge">
+          <img src="../../public/assets/ui/logo_korean_chicken.png" alt="Logo" class="wrapped-logo-img" />
+          <div class="wrapped-shop-info">
+            <span class="wrapped-shop-name">🍗 TIỆM GÀ NHÀ TUI</span>
+            <span class="wrapped-shop-sub">Hẻm 1102 Sài Gòn · Đã mở 30 ngày</span>
+          </div>
+        </div>
+        <span class="wrapped-pill-tag">CHƯƠNG 3 · TIỆM HẺM</span>
+      </div>
+
+      <!-- 2. Tiêu đề Wrapped & Danh hiệu vinh danh -->
+      <div class="wrapped-title-block">
+        <div class="wrapped-kicker">✨ BÁO CÁO TỔNG KẾT HÀNH TRÌNH ✨</div>
+        <div class="wrapped-main-title">GÀ WRAPPED CỦA BẠN</div>
+        <div class="wrapped-honor-card">
+          <span class="wrapped-honor-icon">🏆</span>
+          <span class="wrapped-honor-text">DANH HIỆU: BẬC THẦY GIÒN RỤM HẺM 1102</span>
+        </div>
+      </div>
+
+      <!-- 3. Lưới 4 chỉ số vàng (Hero Stats) -->
+      <div class="wrapped-stats-grid">
+        <!-- Ô 1: Tổng doanh thu -->
+        <div class="wrapped-stat-box">
+          <div class="wrapped-stat-label">
+            <span>💰</span>
+            <span>TỔNG DOANH THU</span>
+          </div>
+          <div class="wrapped-stat-value gold">148.500.000đ</div>
+          <div class="wrapped-stat-desc">Vượt 297% so với vốn ban đầu (850k)</div>
+        </div>
+
+        <!-- Ô 2: Gà chiên vàng giòn -->
+        <div class="wrapped-stat-box">
+          <div class="wrapped-stat-label">
+            <span>🍗</span>
+            <span>SỐ MIẾNG GÀ ĐÃ CHIÊN</span>
+          </div>
+          <div class="wrapped-stat-value red">1.428 miếng</div>
+          <div class="wrapped-stat-desc">Tỷ lệ vàng giòn Perfect đạt 94.2%</div>
+        </div>
+
+        <!-- Ô 3: Thực khách phục vụ -->
+        <div class="wrapped-stat-box">
+          <div class="wrapped-stat-label">
+            <span>👥</span>
+            <span>THỰC KHÁCH ĐÃ PHỤC VỤ</span>
+          </div>
+          <div class="wrapped-stat-value green">682 lượt khách</div>
+          <div class="wrapped-stat-desc">Điểm đánh giá trung bình 4.9 / 5.0 ⭐</div>
+        </div>
+
+        <!-- Ô 4: Kỷ lục chuỗi Perfect -->
+        <div class="wrapped-stat-box">
+          <div class="wrapped-stat-label">
+            <span>🔥</span>
+            <span>KỶ LỤC CHUỖI PERFECT</span>
+          </div>
+          <div class="wrapped-stat-value gold">x14 LẦN LIÊN TIẾP</div>
+          <div class="wrapped-stat-desc">Khen ngợi bởi Bác Ba Tổ Trưởng 👨‍🍳</div>
+        </div>
+      </div>
+
+      <!-- 4. Món ăn 'Ruột' bán chạy nhất & Review Threads -->
+      <div class="wrapped-spotlight-box">
+        <img src="../../public/assets/food/food_spicy_chicken.png" alt="Gà Sốt Cay" class="wrapped-food-thumb" />
+        <div class="wrapped-spotlight-content">
+          <div class="wrapped-spotlight-tag">⭐ MÓN 'RUỘT' ĐƯỢC GỌI NHIỀU NHẤT</div>
+          <div class="wrapped-spotlight-name">Gà Rán Sốt Cay Hàn Quốc (452 phần)</div>
+          <div class="wrapped-spotlight-quote">
+            "Da gà giòn rụm rôm rốp, sốt cay óng ánh phủ đều đặn, cắn vào mọng nước bốc khói nghi ngút! Ăn một lần là nghiền luôn cả tháng!"
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Mascot & Con dấu chứng nhận Hẻm 1102 -->
+      <div class="wrapped-mascot-row">
+        <div class="wrapped-mascot-group">
+          <img src="../../public/assets/characters/gabong_mascot_front.png" alt="Gà Bông" class="wrapped-mascot-img" />
+          <div class="wrapped-mascot-text">
+            <b>Bé Gà Bông nhắn gửi:</b> "Cảm ơn bạn đã thức khuya dậy sớm chiên gà cùng tiệm! Hẻm 1102 ấm áp lên rất nhiều là nhờ bạn đó!"
+          </div>
+        </div>
+        <div class="wrapped-stamp-seal">
+          <span>CHỨNG NHẬN</span>
+          <span>TIỆM GÀ</span>
+          <span>CHUẨN VỊ</span>
+          <span>★★★★★</span>
+        </div>
+      </div>
+
+      <!-- 6. Footer Threads / Web Watermark -->
+      <div class="wrapped-footer">
+        <div class="wrapped-footer-left">
+          <span class="wrapped-footer-brand">🐣 Tiệm Gà Nhà Tui · Trò Chơi Quản Lý Tiệm Gà Sài Gòn</span>
+          <span class="wrapped-footer-sub">Chơi ngay trên Web: tiem-ga-nha-tui · Không cần tải app · Lưu tiến độ tự động</span>
+        </div>
+        <div class="wrapped-footer-tag">
+          <span>📸 Chia sẻ Threads</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function setScale(cls) {
+      const el = document.getElementById('viewport');
+      el.className = 'viewport-box ' + cls;
+    }
+  </script>
+</body>
+</html>
