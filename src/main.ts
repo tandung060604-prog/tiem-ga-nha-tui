@@ -2,7 +2,7 @@ import { GameState, GamePhase, DayLedger, CustomerReview, StoryEndingId } from '
 import { stateManager } from './core/state';
 import { audio } from './core/audio';
 import { music, babble, narrate, stopNarration } from './core/music';
-import { renderTitleScreen } from './ui/components/TitleScreen';
+import { renderTitleScreen, bindTitleScreenInteractions } from './ui/components/TitleScreen';
 import { STORY_ACTS } from './content/storyNovel';
 import { cookingEngine, CookingEngine, Sauce } from './core/cooking';
 import { escapeHtml } from './ui/escapeHtml';
@@ -130,6 +130,7 @@ class AppController {
     const hasProgress = state.day > 1 || state.dayHistory.length > 0 || !!state.pausedShift;
     document.getElementById('title-screen')?.remove();
     document.body.insertAdjacentHTML('beforeend', renderTitleScreen(state, hasProgress, music.isEnabled()));
+    bindTitleScreenInteractions();
 
     const start = (fresh: boolean) => {
       // Vào game trước, âm thanh sau: máy không có Web Audio cũng không bị kẹt ở màn tiêu đề

@@ -2,29 +2,140 @@ import { GameState } from '../../types/game';
 import { ASSETS } from '../../content/assets';
 import { CHAPTERS } from '../../content/chapters';
 import { escapeHtml } from '../escapeHtml';
+import { audio } from '../../core/audio';
 
-// Màn tiêu đề: logo, tên game, Chơi tiếp / Chơi mới. Chạm đầu tiên ở đây bật âm thanh trên iOS.
-// Style tạm để inline; Gemini 1 chuyển sang CSS các class .title-* (xem docs/phan-cong.md).
+const GABONG_QUOTES = [
+  'Dạ Tiệm Gà Nhà Tui xin chào bạn! 🍗',
+  'Hôm nay đùi gà sốt cay giòn rụm đang chờ chủ tiệm nè! ✨',
+  'Khởi nghiệp từ chiếc xe đẩy nhỏ xíu, cùng nhau cố lên nha! 💛',
+  'Chíp chíp! Chúc quán hôm nay bán hết veo trong một nốt nhạc! 🌟',
+  'Bí quyết là sốt tẩm đậm đà và nụ cười tươi rói với khách! 🥰'
+];
+
+const CAT_QUOTES = [
+  'Meo~ Mùi gà rán thơm phức làm mèo thức giấc nè! 🐱',
+  'Meo meo... Cho mèo xin một miếng gà giòn không tiêu nha! ✨',
+  'Ngủ nướng một xíu rồi phụ chủ tiệm canh hẻm nha meo~ 🐾'
+];
+
+const BASKET_QUOTES = [
+  'Xèo xèo~ Mẻ gà vừa chiên xong, vàng giòn rùm rụm thơm nức mũi! 🍗🔥',
+  'Vỏ ngoài giòn tan, bên trong mọng nước ngọt thịt! 🤤',
+  'Lắc thêm xíu phô mai béo ngậy nữa là số dách luôn! 🧀'
+];
+
+const LANTERN_QUOTES = [
+  '🏮 Đèn lồng sáng ấm, góc hẻm nhỏ bỗng bình yên lạ kỳ!',
+  '✨ Ánh đèn vàng lung linh soi lối thực khách ghé tiệm gà!'
+];
+
 export function renderTitleScreen(state: GameState, hasProgress: boolean, musicOn: boolean): string {
   const chapter = CHAPTERS.find(c => c.number === state.currentChapter);
   return `
-    <div id="title-screen" class="title-screen" style="position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: calc(24px + env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom)); background: radial-gradient(circle at 50% 30%, #fff6e3 0%, #fdf3e4 45%, #f4d9b0 100%); text-align: center;">
-      <div class="title-awning" style="position: absolute; top: 0; left: 0; right: 0; height: calc(18px + env(safe-area-inset-top)); background: repeating-linear-gradient(90deg, #e63946 0 28px, #fffaf2 28px 56px);"></div>
-      <img class="title-logo" src="${ASSETS.gabong.front}" alt="Gà Bông" width="168" height="168" style="filter: drop-shadow(0 8px 12px rgba(61,44,46,.25)); animation: gabongBob 2.5s ease-in-out infinite;" />
-      <h1 class="title-name" style="margin: 0; font-family: var(--font-display); font-size: 2.3rem; line-height: 1; color: #e63946; text-shadow: 0 3px 0 #3d2c2e22; letter-spacing: .5px;">TIỆM GÀ<br/>NHÀ TUI</h1>
-      <p class="title-tagline" style="margin: 0; max-width: 300px; color: #8a6452; font-weight: 600; font-size: .92rem;">Từ xe đẩy đầu hẻm đến chuỗi gà quốc dân</p>
-      ${hasProgress ? `
-        <div class="title-save" style="font-size: .8rem; color: #3d2c2e; background: #fffaf2; border: 2px solid #ead7bd; border-radius: 999px; padding: 4px 12px;">
-          🍗 ${escapeHtml(state.shopName)} · Ngày ${state.day}${chapter ? ` · Chương ${chapter.number}` : ''}
-        </div>` : ''}
-      <div class="title-actions" style="display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 300px; margin-top: 6px;">
-        <button id="btn-title-play" class="btn-big-open" style="min-height: 56px; font-size: 1.15rem;">
-          ${hasProgress ? '▶ CHƠI TIẾP' : '▶ BẮT ĐẦU'}
-        </button>
-        ${hasProgress ? '<button id="btn-title-new" class="btn-sm" style="min-height: 44px;">🆕 Chơi mới từ đầu</button>' : ''}
-        <button id="btn-title-music" class="btn-sm" style="min-height: 44px;">${musicOn ? '🎵 Nhạc nền: Bật' : '🔇 Nhạc nền: Tắt'}</button>
+    <div id="title-screen" class="title-screen" style="--landing-bg: url('${ASSETS.ui.landingBg}');">
+      <!-- Vignette and mood gradient overlay -->
+      <div class="title-overlay"></div>
+
+      <!-- Scalloped Awning on top edge -->
+      <div class="title-awning"></div>
+
+      <!-- Top Title Area -->
+      <div class="title-top">
+        <div class="title-kicker">🏮 TIỆM NHỎ KHỞI NGHIỆP · HẺM 1102 🏮</div>
+        <h1 class="title-name">TIỆM GÀ<br/>NHÀ TUI</h1>
+        <p class="title-tagline">Từ xe đẩy đầu hẻm đến chuỗi gà quốc dân</p>
+        ${hasProgress ? `
+          <div class="title-save">
+            🍗 ${escapeHtml(state.shopName)} · Ngày ${state.day}${chapter ? ` · Chương ${chapter.number}` : ''}
+          </div>` : ''}
       </div>
-      <small class="title-hint" style="position: absolute; bottom: calc(14px + env(safe-area-inset-bottom)); color: #8a6452; opacity: .8;">Chơi dọc trên điện thoại · Thêm vào Màn hình chính để chơi toàn màn</small>
+
+      <!-- Interactive Hotspots on the AI Landing Backdrop -->
+      <div class="title-hotspots">
+        <!-- Hotspot 1: Mascot Gà Bông -->
+        <button id="hotspot-gabong" class="title-hotspot hotspot-gabong" aria-label="Gà Bông" title="Chạm để nói chuyện với Gà Bông">
+          <span class="hotspot-ping"></span>
+          <span class="hotspot-pill">🐥 Gà Bông</span>
+        </button>
+
+        <!-- Hotspot 2: Rổ gà rán giòn rụm -->
+        <button id="hotspot-basket" class="title-hotspot hotspot-basket" aria-label="Rổ Gà Rán" title="Chạm xem gà chiên giòn">
+          <span class="hotspot-ping"></span>
+          <span class="hotspot-pill">🍗 Gà Rán Giòn</span>
+        </button>
+
+        <!-- Hotspot 3: Mèo ngủ trên gờ tường -->
+        <button id="hotspot-cat" class="title-hotspot hotspot-cat" aria-label="Mèo Ngủ" title="Chạm đánh thức bé mèo">
+          <span class="hotspot-ping"></span>
+          <span class="hotspot-pill">🐱 Bé Mèo</span>
+        </button>
+
+        <!-- Hotspot 4: Đèn lồng ấm cúng -->
+        <button id="hotspot-lantern" class="title-hotspot hotspot-lantern" aria-label="Đèn Lồng" title="Chạm thắp sáng đèn lồng">
+          <span class="hotspot-ping"></span>
+          <span class="hotspot-pill">🏮 Đèn Lồng</span>
+        </button>
+
+        <!-- Dynamic Floating Speech Bubble Container -->
+        <div id="title-speech-bubble" class="title-speech-bubble" hidden></div>
+      </div>
+
+      <!-- Bottom Actions Area -->
+      <div class="title-bottom">
+        <div class="title-actions">
+          <button id="btn-title-play" class="title-btn-play">
+            ${hasProgress ? '▶ TIẾP TỤC BÁN GÀ' : '🍗 MỞ TIỆM NGAY (BẮT ĐẦU)'}
+          </button>
+          <div class="title-sub-actions">
+            ${hasProgress ? '<button id="btn-title-new" class="btn-sm title-btn-sub">🆕 Chơi lại từ đầu</button>' : ''}
+            <button id="btn-title-music" class="btn-sm title-btn-sub">${musicOn ? '🎵 Nhạc: Bật' : '🔇 Nhạc: Tắt'}</button>
+          </div>
+        </div>
+        <p class="title-hint">
+          ✨ Chạm vào <b>Gà Bông</b>, <b>Rổ Gà</b> hoặc <b>Bé Mèo</b> để tương tác nha!
+        </p>
+      </div>
     </div>
   `;
+}
+
+export function bindTitleScreenInteractions() {
+  const bubble = document.getElementById('title-speech-bubble');
+  let bubbleTimeout: any = null;
+
+  const showBubble = (text: string, leftPercent: number, topPercent: number) => {
+    if (!bubble) return;
+    clearTimeout(bubbleTimeout);
+    bubble.textContent = text;
+    bubble.style.left = `${leftPercent}%`;
+    bubble.style.top = `${topPercent}%`;
+    bubble.hidden = false;
+    bubble.classList.remove('pop-anim');
+    void bubble.offsetWidth;
+    bubble.classList.add('pop-anim');
+    bubbleTimeout = setTimeout(() => {
+      bubble.hidden = true;
+    }, 3800);
+  };
+
+  const bindHotspot = (id: string, quotes: string[], left: number, top: number, onSound: () => void) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    let idx = 0;
+    el.onclick = (e) => {
+      e.stopPropagation();
+      onSound();
+      const quote = quotes[idx % quotes.length] ?? '';
+      idx++;
+      showBubble(quote, left, top);
+      el.classList.remove('hotspot-tapped');
+      void el.offsetWidth;
+      el.classList.add('hotspot-tapped');
+    };
+  };
+
+  bindHotspot('hotspot-gabong', GABONG_QUOTES, 32, 54, () => audio.playPop());
+  bindHotspot('hotspot-basket', BASKET_QUOTES, 55, 58, () => audio.playPerfect());
+  bindHotspot('hotspot-cat', CAT_QUOTES, 65, 33, () => audio.playPop());
+  bindHotspot('hotspot-lantern', LANTERN_QUOTES, 72, 45, () => audio.playPop());
 }

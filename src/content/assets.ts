@@ -114,7 +114,11 @@ export const ASSETS = {
     logoKoreanChicken: url('assets/ui/logo_korean_chicken.png'),
     stickerDrumstick: url('assets/ui/sticker_drumstick.png'),
     stickerNeon: url('assets/ui/sticker_neon.png'),
-    stickerFries: url('assets/ui/sticker_fries.png')
+    stickerFries: url('assets/ui/sticker_fries.png'),
+    stickerCat: url('assets/ui/sticker_cat.png'),
+    stickerLantern: url('assets/ui/sticker_lantern.png'),
+    stickerDaisy: url('assets/ui/sticker_daisy.png'),
+    landingBg: url('assets/ui/landing_bg.jpg')
   }
 } as const;
 

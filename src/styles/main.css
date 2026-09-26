@@ -1709,4 +1709,300 @@ body.selling-mode .awning::after {
   background: var(--panel);
 }
 
+/* ==========================================================================
+   Cozy Startup Game Title & Landing Screen (Tiệm Gà Nhà Tui)
+   Phong cách Chữa lành / Cozy Healing Tycoon (Boba Tale, Tiệm Mì Bé Xíu)
+   ========================================================================== */
+
+.title-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  background: #23120b var(--landing-bg) center center / cover no-repeat;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.title-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: 
+    linear-gradient(180deg, rgba(20, 10, 5, 0.72) 0%, rgba(20, 10, 5, 0.22) 22%, transparent 40%),
+    linear-gradient(0deg, rgba(20, 10, 5, 0.92) 0%, rgba(20, 10, 5, 0.5) 28%, transparent 58%);
+}
+
+.title-awning {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(16px + env(safe-area-inset-top));
+  background: repeating-linear-gradient(90deg, #d92534 0 28px, #fff7ea 28px 56px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  z-index: 20;
+}
+
+.title-top {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  padding: calc(22px + env(safe-area-inset-top)) 16px 0;
+  width: 100%;
+  max-width: 440px;
+}
+
+.title-kicker {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #ffd166;
+  background: rgba(35, 18, 10, 0.75);
+  border: 1.5px solid rgba(255, 209, 102, 0.6);
+  padding: 3px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+}
+
+.title-name {
+  margin: 2px 0 0;
+  font-family: var(--font-display);
+  font-size: 2.35rem;
+  line-height: 1.05;
+  font-weight: 800;
+  color: #fffaf0;
+  text-align: center;
+  text-shadow: 0 3px 0 #8d121c, 0 6px 0 #52070e, 0 10px 20px rgba(0, 0, 0, 0.75);
+  letter-spacing: 0.8px;
+}
+
+.title-tagline {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fff2db;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+.title-save {
+  margin-top: 4px;
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #432411;
+  background: #fffaf2;
+  border: 2px solid #f4a261;
+  border-radius: 999px;
+  padding: 4px 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* Interactive Hotspots on the AI Landing Backdrop */
+.title-hotspots {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+}
+
+.title-hotspot {
+  position: absolute;
+  pointer-events: auto;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.title-hotspot:active,
+.title-hotspot.hotspot-tapped {
+  transform: translate(-50%, -50%) scale(1.18);
+}
+
+.hotspot-gabong { left: 28%; top: 58%; }
+.hotspot-basket { left: 60%; top: 62%; }
+.hotspot-cat { left: 70%; top: 37%; }
+.hotspot-lantern { left: 78%; top: 50%; }
+
+.hotspot-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #432411;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #f4a261;
+  border-radius: 999px;
+  padding: 3px 9px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.hotspot-ping {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: rgba(244, 162, 97, 0.55);
+  animation: pingRadar 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  z-index: -1;
+}
+
+/* Floating speech bubble */
+.title-speech-bubble {
+  position: absolute;
+  z-index: 50;
+  transform: translate(-50%, -100%);
+  margin-top: -12px;
+  background: #ffffff;
+  color: #3d2c2e;
+  border: 2.5px solid #d92534;
+  border-radius: 16px;
+  padding: 8px 12px;
+  font-family: var(--font-display);
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.35;
+  max-width: 250px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+.title-speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #d92534;
+}
+
+.title-speech-bubble.pop-anim {
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Bottom Actions Area */
+.title-bottom {
+  position: relative;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 330px;
+  padding: 0 16px calc(14px + env(safe-area-inset-bottom));
+}
+
+.title-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.title-btn-play {
+  width: 100%;
+  min-height: 56px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ff4d5e 0%, #d92534 100%);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  box-shadow: 0 6px 0 #7e0a13, 0 12px 24px rgba(217, 37, 52, 0.55);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.title-btn-play:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #7e0a13, 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.title-sub-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.title-btn-sub {
+  flex: 1;
+  min-height: 42px;
+  border: 2px solid #eed8bf;
+  border-radius: 999px;
+  background: rgba(255, 250, 242, 0.96);
+  color: #5c351f;
+  font-family: var(--font-display);
+  font-size: 0.86rem;
+  font-weight: 700;
+  box-shadow: 0 3px 0 #d4bda0, 0 4px 12px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.title-btn-sub:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #d4bda0;
+}
+
+.title-hint {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #fff3db;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  opacity: 0.95;
+}
+
+@keyframes pingRadar {
+  0% { transform: scale(0.95); opacity: 0.85; }
+  70% { transform: scale(1.35); opacity: 0; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+@keyframes pulseSoft {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.025); }
+}
+
+
 
