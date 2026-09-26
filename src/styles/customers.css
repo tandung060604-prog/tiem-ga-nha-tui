@@ -50,7 +50,170 @@
   100% { transform: translateX(3px) rotate(1deg); }
 }
 
-/* Customer Header (Avatar & Name) */
+/* 2D Character Stage inside Customer Card */
+.cust-stage {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+}
+
+.char-actor {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 52px;
+  animation: customerWalkIn 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.customer-card.leaving {
+  animation: customerWalkOut 0.45s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes customerWalkIn {
+  0% { transform: translateX(35px) scale(0.9); opacity: 0; }
+  100% { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+@keyframes customerWalkOut {
+  0% { transform: translateX(0) scale(1); opacity: 1; }
+  100% { transform: translateX(-45px) scale(0.85); opacity: 0; }
+}
+
+.char-sprite-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.char-sprite-img.walking {
+  animation: charStepCycle 0.35s infinite alternate ease-in-out;
+}
+
+.char-sprite-img.standing {
+  animation: charIdleBob 2.2s infinite ease-in-out;
+}
+
+.char-sprite-img.angry {
+  animation: charAngryHiss 0.28s infinite alternate ease-in-out;
+  filter: drop-shadow(0 2px 8px rgba(230, 57, 70, 0.45));
+}
+
+@keyframes charStepCycle {
+  0% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-4px) rotate(0deg); }
+  100% { transform: translateY(0) rotate(3deg); }
+}
+
+@keyframes charIdleBob {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes charAngryHiss {
+  0% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.08) translateY(-2px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+.char-avatar-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  animation: charIdleBob 2.2s infinite ease-in-out;
+}
+
+.char-shadow {
+  width: 32px;
+  height: 6px;
+  background: rgba(0,0,0,0.22);
+  border-radius: 50%;
+  margin-top: -3px;
+  transition: transform 0.3s ease;
+}
+
+.cust-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+  flex: 1;
+}
+
+.cust-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.cust-name {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mood-indicator {
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.cust-badge {
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 6px;
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.cust-badge.bunny-badge { background: #ffe4e6; color: #e11d48; }
+.cust-badge.vip-badge { background: #fef3c7; color: #b45309; }
+.cust-badge.mystery-badge { background: #ede9fe; color: #6d28d9; }
+.cust-badge.delivery-badge { background: #dcfce7; color: #15803d; }
+.cust-badge.student-badge { background: #e0f2fe; color: #0369a1; }
+.cust-badge.office-badge { background: #f1f5f9; color: #334155; }
+.cust-badge.genz-badge { background: #fae8ff; color: #86198f; }
+.cust-badge.demanding-badge { background: #fee2e2; color: #b91c1c; }
+.cust-badge.family-badge { background: #ffedd5; color: #c2410c; }
+.cust-badge.kid-badge { background: #fef9c3; color: #a16207; }
+.cust-badge.local-badge { background: #ecfdf5; color: #047857; }
+.cust-badge.regular-badge { background: #f3f4f6; color: #4b5563; }
+
+.cust-badge.mystery-badge {
+  background: #9b59b6;
+  color: #fff;
+}
+
+.cust-badge.delivery-badge {
+  background: #3498db;
+  color: #fff;
+}
+
+.cust-badge.regular-badge {
+  background: #dfe6e9;
+  color: #2d3436;
+}
+
+/* Customer Header legacy support */
 .cust-header {
   display: flex;
   align-items: center;
@@ -72,15 +235,6 @@
   flex-shrink: 0;
 }
 
-.cust-name {
-  font-size: 0.76rem;
-  font-weight: 800;
-  color: var(--ink);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .delivery-badge {
   font-size: 0.65rem;
   background: #3498db;
@@ -93,11 +247,12 @@
 /* Speech Bubble (Order list) */
 .speech-bubble {
   background: #f7ede0;
-  border-radius: 4px 10px 10px 10px;
+  border-radius: 6px 12px 12px 12px;
   padding: 6px 8px;
   font-size: 0.72rem;
   display: flex;
   flex-direction: column;
+  position: relative;
   gap: 3px;
   flex: 1;
 }

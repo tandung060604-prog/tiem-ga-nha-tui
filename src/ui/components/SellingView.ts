@@ -2,7 +2,7 @@ import { GameState, CustomerOrder, QualityRating } from '../../types/game';
 import { cookingEngine } from '../../core/cooking';
 import { SellingSession } from '../../core/sellingSim';
 import { isRushHour } from '../../core/clock';
-import { foodImage } from '../../content/assets';
+import { foodImage, ASSETS } from '../../content/assets';
 
 export type { SellingSession };
 
@@ -18,19 +18,19 @@ function patienceLevel(order: CustomerOrder): { percent: number; cls: '' | 'mid'
 }
 
 // Mọi thứ làm thay đổi CẤU TRÚC màn bán hàng. Khác key cũ → dựng lại HTML; giống → chỉ patch.
-// Không đưa vào đây những giá trị đổi mỗi frame (giờ, kiên nhẫn, tiến độ chiên), nếu không
-// nút sẽ bị thay giữa lúc người chơi đang bấm và click bị nuốt.
 export function sellingStructureKey(state: GameState, session: SellingSession): string {
   const cook = cookingEngine.getCookState();
+  const quality = cookingEngine.calculateCurrentQuality();
   return JSON.stringify([
     session.orders.map(o => [o.id, o.items.map(it => it.served)]),
     cookingEngine.getTray().map(t => t.id),
-    cook.isFrying, cook.fryingType, cookingEngine.getActiveSeasoning(),
+    cook.isFrying, cook.fryingType, quality, cookingEngine.getActiveSeasoning(),
     state.oilCondition, state.currentChapter,
     session.isFastForward, isRushHour(session.gameHour)
   ]);
 }
 
+// Cập nhật tại chỗ các giá trị chạy theo thời gian; không tạo/xóa node.
 // Cập nhật tại chỗ các giá trị chạy theo thời gian; không tạo/xóa node.
 export function patchSellingView(root: HTMLElement, session: SellingSession): void {
   const clock = root.querySelector('.clock b');
@@ -47,6 +47,33 @@ export function patchSellingView(root: HTMLElement, session: SellingSession): vo
       fill.classList.toggle('mid', p.cls === 'mid');
       fill.classList.toggle('low', p.cls === 'low');
     }
+    const moodEmoji = card.querySelector<HTMLElement>('.mood-indicator');
+    if (moodEmoji) {
+      moodEmoji.textContent = p.angry ? '💢' : p.cls === 'low' ? '🥺' : p.cls === 'mid' ? '😋' : '✨';
+    }
+
+    // Dynamic 2D sprite expression swap
+    const img = card.querySelector<HTMLImageElement>('.char-sprite-img');
+    if (img) {
+      const standSrc = card.dataset.standSrc;
+      const angrySrc = card.dataset.angrySrc;
+      const walkSrc = card.dataset.walkSrc;
+      const isNew = Date.now() - order.startTime < 750;
+
+      if (p.angry && angrySrc) {
+        if (!img.src.endsWith(angrySrc)) img.src = angrySrc;
+        img.classList.remove('standing', 'walking');
+        img.classList.add('angry');
+      } else if (isNew && walkSrc) {
+        if (!img.src.endsWith(walkSrc)) img.src = walkSrc;
+        img.classList.remove('standing', 'angry');
+        img.classList.add('walking');
+      } else if (standSrc) {
+        if (!img.src.endsWith(standSrc)) img.src = standSrc;
+        img.classList.remove('angry', 'walking');
+        img.classList.add('standing');
+      }
+    }
   }
 
   const cook = cookingEngine.getCookState();
@@ -54,28 +81,211 @@ export function patchSellingView(root: HTMLElement, session: SellingSession): vo
   if (pointer) pointer.style.left = `${Math.min(100, Math.round(cook.progress))}%`;
   const hint = root.querySelector('.pot-hint');
   if (hint) hint.textContent = potHint();
+
+  const fryPot = root.querySelector<HTMLElement>('#btn-fry-pot');
+  if (fryPot && cook.isFrying) {
+    const quality = cookingEngine.calculateCurrentQuality();
+    fryPot.classList.toggle('perfect-glow', quality === 'perfect');
+    fryPot.classList.toggle('burnt-smoke', quality === 'burnt');
+  }
 }
 
 function potHint(): string {
   const cook = cookingEngine.getCookState();
-  if (!cook.isFrying) return 'Bấm để thả gà/khoai';
-  return cookingEngine.calculateCurrentQuality() === 'perfect' ? '👉 NHẤC LÊN NGAY! (Perfect)' : 'Đang chiên xèo xèo...';
+  if (!cook.isFrying) return '👉 Chạm để thả gà tươi / khoai vào chảo!';
+  const quality = cookingEngine.calculateCurrentQuality();
+  if (quality === 'perfect') return '⭐ VÀNG GIÒN RỒI! BẤM VỚT NGAY!';
+  if (quality === 'burnt') return '💥 CHÁY KHÉT! BẤM VỚT BỎ NGAY!';
+  if (quality === 'good') return '🔥 Dầu sôi xèo xèo... Canh vàng giòn!';
+  return '🍗 Đang chiên ngập dầu... Chờ chín!';
 }
 
 const TRAY_QUALITY_LABEL: Record<QualityRating, string> = {
   raw: 'CÒN SỐNG',
   good: 'VỪA CHÍN',
-  perfect: 'VÀNG GIÒN',
+  perfect: 'VÀNG GIÒN ⭐',
   burnt: 'CHÁY KHÉT'
 };
+
+export interface CustomerVisualModel {
+  stand: string;
+  walk: string;
+  angry: string;
+  leave: string;
+  name: string;
+  badge: string;
+  badgeClass: string;
+}
+
+function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
+  if (order.isBunny) {
+    return {
+      stand: ASSETS.thocam.front,
+      walk: ASSETS.thocam.side,
+      angry: ASSETS.thocam.buon,
+      leave: ASSETS.thocam.vui,
+      name: 'Bé Thỏ Cam 🐰',
+      badge: 'Khách Tri Kỷ',
+      badgeClass: 'bunny-badge'
+    };
+  }
+  if (order.customerName.includes('Bác Ba')) {
+    return {
+      stand: ASSETS.bacba.front,
+      walk: ASSETS.bacba.threeQuarter,
+      angry: ASSETS.bacba.front,
+      leave: ASSETS.bacba.threeQuarter,
+      name: order.customerName,
+      badge: 'Trưởng Ban Hẻm',
+      badgeClass: 'vip-badge'
+    };
+  }
+  if (order.customerName.includes('Gà Bông') || order.isMysteryGuest) {
+    return {
+      stand: ASSETS.gabong.front,
+      walk: ASSETS.gabong.side,
+      angry: ASSETS.gabong.hoang,
+      leave: ASSETS.gabong.vui,
+      name: order.customerName,
+      badge: 'Khách Bí Ẩn',
+      badgeClass: 'mystery-badge'
+    };
+  }
+  if (order.isDelivery || order.customerName.includes('Shipper') || order.customerName.includes('Giao Hàng') || order.customerName.includes('[App]')) {
+    return {
+      stand: ASSETS.shipper.stand,
+      walk: ASSETS.shipper.walk,
+      angry: ASSETS.shipper.angry,
+      leave: ASSETS.shipper.leave,
+      name: order.customerName,
+      badge: 'Shipper Ruột',
+      badgeClass: 'delivery-badge'
+    };
+  }
+
+  const n = order.customerName;
+  if (n.includes('Học Sinh') || n.includes('Sinh Viên') || n.includes('Kiệt') || n.includes('Vy') || n.includes('Khôi') || n.includes('Nguyên')) {
+    return {
+      stand: ASSETS.hocsinh.stand,
+      walk: ASSETS.hocsinh.walk,
+      angry: ASSETS.hocsinh.angry,
+      leave: ASSETS.hocsinh.leave,
+      name: order.customerName,
+      badge: 'Học Sinh Ôn Thi',
+      badgeClass: 'student-badge'
+    };
+  }
+  if (n.includes('Game') || n.includes('Huy') || n.includes('Rank') || n.includes('Cú Đêm') || n.includes('Bảo')) {
+    return {
+      stand: ASSETS.gamethu.stand,
+      walk: ASSETS.gamethu.walk,
+      angry: ASSETS.gamethu.angry,
+      leave: ASSETS.gamethu.leave,
+      name: order.customerName,
+      badge: 'Cú Đêm Cày Rank',
+      badgeClass: 'genz-badge'
+    };
+  }
+  if (n.includes('Review') || n.includes('Tiktok') || n.includes('Mukbang') || n.includes('Quỳnh Anh') || n.includes('Hân') || n.includes('Trend')) {
+    return {
+      stand: ASSETS.tiktoker.stand,
+      walk: ASSETS.tiktoker.walk,
+      angry: ASSETS.tiktoker.angry,
+      leave: ASSETS.tiktoker.leave,
+      name: order.customerName,
+      badge: 'Tiktoker Triệu View',
+      badgeClass: 'genz-badge'
+    };
+  }
+  if (n.includes('Khó Tính') || n.includes('Karen') || n.includes('Lan') || n.includes('Hằng') || n.includes('Soi')) {
+    return {
+      stand: ASSETS.karen.stand,
+      walk: ASSETS.karen.walk,
+      angry: ASSETS.karen.angry,
+      leave: ASSETS.karen.leave,
+      name: order.customerName,
+      badge: 'Thực Khách Kỹ Tính',
+      badgeClass: 'demanding-badge'
+    };
+  }
+  if (n.includes('Bắp') || n.includes('Bé') || n.includes('Mít') || n.includes('Cháu')) {
+    return {
+      stand: ASSETS.becon.stand,
+      walk: ASSETS.becon.walk,
+      angry: ASSETS.becon.angry,
+      leave: ASSETS.becon.leave,
+      name: order.customerName,
+      badge: 'Khách Hàng Nhí',
+      badgeClass: 'kid-badge'
+    };
+  }
+  if (n.includes('Trưởng Phòng') || n.includes('Long') || n.includes('Khải') || n.includes('Sếp')) {
+    return {
+      stand: ASSETS.truongphong.stand,
+      walk: ASSETS.truongphong.walk,
+      angry: ASSETS.truongphong.angry,
+      leave: ASSETS.truongphong.leave,
+      name: order.customerName,
+      badge: 'Sếp Khao Team',
+      badgeClass: 'office-badge'
+    };
+  }
+  if (n.includes('Bảy') || n.includes('Bà') || n.includes('Chợ Cũ') || n.includes('Cô Tư') || n.includes('Bác Hạc')) {
+    return {
+      stand: ASSETS.babay.stand,
+      walk: ASSETS.babay.walk,
+      angry: ASSETS.babay.angry,
+      leave: ASSETS.babay.leave,
+      name: order.customerName,
+      badge: 'Bà Bảy Nam Bộ',
+      badgeClass: 'local-badge'
+    };
+  }
+  if (n.includes('Cặp Đôi') || n.includes('Bé Na') || n.includes('Bạn Trai') || n.includes('Hẹn Hò')) {
+    return {
+      stand: ASSETS.capdoi.stand,
+      walk: ASSETS.capdoi.walk,
+      angry: ASSETS.capdoi.angry,
+      leave: ASSETS.capdoi.leave,
+      name: order.customerName,
+      badge: 'Cặp Đôi Hẹn Hò',
+      badgeClass: 'genz-badge'
+    };
+  }
+  if (n.includes('Su Su') || n.includes('Mẹ Con') || n.includes('Gia Đình') || n.includes('Nhà')) {
+    return {
+      stand: ASSETS.mecon.stand,
+      walk: ASSETS.mecon.walk,
+      angry: ASSETS.mecon.angry,
+      leave: ASSETS.mecon.leave,
+      name: order.customerName,
+      badge: 'Gia Đình Ấm Cúng',
+      badgeClass: 'family-badge'
+    };
+  }
+
+  // Default: Office Lady
+  return {
+    stand: ASSETS.vanphong.stand,
+    walk: ASSETS.vanphong.walk,
+    angry: ASSETS.vanphong.angry,
+    leave: ASSETS.vanphong.leave,
+    name: order.customerName,
+    badge: order.archetypeBadge || 'Dân Văn Phòng',
+    badgeClass: 'office-badge'
+  };
+}
 
 export function renderSellingView(state: GameState, session: SellingSession): string {
   const formattedTime = formatClock(session.gameHour);
   const rush = isRushHour(session.gameHour);
+  const hourNum = session.gameHour;
+  const timePeriodLabel = hourNum < 14 ? '☀️ Ca Trưa Hẻm 1102 · Nắng Vàng Giòn Rụm' : '🌙 Ca Tối Hẻm 1102 · Đèn Dầu Bập Bùng';
 
-  // Customer Lane HTML
+  // Customer Queue Lane
   const customerCardsHtml = session.orders.map((ord, idx) => {
     const { percent: patiencePercent, cls: patienceColorClass, angry: isAngry } = patienceLevel(ord);
+    const visual = getCustomerVisual(ord);
 
     const itemsHtml = ord.items.map(it => {
       const menuItem = state.menu.find(m => m.id === it.menuItemId);
@@ -88,26 +298,42 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       `;
     }).join('');
 
-    const isImageAvatar = ord.avatar.startsWith('/') || ord.avatar.includes('.');
-    const avatarHtml = isImageAvatar
-      ? `<img src="${ord.avatar}" alt="${ord.customerName}" class="cust-avatar-img" />`
-      : ord.avatar;
+    const isNew = Date.now() - ord.startTime < 750;
+    const initialSrc = isAngry ? visual.angry : isNew ? visual.walk : visual.stand;
+    const initialCls = isAngry ? 'angry' : isNew ? 'walking' : 'standing';
+    const actorHtml = `<img src="${initialSrc}" alt="${visual.name}" class="char-sprite-img ${initialCls}" />`;
 
     return `
-      <div class="customer-card ${ord.isBunny ? 'bunny-card' : ''} ${isAngry ? 'angry' : ''} ${idx === 0 ? 'active' : ''}" data-order-id="${ord.id}" data-is-bunny="${ord.isBunny ? 'true' : 'false'}" data-letter-id="${ord.bunnyLetterId || ''}">
-        <div class="cust-header">
-          <div class="cust-avatar">${avatarHtml}</div>
-          <div class="cust-name">
-            ${ord.customerName}
-            ${ord.isDelivery ? '<span class="delivery-badge">Shipper</span>' : ''}
-            ${ord.isBunny ? '<span class="bunny-badge">🐰 Tri Kỷ</span>' : ''}
+      <div class="customer-card ${ord.isBunny ? 'bunny-card' : ''} ${isAngry ? 'angry' : ''} ${idx === 0 ? 'active' : ''}" 
+           data-order-id="${ord.id}" 
+           data-is-bunny="${ord.isBunny ? 'true' : 'false'}" 
+           data-letter-id="${ord.bunnyLetterId || ''}"
+           data-stand-src="${visual.stand}"
+           data-walk-src="${visual.walk}"
+           data-angry-src="${visual.angry}"
+           data-leave-src="${visual.leave}">
+        <!-- 2D Character Walking & Standing Stage -->
+        <div class="cust-stage">
+          <div class="char-actor">
+            ${actorHtml}
+            <div class="char-shadow"></div>
+          </div>
+          <div class="cust-info-col">
+            <div class="cust-name-row">
+              <span class="cust-name">${visual.name}</span>
+              <span class="mood-indicator">${isAngry ? '💢' : patienceColorClass === 'low' ? '🥺' : '✨'}</span>
+            </div>
+            <span class="cust-badge ${visual.badgeClass}">${visual.badge}</span>
           </div>
         </div>
 
+        <!-- Speech Bubble Order -->
         <div class="speech-bubble">
+          <div class="bubble-arrow"></div>
           ${itemsHtml}
         </div>
 
+        <!-- Patience Bar -->
         <div class="patience-container">
           <div class="patience-bar">
             <div class="patience-fill ${patienceColorClass}" style="width: ${patiencePercent}%;"></div>
@@ -119,12 +345,49 @@ export function renderSellingView(state: GameState, session: SellingSession): st
 
   // Fryer Pot State
   const cookState = cookingEngine.getCookState();
+  const quality = cookingEngine.calculateCurrentQuality();
   const tray = cookingEngine.getTray();
   const oilCondition = state.oilCondition;
 
   const potProgressPercent = Math.min(100, Math.round(cookState.progress));
+  const oilLabel = oilCondition === 'clean' ? 'Vàng óng (Thơm lừng)' : oilCondition === 'medium' ? 'Nâu hổ phách' : 'Đen khét (Bốc khói!)';
 
-  const oilLabel = oilCondition === 'clean' ? 'Vàng óng' : oilCondition === 'medium' ? 'Nâu sẫm' : 'Đen khét (Giảm sao!)';
+  // Render food in pan
+  let panFoodHtml = '';
+  if (cookState.isFrying) {
+    if (cookState.fryingType === 'chicken') {
+      const foodImg = quality === 'raw' 
+        ? ASSETS.food.crispyChickenRaw 
+        : quality === 'burnt' 
+        ? ASSETS.food.crispyChickenBurnt 
+        : ASSETS.food.crispyChickenPerfect;
+      
+      const qualityTag = quality === 'perfect' ? '⭐ VÀNG GIÒN' : quality === 'burnt' ? '💥 CHÁY KHÉT' : quality === 'good' ? 'VỪA CHÍN' : 'SỐNG';
+
+      panFoodHtml = `
+        <div class="frying-food-item ${quality} sizzle-active">
+          <img src="${foodImg}" alt="Gà chiên" class="food-pan-img" />
+          <div class="food-status-badge ${quality}">${qualityTag}</div>
+          ${quality === 'perfect' ? '<div class="perfect-sparkles">✨</div>' : ''}
+          ${quality === 'burnt' ? '<div class="burnt-smoke-puff">💨</div>' : ''}
+        </div>
+      `;
+    } else {
+      panFoodHtml = `
+        <div class="frying-food-item perfect sizzle-active">
+          <img src="${ASSETS.food.shakeFries}" alt="Khoai tây chiên" class="food-pan-img" />
+          <div class="food-status-badge perfect">🍟 KHOAI LẮC</div>
+        </div>
+      `;
+    }
+  } else {
+    panFoodHtml = `
+      <div class="pot-idle-view">
+        <span class="pan-big-icon">🍳</span>
+        <div class="pan-idle-text">Chảo dầu sôi 180°C sẵn sàng</div>
+      </div>
+    `;
+  }
 
   // Tray HTML
   const traySlotsHtml = [0, 1, 2, 3].map(slotIdx => {
@@ -133,7 +396,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       const isDrink = item.menuItemId === 'soda';
       const img = foodImage(item.menuItemId, item.quality);
       const qClass = isDrink ? 'good' : item.quality;
-      const qText = isDrink ? 'ƯỚP LẠNH' : TRAY_QUALITY_LABEL[item.quality];
+      const qText = isDrink ? 'ƯỚP LẠNH ❄️' : TRAY_QUALITY_LABEL[item.quality];
       return `
         <div class="tray-item" data-tray-idx="${slotIdx}" title="Bấm để vứt nếu bị cháy">
           ${img ? `<img class="t-icon t-img" src="${img}" alt="${item.name}" width="36" height="36" />` : `<span class="t-icon">${item.icon}</span>`}
@@ -143,20 +406,21 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       `;
     }
     return `
-      <div style="border: 1.5px dashed var(--line); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--line); font-size: 0.7rem; font-weight: 700;">
-        Trống
+      <div class="tray-slot-empty">
+        <span class="empty-wire-icon">▤</span>
+        <span class="empty-wire-label">Vỉ ráo dầu</span>
       </div>
     `;
   }).join('');
 
   return `
     <div class="selling-screen">
-      <!-- HUD Time & Rush Hour -->
+      <!-- HUD Time & Sài Gòn Ambience -->
       <div class="kitchen-hud">
         <div class="clock">
           <span>🕒 Giờ mở bán: <b>${formattedTime}</b></span>
         </div>
-        ${rush ? '<span class="rush-badge">🔥 CA CAO ĐIỂM!</span>' : '<span style="color: var(--soft); font-size: 0.74rem;">Ca bán bình thường</span>'}
+        ${rush ? '<span class="rush-badge">🔥 CA CAO ĐIỂM!</span>' : `<span class="session-ambience">${timePeriodLabel}</span>`}
         <div style="display: flex; gap: 6px;">
           <button id="btn-toggle-fast" class="btn-sm" style="font-size: 0.7rem; padding: 2px 8px;">
             ${session.isFastForward ? '⏩ Tua x2' : '▶️ 1x'}
@@ -164,32 +428,33 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         </div>
       </div>
 
-      <!-- Customer Queue Lane -->
+      <!-- Customer Queue Lane (Khách vào/ra quán) -->
       <div class="customer-lane">
-        ${session.orders.length > 0 ? customerCardsHtml : '<div class="empty-queue">Đang chờ khách tới quầy... 🏃</div>'}
+        ${session.orders.length > 0 ? customerCardsHtml : '<div class="empty-queue">🍗 Mùi gà thơm phức bay khắp hẻm... Khách đang tấp nập tới! 🏃</div>'}
       </div>
 
-      <!-- Wood Kitchen Counter -->
+      <!-- Wood Kitchen Counter (Quầy Bếp Gỗ Chiên Gà) -->
       <div class="kitchen-counter">
         <div class="work-grid">
-          <!-- Fryer Card -->
+          <!-- Real Cast Iron Fryer Card (Bếp Chiên Ngập Dầu Chợ Lớn) -->
           <div class="fryer-card">
             <div class="fryer-header">
-              <span>🍳 Chảo Chiên</span>
+              <span>🍳 Bếp Chiên Ngập Dầu 1990</span>
               <div class="oil-status">
                 <span class="oil-dot ${oilCondition}"></span>
                 <span>Dầu: ${oilLabel}</span>
               </div>
             </div>
 
-            <!-- The Boiling Pot -->
-            <div id="btn-fry-pot" class="fry-pot ${oilCondition !== 'clean' ? 'oil-' + oilCondition : ''}">
-              <div class="bubble" style="left: 20%; animation-delay: 0s;"></div>
-              <div class="bubble" style="left: 55%; animation-delay: 0.4s;"></div>
-              <div class="bubble" style="left: 75%; animation-delay: 0.8s;"></div>
+            <!-- The Boiling Pot with Real Food Asset -->
+            <div id="btn-fry-pot" class="fry-pot ${oilCondition !== 'clean' ? 'oil-' + oilCondition : ''} ${cookState.isFrying && quality === 'perfect' ? 'perfect-glow' : ''}">
+              <div class="bubble" style="left: 15%; animation-delay: 0s;"></div>
+              <div class="bubble" style="left: 38%; animation-delay: 0.3s;"></div>
+              <div class="bubble" style="left: 65%; animation-delay: 0.6s;"></div>
+              <div class="bubble" style="left: 82%; animation-delay: 0.9s;"></div>
               
               <div class="pot-chicken">
-                ${cookState.isFrying ? (cookState.fryingType === 'chicken' ? '🍗' : '🍟') : '✨'}
+                ${panFoodHtml}
               </div>
               <div class="pot-hint">${potHint()}</div>
             </div>
@@ -213,6 +478,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
               </div>
             </div>
 
+            <!-- Real Action Buttons -->
             <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin-top: 2px;">
               <button id="btn-fry-chicken" class="btn-sm primary" ${cookState.isFrying ? 'disabled' : ''}>+ Gà Rán</button>
               <button id="btn-fry-fries" class="btn-sm" ${cookState.isFrying ? 'disabled' : ''}>+ Khoai</button>
@@ -221,11 +487,11 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             </div>
           </div>
 
-          <!-- Tray & Assemble Card -->
+          <!-- Tray & Assemble Card (Quầy Giữ Nhiệt Giòn Tan) -->
           <div class="assemble-card">
             <div class="tray-title">
-              <span>🍱 Khay Thành Phẩm (${tray.length}/4)</span>
-              <span style="font-size: 0.68rem; color: var(--soft);">Bấm khay để vứt</span>
+              <span>🍱 Quầy Giữ Nhiệt (${tray.length}/4)</span>
+              <span style="font-size: 0.68rem; color: var(--soft);">Bấm khay để vớt/vứt</span>
             </div>
 
             <div class="tray-slots">
@@ -235,16 +501,16 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             <!-- Seasoning Addons (món sốt mở từ chương 2) -->
             ${state.currentChapter < 2 ? '' : `<div class="addon-station">
               <button id="btn-season-spicy" class="addon-btn ${cookingEngine.getActiveSeasoning() === 'spicy' ? 'active' : ''}">
-                🌶️ Cay
+                🌶️ Sốt Cay
               </button>
               <button id="btn-season-honey" class="addon-btn ${cookingEngine.getActiveSeasoning() === 'honey' ? 'active' : ''}">
-                🍯 Mật Ong
+                🍯 Bơ Tỏi
               </button>
             </div>`}
 
             <!-- Serve Button -->
             <button id="btn-serve-order" class="btn-serve" ${session.orders.length === 0 || tray.length === 0 ? 'disabled' : ''}>
-              🔔 GIAO MÓN (SERVE)
+              🛎️ KENG! LÊN MÓN (SERVE)
             </button>
           </div>
         </div>
