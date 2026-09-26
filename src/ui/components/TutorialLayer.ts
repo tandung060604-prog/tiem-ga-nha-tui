@@ -36,6 +36,15 @@ export function syncTutorialLayer(hint: TutorialHint | null, actions: TutorialAc
   if (hint.target) document.querySelector(hint.target)?.classList.add(TARGET_CLASS);
   if (shownKey === hint.step && document.getElementById(LAYER_ID)) return;
   shownKey = hint.step;
+  // Đổi bước → cuộn nút cần bấm vào giữa màn (iPhone SE: nút bếp thường nằm dưới mép màn hình)
+  const targetEl = hint.target ? document.querySelector<HTMLElement>(hint.target) : null;
+  if (targetEl) {
+    const r = targetEl.getBoundingClientRect();
+    if (r.top < 0 || r.bottom > innerHeight) {
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      targetEl.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    }
+  }
 
   let layer = document.getElementById(LAYER_ID);
   if (!layer) {

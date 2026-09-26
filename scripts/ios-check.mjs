@@ -35,12 +35,32 @@ for (const deviceName of ['iPhone SE', 'iPhone 13', 'iPhone 15 Pro Max']) {
 
   await page.locator('#btn-start-selling').tap();
   await page.locator('.selling-screen').waitFor();
-  // Tiệm mới ngày 1: Bác Ba mở đầu hướng dẫn → bấm qua lời mở đầu để vào thao tác
-  const tutNext = page.locator('#btn-tutorial-next');
-  if (await tutNext.isVisible().catch(() => false)) await tutNext.tap();
+  // Tiệm mới ngày 1: làm theo Bác Ba tới khi giao xong khách đầu (chạm cảm ứng thật: touchstart → touchend → click)
+  const steps = [];
+  let tutorialDone = false;
+  for (let i = 0; i < 80 && !tutorialDone; i++) {
+    const hint = await page.evaluate(() => {
+      const t = document.querySelector('.tutorial-target');
+      return { text: (document.querySelector('.tutorial-text')?.textContent ?? '').slice(0, 20), target: t ? (t.id || t.className.split(' ')[0]) : '', button: !!document.getElementById('btn-tutorial-next') };
+    });
+    if (!hint.text) break;
+    if (steps[steps.length - 1] !== hint.text) steps.push(hint.text);
+    const sel = hint.button ? '#btn-tutorial-next' : hint.target && hint.target !== 'cook-gauge-container' && hint.target !== 'customer-card' ? '.tutorial-target' : null;
+    if (sel) {
+      if (hint.button && hint.text.startsWith('Giỏi lắm')) tutorialDone = true;
+      await page.locator(sel).first().scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => {});
+      const box = await page.locator(sel).first().boundingBox();
+      if (box) await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
+    }
+    await page.waitForTimeout(250);
+  }
+  check(tutorialDone && !(await page.locator('#tutorial-layer').count()), `${tag} làm theo Bác Ba tới hết hướng dẫn`, `${steps.length} bước: ${steps.join(' / ')}`);
   let tapsOk = true;
   for (const id of ['#btn-add-drink', '#btn-fry-chicken']) {
-    try { await page.locator(id).tap({ timeout: 3000 }); } catch { tapsOk = false; }
+    try { await page.locator(id).tap({ timeout: 3000 }); } catch (e) {
+      console.log(`[TAP ERROR ${id}]`, e.message.split('\n')[0]);
+      tapsOk = false;
+    }
   }
   check(tapsOk, `${tag} chạm nút trong ca bán ăn ngay`);
 

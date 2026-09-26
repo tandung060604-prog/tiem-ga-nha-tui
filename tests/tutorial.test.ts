@@ -35,6 +35,12 @@ describe('Bác Ba chỉ bước tiếp theo từ trạng thái thật của ca',
     expect(tutorialStep(started, s, idle, [])).toBe('done');
   });
 
+  it('khách gọi 7Up → chỉ máy nước, không bảo thả gà', () => {
+    const s = createSellingSession();
+    s.orders = [order([['seven_up', 1]])];
+    expect(tutorialStep(started, s, idle, [])).toBe('drink');
+  });
+
   it('khách gọi khoai → chỉ nút khoai; lỡ nhấc gà sống → chỉ bỏ món sống', () => {
     const s = createSellingSession();
     s.orders = [order([['shake_fries', 1]])];

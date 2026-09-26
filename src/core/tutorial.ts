@@ -2,6 +2,7 @@ import { TrayItem } from '../types/game';
 import type { CookingState } from './cooking';
 import { CookingEngine } from './cooking';
 import { missingItems } from './staff';
+import { isDrinkId } from './stations';
 import type { SellingSession } from './sellingSim';
 
 // Bác Ba dẫn ca bán đầu tiên. Không có kịch bản cứng: mỗi bước được TÍNH từ trạng thái thật của ca
@@ -25,7 +26,7 @@ export const TUTORIAL_TEXT: Record<TutorialStep, Omit<TutorialHint, 'step'>> = {
   },
   'fry-chicken': { text: 'Khách gọi gà. Bấm "+ Gà Rán" để thả một miếng vào chảo nè.', target: '#btn-fry-chicken' },
   'fry-fries': { text: 'Khách gọi khoai. Bấm "+ Khoai" để thả khoai vô chảo.', target: '#btn-fry-fries' },
-  'drink': { text: 'Nước ngọt thì khỏi chiên: bấm "Nước" là có ly lạnh trong khay liền.', target: '#btn-add-drink' },
+  'drink': { text: 'Nước ngọt thì khỏi chiên: bấm "Nước" là máy rót đúng loại khách gọi, có ly lạnh trong khay liền.', target: '#btn-add-drink' },
   'wait': { text: 'Canh thanh đo nha. Còn ở vùng SỐNG thì chưa được nhấc — đợi kim chạy tới vùng VÀNG GIÒN.', target: '.cook-gauge-container' },
   'lift': { text: 'VÀNG GIÒN rồi! Chạm vô chảo để nhấc ngay, để lâu là cháy đó con!', target: '#btn-fry-pot' },
   'discard-raw': { text: 'Miếng này còn sống, khách không ăn đâu. Chạm vô món trong khay để bỏ, rồi chiên mẻ khác.', target: '.tray-item' },
@@ -58,7 +59,7 @@ export function tutorialStep(
   const missing = missingItems(first, tray);
   if (missing.length === 0) return 'serve';
   const next = missing[0];
-  if (next === 'soda') return 'drink';
+  if (next && isDrinkId(next)) return 'drink'; // Coca, 7Up, Fanta… đều rót ở máy nước
   if (next === 'shake_fries') return 'fry-fries';
   return 'fry-chicken';
 }
