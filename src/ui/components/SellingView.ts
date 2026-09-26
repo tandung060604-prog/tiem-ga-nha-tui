@@ -21,6 +21,91 @@ function patienceLevel(order: CustomerOrder): { percent: number; cls: '' | 'mid'
   return { percent, cls: percent > 50 ? '' : percent > 25 ? 'mid' : 'low', angry: percent <= 25 };
 }
 
+export type CustomerMood = 'happy' | 'waiting' | 'impatient' | 'leaving';
+
+export function getCustomerMood(order: CustomerOrder): CustomerMood {
+  const p = patienceLevel(order);
+  if (p.angry) return 'leaving';
+  if (p.cls === 'low') return 'impatient';
+  if (p.cls === 'mid') return 'waiting';
+  return 'happy';
+}
+
+export function getMoodThought(mood: CustomerMood, order?: CustomerOrder): string {
+  if (order?.isBunny) {
+    if (mood === 'leaving') return 'Em đói bụng rồi tiệm ơi... 🥺';
+    if (mood === 'impatient') return 'Chờ xíu xíu nữa thôi nè! 🐰';
+    return 'Gà chiên thơm lừng luôn á! 💖';
+  }
+  switch (mood) {
+    case 'leaving':
+      return 'Lâu quá! Bỏ về đây! 💢';
+    case 'impatient':
+      return 'Chờ sốt ruột ghê... 🥺';
+    case 'waiting':
+      return 'Mùi gà thơm nức mũi! 🤤';
+    case 'happy':
+    default:
+      return 'Tiệm này đỉnh chóp! ✨';
+  }
+}
+
+let prevGrossRevenue = 0;
+let prevTips = 0;
+let prevSessionTime = 0;
+
+function checkAndSpawnFloatingMoney(root: HTMLElement, session: SellingSession): void {
+  const layer = root.querySelector<HTMLElement>('#floating-money-layer');
+  if (!layer) return;
+
+  // Reset if new session starts
+  if (session.gameHour < prevSessionTime) {
+    prevGrossRevenue = session.grossRevenue;
+    prevTips = session.tips;
+    prevSessionTime = session.gameHour;
+    return;
+  }
+  prevSessionTime = session.gameHour;
+
+  // Initialize tracking on first tick
+  if (prevGrossRevenue === 0 && prevTips === 0 && session.grossRevenue > 0) {
+    prevGrossRevenue = session.grossRevenue;
+    prevTips = session.tips;
+    return;
+  }
+
+  if (session.grossRevenue > prevGrossRevenue || session.tips > prevTips) {
+    const revGain = session.grossRevenue - prevGrossRevenue;
+    const tipGain = session.tips - prevTips;
+    const totalGain = revGain + tipGain;
+
+    if (totalGain > 0) {
+      const moneyEl = document.createElement('div');
+      moneyEl.className = 'money-float';
+      const rndLeft = 20 + Math.random() * 35;
+      moneyEl.style.left = `${rndLeft}%`;
+      moneyEl.style.top = '115px';
+      moneyEl.textContent = `+${totalGain.toLocaleString('vi-VN')}đ 💵`;
+      layer.appendChild(moneyEl);
+
+      if (tipGain > 0) {
+        const tipEl = document.createElement('div');
+        tipEl.className = 'money-float tip-float';
+        tipEl.style.left = `${rndLeft + 4}%`;
+        tipEl.style.top = '145px';
+        tipEl.textContent = `+${tipGain.toLocaleString('vi-VN')}đ tip ✨`;
+        layer.appendChild(tipEl);
+        setTimeout(() => tipEl.remove(), 1150);
+      }
+
+      setTimeout(() => moneyEl.remove(), 1150);
+    }
+
+    prevGrossRevenue = session.grossRevenue;
+    prevTips = session.tips;
+  }
+}
+
 // Mọi thứ làm thay đổi CẤU TRÚC màn bán hàng. Khác key cũ → dựng lại HTML; giống → chỉ patch.
 export function sellingStructureKey(state: GameState, session: SellingSession): string {
   const cook = cookingEngine.getCookState();
@@ -31,6 +116,7 @@ export function sellingStructureKey(state: GameState, session: SellingSession): 
     cook.isFrying, cook.fryingType, quality, cookingEngine.getActiveSeasoning(),
     state.oilCondition, state.currentChapter,
     session.isFastForward, isRushHour(session.gameHour),
+    session.perfectStreak >= 2,
     stationStripKey(state, session),
     staffStripKey(state, session)
   ]);
@@ -65,6 +151,9 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
     if (!card) continue;
     const p = patienceLevel(order);
     card.classList.toggle('angry', p.angry);
+    const mood = getCustomerMood(order);
+    card.dataset.mood = mood;
+
     const fill = card.querySelector<HTMLElement>('.patience-fill');
     if (fill) {
       fill.style.width = `${p.percent}%`;
@@ -74,6 +163,15 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
     const moodEmoji = card.querySelector<HTMLElement>('.mood-indicator');
     if (moodEmoji) {
       moodEmoji.textContent = p.angry ? '💢' : p.cls === 'low' ? '🥺' : p.cls === 'mid' ? '😋' : '✨';
+    }
+
+    // Dynamic Thought Bubble update
+    const thoughtEl = card.querySelector<HTMLElement>('.thought-bubble');
+    if (thoughtEl && thoughtEl.dataset.mood !== mood) {
+      thoughtEl.dataset.mood = mood;
+      thoughtEl.className = `thought-bubble ${mood}`;
+      const textSpan = thoughtEl.querySelector('.thought-text');
+      if (textSpan) textSpan.textContent = getMoodThought(mood, order);
     }
 
     // Dynamic 2D sprite expression swap
@@ -107,11 +205,39 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
   if (hint) hint.textContent = potHint();
 
   const fryPot = root.querySelector<HTMLElement>('#btn-fry-pot');
-  if (fryPot && cook.isFrying) {
-    const quality = cookingEngine.calculateCurrentQuality();
-    fryPot.classList.toggle('perfect-glow', quality === 'perfect');
-    fryPot.classList.toggle('burnt-smoke', quality === 'burnt');
+  if (fryPot) {
+    if (cook.isFrying) {
+      const quality = cookingEngine.calculateCurrentQuality();
+      fryPot.classList.toggle('perfect-glow', quality === 'perfect');
+      fryPot.classList.toggle('burnt-smoke', quality === 'burnt');
+    }
+    fryPot.classList.toggle('streak-fire', (session.perfectStreak || 0) >= 2);
   }
+
+  // Dynamic Perfect Streak Flame update
+  const streakContainer = root.querySelector<HTMLElement>('#streak-flame-container');
+  if (streakContainer) {
+    const streak = session.perfectStreak || 0;
+    const currentStreak = streakContainer.dataset.streak ? parseInt(streakContainer.dataset.streak, 10) : 0;
+    if (streak !== currentStreak) {
+      streakContainer.dataset.streak = String(streak);
+      if (streak >= 2) {
+        const bonusTip = Math.round((1 + Math.min(streak - 1, 8) * 0.25) * 2.5);
+        streakContainer.innerHTML = `
+          <div class="streak-flame ${streak >= 5 ? 'super-fire' : ''}" data-streak="${streak}">
+            <span class="flame-icon">🔥</span>
+            <span class="streak-count">Chuỗi x${streak} PERFECT!</span>
+            <span class="streak-bonus">+${bonusTip}k tip</span>
+          </div>
+        `;
+      } else {
+        streakContainer.innerHTML = '';
+      }
+    }
+  }
+
+  // Floating money on collect
+  checkAndSpawnFloatingMoney(root, session);
 }
 
 function potHint(): string {
@@ -310,6 +436,8 @@ export function renderSellingView(state: GameState, session: SellingSession): st
   const customerCardsHtml = session.orders.map((ord, idx) => {
     const { percent: patiencePercent, cls: patienceColorClass, angry: isAngry } = patienceLevel(ord);
     const visual = getCustomerVisual(ord);
+    const mood = getCustomerMood(ord);
+    const thought = getMoodThought(mood, ord);
 
     const comboHtml = ord.comboName ? `<div class="order-combo" style="font-size: .72rem; font-weight: 800; color: var(--red);">🍱 ${escapeHtml(ord.comboName)}</div>` : '';
     const itemsHtml = comboHtml + ord.items.map(it => {
@@ -335,12 +463,18 @@ export function renderSellingView(state: GameState, session: SellingSession): st
     return `
       <div class="customer-card ${ord.isBunny ? 'bunny-card' : ''} ${isAngry ? 'angry' : ''} ${idx === 0 ? 'active' : ''}" 
            data-order-id="${ord.id}" 
+           data-mood="${mood}" 
            data-is-bunny="${ord.isBunny ? 'true' : 'false'}" 
            data-letter-id="${ord.bunnyLetterId || ''}"
            data-stand-src="${visual.stand}"
            data-walk-src="${visual.walk}"
            data-angry-src="${visual.angry}"
            data-leave-src="${visual.leave}">
+        <!-- Realtime Customer Thought Bubble -->
+        <div class="thought-bubble ${mood}" data-mood="${mood}">
+          <span class="thought-text">${thought}</span>
+        </div>
+
         <!-- 2D Character Walking & Standing Stage -->
         <div class="cust-stage">
           <div class="char-actor">
@@ -464,6 +598,9 @@ export function renderSellingView(state: GameState, session: SellingSession): st
 
   return `
     <div class="selling-screen">
+      <!-- Floating Money Layer -->
+      <div id="floating-money-layer" class="floating-money-layer"></div>
+
       <!-- HUD Time & Sài Gòn Ambience -->
       <div class="kitchen-hud">
         <div class="clock">
@@ -496,7 +633,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             </div>
 
             <!-- The Boiling Pot with Real Food Asset -->
-            <div id="btn-fry-pot" class="fry-pot ${oilCondition !== 'clean' ? 'oil-' + oilCondition : ''} ${cookState.isFrying && quality === 'perfect' ? 'perfect-glow' : ''}">
+            <div id="btn-fry-pot" class="fry-pot ${oilCondition !== 'clean' ? 'oil-' + oilCondition : ''} ${cookState.isFrying && quality === 'perfect' ? 'perfect-glow' : ''} ${session.perfectStreak >= 2 ? 'streak-fire' : ''}">
               <div class="bubble" style="left: 15%; animation-delay: 0s;"></div>
               <div class="bubble" style="left: 38%; animation-delay: 0.3s;"></div>
               <div class="bubble" style="left: 65%; animation-delay: 0.6s;"></div>
@@ -506,6 +643,17 @@ export function renderSellingView(state: GameState, session: SellingSession): st
                 ${panFoodHtml}
               </div>
               <div class="pot-hint">${potHint()}</div>
+            </div>
+
+            <!-- Perfect Streak Flame Banner -->
+            <div class="streak-flame-container" id="streak-flame-container" data-streak="${session.perfectStreak || 0}">
+              ${session.perfectStreak >= 2 ? `
+                <div class="streak-flame ${session.perfectStreak >= 5 ? 'super-fire' : ''}" data-streak="${session.perfectStreak}">
+                  <span class="flame-icon">🔥</span>
+                  <span class="streak-count">Chuỗi x${session.perfectStreak} PERFECT!</span>
+                  <span class="streak-bonus">+${Math.round((1 + Math.min(session.perfectStreak - 1, 8) * 0.25) * 2.5)}k tip</span>
+                </div>
+              ` : ''}
             </div>
 
             <!-- Cooking Progress Gauge -->
