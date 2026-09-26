@@ -1214,6 +1214,55 @@ body.selling-mode .awning::after {
   color: #1b5e20;
 }
 
+/* Khối "Lựa chọn đang tác động tới quán" (Karma Effects) */
+.story-karma-effects {
+  background: linear-gradient(135deg, #f0f7ff 0%, #e6f4ff 100%);
+  border: 1.5px solid #91caff;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-top: 12px;
+  font-size: 0.82rem;
+  color: #003a8c;
+  box-shadow: 0 2px 8px rgba(22, 119, 255, 0.08);
+  animation: karmaSectionFade 0.3s ease-out;
+}
+
+.story-karma-effects > b {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  font-size: 0.84rem;
+  color: #0958d9;
+  margin-bottom: 8px;
+  letter-spacing: 0.2px;
+}
+
+.story-karma-effect {
+  background: #ffffff;
+  border: 1px solid #bae0ff;
+  border-left: 3.5px solid #1677ff;
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin-top: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #1f1f1f;
+  line-height: 1.4;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+@keyframes karmaSectionFade {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .btn-story-choice {
   display: flex;
   flex-direction: column;

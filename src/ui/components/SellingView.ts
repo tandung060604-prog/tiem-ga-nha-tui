@@ -60,7 +60,6 @@ export function renderFx(events: readonly FxEvent[]): void {
     layer.id = 'fx-layer';
     layer.className = 'fx-layer floating-money-layer';
     layer.setAttribute('aria-hidden', 'true');
-    layer.setAttribute('style', 'position: fixed; inset: 0; pointer-events: none; z-index: 40; overflow: hidden;');
     document.body.appendChild(layer);
   }
   const spawn = (cls: string, text: string, left: number, top: string) => {
@@ -709,7 +708,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <!-- Tray & Assemble Card (Quầy Giữ Nhiệt Giòn Tan) -->
           <div class="assemble-card">
             <div class="tray-title">
-              <span>🍱 Quầy Giữ Nhiệt (${tray.length}/4)</span>
+              <span>🍱 Quầy Giữ Nhiệt (${tray.length}/${cookingEngine.getTraySize()})</span>
               <span style="font-size: 0.68rem; color: var(--soft);">Bấm khay để vớt/vứt</span>
             </div>
 

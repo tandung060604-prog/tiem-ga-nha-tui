@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview Gemini Vòng 2 — Giao Diện & Hiệu Ứng</title>
+  <link rel="stylesheet" href="../../src/styles/tokens.css">
+  <link rel="stylesheet" href="../../src/styles/main.css">
+  <link rel="stylesheet" href="../../src/styles/kitchen.css">
+  <link rel="stylesheet" href="../../src/styles/customers.css">
+  <link rel="stylesheet" href="../../src/styles/share.css">
+  <style>
+    body {
+      background: #2b231d;
+      color: #333;
+      padding: 20px;
+      font-family: var(--font-base, system-ui, sans-serif);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+    .preview-section {
+      background: #fdfaf7;
+      border-radius: 16px;
+      padding: 16px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      box-sizing: border-box;
+    }
+    .preview-header {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #7a4f32;
+      border-bottom: 2px dashed #e6d3c2;
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .preview-tag {
+      font-size: 0.65rem;
+      background: #e63946;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+    /* 320px simulator wrapper */
+    .sim-320 {
+      width: 320px;
+      max-width: 320px;
+      margin: 0 auto;
+      border: 2px solid #555;
+      border-radius: 12px;
+      padding: 8px;
+      background: #fff;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <h1 style="color: #fff; font-size: 1.25rem; font-weight: 800; text-align: center; margin: 0;">
+    🍗 TIỆM GÀ NHÀ TUI — KIỂM THỬ TRỰC QUAN GEMINI VÒNG 2
+  </h1>
+
+  <!-- 1. ORDER CONDIMENT -->
+  <div class="preview-section" id="sec-condiment">
+    <div class="preview-header">
+      <span>1. KHÁCH DẶN THÊM TƯƠNG (.order-condiment)</span>
+      <span class="preview-tag">Thẻ Khách</span>
+    </div>
+    <div class="order-row" style="background: #fff; padding: 8px 10px; border-radius: 8px; border: 1.5px solid var(--line); margin-bottom: 6px;">
+      <span class="order-item-title">
+        <span class="order-food-emoji">🍗</span> 1x Gà Rán Giòn Cay
+        <span class="order-condiment" data-condiment="ketchup">🍅 + tương cà</span>
+      </span>
+      <span class="order-check done">✓</span>
+    </div>
+    <div class="order-row" style="background: #fff; padding: 8px 10px; border-radius: 8px; border: 1.5px solid var(--line);">
+      <span class="order-item-title">
+        <span class="order-food-emoji">🍟</span> 1x Khoai Tây Chiên Lắc
+        <span class="order-condiment" data-condiment="chili">🌶️ + tương ớt</span>
+      </span>
+      <span class="order-check">○</span>
+    </div>
+  </div>
+
+  <!-- 2. STORY KARMA EFFECTS -->
+  <div class="preview-section" id="sec-karma">
+    <div class="preview-header">
+      <span>2. TÁC ĐỘNG KARMA TRONG TRUYỆN (.story-karma-effects)</span>
+      <span class="preview-tag">Visual Novel</span>
+    </div>
+    <div class="story-reaction-narrative">
+      <b>💬 Diễn biến tiếp theo:</b> Bác Ba gật gù khen bạn biết giữ chữ tín với xóm giềng!
+    </div>
+    <div class="story-karma-effects">
+      <b>🧭 Lựa chọn của bạn đang tác động tới quán:</b>
+      <div class="story-karma-effect">🤝 Bà con hẻm 1102 yêu quý tiệm: khách quen tới sớm hơn 10%</div>
+      <div class="story-karma-effect">🌟 Uy tín tay nghề lan rộng: tăng 15% xác suất khách tip hào phóng</div>
+    </div>
+  </div>
+
+  <!-- 3. FX-LAYER & LOST-FLOAT -->
+  <div class="preview-section" id="sec-fx">
+    <div class="preview-header">
+      <span>3. HIỆU ỨNG TIỀN VÀ KHÁCH BỎ VỀ (.fx-layer)</span>
+      <span class="preview-tag">Core Fx</span>
+    </div>
+    <div style="position: relative; padding: 12px; background: #faf4ed; border-radius: 8px; border: 1px dashed #d1b89d; overflow: hidden; display: flex; flex-direction: column; gap: 8px; align-items: center;">
+      <div class="money-float" style="position: relative; animation: none;">+35.000đ 💵</div>
+      <div class="money-float tip-float" style="position: relative; animation: none;">+8.000đ tip ✨</div>
+      <div class="money-float lost-float" style="position: relative; animation: none;">😤 Khách bỏ về</div>
+    </div>
+  </div>
+
+  <!-- 4. BTN-WRAPPED & PREVIEW IMG -->
+  <div class="preview-section" id="sec-wrapped">
+    <div class="preview-header">
+      <span>4. NÚT GÀ WRAPPED & XEM TRƯỚC (.btn-wrapped)</span>
+      <span class="preview-tag">Màn Tổng Kết</span>
+    </div>
+    <button class="btn-share-threads btn-wrapped" style="width: 100%;">
+      <span>🎁</span> Gà Wrapped tuần 1 — tạo thẻ & chia sẻ
+    </button>
+    <div id="wrapped-preview" style="margin-top: 10px;">
+      <div class="wrapped-preview-img" style="background: linear-gradient(135deg, #ff9f43, #ee5253); padding: 16px; color: #fff; text-align: center; border-radius: 14px;">
+        <div style="font-weight: 850; font-size: 1.1rem;">🍗 GÀ WRAPPED TUẦN 1</div>
+        <div style="font-size: 0.85rem; margin-top: 4px; opacity: 0.95;">Tiệm Gà Giòn Test — Doanh thu 12.500.000đ</div>
+        <div style="margin-top: 8px; font-size: 0.75rem; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 8px; display: inline-block;">👑 Bậc Thầy Giòn Rụm Hẻm 1102</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. TRAY-SLOTS 7 Ô TRÊN 320PX -->
+  <div class="preview-section" style="max-width: 340px;" id="sec-tray">
+    <div class="preview-header">
+      <span>5. KHAY 7 Ô TRÊN MÀN 320PX (.tray-slots)</span>
+      <span class="preview-tag">Khung 320px</span>
+    </div>
+    <div class="sim-320">
+      <div class="assemble-card" style="box-shadow: none;">
+        <div class="tray-title">
+          <span>🍱 Quầy Giữ Nhiệt (5/7)</span>
+          <span style="font-size: 0.65rem; color: var(--soft);">Bấm khay để vớt/vứt</span>
+        </div>
+        <div class="tray-slots">
+          <!-- Slot 1 -->
+          <div class="tray-item">
+            <div class="tray-food-frame">
+              <span class="t-icon" style="font-size: 1.2rem;">🍗</span>
+              <span class="tray-condiment-tag ketchup">🍅 Tương Cà</span>
+            </div>
+            <span class="t-name">Gà Giòn Cay</span>
+            <span class="t-quality perfect">VÀNG GIÒN</span>
+          </div>
+          <!-- Slot 2 -->
+          <div class="tray-item">
+            <div class="tray-food-frame">
+              <span class="t-icon" style="font-size: 1.2rem;">🍟</span>
+              <span class="tray-condiment-tag chili">🌶️ Tương Ớt</span>
+            </div>
+            <span class="t-name">Khoai Tây</span>
+            <span class="t-quality good">CHÍN TỚI</span>
+          </div>
+          <!-- Slot 3 -->
+          <div class="tray-item drink-coca">
+            <div class="tray-food-frame">
+              <span class="t-icon" style="font-size: 1.2rem;">🥤</span>
+            </div>
+            <span class="t-name">Coca-Cola</span>
+            <span class="t-quality good">🔴 COCA ĐÁ ❄️</span>
+          </div>
+          <!-- Slot 4 -->
+          <div class="tray-item drink-7up">
+            <div class="tray-food-frame">
+              <span class="t-icon" style="font-size: 1.2rem;">🥤</span>
+            </div>
+            <span class="t-name">7Up Chanh</span>
+            <span class="t-quality good">🟢 7UP CHANH ❄️</span>
+          </div>
+          <!-- Slot 5 -->
+          <div class="tray-item drink-fanta">
+            <div class="tray-food-frame">
+              <span class="t-icon" style="font-size: 1.2rem;">🥤</span>
+            </div>
+            <span class="t-name">Fanta Cam</span>
+            <span class="t-quality good">🟠 FANTA CAM ❄️</span>
+          </div>
+          <!-- Slot 6 (Empty) -->
+          <div class="tray-slot-empty">
+            <span class="empty-wire-icon">▤</span>
+            <span class="empty-wire-label">Vỉ ráo dầu</span>
+          </div>
+          <!-- Slot 7 (Empty) -->
+          <div class="tray-slot-empty">
+            <span class="empty-wire-icon">▤</span>
+            <span class="empty-wire-label">Vỉ ráo dầu</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

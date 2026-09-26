@@ -522,12 +522,26 @@
 .tray-slots {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 5px;
+  gap: 4px;
   flex: 0 0 auto;
   background: #f5ebdc;
   border-radius: 10px;
-  padding: 5px;
+  padding: 4px;
   border: 2px dashed #dfcbb3;
+  max-height: 220px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #d1b89d transparent;
+}
+
+.tray-slots::-webkit-scrollbar {
+  width: 4px;
+}
+
+.tray-slots::-webkit-scrollbar-thumb {
+  background: #d1b89d;
+  border-radius: 4px;
 }
 
 .tray-item {
@@ -1067,26 +1081,27 @@
 
 /* Tray food frame & concept display */
 .tray-food-frame {
-  width: 48px;
-  height: 48px;
+  width: 42px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 2px;
+  position: relative;
 }
 
 .tray-item .t-img {
-  width: 46px;
-  height: 46px;
-  min-width: 46px;
-  min-height: 46px;
-  max-width: 46px;
-  max-height: 46px;
+  width: 40px;
+  height: 40px;
+  min-width: 28px;
+  min-height: 28px;
+  max-width: 40px;
+  max-height: 40px;
   object-fit: contain;
   display: block;
   margin: 0 auto;
   flex-shrink: 0;
-  filter: drop-shadow(0 3px 5px rgba(0,0,0,0.16));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.16));
 }
 
 /* Tray drink specific accents */
@@ -1359,6 +1374,15 @@
   z-index: var(--z-floating, 50);
 }
 
+/* Lớp hiệu ứng cố định toàn màn hình cho Core Fx Queue */
+.fx-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  overflow: hidden;
+}
+
 .money-float {
   position: absolute;
   font-weight: 850;
@@ -1384,6 +1408,41 @@
   font-size: 0.92rem;
   background: rgba(254, 243, 199, 0.95);
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.32);
+}
+
+/* Hiệu ứng khách bực bội bỏ về */
+.money-float.lost-float {
+  color: #e03131;
+  border-color: #fa5252;
+  font-size: 1.02rem;
+  background: rgba(255, 235, 235, 0.96);
+  box-shadow: 0 4px 14px rgba(224, 49, 49, 0.36);
+  animation: floatLostAway 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes floatLostAway {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.7) rotate(-4deg);
+  }
+  16% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.14) rotate(4deg);
+  }
+  32% {
+    transform: translateY(-10px) scale(1) rotate(-3deg);
+  }
+  48% {
+    transform: translateY(-16px) scale(1.02) rotate(2deg);
+  }
+  78% {
+    opacity: 1;
+    transform: translateY(-28px) scale(1) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-52px) scale(0.85);
+  }
 }
 
 @keyframes floatMoneyUp {
@@ -1491,7 +1550,8 @@
 /* Prefers Reduced Motion Accessibility for Kitchen */
 @media (prefers-reduced-motion: reduce) {
   .money-float,
-  .money-float.tip-float {
+  .money-float.tip-float,
+  .money-float.lost-float {
     animation: none !important;
     transform: translateY(-20px) !important;
     opacity: 1 !important;
@@ -1504,6 +1564,84 @@
   }
   .fry-pot.streak-fire {
     animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   TỐI ƯU KHAY 5-7 Ô VỪA KHÍT MÀN HÌNH 320PX (iPhone SE & Android màn hẹp)
+   ========================================================================== */
+
+@media (max-width: 350px) {
+  .assemble-card {
+    padding: 6px 4px;
+    gap: 4px;
+  }
+
+  .tray-title {
+    font-size: 0.68rem;
+    gap: 2px;
+  }
+
+  .tray-slots {
+    gap: 3px;
+    padding: 3px;
+    max-height: 185px;
+    border-radius: 8px;
+    border-width: 1.5px;
+  }
+
+  .tray-item {
+    padding: 2px 1px;
+    border-radius: 6px;
+    border-width: 1px;
+  }
+
+  .tray-food-frame {
+    width: 36px;
+    height: 36px;
+    margin: 0 auto 1px;
+  }
+
+  .tray-item .t-img {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 26px !important;
+    min-height: 26px !important;
+    max-width: 34px !important;
+    max-height: 34px !important;
+  }
+
+  .tray-item .t-name {
+    font-size: 0.56rem;
+    max-width: 52px;
+    line-height: 1.1;
+  }
+
+  .tray-item .t-quality {
+    font-size: 0.48rem;
+    padding: 0 2px;
+    line-height: 1.1;
+    margin-top: 1px;
+  }
+
+  .tray-slot-empty {
+    min-height: 44px;
+    border-radius: 6px;
+    gap: 1px;
+  }
+
+  .empty-wire-icon {
+    font-size: 0.68rem;
+  }
+
+  .empty-wire-label {
+    font-size: 0.48rem;
+  }
+
+  .tray-condiment-tag {
+    font-size: 0.44rem;
+    padding: 0 2px;
+    bottom: -1px;
   }
 }
 

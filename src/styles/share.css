@@ -202,6 +202,83 @@
   box-shadow: 0 1px 0 #333;
 }
 
+/* Nút Gà Wrapped đặc biệt (Weekly Milestone) */
+.btn-wrapped {
+  background: linear-gradient(135deg, #e63946 0%, #b5179e 50%, #7209b7 100%);
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border-radius: 14px;
+  padding: 11px 14px;
+  font-size: 0.95rem;
+  font-weight: 850;
+  box-shadow: 0 4px 15px rgba(181, 23, 158, 0.38), 0 3px 0 #480ca8;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  letter-spacing: 0.2px;
+}
+
+.btn-wrapped:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(181, 23, 158, 0.48), 0 3px 0 #480ca8;
+  filter: brightness(1.05);
+}
+
+.btn-wrapped:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #480ca8;
+}
+
+.btn-wrapped span {
+  display: inline-block;
+  animation: giftBounce 1.6s infinite ease-in-out;
+}
+
+@keyframes giftBounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  30% { transform: translateY(-3px) rotate(-8deg); }
+  60% { transform: translateY(-3px) rotate(8deg); }
+}
+
+/* Vùng và ảnh xem trước thẻ Gà Wrapped trong modal tổng kết */
+#wrapped-preview {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.wrapped-preview-img {
+  width: 100% !important;
+  max-width: 340px;
+  height: auto;
+  border-radius: 14px;
+  margin-top: 10px;
+  border: 2px solid var(--line, #e2d5c5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08);
+  animation: wrappedPopIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: block;
+}
+
+@keyframes wrappedPopIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-wrapped span,
+  .wrapped-preview-img {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
 .btn-next-day {
   background: var(--red);
   color: #fff;
