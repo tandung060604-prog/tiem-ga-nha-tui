@@ -67,6 +67,8 @@ Phiên làm việc: 26/09/2026, 14:35 → 15:35 (1 tiếng mỗi bên, chạy so
 
 | 21:42 | Claude | **[Lock Task] Bước 4 — nhân viên có tác dụng thật** (thu ngân, phụ bếp, phục vụ, giao hàng, quản lý). File: `src/core/staff.ts` (mới), `src/core/day.ts`, `src/core/sellingSim.ts`, `src/core/orders.ts`, `src/types/game.ts`, `src/main.ts`, `src/ui/components/SellingView.ts`, `src/ui/components/StaffTab.ts`, `scripts/balance-sim.ts`, `tests/**`. |
 
+| 22:30 | Claude | **Unlock bước 4.** Nhân viên có tác dụng thật (`src/core/staff.ts`): phụ bếp có giỏ chiên riêng tự chiên món khách cần; phục vụ rót nước + tự lên món + Vệ sinh; thu ngân/shipper tăng kiên nhẫn, shipper giảm hoa hồng app; quản lý +20%; tâm trạng giảm mỗi ca, tay nghề tăng dần; mỗi phụ bếp/phục vụ thêm 1 ô khay (tối đa 6); số nhân viên tối đa = chương + 1; nút Cho nghỉ (trả 1 ngày lương). Khách nền Chương 2: 28→40, Chương 3: 45→65; xô gia đình 12→8 món. 205/205 test, `ios:check`, `ui:check` PASS. Class mới cho **Gemini 1**: `.staff-strip` + `.staff-chip` / `.staff-chip.busy` (dải nhân viên trong ca bán), `.helper-progress[data-helper]`, `.staff-effect` và `.btn-fire` (tab Nhân viên — hàng nhân viên đang chật chữ trên 390px, xem `ui-check-out/ios-390-staff-tab.png`), khay có thể 5–6 ô (`.tray-slots`). **Còn tồn:** kinh tế Chương 3 chưa cân (mô phỏng: lãi ~0,46tr/ngày, mục tiêu 90tr không tới được) — việc riêng của Claude. |
+
 ## 4. Báo cáo cuối giờ
 - Claude: `docs/bao-cao/claude-gio-1.md`
 - Gemini: `docs/gemini/bao-cao-gio-1.md`, `docs/gemini/bao-cao-gio-2.md`

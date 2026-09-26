@@ -1,3 +1,4 @@
+import { staffEffects } from './staff';
 import { GameState, DayLedger } from '../types/game';
 import { upgradeEffects } from './upgrades';
 import { GAME_HOUR_MS, OFF_PEAK_HOURS, RUSH_HOURS, isWeekend, WEEKEND_CUSTOMER_MULTIPLIER } from './clock';
@@ -8,8 +9,8 @@ export class EconomyEngine {
     // Khách nền theo từng chương
     const baseCustomersPerChapter: { [key: number]: number } = {
       1: 12, // mô phỏng (npm run sim): 16 → người chơi trung bình qua Chương 1 ở ngày 9, GDD muốn ~15
-      2: 28,
-      3: 45,
+      2: 40, // mô phỏng: 28 khách thì phụ bếp không có việc, Chương 2 không qua nổi trong 35 ngày
+      3: 65,
       4: 75,
       5: 140
     };
@@ -28,7 +29,8 @@ export class EconomyEngine {
     }
 
     // Nâng cấp có ghi "+% khách" (Marketing, App giao hàng, Không gian check-in…)
-    const marketingMultiplier = 1.0 + upgradeEffects(state.upgrades).customersPct / 100;
+    // Nhân viên Idol TikTok cũng kéo khách tới
+    const marketingMultiplier = 1.0 + (upgradeEffects(state.upgrades).customersPct + staffEffects(state.staff).customersPct) / 100;
 
     // Thứ Bảy, Chủ Nhật khách đông hơn ngày thường
     const weekendMultiplier = isWeekend(state.day) ? WEEKEND_CUSTOMER_MULTIPLIER : 1;
@@ -94,10 +96,11 @@ export class EconomyEngine {
     lostCount: number,
     burntCount: number,
     topSellerId: string,
-    fines = 0
+    fines = 0,
+    commissionRate = 0.08 // shipper nhà giảm hoa hồng app (core/staff.ts)
   ): DayLedger {
     const overhead = this.getOverheadCosts(chapter);
-    const appCommissions = chapter >= 3 ? Math.round(grossRevenue * 0.08) : 0; // 8% hoa hồng app nếu có
+    const appCommissions = chapter >= 3 ? Math.round(grossRevenue * commissionRate) : 0; // hoa hồng app nếu có
 
     const totalIncome = grossRevenue + tips;
     const totalExpenses = ingredientCost + wasteCost + wages + overhead.rent + overhead.utilities + appCommissions + fines;

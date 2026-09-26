@@ -1,3 +1,4 @@
+import { staffEffects } from './staff';
 import { BaseMenuItemId, CustomerOrder, GameState } from '../types/game';
 import { CharacterGenerator } from '../content/characterGenerator';
 import { BunnyLetter } from '../content/mysteryBunny';
@@ -62,7 +63,9 @@ export class OrdersEngine {
 
     // Thời gian kiên nhẫn: 28 - 42 giây (ảnh hưởng bởi archetype và nâng cấp không gian)
     const spaceBonus = (state.upgrades.space?.currentLevel || 1) * 2;
-    const patienceBoost = 1 + upgradeEffects(state.upgrades).patiencePct / 100; // POS, màn gọi số, kiosk
+    // POS, màn gọi số, kiosk + thu ngân (khách tại quán) / shipper nhà (khách app)
+    const team = staffEffects(state.staff);
+    const patienceBoost = 1 + (upgradeEffects(state.upgrades).patiencePct + (isDelivery ? team.deliveryPatiencePct : team.walkInPatiencePct)) / 100;
     const orderSizeBonus = Math.min(30, extraItems * 5); // order nhiều món (combo) chờ được lâu hơn
     const patienceMax = Math.max(18, Math.round((28 + random() * 12 + spaceBonus + orderSizeBonus) * char.patienceMultiplier * patienceBoost));
 

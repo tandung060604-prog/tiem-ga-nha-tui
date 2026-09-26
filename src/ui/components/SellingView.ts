@@ -1,3 +1,4 @@
+import { staffEffects } from '../../core/staff';
 import { GameState, CustomerOrder, QualityRating } from '../../types/game';
 import { cookingEngine } from '../../core/cooking';
 import { SellingSession } from '../../core/sellingSim';
@@ -30,13 +31,22 @@ export function sellingStructureKey(state: GameState, session: SellingSession): 
     cook.isFrying, cook.fryingType, quality, cookingEngine.getActiveSeasoning(),
     state.oilCondition, state.currentChapter,
     session.isFastForward, isRushHour(session.gameHour),
-    stationStripKey(state, session)
+    stationStripKey(state, session),
+    staffStripKey(state, session)
   ]);
 }
 
 // Cập nhật tại chỗ các giá trị chạy theo thời gian; không tạo/xóa node.
 // Cập nhật tại chỗ các giá trị chạy theo thời gian; không tạo/xóa node.
-export function patchSellingView(root: HTMLElement, session: SellingSession): void {
+export function patchSellingView(root: HTMLElement, session: SellingSession, state?: GameState): void {
+  if (state) {
+    const cooks = staffEffects(state.staff, session.gameHour).cooks;
+    cooks.forEach((c, i) => {
+      const el = root.querySelector<HTMLElement>(`.helper-progress[data-helper="${i}"]`);
+      const slot = session.helpers?.[i];
+      if (el && slot) el.textContent = `${Math.min(100, Math.round((slot.elapsedMs / c.cycleMs) * 100))}%`;
+    });
+  }
   const clock = root.querySelector('.clock b');
   if (clock) clock.textContent = formatClock(session.gameHour);
 
@@ -405,7 +415,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
   }
 
   // Tray HTML
-  const traySlotsHtml = [0, 1, 2, 3].map(slotIdx => {
+  const traySlotsHtml = Array.from({ length: cookingEngine.getTraySize() }, (_, i) => i).map(slotIdx => {
     const item = tray[slotIdx];
     if (item) {
       const isDrink = item.menuItemId === 'soda';
@@ -524,6 +534,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
               </button>
             </div>`}
 
+            ${renderStaffStrip(state, session)}
             ${renderStationStrip(state, session)}
 
             <!-- Serve Button -->
@@ -585,3 +596,24 @@ function renderStationStrip(state: GameState, session: SellingSession): string {
   if (buttons.length === 0) return '';
   return `<div class="station-strip" style="display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0;">${buttons.join('')}</div>`;
 }
+
+// ---------------------------------------------------------------------------
+// Dải nhân viên: phụ bếp đang chiên gì, có phục vụ tự lên món không (luật ở core/staff.ts)
+// ---------------------------------------------------------------------------
+function staffStripKey(state: GameState, session: SellingSession): string {
+  return state.staff.map(m => m.id).join(',') + '|' + (session.helpers ?? []).map(h => h?.menuItemId ?? '-').join(',');
+}
+
+function renderStaffStrip(state: GameState, session: SellingSession): string {
+  if (state.staff.length === 0) return '';
+  const eff = staffEffects(state.staff, session.gameHour);
+  const chips = eff.cooks.map((c, i) => {
+    const slot = session.helpers?.[i];
+    const what = slot ? `${FRY_ICON[slot.menuItemId] ?? '🍗'} <small class="helper-progress" data-helper="${i}"></small>` : 'đang rảnh';
+    return `<span class="staff-chip${slot ? ' busy' : ''}">👨‍🍳 ${c.name.split(' ')[0]}: ${what}</span>`;
+  });
+  if (eff.waiterServeMs !== null) chips.push('<span class="staff-chip">🧹 Phục vụ rót nước & lên món</span>');
+  if (chips.length === 0) return '';
+  return `<div class="staff-strip" style="display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0; font-size: 0.72rem;">${chips.join('')}</div>`;
+}
+const FRY_ICON: Record<string, string> = { crispy_chicken: '🍗', spicy_chicken: '🌶️', honey_garlic_chicken: '🍯', shake_fries: '🍟', popcorn_chicken: '🍿' };

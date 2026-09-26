@@ -5,6 +5,7 @@ import { DRINK_RECIPES, DrinkId } from './stations';
 export type Sauce = 'spicy' | 'honey';
 // Gà viên (Chương 3): mẻ nhỏ chín nhanh gấp 1,5 → vùng Perfect ngắn hơn, đòi tay canh nhanh hơn
 export type FryType = 'chicken' | 'fries' | 'popcorn';
+const BASE_TRAY_SIZE = 4;
 const FRY_SPEED: Record<FryType, number> = { chicken: 1, fries: 1, popcorn: 1.5 };
 
 export interface CookingState {
@@ -29,6 +30,15 @@ export class CookingEngine {
   private tray: TrayItem[] = [];
   private activeSeasoning: Sauce | null = null;
   private fryRampPct = 0;
+  private traySize = BASE_TRAY_SIZE;
+
+  // Khay rộng thêm khi có phụ bếp / phục vụ (core/staff.ts extraTraySlots)
+  public setTraySize(n: number) {
+    this.traySize = Math.max(CookingEngine.TRAY_SIZE, n);
+  }
+  public getTraySize(): number {
+    return this.traySize;
+  }
 
   public setFryRampBonus(pct: number) {
     this.fryRampPct = Math.max(0, pct);
@@ -46,7 +56,7 @@ export class CookingEngine {
 
   public restore(s: CookingSnapshot) {
     this.cookState = { ...s.cook };
-    this.tray = s.tray.map(t => ({ ...t })).slice(0, CookingEngine.TRAY_SIZE);
+    this.tray = s.tray.map(t => ({ ...t })).slice(0, this.traySize);
     this.activeSeasoning = s.seasoning;
     if (this.cookState.isFrying) audio.startSizzle();
   }
@@ -109,10 +119,10 @@ export class CookingEngine {
   // Điểm giữa vùng Perfect: dây chuyền tự động nhấc giỏ tại đây
   public static readonly AUTO_LIFT_AT = (CookingEngine.ZONES.goodLow + CookingEngine.ZONES.perfect) / 2;
 
-  public static readonly TRAY_SIZE = 4;
+  public static readonly TRAY_SIZE = BASE_TRAY_SIZE;
 
   public isTrayFull(): boolean {
-    return this.tray.length >= CookingEngine.TRAY_SIZE;
+    return this.tray.length >= this.traySize;
   }
 
   // Trạm nước: lấy lon lạnh bỏ thẳng vào khay, không qua chảo

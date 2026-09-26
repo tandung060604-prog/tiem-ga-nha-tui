@@ -1,6 +1,7 @@
 import { GameState } from '../../types/game';
 import { STAFF_ROLES_INFO, STAFF_TRAITS, generateCandidate } from '../../content/staff';
 import { audio } from '../../core/audio';
+import { describeStaffEffect, maxStaff, severancePay } from '../../core/staff';
 
 export function renderStaffTab(state: GameState): string {
   // Nếu ở Chương 1: Báo mở khóa ở Chương 2
@@ -37,6 +38,7 @@ export function renderStaffTab(state: GameState): string {
           <div style="font-size: 0.72rem; color: var(--soft); margin-top: 2px;">
             Tốc độ: <b>${member.speed}</b> | Tay nghề: <b>${member.skill}</b> | Thái độ: <b>${member.attitude}</b>
           </div>
+          <div class="staff-effect" style="font-size: 0.72rem; color: #27ae60; font-weight: 700; margin-top: 2px;">⚙️ ${describeStaffEffect(member, state.staff)}</div>
           ${traitInfo ? `<div style="font-size: 0.7rem; color: #8e44ad; font-weight: 700; margin-top: 1px;">✨ ${traitInfo.name}: ${traitInfo.desc}</div>` : ''}
         </div>
 
@@ -44,12 +46,17 @@ export function renderStaffTab(state: GameState): string {
           <button class="btn-sm btn-bonus" data-index="${idx}">
             Thưởng<small>(50k)</small>
           </button>
+          <button class="btn-sm btn-fire" data-index="${idx}">
+            Cho nghỉ<small>(${Math.round(severancePay(member) / 1000)}k)</small>
+          </button>
         </div>
       </div>
     `;
   }).join('');
 
   // Danh sách ứng viên đang tuyển
+  const cap = maxStaff(state.currentChapter);
+  const full = state.staff.length >= cap;
   const candidateRows = state.candidates.map((cand, idx) => {
     const roleInfo = STAFF_ROLES_INFO[cand.role];
     const traitInfo = STAFF_TRAITS.find(t => cand.traits.includes(t.id));
@@ -69,11 +76,12 @@ export function renderStaffTab(state: GameState): string {
           <div style="font-size: 0.72rem; color: var(--soft);">
             Tốc độ: <b>${cand.speed}</b> · Tay nghề: <b>${cand.skill}</b> · Thái độ: <b>${cand.attitude}</b>
           </div>
+          <div class="staff-effect" style="font-size: 0.72rem; color: #27ae60; font-weight: 700;">⚙️ ${describeStaffEffect(cand, state.staff)}</div>
           ${traitInfo ? `<div style="font-size: 0.7rem; color: #8e44ad; font-weight: 700;">✨ ${traitInfo.name}</div>` : ''}
         </div>
 
         <div>
-          <button class="btn-sm primary btn-hire" data-index="${idx}">
+          <button class="btn-sm primary btn-hire" data-index="${idx}" ${full ? 'disabled' : ''}>
             Tuyển Dụng
           </button>
         </div>
@@ -83,10 +91,10 @@ export function renderStaffTab(state: GameState): string {
 
   return `
     <div class="sec-title">
-      <span>👥 Đội Ngũ Nhân Viên (${state.staff.length} người)</span>
+      <span>👥 Đội Ngũ Nhân Viên (${state.staff.length}/${cap} người)</span>
     </div>
     <div class="sec-desc">
-      Trả lương đàng hoàng cuối mỗi ngày (tối thiểu ~25k/giờ). Thưởng và cho nghỉ giúp nhân viên vui vẻ, không bị bóc phốt!
+      Lương trả cuối mỗi ngày (ca 8 tiếng). Tâm trạng giảm dần sau mỗi ca: nhân viên buồn làm việc kém hơn, thưởng nóng để vui lại.${full ? ' <b>Quán đã đủ chỗ</b> — lên chương để có thêm chỗ.' : ''}
     </div>
     
     <div class="staff-roster" style="margin-bottom: 16px;">
@@ -130,6 +138,29 @@ export function bindStaffEvents(
     });
   });
 
+  // Nút Cho nghỉ: trả thêm 1 ngày lương
+  document.querySelectorAll('.btn-fire').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = parseInt((e.currentTarget as HTMLElement).getAttribute('data-index') || '0', 10);
+      const member = state.staff[idx];
+      if (!member) return;
+      const pay = severancePay(member);
+      if (state.money < pay) {
+        showToast(`Cần ${pay.toLocaleString('vi-VN')}đ trợ cấp mới cho ${member.name} nghỉ được!`);
+        return;
+      }
+      if (!confirm(`Cho ${member.name} nghỉ việc? Trả trợ cấp ${pay.toLocaleString('vi-VN')}đ.`)) return;
+      onUpdateState(draft => {
+        const i = draft.staff.findIndex(m => m.id === member.id);
+        if (i < 0) return;
+        draft.staff.splice(i, 1);
+        draft.money -= pay;
+      });
+      audio.playPop();
+      showToast(`${member.name} đã nghỉ việc. Chúc bạn ấy may mắn! 👋`);
+    });
+  });
+
   // Nút Tuyển dụng
   const hireBtns = document.querySelectorAll('.btn-hire');
   hireBtns.forEach(btn => {
@@ -137,6 +168,10 @@ export function bindStaffEvents(
       const idx = parseInt((e.currentTarget as HTMLElement).getAttribute('data-index') || '0', 10);
       const candidate = state.candidates[idx];
       if (!candidate) return;
+      if (state.staff.length >= maxStaff(state.currentChapter)) {
+        showToast('Quán chật rồi, không còn chỗ cho thêm người! Lên chương để mở rộng.');
+        return;
+      }
 
       onUpdateState(draft => {
         draft.staff.push(candidate);

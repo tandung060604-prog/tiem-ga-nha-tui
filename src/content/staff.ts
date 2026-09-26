@@ -137,7 +137,7 @@ export function generateCandidate(chapter: number): StaffMember {
   const attitude = Math.min(98, Math.floor(65 + random() * 30));
   const stamina = Math.min(98, Math.floor(60 + random() * 35));
   
-  const hourlyWage = Math.floor(25000 + (speed + skill) * 60 + chapter * 2000);
+  const hourlyWage = Math.floor(20000 + (speed + skill) * 40 + chapter * 1500); // ~26–32k/giờ
 
   return {
     id: 'staff_' + Date.now() + '_' + Math.floor(Math.random() * 1000),

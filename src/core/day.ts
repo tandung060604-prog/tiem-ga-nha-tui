@@ -1,4 +1,4 @@
-import { CustomerOrder, CustomerReview, DayLedger, GameEvent, GameState, TrayItem } from '../types/game';
+import { CustomerOrder, CustomerReview, DayLedger, GameEvent, GameState, QualityRating, TrayItem } from '../types/game';
 import { RANDOM_EVENTS } from '../content/events';
 import { BUNNY_LETTERS, BunnyLetter, MysteryBunnyEngine } from '../content/mysteryBunny';
 import { OrdersEngine } from './orders';
@@ -10,6 +10,7 @@ import {
   TIMER_RECIPES, TimerStationId, collectTimer, DRINK_RECIPES, DrinkId, ASSEMBLY_RECIPES, AssemblyId, assemble, assemblyBaseIndex
 } from './stations';
 import { upgradeEffects } from './upgrades';
+import { staffEffects, endShiftForStaff } from './staff';
 import { auditState, flagIntegrity } from './integrity';
 import { SellingSession } from './sellingSim';
 import { random } from './rng';
@@ -94,6 +95,14 @@ export function recordFryerLift(
   }
   if (session && result.quality === 'burnt') session.burntCount += 1;
   if (session && result.quality !== 'perfect') session.perfectStreak = 0; // chỉ Perfect mới giữ chuỗi
+}
+
+// Mẻ của phụ bếp: dầu xuống cấp, đếm chất lượng (chấm sao Vị), không đụng chuỗi Perfect của người chơi
+export function recordHelperFry(draft: GameState, session: SellingSession, quality: QualityRating): void {
+  draft.oilBatchesCooked += 1;
+  draft.oilCondition = CookingEngine.getOilCondition(draft.oilBatchesCooked, upgradeEffects(draft.upgrades).oilLifePct);
+  if (quality === 'perfect') session.perfectCount += 1;
+  if (quality === 'burnt') session.burntCount += 1;
 }
 
 // Bác Ba tiếp tế khi hết gà và hết tiền: 1 lần mỗi chương (trước đây không giới hạn → cày tiền được)
@@ -251,11 +260,12 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   const inspected = event.effect.inspection === true;
   const oil = draft.oilCondition;
   const fine = inspected && oil === 'dirty' ? INSPECTION_FINE : 0;
+  const team = staffEffects(draft.staff);
 
   const ledger = EconomyEngine.finalizeDayLedger(
     draft.day, session.grossRevenue, session.tips, session.ingredientCost, expiredValue,
     EconomyEngine.calculateTotalWages(draft), draft.currentChapter,
-    session.servedCount, session.lostCount, session.burntCount, session.topSellerId, fine
+    session.servedCount, session.lostCount, session.burntCount, session.topSellerId, fine, team.commissionRate
   );
 
   const perfectRatio = session.totalFriedCount > 0 ? session.perfectCount / session.totalFriedCount : 0.8;
@@ -263,6 +273,10 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   const { newRatings, generatedReview, advisorTip } = ReviewsEngine.evaluateDay(
     draft, perfectRatio, session.burntCount, avgWait, session.lostCount, session.servedCount, session.totalFriedCount
   );
+  if (team.hygienePerDay > 0) { // phục vụ lau dọn mỗi ngày
+    newRatings.hygiene = Math.min(5, newRatings.hygiene + team.hygienePerDay);
+    newRatings.overall = ReviewsEngine.calculateOverallStars(newRatings);
+  }
   if (inspected) {
     const delta = oil === 'dirty' ? -0.3 : oil === 'clean' ? 0.2 : 0;
     newRatings.hygiene = Math.max(1, Math.min(5, newRatings.hygiene + delta));
@@ -278,6 +292,7 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   draft.lifetimeStats.totalFried += session.totalFriedCount;
   draft.lifetimeStats.totalBurnt += session.burntCount;
   draft.lifetimeStats.perfectFriedCount += session.perfectCount;
+  endShiftForStaff(draft.staff);
 
   flagIntegrity(draft, auditState(draft)); // chống gian lận: sổ sách phải hợp lý sau mỗi ngày
 

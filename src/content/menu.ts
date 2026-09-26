@@ -182,14 +182,15 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   {
     id: 'family_bucket',
     name: 'Bucket Đại Tiệc Gia Đình',
-    basePrice: 199000,
-    currentPrice: 199000,
+    basePrice: 179000,
+    currentPrice: 179000,
     chapter: 3,
     icon: '🪣',
     category: 'combo',
     station: 'combo',
-    components: [{ menuItemId: 'crispy_chicken', count: 5 }, { menuItemId: 'shake_fries', count: 2 }, { menuItemId: 'popcorn_chicken', count: 1 }, { menuItemId: 'soda', count: 4 }],
-    steps: ['5 Miếng gà', '2 Khoai lớn', '1 Popcorn', '4 Nước ngọt'],
-    ingredients: { chicken_meat: 5, flour: 5, potato_cheese: 2, soft_drink: 4 }
+    // 8 món (mô phỏng: xô 12 món chặn cả hàng khách, Chương 3 tụt từ 66 xuống ~25 khách/ngày)
+    components: [{ menuItemId: 'crispy_chicken', count: 4 }, { menuItemId: 'shake_fries', count: 1 }, { menuItemId: 'popcorn_chicken', count: 1 }, { menuItemId: 'soda', count: 2 }],
+    steps: ['4 Miếng gà', '1 Khoai lớn', '1 Popcorn', '2 Nước ngọt'],
+    ingredients: { chicken_meat: 5, flour: 5, potato_cheese: 1, soft_drink: 2 }
   }
 ];

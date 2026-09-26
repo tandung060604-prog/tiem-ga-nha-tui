@@ -27,8 +27,9 @@ import { renderSellingView, patchSellingView, sellingStructureKey } from './ui/c
 import { SellingSession, createSellingSession, gameDeltaMs, tickSelling } from './core/sellingSim';
 import { OPEN_HOUR, CLOSE_HOUR } from './core/clock';
 import type { ShiftSnapshot } from './core/sellingSim';
-import { TIMER_RECIPES, timerPhase, TimerStationId, AssemblyId, DrinkId, isTimerStationId, isAssemblyId, isDrinkId } from './core/stations';
-import { StationResult, startTimerStation, pullTimerStation, assembleAtCounter, makeDrink, creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, SAUCE_STOCK, serveFirstOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP } from './core/day';
+import { DRINK_RECIPES, TIMER_RECIPES, timerPhase, TimerStationId, AssemblyId, DrinkId, isTimerStationId, isAssemblyId, isDrinkId } from './core/stations';
+import { staffEffects, tickStaff, fryingItemId, extraTraySlots } from './core/staff';
+import { recordHelperFry, StationResult, startTimerStation, pullTimerStation, assembleAtCounter, makeDrink, creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, SAUCE_STOCK, serveFirstOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP } from './core/day';
 import { upgradeEffects } from './core/upgrades';
 import { renderSummaryModal } from './ui/components/SummaryModal';
 import { renderSettingsModal } from './ui/components/SettingsModal';
@@ -455,7 +456,7 @@ class AppController {
         this.sellingStructureKey = key;
         mainViewEl.innerHTML = renderSellingView(state, this.sellingSession);
       } else {
-        patchSellingView(mainViewEl, this.sellingSession);
+        patchSellingView(mainViewEl, this.sellingSession, state);
       }
     }
   }
@@ -695,6 +696,7 @@ class AppController {
     this.expectedCustomers = shift.expectedCustomers;
     this.customerSource = createCustomerSource(state, this.currentEvent, shift.bunnyVisited);
     cookingEngine.setFryRampBonus(upgradeEffects(state.upgrades).fryRampPct);
+    cookingEngine.setTraySize(CookingEngine.TRAY_SIZE + extraTraySlots(state.staff));
     cookingEngine.restore(shift.cooking);
     document.body.classList.add('selling-mode');
     music.setMode('selling');
@@ -714,6 +716,7 @@ class AppController {
     cookingEngine.setFryRampBonus(upgradeEffects(stateManager.getState().upgrades).fryRampPct);
     cookingEngine.clearTray();
     const state = stateManager.getState();
+    cookingEngine.setTraySize(CookingEngine.TRAY_SIZE + extraTraySlots(state.staff));
     this.customerSource = createCustomerSource(state, this.currentEvent);
     this.sellingSession.orders.push(...this.customerSource.opening());
 
@@ -785,6 +788,9 @@ class AppController {
       }
     }
 
+    // Nhân viên: phụ bếp tự chiên, phục vụ tự lên món (luật ở core/staff.ts)
+    this.tickStaff(session, gameDt);
+
     // Nồi mì / lò bánh vừa chín → chuông báo một lần (đang canh chảo dễ quên)
     for (const id of Object.keys(TIMER_RECIPES) as TimerStationId[]) {
       const ready = timerPhase(TIMER_RECIPES[id], session.timers[id]) === 'ready';
@@ -805,6 +811,38 @@ class AppController {
       return;
     }
     this.animFrameId = requestAnimationFrame((ts) => this.loopSelling(ts));
+  }
+
+  private tickStaff(session: SellingSession, gameDt: number) {
+    const state = stateManager.getState();
+    if (state.staff.length === 0 || gameDt <= 0) return;
+    const cook = cookingEngine.getCookState();
+    const playerFrying = cook.isFrying ? fryingItemId(cook.fryingType, cookingEngine.getActiveSeasoning()) : null;
+    const events = tickStaff(session, cookingEngine.getTray(), gameDt, staffEffects(state.staff, session.gameHour), playerFrying, {
+      // hết hàng thì khỏi mở stateManager.update mỗi frame
+      use: ids => ids.every(id => (state.inventory[id]?.amount ?? 0) >= 1) && this.useIngredients([...ids]),
+      place: item => cookingEngine.addToTray(item),
+      pour: drink => {
+        if ((state.inventory[DRINK_RECIPES[drink].stock]?.amount ?? 0) < 1) return false;
+        let r = 'locked' as StationResult;
+        stateManager.update(draft => { r = makeDrink(draft, session, cookingEngine, drink); });
+        return r === 'ok';
+      },
+      traySize: cookingEngine.getTraySize()
+    });
+    for (const ev of events) {
+      switch (ev.type) {
+        case 'helperDone':
+          stateManager.update(draft => recordHelperFry(draft, session, ev.item.quality));
+          if (ev.item.quality === 'burnt') this.showToast(`😅 ${ev.cook} lỡ tay chiên cháy ${ev.item.name}!`);
+          break;
+        case 'autoServe':
+          this.serveCurrentCustomer();
+          break;
+        default:
+          assertNever(ev);
+      }
+    }
   }
 
   private useIngredients(ids: string[]): boolean {
