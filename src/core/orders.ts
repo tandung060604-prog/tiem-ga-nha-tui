@@ -1,4 +1,5 @@
 import { staffEffects, FRY_RECIPES } from './staff';
+import { karmaEffects } from './karmaEffects';
 
 export const CONDIMENT_REQUEST_CHANCE = 0.3;
 import { BaseMenuItemId, CustomerOrder, GameState } from '../types/game';
@@ -77,7 +78,8 @@ export class OrdersEngine {
     const spaceBonus = (state.upgrades.space?.currentLevel || 1) * 2;
     // POS, màn gọi số, kiosk + thu ngân (khách tại quán) / shipper nhà (khách app)
     const team = staffEffects(state.staff);
-    const patienceBoost = 1 + (upgradeEffects(state.upgrades).patiencePct + (isDelivery ? team.deliveryPatiencePct : team.walkInPatiencePct)) / 100;
+    const patienceBoost = 1 + (upgradeEffects(state.upgrades).patiencePct + (isDelivery ? team.deliveryPatiencePct : team.walkInPatiencePct)
+      + karmaEffects(state.karma).patiencePct) / 100; // Tình Hẻm (core/karmaEffects.ts)
     const orderSizeBonus = Math.min(30, extraItems * 5); // order nhiều món (combo) chờ được lâu hơn
     const patienceMax = Math.max(18, Math.round((28 + random() * 12 + spaceBonus + orderSizeBonus) * char.patienceMultiplier * patienceBoost));
 

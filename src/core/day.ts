@@ -11,6 +11,7 @@ import {
 } from './stations';
 import { upgradeEffects } from './upgrades';
 import { staffEffects, endShiftForStaff, FRY_RECIPES } from './staff';
+import { karmaEffects } from './karmaEffects';
 import { auditState, flagIntegrity } from './integrity';
 import { SellingSession } from './sellingSim';
 import { random } from './rng';
@@ -285,11 +286,13 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   const oil = draft.oilCondition;
   const fine = inspected && oil === 'dirty' ? INSPECTION_FINE : 0;
   const team = staffEffects(draft.staff, 12, draft.upgrades);
+  const karma = karmaEffects(draft.karma);
 
   const ledger = EconomyEngine.finalizeDayLedger(
     draft.day, session.grossRevenue, session.tips, session.ingredientCost, expiredValue,
     EconomyEngine.calculateTotalWages(draft), draft.currentChapter,
-    session.servedCount, session.lostCount, session.burntCount, session.topSellerId, fine, team.commissionRate
+    session.servedCount, session.lostCount, session.burntCount, session.topSellerId, fine, team.commissionRate,
+    karma.overheadPct
   );
 
   const perfectRatio = session.totalFriedCount > 0 ? session.perfectCount / session.totalFriedCount : 0.8;
@@ -297,6 +300,10 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   const { newRatings, generatedReview, advisorTip } = ReviewsEngine.evaluateDay(
     draft, perfectRatio, session.burntCount, avgWait, session.lostCount, session.servedCount, session.totalFriedCount
   );
+  if (karma.tasteDriftPerDay !== 0) { // Nghệ Nhân (karma): tiếng lành / tiếng dữ về độ ngon
+    newRatings.taste = Math.max(1, Math.min(5, newRatings.taste + karma.tasteDriftPerDay));
+    newRatings.overall = ReviewsEngine.calculateOverallStars(newRatings);
+  }
   if (team.hygienePerDay > 0) { // phục vụ lau dọn mỗi ngày
     newRatings.hygiene = Math.min(5, newRatings.hygiene + team.hygienePerDay);
     newRatings.overall = ReviewsEngine.calculateOverallStars(newRatings);
