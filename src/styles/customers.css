@@ -1,0 +1,248 @@
+/* CUSTOMER LANE & ORDER BUBBLE STYLES */
+
+.customer-lane {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 16px 12px 10px;
+  min-height: 135px;
+  max-height: 165px;
+  background: var(--bg);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  min-width: 0;
+  width: 100%;
+}
+
+.customer-lane::-webkit-scrollbar {
+  display: none;
+}
+
+.customer-card {
+  flex: 0 0 170px;
+  background: var(--panel);
+  border: 2px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  scroll-snap-align: start;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+}
+
+.customer-card.active {
+  border-color: var(--red);
+  box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.25);
+  transform: translateY(-2px);
+}
+
+.customer-card.angry {
+  animation: angryShake 0.35s infinite alternate;
+  border-color: var(--warn);
+}
+
+@keyframes angryShake {
+  0% { transform: translateX(-3px) rotate(-1deg); }
+  100% { transform: translateX(3px) rotate(1deg); }
+}
+
+/* Customer Header (Avatar & Name) */
+.cust-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: -16px;
+}
+
+.cust-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--panel);
+  border: 2px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+
+.cust-name {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.delivery-badge {
+  font-size: 0.65rem;
+  background: #3498db;
+  color: #fff;
+  border-radius: 6px;
+  padding: 1px 4px;
+  font-weight: 800;
+}
+
+/* Speech Bubble (Order list) */
+.speech-bubble {
+  background: #f7ede0;
+  border-radius: 4px 10px 10px 10px;
+  padding: 6px 8px;
+  font-size: 0.72rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.order-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.order-item-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.order-check {
+  font-size: 0.7rem;
+  color: var(--soft);
+}
+
+.order-check.done {
+  color: var(--mint-dark);
+  font-weight: 800;
+}
+
+/* Patience Bar */
+.patience-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.patience-bar {
+  flex: 1;
+  height: 6px;
+  background: #ecdcc6;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.patience-fill {
+  height: 100%;
+  width: 100%;
+  background: var(--mint);
+  border-radius: 3px;
+  transition: width 0.3s linear, background-color 0.3s;
+}
+
+.patience-fill.mid {
+  background: var(--gold-dark);
+}
+
+.patience-fill.low {
+  background: var(--warn);
+}
+
+/* Empty Queue State */
+.empty-queue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  color: var(--soft);
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 2px dashed var(--line);
+  border-radius: var(--radius-md);
+  margin: 6px 0;
+  padding: 20px;
+}
+
+/* Bé Thỏ Cam Mystery Character Styles */
+.customer-card.bunny-card {
+  border: 2px solid #ff9800;
+  background: linear-gradient(180deg, #fffcf5 0%, #fff3e0 100%);
+  box-shadow: 0 4px 14px rgba(255, 152, 0, 0.35);
+  animation: bunnyPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes bunnyPulse {
+  0%, 100% {
+    box-shadow: 0 4px 14px rgba(255, 152, 0, 0.35);
+    border-color: #ff9800;
+  }
+  50% {
+    box-shadow: 0 6px 20px rgba(255, 87, 34, 0.55);
+    border-color: #ff5722;
+    transform: translateY(-2px);
+  }
+}
+
+.cust-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.bunny-badge {
+  font-size: 0.65rem;
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+  color: #fff;
+  border-radius: 6px;
+  padding: 1px 6px;
+  font-weight: 800;
+  margin-left: 4px;
+  box-shadow: 0 1px 3px rgba(230, 81, 0, 0.3);
+}
+
+/* Realtime Customer Thought Bubble */
+.thought-bubble {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 1.5px solid var(--ink);
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--ink);
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+  pointer-events: none;
+  animation: popIn 0.25s var(--ease-spring);
+  z-index: 5;
+}
+
+.thought-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 4px 4px 0;
+  border-style: solid;
+  border-color: #fff transparent;
+}
+

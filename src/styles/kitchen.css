@@ -1,0 +1,499 @@
+/* KITCHEN & FRYING STATION STYLES */
+
+.selling-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1;
+  min-width: 0; /* để hàng khách cuộn ngang thay vì kéo cả màn rộng ra */
+  overflow: hidden;
+  position: relative;
+}
+
+/* Clock & Rush Hour Banner */
+.kitchen-hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 10px;
+  background: #f7e6ce;
+  border-bottom: 2px solid var(--line);
+  font-size: 0.82rem;
+  font-weight: 800;
+  min-height: 48px;
+}
+
+.kitchen-hud button,
+#btn-toggle-fast {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 6px 12px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.kitchen-hud .clock {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.kitchen-hud .rush-badge {
+  background: var(--red);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+  from { transform: scale(0.96); opacity: 0.9; }
+  to { transform: scale(1.04); opacity: 1; }
+}
+
+/* Wood Counter (Mặt quầy gỗ) */
+.kitchen-counter {
+  background: var(--counter);
+  border-top: 8px solid var(--counter-top);
+  box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 10px 10px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Fryer & Prep Work Area */
+.work-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+}
+
+/* Fryer Station (Chảo chiên gà) */
+.fryer-card {
+  background: var(--panel);
+  border: 2px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 8px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: var(--shadow-sm);
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+.fryer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.74rem;
+  font-weight: 800;
+  white-space: nowrap;
+  gap: 4px;
+}
+
+.fryer-header > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.oil-status {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.oil-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #f7b731;
+  border: 1px solid rgba(0,0,0,0.15);
+  flex-shrink: 0;
+}
+
+.oil-dot.clean { background: #ffd166; }
+.oil-dot.medium { background: #d38b28; }
+.oil-dot.dirty { background: #4a2810; }
+
+/* The Pot with bubbling oil */
+.fry-pot {
+  height: 92px;
+  flex: 0 0 92px;
+  border-radius: 14px;
+  border: 3px solid #5a3825;
+  background: linear-gradient(180deg, #ffd369 0%, #e59828 100%);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: inset 0 4px 10px rgba(0,0,0,0.3);
+  transition: filter 0.3s;
+}
+
+.fry-pot.oil-medium {
+  background: linear-gradient(180deg, #e59828 0%, #a85818 100%);
+}
+
+.fry-pot.oil-dirty {
+  background: linear-gradient(180deg, #7a3e14 0%, #3a1a08 100%);
+}
+
+/* Bubbles animation */
+.fry-pot .bubble {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  animation: boil 1.2s infinite ease-in;
+}
+
+@keyframes boil {
+  0% { transform: translateY(30px) scale(0.4); opacity: 0; }
+  50% { opacity: 0.8; }
+  100% { transform: translateY(-30px) scale(1); opacity: 0; }
+}
+
+.pot-chicken {
+  font-size: 2.2rem;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+  transition: transform 0.2s ease;
+}
+
+.fry-pot:active .pot-chicken {
+  transform: scale(0.9);
+}
+
+/* Cooking Gauge: Sống -> Vừa -> Vàng Giòn -> Vừa -> Cháy */
+.cook-gauge-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gauge-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+  margin-bottom: 2px;
+  line-height: 1;
+}
+
+.gauge-label-raw {
+  color: #8a6452;
+  font-size: 0.62rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.gauge-label-perfect {
+  color: var(--mint-dark);
+  font-size: 0.52rem;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1;
+  white-space: normal;
+  max-width: 65px;
+  letter-spacing: -0.2px;
+}
+
+.gauge-label-burnt {
+  color: var(--warn);
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.cook-gauge {
+  height: 14px;
+  background: #e8dcc8;
+  border-radius: 7px;
+  border: 1.5px solid #8a5a3b;
+  position: relative;
+  overflow: hidden;
+}
+
+.cook-gauge-zones {
+  position: absolute;
+  inset: 0;
+  display: flex;
+}
+
+.zone-raw {
+  width: 38%;
+  background: #f7d2b0;
+}
+
+.zone-good {
+  width: 10%;
+  background: #f6e7a1;
+}
+
+.zone-perfect {
+  width: 22%;
+  background: #a3e7be;
+  box-shadow: 0 0 4px rgba(79, 168, 131, 0.6);
+}
+
+.zone-burnt {
+  width: 20%;
+  background: #ff9b94;
+}
+
+.cook-gauge-pointer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #2b170c;
+  border-radius: 2px;
+  transform: translateX(-50%);
+  transition: left 0.1s linear;
+  z-index: 3;
+}
+
+.pot-hint {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-align: center;
+  color: var(--soft);
+}
+
+/* Action button for changing oil and frying buttons */
+.fryer-card .btn-sm,
+#btn-fry-chicken,
+#btn-fry-fries,
+#btn-add-drink {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px 10px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.oil-change-btn,
+#btn-change-oil {
+  min-height: 44px;
+  min-width: 44px;
+  border: 1.5px dashed var(--line);
+  background: transparent;
+  color: var(--soft);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.oil-change-btn:hover {
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* Prep / Assemble Station (Khay hoàn thiện & bàn giao) */
+.assemble-card {
+  background: var(--panel);
+  border: 2px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 8px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: var(--shadow-sm);
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+.tray-title {
+  font-size: 0.74rem;
+  font-weight: 800;
+  display: flex;
+  justify-content: space-between;
+  white-space: nowrap;
+  gap: 4px;
+}
+
+.tray-title > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tray-slots {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+  flex: 1;
+  min-height: 85px;
+  background: #f5ebdc;
+  border-radius: 10px;
+  padding: 5px;
+  border: 2px dashed #dfcbb3;
+  align-content: stretch;
+}
+
+.tray-item {
+  background: #fff;
+  border-radius: 8px;
+  border: 1.5px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  position: relative;
+  animation: popIn 0.2s var(--ease-spring);
+}
+
+.tray-item .t-icon {
+  font-size: 1.5rem;
+}
+
+.tray-item .t-img {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  max-width: 36px;
+  max-height: 36px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  flex-shrink: 0;
+}
+
+.tray-item .t-name {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.tray-item .t-quality {
+  font-size: 0.58rem;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-weight: 800;
+  margin-top: 2px;
+}
+
+.t-quality.perfect {
+  background: #d4edda;
+  color: #155724;
+}
+
+.t-quality.good {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.t-quality.raw {
+  background: #fde2c8;
+  color: #8a4b12;
+}
+
+.t-quality.burnt {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.btn-serve {
+  background: linear-gradient(180deg, #4fa883, #388e68);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 10px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #28644a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: auto;
+  min-height: 44px;
+}
+
+.btn-serve:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #28644a;
+}
+
+.btn-serve:disabled {
+  background: #bbb;
+  box-shadow: 0 3px 0 #999;
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Seasoning / Shake Station (Trạm rắc phô mai / quét sốt) */
+.addon-station {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.addon-btn {
+  flex: 1;
+  min-height: 44px;
+  min-width: 44px;
+  border: 1.5px solid var(--line);
+  background: #fff;
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-sizing: border-box;
+}
+
+.addon-btn.active {
+  border-color: var(--orange);
+  background: #fff3e6;
+  color: var(--orange);
+}

@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Preview Kho Nguyên Liệu & 5 Đại Kết Cục — Tiệm Gà Nhà Tui</title>
+  <link rel="stylesheet" href="../../src/styles/variables.css">
+  <link rel="stylesheet" href="../../src/styles/main.css">
+  <link rel="stylesheet" href="../../src/styles/kitchen.css">
+  <link rel="stylesheet" href="../../src/styles/customers.css">
+  <link rel="stylesheet" href="../../src/styles/share.css">
+  <style>
+    body {
+      background: #1e171f;
+      margin: 0;
+      padding: 16px;
+      font-family: var(--font-sans);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      color: #fff;
+    }
+
+    .top-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 10px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .preview-viewport {
+      width: 100%;
+      max-width: 390px;
+      background: var(--bg);
+      border: 3px solid var(--ink);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+      position: relative;
+      box-sizing: border-box;
+      transition: max-width 0.25s ease;
+    }
+
+    .preview-viewport.w-360 {
+      max-width: 360px;
+    }
+
+    .viewport-header {
+      background: var(--ink);
+      color: var(--yellow);
+      padding: 8px 12px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .viewport-content {
+      padding: 14px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .btn-tab {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-tab.active {
+      background: var(--yellow);
+      color: var(--ink);
+      border-color: var(--yellow);
+    }
+  </style>
+</head>
+<body>
+
+  <div style="text-align: center;">
+    <h2 style="color: var(--yellow); margin: 0 0 6px 0; font-family: var(--font-display);">PREVIEW: KHO & 5 ĐẠI KẾT CỤC</h2>
+    <p style="margin: 0; font-size: 0.85rem; opacity: 0.8;">Gemini 1 UI Specialist · Chuẩn hóa 360px & 390px Mobile Thumb Zone</p>
+  </div>
+
+  <div class="top-controls">
+    <span style="font-size: 0.75rem; font-weight: 800; opacity: 0.7;">ĐỘ RỘNG MÀN HÌNH:</span>
+    <button class="btn-tab active" onclick="setViewport(390)">📱 390px (iPhone 14/15)</button>
+    <button class="btn-tab" onclick="setViewport(360)">📱 360px (Android Mini)</button>
+    <span style="font-size: 0.75rem; font-weight: 800; opacity: 0.7; margin-left: 10px;">PHÂN VÙNG:</span>
+    <button class="btn-tab active" id="btn-show-inv" onclick="switchSection('inv')">📦 Kho & Nút -5</button>
+    <button class="btn-tab" id="btn-show-end" onclick="switchSection('ending')">🏆 5 Đại Kết Cục</button>
+  </div>
+
+  <!-- CONTAINER HIỂN THỊ -->
+  <div class="preview-viewport" id="viewport-box">
+    <div class="viewport-header">
+      <span id="vp-size-text">Viewport: 390×844 (9:16)</span>
+      <span style="color: #a8dadc;">● GEMINI 1 UI GATE</span>
+    </div>
+
+    <!-- PHẦN 1: QUẢN LÝ KHO & NÚT -5 HOÀN TIỀN -->
+    <div class="viewport-content" id="section-inventory">
+      <div class="sec-title">
+        <span>📦 Quản Lý Kho & Nguyên Liệu</span>
+        <span style="font-size: 0.75rem; color: var(--soft); font-weight: normal;">Tiền ví: <b id="money-display" style="color: #2e7d32;">450.000đ</b></span>
+      </div>
+      <div class="sec-desc">
+        Hệ thống phân tầng: 5 món cơ bản Ngày 1; các món cao cấp mở khóa theo ngày kinh doanh & phí hợp đồng cung ứng.
+      </div>
+
+      <div class="inventory-list" style="margin-top: 10px;">
+
+        <!-- 1. GÀ TƯƠI CỐT LÕI (MỞ SẴN) -->
+        <div class="item-row" id="row-chicken">
+          <div class="item-icon">🍗</div>
+          <div class="item-meta">
+            <div class="item-name">
+              Gà Tươi Cắt Miếng
+              <span class="shelf-tag">HSD: 2 ngày</span>
+            </div>
+            <div class="item-sub">
+              Tồn kho: <b id="stock-chicken">15</b> kg · Giá: 14.000đ
+            </div>
+          </div>
+          <div class="btn-group">
+            <button class="btn-sm btn-refund" onclick="refundStock('chicken', 14000)" title="Hoàn vốn 5 phần" id="btn-ref-chicken">
+              -5<small>(70k)</small>
+            </button>
+            <button class="btn-sm" onclick="buyStock('chicken', 5, 14000)">
+              +5<small>(70k)</small>
+            </button>
+            <button class="btn-sm primary" onclick="buyStock('chicken', 10, 14000)">
+              +10<small>(140k)</small>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. BỘT CHIÊN GIÒN (MỞ SẴN) -->
+        <div class="item-row" id="row-flour">
+          <div class="item-icon">🌾</div>
+          <div class="item-meta">
+            <div class="item-name">
+              Bột Chiên Giòn Bí Truyền
+              <span class="shelf-tag">HSD: 7 ngày</span>
+            </div>
+            <div class="item-sub">
+              Tồn kho: <b id="stock-flour">20</b> gói · Giá: 3.000đ
+            </div>
+          </div>
+          <div class="btn-group">
+            <button class="btn-sm btn-refund" onclick="refundStock('flour', 3000)" id="btn-ref-flour">
+              -5<small>(15k)</small>
+            </button>
+            <button class="btn-sm" onclick="buyStock('flour', 5, 3000)">
+              +5<small>(15k)</small>
+            </button>
+            <button class="btn-sm primary" onclick="buyStock('flour', 10, 3000)">
+              +10<small>(30k)</small>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. DẦU CHIÊN CAO CẤP (MỞ SẴN) -->
+        <div class="item-row" id="row-oil">
+          <div class="item-icon">🛢️</div>
+          <div class="item-meta">
+            <div class="item-name">
+              Dầu Chiên Can 5L
+              <span class="shelf-tag">HSD: 10 ngày</span>
+            </div>
+            <div class="item-sub">
+              Tồn kho: <b id="stock-oil">4</b> can · Giá: 150.000đ
+            </div>
+          </div>
+          <div class="btn-group">
+            <!-- Tồn < 5 -> disabled -->
+            <button class="btn-sm btn-refund" disabled id="btn-ref-oil" title="Tồn kho ít hơn 5, không thể hoàn trả">
+              -5<small>(750k)</small>
+            </button>
+            <button class="btn-sm" onclick="buyStock('oil', 5, 150000)">
+              +5<small>(750k)</small>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. KHOAI TÂY & PHÔ MAI (MỞ SẴN) -->
+        <div class="item-row" id="row-potato">
+          <div class="item-icon">🍟</div>
+          <div class="item-meta">
+            <div class="item-name">
+              Khoai Tây & Phô Mai Lắc
+              <span class="shelf-tag">HSD: 4 ngày</span>
+            </div>
+            <div class="item-sub">
+              Tồn kho: <b id="stock-potato">10</b> phần · Giá: 8.000đ
+            </div>
+          </div>
+          <div class="btn-group">
+            <button class="btn-sm btn-refund" onclick="refundStock('potato', 8000)" id="btn-ref-potato">
+              -5<small>(40k)</small>
+            </button>
+            <button class="btn-sm" onclick="buyStock('potato', 5, 8000)">
+              +5<small>(40k)</small>
+            </button>
+            <button class="btn-sm primary" onclick="buyStock('potato', 10, 8000)">
+              +10<small>(80k)</small>
+            </button>
+          </div>
+        </div>
+
+        <!-- 5. SỐT CAY XÉ LƯỠI (KHÓA - MỞ NGÀY 3) -->
+        <div class="item-row is-locked" id="row-spicy">
+          <div class="item-icon">🌶️</div>
+          <div class="item-meta">
+            <div class="item-name">
+              Sốt Cay Xé Lưỡi
+              <span class="locked-tag">🔒 Ngày 3</span>
+            </div>
+            <div class="locked-desc">Cần phí hợp đồng cung ứng 50.000đ để nhập vào menu.</div>
+          </div>
+          <div>
+            <button class="btn-unlock" onclick="unlockItem('spicy', 50000, 'Sốt Cay Xé Lưỡi', '🌶️', 12000, 5)">
+              🔓 Mở (50k)
+            </button>
+          </div>
+        </div>
+
+        <!-- 6. SỐT MẬT ONG BƠ TỎI (KHÓA - MỞ NGÀY 4) -->
+        <div class="item-row is-locked" id="row-garlic">
+          <div class="item-icon">🧄</div>
+          <div class="item-meta">
+            <div class="item-name">
+              Sốt Mật Ong Bơ Tỏi
+              <span class="locked-tag">🔒 Ngày 4</span>
+            </div>
+            <div class="locked-desc">Bí kíp gia truyền Bác Ba. Phí chuyển giao 80.000đ.</div>
+          </div>
+          <div>
+            <button class="btn-unlock" onclick="unlockItem('garlic', 80000, 'Sốt Mật Ong Bơ Tỏi', '🧄', 15000, 5)">
+              🔓 Mở (80k)
+            </button>
+          </div>
+        </div>
+
+        <!-- 7. TRÀ ĐÀO KEM SUNDAE (KHÓA - CHƯƠNG 2 / NGÀY 7) -->
+        <div class="item-row is-locked" id="row-dessert">
+          <div class="item-icon">🍨</div>
+          <div class="item-meta">
+            <div class="item-name">
+              Trà Đào & Kem Sundae
+              <span class="locked-tag">🔒 Chương 2</span>
+            </div>
+            <div class="locked-desc">Yêu cầu mở tiệm số 14 và ký quỹ thiết bị lạnh (120.000đ).</div>
+          </div>
+          <div>
+            <button class="btn-unlock" disabled title="Chưa đạt Chương 2">
+              🔒 Khóa
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PHẦN 2: 5 ĐẠI KẾT CỤC (MULTI-ENDING) -->
+    <div class="viewport-content" id="section-ending" style="display: none; padding: 0;">
+      
+      <!-- MENU CHỌN ENDING -->
+      <div style="padding: 12px 14px; background: rgba(0,0,0,0.3); display: flex; gap: 4px; overflow-x: auto;">
+        <button class="btn-tab active" onclick="renderEnding('happy')">🏆 Happy</button>
+        <button class="btn-tab" onclick="renderEnding('open')">🌱 Open</button>
+        <button class="btn-tab" onclick="renderEnding('badA')">💀 Bad 3A</button>
+        <button class="btn-tab" onclick="renderEnding('badB')">💔 Bad 3B</button>
+        <button class="btn-tab" onclick="renderEnding('secret')">🌟 Secret</button>
+      </div>
+
+      <div id="ending-display-area" style="padding: 10px;">
+        <!-- Modal Ending Render Tại Đây -->
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let userMoney = 450000;
+    const stocks = {
+      chicken: 15,
+      flour: 20,
+      oil: 4,
+      potato: 10
+    };
+
+    function updateDisplay() {
+      document.getElementById('money-display').textContent = userMoney.toLocaleString('vi-VN') + 'đ';
+      for (const key in stocks) {
+        const el = document.getElementById('stock-' + key);
+        if (el) el.textContent = stocks[key];
+        const btnRef = document.getElementById('btn-ref-' + key);
+        if (btnRef) {
+          btnRef.disabled = stocks[key] < 5;
+        }
+      }
+    }
+
+    function buyStock(key, qty, costEach) {
+      const total = qty * costEach;
+      if (userMoney < total) {
+        alert('Không đủ tiền!');
+        return;
+      }
+      userMoney -= total;
+      stocks[key] += qty;
+      updateDisplay();
+    }
+
+    function refundStock(key, costEach) {
+      if (stocks[key] < 5) return;
+      stocks[key] -= 5;
+      userMoney += 5 * costEach;
+      updateDisplay();
+    }
+
+    function unlockItem(id, cost, name, icon, price, shelfDays) {
+      if (userMoney < cost) {
+        alert('Không đủ tiền trả phí hợp đồng (' + cost.toLocaleString('vi-VN') + 'đ)!');
+        return;
+      }
+      userMoney -= cost;
+      stocks[id] = 5;
+      const row = document.getElementById('row-' + id);
+      row.className = 'item-row';
+      row.innerHTML = `
+        <div class="item-icon">${icon}</div>
+        <div class="item-meta">
+          <div class="item-name">
+            ${name}
+            <span class="shelf-tag">HSD: ${shelfDays} ngày</span>
+          </div>
+          <div class="item-sub">
+            Tồn kho: <b id="stock-${id}">5</b> phần · Giá: ${price.toLocaleString('vi-VN')}đ
+          </div>
+        </div>
+        <div class="btn-group">
+          <button class="btn-sm btn-refund" onclick="refundStock('${id}', ${price})" id="btn-ref-${id}">
+            -5<small>(${(price * 5 / 1000)}k)</small>
+          </button>
+          <button class="btn-sm" onclick="buyStock('${id}', 5, ${price})">
+            +5<small>(${(price * 5 / 1000)}k)</small>
+          </button>
+          <button class="btn-sm primary" onclick="buyStock('${id}', 10, ${price})">
+            +10<small>(${(price * 10 / 1000)}k)</small>
+          </button>
+        </div>
+      `;
+      updateDisplay();
+    }
+
+    function setViewport(w) {
+      const box = document.getElementById('viewport-box');
+      const text = document.getElementById('vp-size-text');
+      if (w === 360) {
+        box.classList.add('w-360');
+        text.textContent = 'Viewport: 360×800 (Compact Mobile)';
+      } else {
+        box.classList.remove('w-360');
+        text.textContent = 'Viewport: 390×844 (Standard iPhone)';
+      }
+      event.target.parentElement.querySelectorAll('.btn-tab').forEach(b => {
+        if (b.textContent.includes('360') || b.textContent.includes('390')) b.classList.remove('active');
+      });
+      event.target.classList.add('active');
+    }
+
+    function switchSection(sec) {
+      const inv = document.getElementById('section-inventory');
+      const end = document.getElementById('section-ending');
+      document.getElementById('btn-show-inv').classList.toggle('active', sec === 'inv');
+      document.getElementById('btn-show-end').classList.toggle('active', sec === 'ending');
+
+      if (sec === 'inv') {
+        inv.style.display = 'block';
+        end.style.display = 'none';
+      } else {
+        inv.style.display = 'none';
+        end.style.display = 'block';
+        renderEnding('happy');
+      }
+    }
+
+    const ENDINGS_DATA = {
+      happy: {
+        themeClass: 'ending-happy',
+        kicker: '🏆 ĐẠI KẾT CỤC 1 — ĐẠI VIÊN MÃN',
+        icon: '👑',
+        title: 'BẾP LỬA HẺM 1102 & CHUỖI GÀ TRI KỶ',
+        tagline: 'Khi mùi thơm gà rán hòa cùng nghĩa tình Sài Gòn, không đế chế nào có thể đánh bại bạn.',
+        excerpt: 'Mimi đứng trên sân khấu trao giải Gà Vàng, từ từ tháo chiếc đầu mascot Thỏ Cam. Dưới ánh đèn rực rỡ, cô gái nở nụ cười rạng rỡ. Bác Ba trao lại cho bạn chiếc vá gỗ gia truyền của tiệm Gà Chợ Lớn năm 1990. Hẻm 1102 tối nay sáng rực ánh đèn mừng ngày hội ngộ.',
+        karma: { community: 95, craftsmanship: 88, ambition: 72 },
+        stats: { days: 25, rev: '128.500.000đ', stars: '4.95⭐', notes: '12/12' }
+      },
+      open: {
+        themeClass: 'ending-open',
+        kicker: '🌱 ĐẠI KẾT CỤC 2 — BÌNH DỊ AN YÊN',
+        icon: '🏡',
+        title: 'GIÓ HẺM THỔI MÃI',
+        tagline: 'Không cần trở thành đế chế triệu đô, bình yên dưới mái hiên số 14 đã là một hạnh phúc trọn vẹn.',
+        excerpt: 'Tiệm số 14 vẫn mở cửa đón gió chiều mát rượi. Na và Dũng đều đậu vào trường đại học mơ ước. Mimi không còn phải mặc đồ thú bông đi phát tờ rơi nữa, mà trở thành thực khách thân quen mỗi chiều thứ Bảy bên đĩa khoai lắc vàng giòn.',
+        karma: { community: 80, craftsmanship: 75, ambition: 45 },
+        stats: { days: 25, rev: '68.200.000đ', stars: '4.72⭐', notes: '9/12' }
+      },
+      badA: {
+        themeClass: 'ending-bad-bankruptcy',
+        kicker: '💀 BAD ENDING 3A — PHÁ SẢN RỜI HẺM',
+        icon: '🌧️',
+        title: 'CỬA CUỐN ĐÓNG LẠI',
+        tagline: 'Tiếng dầu sôi tắt ngấm, chỉ còn tiếng mưa rơi lộp độp trên mái hiên tôn lạnh lẽo.',
+        excerpt: 'Hạn chót tiền cọc mặt bằng đã điểm. Bạn đứng trước xe đẩy xếp gọn đồ đạc trong một buổi chiều mưa nặng hạt. Bác Ba thở dài, dúi vào túi bạn vài tờ tiền lộ phí. Con hẻm 1102 vắng tiếng cười, bạn lặng lẽ rời đi...',
+        karma: { community: 40, craftsmanship: 50, ambition: 60 },
+        stats: { days: 12, rev: '11.400.000đ', stars: '2.40⭐', notes: '2/12' }
+      },
+      badB: {
+        themeClass: 'ending-bad-corporate',
+        kicker: '💔 BAD ENDING 3B — ĐÁNH MẤT LINH HỒN',
+        icon: '🏢',
+        title: 'CỖ MÁY GÀ VÔ HỒN',
+        tagline: 'Bạn có được triệu đô, nhưng đã đánh mất tất cả những gì làm nên hương vị của một con hẻm.',
+        excerpt: 'Bán 49% cổ phần cho MegaChicken, bạn ngồi trong phòng máy lạnh tầng 30 ngắm nhìn 50 chi nhánh nhượng quyền. Nhưng gà giờ đây dùng bột công nghiệp và thịt đông lạnh nguội ngắt. Bác Ba lặng lẽ bỏ về quê; Thỏ Cam không bao giờ xuất hiện nữa.',
+        karma: { community: 20, craftsmanship: 30, ambition: 98 },
+        stats: { days: 25, rev: '340.000.000đ', stars: '3.10⭐', notes: '4/12' }
+      },
+      secret: {
+        themeClass: 'ending-secret',
+        kicker: '🌟 SECRET ENDING — BẢO VẬT ẨM THỰC',
+        icon: '✨',
+        title: 'CHIẾC VÁ VÀNG 1975',
+        tagline: 'Đẳng cấp nghệ nhân ẩm thực đường phố vươn tầm di sản quốc gia.',
+        excerpt: 'Suốt 20 ngày kinh doanh, tiệm đạt 5.0 sao tuyệt đối, không một miếng gà cháy, độ giòn đạt cảnh giới thượng thừa. Hiệp hội Ẩm thực Quốc tế trao tặng danh hiệu Bàn Tay Vàng. Chiếc vá gỗ của Bác Ba được đúc đồng mạ vàng trang trọng.',
+        karma: { community: 92, craftsmanship: 100, ambition: 85 },
+        stats: { days: 25, rev: '195.000.000đ', stars: '5.00⭐', notes: '12/12' }
+      }
+    };
+
+    function renderEnding(key) {
+      const data = ENDINGS_DATA[key];
+      const area = document.getElementById('ending-display-area');
+
+      area.innerHTML = `
+        <div class="ending-modal">
+          <div class="ending-banner ${data.themeClass}">
+            <div class="ending-kicker">${data.kicker}</div>
+            <div class="ending-illustration">${data.icon}</div>
+            <div class="ending-title">${data.title}</div>
+            <div class="ending-tagline">“${data.tagline}”</div>
+          </div>
+
+          <div class="ending-body">
+            <div class="ending-novel-excerpt">
+              ${data.excerpt}
+            </div>
+
+            <div class="ending-karma-board">
+              <div class="ending-karma-title">
+                <span>Chỉ Số Nghiệp Cảm (Karma)</span>
+                <span>Tác Động Quá Khứ & Vận Mệnh</span>
+              </div>
+              <div class="karma-metric">
+                <div class="karma-metric-header">
+                  <span>❤️ Tình Thân Hẻm (Community)</span>
+                  <span>${data.karma.community}%</span>
+                </div>
+                <div class="karma-bar">
+                  <div class="karma-fill community" style="width: ${data.karma.community}%;"></div>
+                </div>
+              </div>
+              <div class="karma-metric">
+                <div class="karma-metric-header">
+                  <span>🔥 Bản Sắc Nghệ Nhân (Craft)</span>
+                  <span>${data.karma.craftsmanship}%</span>
+                </div>
+                <div class="karma-bar">
+                  <div class="karma-fill craftsmanship" style="width: ${data.karma.craftsmanship}%;"></div>
+                </div>
+              </div>
+              <div class="karma-metric">
+                <div class="karma-metric-header">
+                  <span>💼 Tham Vọng Quy Mô (Ambition)</span>
+                  <span>${data.karma.ambition}%</span>
+                </div>
+                <div class="karma-bar">
+                  <div class="karma-fill ambition" style="width: ${data.karma.ambition}%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="ending-stats-grid">
+              <div class="ending-stat-box">
+                <div class="ending-stat-val">${data.stats.days}</div>
+                <div class="ending-stat-lbl">Ngày Kinh Doanh</div>
+              </div>
+              <div class="ending-stat-box">
+                <div class="ending-stat-val">${data.stats.rev}</div>
+                <div class="ending-stat-lbl">Tổng Doanh Thu</div>
+              </div>
+              <div class="ending-stat-box">
+                <div class="ending-stat-val">${data.stats.stars}</div>
+                <div class="ending-stat-lbl">Đánh Giá Thực Khách</div>
+              </div>
+              <div class="ending-stat-box">
+                <div class="ending-stat-val">${data.stats.notes}</div>
+                <div class="ending-stat-lbl">Thư Thỏ Cam Mimi</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ending-actions">
+            <button class="btn-ending-main" onclick="alert('Bắt đầu New Game+ với giữ lại bí quyết chiên giòn!')">
+              🔄 BẮT ĐẦU NEW GAME+
+            </button>
+            <button class="btn-ending-secondary" onclick="alert('Mở Sổ Ký Ức Hẻm 1102')">
+              📖 XEM LẠI SỔ KÝ ỨC THỎ CAM
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Init
+    updateDisplay();
+  </script>
+</body>
+</html>

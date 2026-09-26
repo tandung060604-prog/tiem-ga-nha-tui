@@ -1,0 +1,221 @@
+/* SUMMARY & VIRAL SHARE CARD STYLES */
+
+.summary-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+
+.summary-title {
+  text-align: center;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.summary-subtitle {
+  text-align: center;
+  margin: -6px 0 6px;
+  font-size: 0.82rem;
+  color: var(--soft);
+  font-weight: 600;
+}
+
+/* Financial Ledger Table */
+.ledger-box {
+  background: var(--bg);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  border: 1.5px solid var(--line);
+}
+
+.ledger-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 0.85rem;
+  color: var(--ink);
+  border-bottom: 1px dashed var(--line);
+}
+
+.ledger-row:last-child {
+  border-bottom: none;
+}
+
+.ledger-row.total {
+  font-weight: 800;
+  font-size: 1.05rem;
+  padding-top: 8px;
+  margin-top: 4px;
+  border-top: 2px solid var(--line-strong);
+  border-bottom: none;
+}
+
+.val-pos { color: var(--mint-dark); font-weight: 700; }
+.val-neg { color: var(--warn); font-weight: 700; }
+
+/* Stars & 5 Criteria Breakdown */
+.stars-summary-box {
+  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+}
+
+.stars-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.stars-score-big {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--gold-dark);
+}
+
+.criteria-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 12px;
+  font-size: 0.75rem;
+}
+
+.criteria-item {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed #f0e4d0;
+  padding: 2px 0;
+}
+
+.criteria-item span:first-child {
+  color: var(--soft);
+  font-weight: 600;
+}
+
+.criteria-item span:last-child {
+  font-weight: 800;
+  color: var(--ink);
+}
+
+/* GenZ Review Card of the Day */
+.review-highlight-card {
+  background: linear-gradient(135deg, #fff7eb, #ffeed7);
+  border: 2px solid #f4a261;
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  box-shadow: 0 4px 12px rgba(244, 162, 97, 0.15);
+  position: relative;
+}
+
+.review-badge-top {
+  position: absolute;
+  top: -10px;
+  right: 14px;
+  background: var(--red);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.review-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.review-avatar {
+  font-size: 1.4rem;
+}
+
+.review-user-name {
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+.review-stars {
+  color: var(--gold-dark);
+  font-size: 0.8rem;
+  margin-left: auto;
+}
+
+.review-quote {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #5a2e12;
+  line-height: 1.35;
+  font-style: italic;
+  margin: 0;
+}
+
+/* Advisor Tip Box (Cố vấn gợi ý) */
+.advisor-box {
+  background: #eef7f2;
+  border-left: 4px solid var(--mint);
+  border-radius: 4px 10px 10px 4px;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  color: #265942;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.advisor-box b {
+  color: var(--mint-dark);
+}
+
+/* Actions Bottom Row */
+.summary-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.btn-share-threads {
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 10px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 3px 0 #333;
+}
+
+.btn-share-threads:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #333;
+}
+
+.btn-next-day {
+  background: var(--red);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--red-dark);
+  letter-spacing: 0.5px;
+}
+
+.btn-next-day:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--red-dark);
+}

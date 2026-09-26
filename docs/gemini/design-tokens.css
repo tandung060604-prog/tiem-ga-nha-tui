@@ -1,0 +1,117 @@
+/* ==========================================================================
+   DESIGN TOKENS — TIỆM GÀ NHÀ TUI
+   Hệ thống biến thiết kế chuẩn cho Game Cozy Quản Lý Tiệm Gà Rán (Mobile-first)
+   Đặc tả: docs/gemini/brief-giao-dien.md
+   ========================================================================== */
+
+:root {
+  /* --- 1. BẢNG MÀU CHÍNH (COLOR PALETTE) --- */
+  /* Màu nền & Bề mặt (Warm Cream & Panel) */
+  --bg: #fdf3e4;            /* Kem ấm nền chính */
+  --panel: #fffaf2;         /* Nền panel / thẻ sáng */
+  --panel-alt: #f8ede0;     /* Nền panel phụ / vùng tương phản nhẹ */
+  --line: #ead7bd;          /* Đường kẻ viền phân cách chuẩn */
+  --line-strong: #d4bda0;   /* Viền nhấn, khung quầy gỗ */
+
+  /* Chữ & Đường nét (Typography & Inks) */
+  --ink: #3d2c2e;           /* Nâu đậm viền sticker & chữ chính (WCAG AA > 7:1) */
+  --soft: #8a6452;          /* Nâu hạt dẻ chữ phụ, chú thích */
+
+  /* Màu thương hiệu & Món ăn (Brand & Food Accents) */
+  --red: #e63946;           /* Đỏ sốt tương ớt, CTA chính, cảnh báo */
+  --red-dark: #c42b37;      /* Đỏ đậm bóng đáy nút CTA */
+  --orange: #f4a261;        /* Cam sốt bơ tỏi / Áo len Thỏ Cam */
+  --gold: #ffd166;          /* Vàng giòn vỏ bột chiên / Sao đánh giá */
+  --gold-dark: #e5b338;     /* Vàng sẫm bóng nút & viền chọn */
+  --mint: #4fa883;          /* Xanh bạc hà tươi mát, thành công, an toàn */
+  --mint-dark: #3b8868;     /* Xanh đậm viền badge hoàn thành */
+  --warn: #e2574c;          /* Cảnh báo cháy, khách quạu */
+
+  /* Bề mặt chuyên dụng (Kitchen & Chalkboard) */
+  --counter: #8a5a3b;       /* Nâu quầy bếp gỗ truyền thống */
+  --counter-dark: #633e24;  /* Nâu quầy bếp đổ bóng */
+  --chalk: #243b2f;         /* Xanh bảng phấn quán ăn */
+  --chalk-ink: #f4efe2;     /* Trắng ngà phấn viết */
+  --chalk-yellow: #f8df81;  /* Vàng phấn ghi chú */
+  --chalk-green: #9fe2bf;   /* Xanh ngọc phấn mục tiêu */
+
+  /* Dầu chiên (Oil Condition States) */
+  --oil-clean: #f9d849;     /* Dầu mới vàng óng */
+  --oil-medium: #b87333;    /* Dầu nâu vừa */
+  --oil-dirty: #422d22;     /* Dầu đen khét */
+
+  /* --- 2. HỆ THỐNG PHÔNG CHỮ (TYPOGRAPHY) --- */
+  --font-display: 'Baloo 2', cursive, sans-serif;
+  --font-body: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+  --font-handwriting: 'Patrick Hand', 'Baloo 2', cursive, sans-serif;
+
+  /* Cỡ chữ (Type Scale) */
+  --text-xs: 0.6875rem;    /* 11px: Nhãn phụ, badge nhỏ */
+  --text-sm: 0.75rem;      /* 12px: Dòng phụ, chú thích */
+  --text-base: 0.875rem;   /* 14px: Chữ thân, mô tả */
+  --text-md: 1rem;         /* 16px: Tiêu đề thẻ, nút bấm chuẩn */
+  --text-lg: 1.125rem;     /* 18px: Tiêu đề cụm, tiền tệ vừa */
+  --text-xl: 1.375rem;     /* 22px: Tiêu đề màn hình */
+  --text-2xl: 1.75rem;     /* 28px: Điểm số to, tiền tệ chính */
+  --text-3xl: 2.25rem;     /* 36px: Số highlight ngày tổng kết */
+
+  /* Chiều cao dòng (Line Height) */
+  --leading-tight: 1.15;
+  --leading-normal: 1.4;
+  --leading-relaxed: 1.6;
+
+  /* --- 3. KHOẢNG CÁCH (SPACING SYSTEM - 4px BASE) --- */
+  --space-1: 0.25rem;      /* 4px */
+  --space-2: 0.5rem;       /* 8px */
+  --space-3: 0.75rem;      /* 12px */
+  --space-4: 1rem;         /* 16px */
+  --space-5: 1.25rem;      /* 20px */
+  --space-6: 1.5rem;       /* 24px */
+  --space-8: 2rem;         /* 32px */
+  --space-10: 2.5rem;      /* 40px */
+
+  /* --- 4. BO GÓC (BORDER RADIUS) --- */
+  --radius-xs: 4px;
+  --radius-sm: 8px;        /* Nút phụ, ô khay thành phẩm */
+  --radius-md: 14px;       /* Thẻ khách, khung modal, ô tab */
+  --radius-lg: 20px;       /* Bảng phấn, khung chảo chiên */
+  --radius-full: 9999px;   /* Pill badge, avatar tròn */
+
+  /* --- 5. ĐỘ RỘNG VIỀN (BORDER WIDTH) --- */
+  --border-thin: 1.5px solid var(--line);
+  --border-sticker: 2px solid var(--ink);
+  --border-thick: 3px solid var(--ink);
+
+  /* --- 6. HIỆU ỨNG ĐỔ BÓNG NỔI STICKER (SHADOWS - NO BLUR / RETRO 2D) --- */
+  --shadow-sm: 0 2px 0 var(--line-strong);
+  --shadow-md: 0 4px 0 var(--line-strong);
+  --shadow-btn-red: 0 4px 0 var(--red-dark);
+  --shadow-btn-gold: 0 4px 0 var(--gold-dark);
+  --shadow-sticker: 0 3px 0 var(--ink);
+  --shadow-modal: 0 8px 0 rgba(61, 44, 46, 0.25);
+  --shadow-glow-gold: 0 0 16px rgba(255, 209, 102, 0.6);
+  --shadow-glow-orange: 0 0 18px rgba(244, 162, 97, 0.65);
+
+  /* --- 7. THỜI LƯỢNG CHUYỂN ĐỘNG (ANIMATION TIMING) --- */
+  --dur-fast: 120ms;
+  --dur-normal: 200ms;
+  --dur-slow: 300ms;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* --- 8. PHÂN LỚP HIỂN THỊ (Z-INDEX) --- */
+  --z-bg: 0;
+  --z-base: 1;
+  --z-counter: 10;
+  --z-hud: 20;
+  --z-floating: 50;
+  --z-modal-backdrop: 100;
+  --z-modal-content: 101;
+  --z-toast: 200;
+
+  /* --- 9. RÀNG BUỘC KÍCH THƯỚC DI ĐỘNG & VÙNG NGÓN CÁI (THUMB ZONE) --- */
+  --app-max-width: 430px;
+  --target-touch-min: 44px; /* Tối thiểu theo chuẩn Apple/Android HIG */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Tiệm Gà Nhà Tui — Game Quản Lý Tiệm Gà Rán Cozy Hẻm Sài Gòn</title>
+  <meta name="description" content="Từ chiếc xe đẩy gà rán 850k đầu hẻm đến chuỗi gà quốc dân. Trải nghiệm game quản lý ấm cúng, chiên gà sướng tay và cười thả ga cùng review GenZ." />
+  
+  <!-- Google Fonts: Baloo 2 & Be Vietnam Pro -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Patrick+Hand&display=swap" rel="stylesheet" />
+
+  <style>
+    /* CSS nhúng trực tiếp chuẩn tiêu chí 1 file duy nhất */
+    :root {
+      --bg: #fdf3e4;
+      --panel: #fffaf2;
+      --panel-alt: #f8ede0;
+      --line: #ead7bd;
+      --line-strong: #d4bda0;
+      --ink: #3d2c2e;
+      --soft: #8a6452;
+      --red: #e63946;
+      --red-dark: #c42b37;
+      --orange: #f4a261;
+      --gold: #ffd166;
+      --gold-dark: #e5b338;
+      --mint: #4fa883;
+      --mint-dark: #3b8868;
+      --counter: #8a5a3b;
+      --font-display: 'Baloo 2', cursive, sans-serif;
+      --font-body: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-body);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .landing-shell {
+      width: 100%;
+      max-width: 480px;
+      background: var(--panel);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 36px rgba(61, 44, 46, 0.1);
+      position: relative;
+    }
+
+    /* Mái hiên sọc đỏ - kem */
+    .awning-stripe {
+      height: 16px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--red) 0px,
+        var(--red) 20px,
+        var(--panel) 20px,
+        var(--panel) 40px
+      );
+      border-bottom: 3px solid var(--ink);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 36px 24px 28px;
+      text-align: center;
+      background: radial-gradient(circle at 50% 20%, #fff7eb 0%, var(--panel) 100%);
+      border-bottom: 2px solid var(--line);
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffe8d6;
+      border: 1.5px solid var(--orange);
+      color: #c45511;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .mascot-avatar {
+      width: 110px;
+      height: 110px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3.5px solid var(--ink);
+      box-shadow: 0 6px 0 var(--line-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--ink);
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+
+    .hero-title span {
+      color: var(--red);
+    }
+
+    .hero-tagline {
+      font-size: 0.95rem;
+      color: var(--soft);
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .hero-tagline b {
+      color: var(--ink);
+    }
+
+    .btn-play-now {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      min-height: 56px;
+      background: var(--red);
+      color: #fff;
+      text-decoration: none;
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 800;
+      border-radius: 16px;
+      border: 2px solid var(--red-dark);
+      box-shadow: 0 6px 0 var(--red-dark);
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .btn-play-now:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 var(--red-dark);
+    }
+
+    .play-subhint {
+      font-size: 0.75rem;
+      color: var(--mint-dark);
+      font-weight: 700;
+      margin-top: 10px;
+    }
+
+    /* 3 Feature Cards */
+    .features {
+      padding: 28px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .section-header {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--ink);
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .feature-card {
+      background: var(--panel-alt);
+      border: 2px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      box-shadow: 0 3px 0 var(--line-strong);
+    }
+
+    .feature-icon-box {
+      width: 56px;
+      height: 56px;
+      background: #fff;
+      border: 2px solid var(--ink);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      flex-shrink: 0;
+      box-shadow: 0 2px 0 var(--line-strong);
+    }
+
+    .feature-body h3 {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 2px;
+    }
+
+    .feature-body p {
+      font-size: 0.82rem;
+      color: var(--soft);
+      line-height: 1.4;
+    }
+
+    /* Review Gallery Showcase */
+    .review-gallery {
+      padding: 20px;
+      background: #fbf5ec;
+      border-top: 2px dashed var(--line);
+      border-bottom: 2px dashed var(--line);
+    }
+
+    .review-card-demo {
+      background: #fff;
+      border: 2px solid var(--ink);
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 12px;
+      box-shadow: 0 4px 0 var(--line-strong);
+    }
+
+    .review-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .review-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    .review-stars-gold {
+      color: #e5b338;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+    }
+
+    .review-text-quote {
+      font-size: 0.85rem;
+      font-style: italic;
+      color: #4a3637;
+      line-height: 1.45;
+    }
+
+    /* Mystery Bunny Spotlight */
+    .bunny-spotlight {
+      padding: 24px 20px;
+      background: linear-gradient(180deg, #fffbf5 0%, #fff3e0 100%);
+      border-bottom: 2px solid var(--line);
+    }
+
+    .bunny-box {
+      border: 2px solid var(--orange);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      box-shadow: 0 4px 14px rgba(244, 162, 97, 0.25);
+    }
+
+    .bunny-thumb {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 2.5px solid var(--orange);
+      background: #fff;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .bunny-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 28px 20px 40px;
+      text-align: center;
+      background: var(--panel);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 12px;
+    }
+
+    .social-btn {
+      padding: 8px 16px;
+      background: #000;
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 800;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .social-btn.discord {
+      background: #5865f2;
+    }
+
+    .disclaimer {
+      font-size: 0.72rem;
+      color: #a4816e;
+      line-height: 1.4;
+      max-width: 320px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="landing-shell">
+    <!-- Mái hiên đỏ kem -->
+    <div class="awning-stripe"></div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-badge">
+        <span>🍗</span> Game Quản Lý Cozy Việt Nam
+      </div>
+
+      <div class="mascot-avatar">
+        🐣
+      </div>
+
+      <h1 class="hero-title">
+        Tiệm Gà <span>Nhà Tui</span>
+      </h1>
+
+      <p class="hero-tagline">
+        Từ xe đẩy gà rán đầu hẻm đến chuỗi gà quốc dân —<br />
+        và mỗi review 1 sao là một <b>content bá đạo</b>.
+      </p>
+
+      <a href="http://localhost:3000/" class="btn-play-now" id="btn-cta-play">
+        🍗 CHƠI NGAY — KHÔNG CẦN CÀI
+      </a>
+
+      <div class="play-subhint">
+        ⚡ Chơi trực tiếp trên trình duyệt điện thoại · 1 ngón cái
+      </div>
+    </section>
+
+    <!-- 3 Thẻ Tính Năng Chính -->
+    <section class="features">
+      <div class="section-header">Gameplay Gây Nghiện</div>
+
+      <!-- Feature 1 -->
+      <div class="feature-card">
+        <div class="feature-icon-box">🍳</div>
+        <div class="feature-body">
+          <h3>Chiên Sướng Tay</h3>
+          <p>Canh thời gian chảo dầu sôi sùng sục, nhấc đùi gà đúng tích tắc Vàng Giòn Perfect để bùng nổ hương vị.</p>
+        </div>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="feature-card">
+        <div class="feature-icon-box">⭐</div>
+        <div class="feature-body">
+          <h3>Review GenZ Bá Đạo</h3>
+          <p>Đối phó với khách Karen khó tính, chiều chuộng học sinh tan trường, và chụp màn hình khoe review cười ra nước mắt.</p>
+        </div>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="feature-card">
+        <div class="feature-icon-box">🏘️</div>
+        <div class="feature-body">
+          <h3>Từ Xe Đẩy Thành Chuỗi</h3>
+          <p>Hành trình 5 chương vượt qua tập đoàn MegaChicken tỷ đô để giành cúp danh giá "Gà Vàng Quốc Dân".</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Khách Tri Kỷ Bé Thỏ Cam Spotlight -->
+    <section class="bunny-spotlight">
+      <div class="bunny-box">
+        <div class="bunny-thumb">
+          <img src="/assets/characters/mystery_bunny.png" alt="Bé Thỏ Cam" />
+        </div>
+        <div style="min-width: 0;">
+          <div style="font-family: var(--font-display); font-size: 0.95rem; font-weight: 800; color: #bf360c;">
+            🐰 Gặp Gỡ Bé Thỏ Cam
+          </div>
+          <p style="font-size: 0.78rem; color: #5d4037; line-height: 1.35; margin-top: 2px;">
+            Vị khách tri kỷ thầm lặng với chiếc miệng chữ x, gửi tặng những mẩu giấy nhớ kết nối số phận 12 cư dân Hẻm 1102.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Review Showcase Feed -->
+    <section class="review-gallery">
+      <div class="section-header">Khách Hàng Nói Gì?</div>
+
+      <!-- 5 sao review -->
+      <div class="review-card-demo">
+        <div class="review-top">
+          <div class="review-user">
+            <span>👧</span> <b>Bé Trúc Mê Gà</b>
+          </div>
+          <div class="review-stars-gold">★★★★★</div>
+        </div>
+        <p class="review-text-quote">
+          "Xe đẩy đầu hẻm mà gà giòn rụm thơm nức mũi! Giá 35k học sinh sinh viên quá chừng, chiều nào tan học cũng phải ghé làm miếng!"
+        </p>
+      </div>
+
+      <!-- 1 sao hài review -->
+      <div class="review-card-demo" style="border-color: var(--red);">
+        <div class="review-top">
+          <div class="review-user">
+            <span>👵</span> <b>Chị Lan Khó Tính</b>
+          </div>
+          <div class="review-stars-gold" style="color: var(--red);">★☆☆☆☆</div>
+        </div>
+        <p class="review-text-quote">
+          "Gà chiên quá giòn khiến tôi nhai phát ra tiếng rôm rốp làm cả rạp chiếu phim quay lại nhìn! Quá quắt! Cho 1 sao vì quá ngon!"
+        </p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="social-links">
+        <a href="https://threads.net" target="_blank" class="social-btn">
+          <span>🧵</span> Threads
+        </a>
+        <a href="https://discord.com" target="_blank" class="social-btn discord">
+          <span>💬</span> Discord
+        </a>
+      </div>
+
+      <p class="disclaimer">
+        © 2026 Tiệm Gà Nhà Tui.<br />
+        Game giải trí hư cấu ấm cúng, không liên quan hay bảo trợ bởi bất kỳ thương hiệu đồ ăn nhanh ngoài đời thực nào.
+      </p>
+    </footer>
+  </div>
+
+</body>
+</html>

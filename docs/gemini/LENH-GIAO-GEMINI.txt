@@ -1,0 +1,5 @@
+Mở dự án D:\AI Vin Thực Chiến\Side Project\TiemGaRan.
+Đọc và làm đúng file docs/gemini/nhiem-vu-gio-2.md (giờ làm việc thứ 2).
+Ranh giới file giữ như cũ trong docs/phan-cong.md: chỉ sửa src/styles/*.css, assets-src/**, docs/gemini/** và được thêm mục MANIFEST trong scripts/process-assets.mjs. Không sửa file .ts, index.html, package.json (Claude đang sửa song song).
+Nghiệm thu bằng lệnh: npm run assets, npm run ui:check -- http://localhost:<cổng dev của bạn>, npx vitest run. Dán nguyên dòng kết quả vào báo cáo.
+Hết giờ, ghi báo cáo vào docs/gemini/bao-cao-gio-2.md.

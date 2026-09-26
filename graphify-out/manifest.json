@@ -1,0 +1,578 @@
+{
+  "package.json": {
+    "mtime": 1790414762.9052765,
+    "seen": 1790414873.850616,
+    "ast_hash": "8459ffbc951c784cb85d8ac1f509b140",
+    "semantic_hash": ""
+  },
+  "src/content/chapters.ts": {
+    "mtime": 1790408587.8236182,
+    "seen": 1790408784.4138987,
+    "ast_hash": "1fceebd0c06b83dc01b6287658269198",
+    "semantic_hash": ""
+  },
+  "src/content/characterGenerator.ts": {
+    "mtime": 1790408531.4477324,
+    "seen": 1790408784.4139013,
+    "ast_hash": "d17309228207bfe89e03ad94657f7c7b",
+    "semantic_hash": ""
+  },
+  "src/content/customers.ts": {
+    "mtime": 1790400010.6811285,
+    "seen": 1790406224.7617295,
+    "ast_hash": "8a8135fb65f3cd1e29e4c4d5fb1068ca",
+    "semantic_hash": ""
+  },
+  "src/content/events.ts": {
+    "mtime": 1790408587.8280792,
+    "seen": 1790408784.413905,
+    "ast_hash": "adf086095516bcf4a658db3a04484679",
+    "semantic_hash": ""
+  },
+  "src/content/inventory.ts": {
+    "mtime": 1790406859.0015657,
+    "seen": 1790407713.1899188,
+    "ast_hash": "e3ddec4504036eb9c5ed15df492c59cd",
+    "semantic_hash": ""
+  },
+  "src/content/menu.ts": {
+    "mtime": 1790406860.6942585,
+    "seen": 1790407713.18992,
+    "ast_hash": "9744345368ec198b43ee356465649e22",
+    "semantic_hash": ""
+  },
+  "src/content/mysteryBunny.ts": {
+    "mtime": 1790408587.8245482,
+    "seen": 1790408784.4139097,
+    "ast_hash": "0db98e46edd6a867e31510ee71a4dc05",
+    "semantic_hash": ""
+  },
+  "src/content/mysteryGuests.ts": {
+    "mtime": 1790400951.9227767,
+    "seen": 1790406224.7617412,
+    "ast_hash": "d9aab4d7a8ebefdb2a9cad34a0c1ff06",
+    "semantic_hash": ""
+  },
+  "src/content/reviews.ts": {
+    "mtime": 1790408587.8255227,
+    "seen": 1790408784.4139128,
+    "ast_hash": "4028817e6a09c5fae429761c035d0c85",
+    "semantic_hash": ""
+  },
+  "src/content/staff.ts": {
+    "mtime": 1790408518.1739974,
+    "seen": 1790408784.4139144,
+    "ast_hash": "f5ad260ec6f2b887a3277712303c7e6c",
+    "semantic_hash": ""
+  },
+  "src/content/storyNovel.ts": {
+    "mtime": 1790408587.8275237,
+    "seen": 1790408784.4139159,
+    "ast_hash": "b0a8733df363a6f9175b7316a583e48a",
+    "semantic_hash": ""
+  },
+  "src/content/upgrades.ts": {
+    "mtime": 1790413993.027088,
+    "seen": 1790414243.5964134,
+    "ast_hash": "a0aa9de7b6cf0a03bcb0d3c710ac4a3b",
+    "semantic_hash": ""
+  },
+  "src/core/audio.ts": {
+    "mtime": 1790398832.7593288,
+    "seen": 1790406224.7617521,
+    "ast_hash": "6cef6e44aec22638ee8748ab601e226f",
+    "semantic_hash": ""
+  },
+  "src/core/cooking.ts": {
+    "mtime": 1790413967.9835255,
+    "seen": 1790414243.5964172,
+    "ast_hash": "512891b5493bf4b72b8fef5860c185e4",
+    "semantic_hash": ""
+  },
+  "src/core/economy.ts": {
+    "mtime": 1790414822.160037,
+    "seen": 1790414873.8506436,
+    "ast_hash": "3ab0d2622f39d5f4bb8b0caca0458949",
+    "semantic_hash": ""
+  },
+  "src/core/orders.ts": {
+    "mtime": 1790414055.1461625,
+    "seen": 1790414243.596421,
+    "ast_hash": "634286ee883d4426249bc4996e4ed900",
+    "semantic_hash": ""
+  },
+  "src/core/reviewsEngine.ts": {
+    "mtime": 1790413967.9824603,
+    "seen": 1790414243.5964224,
+    "ast_hash": "b9c402412d30035a37164927054b1d5c",
+    "semantic_hash": ""
+  },
+  "src/core/state.ts": {
+    "mtime": 1790409544.1412785,
+    "seen": 1790409682.1189508,
+    "ast_hash": "ba17c5c6b448f0a49fc00cbdcdb7819d",
+    "semantic_hash": ""
+  },
+  "src/main.ts": {
+    "mtime": 1790414712.3527572,
+    "seen": 1790414873.8506544,
+    "ast_hash": "9beae6e419cad6a233fb85b2436b65a2",
+    "semantic_hash": ""
+  },
+  "src/types/game.ts": {
+    "mtime": 1790408587.8236182,
+    "seen": 1790408784.413932,
+    "ast_hash": "bae6c8d17a87ec9b653df281c82c7733",
+    "semantic_hash": ""
+  },
+  "src/ui/components/BunnyModal.ts": {
+    "mtime": 1790414055.1461625,
+    "seen": 1790414243.5964317,
+    "ast_hash": "8a4985c956dbb1e2d434f0ffab3a7d21",
+    "semantic_hash": ""
+  },
+  "src/ui/components/Chalkboard.ts": {
+    "mtime": 1790413873.684514,
+    "seen": 1790414243.5964327,
+    "ast_hash": "4fac9701251fffe64cadf90bf9a60245",
+    "semantic_hash": ""
+  },
+  "src/ui/components/Header.ts": {
+    "mtime": 1790408218.2044036,
+    "seen": 1790408784.4139364,
+    "ast_hash": "7ed8326e8440d5ec36d4694025983d60",
+    "semantic_hash": ""
+  },
+  "src/ui/components/InventoryTab.ts": {
+    "mtime": 1790408630.8485012,
+    "seen": 1790408784.4139378,
+    "ast_hash": "79c7a2c0967566ab17a10ffcd91224ae",
+    "semantic_hash": ""
+  },
+  "src/ui/components/MenuTab.ts": {
+    "mtime": 1790414055.1471617,
+    "seen": 1790414243.5964363,
+    "ast_hash": "17674ece2baeef4c576c494506cfffd5",
+    "semantic_hash": ""
+  },
+  "src/ui/components/ReviewsTab.ts": {
+    "mtime": 1790408630.8505154,
+    "seen": 1790408784.4139404,
+    "ast_hash": "530f57e48fb640f90006219b47595f5c",
+    "semantic_hash": ""
+  },
+  "src/ui/components/SellingView.ts": {
+    "mtime": 1790414055.1489134,
+    "seen": 1790414243.5964386,
+    "ast_hash": "5b0627defa6a366cc4175080792a4e26",
+    "semantic_hash": ""
+  },
+  "src/ui/components/SettingsModal.ts": {
+    "mtime": 1790406973.4546075,
+    "seen": 1790407713.1899543,
+    "ast_hash": "fe6f268a4c9d0e8d8d5685e527d5f292",
+    "semantic_hash": ""
+  },
+  "src/ui/components/ShareCard.ts": {
+    "mtime": 1790398957.382058,
+    "seen": 1790406224.7617881,
+    "ast_hash": "39a729b36e4d0db0ca28ff48ca669614",
+    "semantic_hash": ""
+  },
+  "src/ui/components/StaffTab.ts": {
+    "mtime": 1790408630.8505154,
+    "seen": 1790408784.413952,
+    "ast_hash": "020b88333811596954e70de527217162",
+    "semantic_hash": ""
+  },
+  "src/ui/components/StoryModal.ts": {
+    "mtime": 1790401897.4602213,
+    "seen": 1790406224.7617934,
+    "ast_hash": "b9206941031e891fd7d570545d991762",
+    "semantic_hash": ""
+  },
+  "src/ui/components/SummaryModal.ts": {
+    "mtime": 1790408283.2936423,
+    "seen": 1790408784.413955,
+    "ast_hash": "28604fccb47532e5068205f36ef5d723",
+    "semantic_hash": ""
+  },
+  "src/ui/components/UpgradesTab.ts": {
+    "mtime": 1790413993.0280862,
+    "seen": 1790414243.596446,
+    "ast_hash": "1bdb2f650bb01896372538f56f06b86b",
+    "semantic_hash": ""
+  },
+  "tsconfig.json": {
+    "mtime": 1790408640.2637064,
+    "seen": 1790408784.4139602,
+    "ast_hash": "aebfc1b66d7739d3f4a5807215fde779",
+    "semantic_hash": ""
+  },
+  "vite.config.ts": {
+    "mtime": 1790398644.92903,
+    "seen": 1790406224.7618022,
+    "ast_hash": "eae20ff3fb4bd398fe1bebac2dc86d7f",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1790407113.0827231,
+    "seen": 1790407713.1899714,
+    "ast_hash": "eff3783b63173bf2e47eefdf016880af",
+    "semantic_hash": ""
+  },
+  "K\u1ebf ho\u1ea1ch game Ti\u1ec7m G\u00e0 Nh\u00e0 Tui.md": {
+    "mtime": 1790397342.3968427,
+    "seen": 1790406224.7618272,
+    "ast_hash": "7151e66889e84e3f3a0b0935a75dedad",
+    "semantic_hash": ""
+  },
+  "docs/01-review-va-ke-hoach.md": {
+    "mtime": 1790405650.6668842,
+    "seen": 1790406224.7618294,
+    "ast_hash": "218415dfcaa787c9d2fc4857326020b2",
+    "semantic_hash": ""
+  },
+  "docs/02-story-bible-v2.md": {
+    "mtime": 1790405740.0655656,
+    "seen": 1790406224.7618313,
+    "ast_hash": "307302cbf97b93aed695c73f3768f509",
+    "semantic_hash": ""
+  },
+  "docs/gemini/brief-asset.md": {
+    "mtime": 1790407970.011436,
+    "seen": 1790408784.4139743,
+    "ast_hash": "0a6d7fd0967a4b8fcfb815822142c387",
+    "semantic_hash": ""
+  },
+  "docs/gemini/brief-giao-dien.md": {
+    "mtime": 1790405804.469803,
+    "seen": 1790406224.7618349,
+    "ast_hash": "afca25b07200e074888299216ef6c1b3",
+    "semantic_hash": ""
+  },
+  "docs/gemini/landing.html": {
+    "mtime": 1790406206.8475204,
+    "seen": 1790406224.7618363,
+    "ast_hash": "2bbd27e1e894ca00d51b97b1729ff7ef",
+    "semantic_hash": ""
+  },
+  "index.html": {
+    "mtime": 1790409157.7698274,
+    "seen": 1790409431.4866805,
+    "ast_hash": "48e10460b94d1e3ffd8a5a01f12cdec7",
+    "semantic_hash": ""
+  },
+  "public/assets/characters/mystery_bunny.png": {
+    "mtime": 1790401245.9245186,
+    "seen": 1790406224.7618396,
+    "ast_hash": "0d5e03e3281e37cb7b5eb629f9f55d10",
+    "semantic_hash": ""
+  },
+  ".agents/mcp_config.json": {
+    "mtime": 1790407082.8976984,
+    "seen": 1790407713.189897,
+    "ast_hash": "0ad8faa98742087fb873cafbe0957eaa",
+    "semantic_hash": ""
+  },
+  "src/core/inventory.ts": {
+    "mtime": 1790408587.82912,
+    "seen": 1790408784.413923,
+    "ast_hash": "1034b9554e1c8b73283e688e29128d34",
+    "semantic_hash": ""
+  },
+  "src/ui/escapeHtml.ts": {
+    "mtime": 1790408587.8509588,
+    "seen": 1790408784.4139576,
+    "ast_hash": "1209c801e68da5c8d88d00dec9d8973b",
+    "semantic_hash": ""
+  },
+  "tests/p0-fixes.test.ts": {
+    "mtime": 1790413892.659555,
+    "seen": 1790414243.5964508,
+    "ast_hash": "e7ba55f243bf8db64e67dbaac07fcae3",
+    "semantic_hash": ""
+  },
+  ".agents/rules/parallel-agents.md": {
+    "mtime": 1790407127.8254442,
+    "seen": 1790407713.1899688,
+    "ast_hash": "a277c0a386c31ae59dd2060b420694c0",
+    "semantic_hash": ""
+  },
+  "AGENTS.md": {
+    "mtime": 1790407098.315778,
+    "seen": 1790407713.1899703,
+    "ast_hash": "01b1ee348c5c21d1cbf5475b81531881",
+    "semantic_hash": ""
+  },
+  "docs/gemini/asset-notes.md": {
+    "mtime": 1790406360.8461232,
+    "seen": 1790407713.1899774,
+    "ast_hash": "9d640a70a0264e5063a05ec568bd7e81",
+    "semantic_hash": ""
+  },
+  "docs/gemini/notes.md": {
+    "mtime": 1790406220.7125857,
+    "seen": 1790407713.189983,
+    "ast_hash": "9a38e02ae495c82733930c8c381c907a",
+    "semantic_hash": ""
+  },
+  "src/core/rng.ts": {
+    "mtime": 1790408500.9491827,
+    "seen": 1790408784.4139278,
+    "ast_hash": "a419120e4d500e672d4f58c936bf8523",
+    "semantic_hash": ""
+  },
+  "docs/gemini/LENH-GIAO-GEMINI.txt": {
+    "mtime": 1790408464.0871558,
+    "seen": 1790408784.4139714,
+    "ast_hash": "97d78f810c7ae513e8347a7c4f2b0f28",
+    "semantic_hash": ""
+  },
+  "docs/gemini/nhiem-vu-gio-1.md": {
+    "mtime": 1790407960.5771298,
+    "seen": 1790408784.4139783,
+    "ast_hash": "77918b6b327b118a816fee16a6ed4d6b",
+    "semantic_hash": ""
+  },
+  "docs/phan-cong.md": {
+    "mtime": 1790414786.6778634,
+    "seen": 1790414873.8507123,
+    "ast_hash": "81d6b6c9328cd7fb1ef67dd0990c1b3e",
+    "semantic_hash": ""
+  },
+  "docs/gemini/screenshots/ban-hang-390px.png": {
+    "mtime": 1790407924.981905,
+    "seen": 1790408784.4139838,
+    "ast_hash": "d63ab139f97ea08698c6b16f2c4407a2",
+    "semantic_hash": ""
+  },
+  "docs/gemini/screenshots/tong-ket-390px.png": {
+    "mtime": 1790407925.0194092,
+    "seen": 1790408784.4139853,
+    "ast_hash": "db90309db3741c55730f4d1088597d8a",
+    "semantic_hash": ""
+  },
+  "src/core/sellingSim.ts": {
+    "mtime": 1790414611.8916385,
+    "seen": 1790414873.8506505,
+    "ast_hash": "24bbeedee58391c20860a9b2d1f1934e",
+    "semantic_hash": ""
+  },
+  "tests/selling-sim.test.ts": {
+    "mtime": 1790413892.6605551,
+    "seen": 1790414243.5964534,
+    "ast_hash": "96ca13da70d429af8d89d14130b47cd4",
+    "semantic_hash": ""
+  },
+  "docs/gemini/bao-cao-gio-1.md": {
+    "mtime": 1790414523.972576,
+    "seen": 1790414873.8507025,
+    "ast_hash": "2b9f88ee5d0b2ca8d069e5289f7e7e44",
+    "semantic_hash": ""
+  },
+  "docs/gemini/yeu-cau-markup.md": {
+    "mtime": 1790409137.8364413,
+    "seen": 1790409431.4866772,
+    "ast_hash": "7546ec2084833162389d669e2d97b016",
+    "semantic_hash": ""
+  },
+  "public/assets/food/food_crispy_chicken_perfect.png": {
+    "mtime": 1790414699.687,
+    "seen": 1790414873.8507369,
+    "ast_hash": "2204641c6ee54b5ec2b3f00f7d55b0ae",
+    "semantic_hash": ""
+  },
+  "tests/save-migration.test.ts": {
+    "mtime": 1790409485.0814106,
+    "seen": 1790409682.1189792,
+    "ast_hash": "2927ab74155c06070538afc5b31aac83",
+    "semantic_hash": ""
+  },
+  "src/content/assets.ts": {
+    "mtime": 1790414030.8273387,
+    "seen": 1790414243.596395,
+    "ast_hash": "5a88ba331c0b035806f080925d26f714",
+    "semantic_hash": ""
+  },
+  "src/core/clock.ts": {
+    "mtime": 1790413845.2415302,
+    "seen": 1790414243.596416,
+    "ast_hash": "18225653c57e4a8833860c86ede521ca",
+    "semantic_hash": ""
+  },
+  "src/core/upgrades.ts": {
+    "mtime": 1790413934.202215,
+    "seen": 1790414243.5964274,
+    "ast_hash": "dc68c40ed49096b54909c61f0389c742",
+    "semantic_hash": ""
+  },
+  "tests/assets.test.ts": {
+    "mtime": 1790414057.1432781,
+    "seen": 1790414243.5964484,
+    "ast_hash": "c7f8ac062d544837e72307ddf7e433df",
+    "semantic_hash": ""
+  },
+  "tests/clock.test.ts": {
+    "mtime": 1790413892.6605551,
+    "seen": 1790414243.5964496,
+    "ast_hash": "43b90e58eb30a079404865971accd59e",
+    "semantic_hash": ""
+  },
+  "tests/upgrades.test.ts": {
+    "mtime": 1790414012.1917903,
+    "seen": 1790414243.5964549,
+    "ast_hash": "1b116c40f7f9a0bb0ff60b10b57fa59c",
+    "semantic_hash": ""
+  },
+  ".agents/skills/game-feel-polish/SKILL.md": {
+    "mtime": 1790414163.731832,
+    "seen": 1790414243.5964599,
+    "ast_hash": "1e9b7988cbd0074ab5c9af1143b5fcc7",
+    "semantic_hash": ""
+  },
+  ".agents/skills/game-gameplay-systems/SKILL.md": {
+    "mtime": 1790414142.0009112,
+    "seen": 1790414243.5964608,
+    "ast_hash": "7ac52bced36b7a2d618cea7f0d9433a7",
+    "semantic_hash": ""
+  },
+  ".agents/skills/game-narrative-director/SKILL.md": {
+    "mtime": 1790414099.5358381,
+    "seen": 1790414243.5964618,
+    "ast_hash": "1ed933147a37b415f2b0b9a16910e487",
+    "semantic_hash": ""
+  },
+  ".agents/skills/procedural-content-generator/SKILL.md": {
+    "mtime": 1790414194.2629757,
+    "seen": 1790414243.596463,
+    "ast_hash": "eadda905649c0dfac6b9709295766b60",
+    "semantic_hash": ""
+  },
+  "docs/bao-cao/claude-gio-1.md": {
+    "mtime": 1790414244.2238758,
+    "seen": 1790414873.8506973,
+    "ast_hash": "786105b4c99aba504d4b9a0ee6f4a5bc",
+    "semantic_hash": ""
+  },
+  "assets-src/characters/char_bacba_sheet.jpg": {
+    "mtime": 1790406291.7933762,
+    "seen": 1790414243.5964847,
+    "ast_hash": "8a3d19738e4d88257a51f6a4fdc06e3f",
+    "semantic_hash": ""
+  },
+  "assets-src/characters/char_thocam_sheet.jpg": {
+    "mtime": 1790406267.5626788,
+    "seen": 1790414243.5964859,
+    "ast_hash": "2379eb53df3107caf8803a55bb11e5b6",
+    "semantic_hash": ""
+  },
+  "assets-src/food/food_crispy_chicken_perfect.png": {
+    "mtime": 1790406314.883353,
+    "seen": 1790414243.5964868,
+    "ast_hash": "be149facd11f2bf30e3e4e188f36f506",
+    "semantic_hash": ""
+  },
+  "assets-src/mascot/mascot_gabong_sheet.jpg": {
+    "mtime": 1790406244.9394464,
+    "seen": 1790414243.596488,
+    "ast_hash": "4c8e2968fa8d817462c01a74d6104e04",
+    "semantic_hash": ""
+  },
+  "public/assets/characters/char_bacba_front.png": {
+    "mtime": 1790414700.424,
+    "seen": 1790414873.8507226,
+    "ast_hash": "49d1ed19442537fede165d3be1e0062f",
+    "semantic_hash": ""
+  },
+  "public/assets/characters/char_bacba_three_quarter.png": {
+    "mtime": 1790414700.69,
+    "seen": 1790414873.8507237,
+    "ast_hash": "a48da31da538590ba6e0c5c646938d5e",
+    "semantic_hash": ""
+  },
+  "public/assets/characters/char_thocam_buon.png": {
+    "mtime": 1790414701.255,
+    "seen": 1790414873.8507252,
+    "ast_hash": "7118d4ee5605c383948671ddf8836796",
+    "semantic_hash": ""
+  },
+  "public/assets/characters/char_thocam_front.png": {
+    "mtime": 1790414700.928,
+    "seen": 1790414873.8507264,
+    "ast_hash": "65b4cf705a8aa338e21ea72ee1dff9b8",
+    "semantic_hash": ""
+  },
+  "public/assets/characters/char_thocam_ngac_nhien.png": {
+    "mtime": 1790414701.371,
+    "seen": 1790414873.8507278,
+    "ast_hash": "10cd60fde7444e38eff50a9f7ca224a3",
+    "semantic_hash": ""
+  },
+  "public/assets/characters/char_thocam_ngu.png": {
+    "mtime": 1790414701.579,
+    "seen": 1790414873.8507292,
+    "ast_hash": "39d247cf5c237ff14e8e23d18a20b211",
+    "semantic_hash": ""
+  },
+  "public/assets/characters/char_thocam_notes.png": {
+    "mtime": 1790414700.851,
+    "seen": 1790414873.8507304,
+    "ast_hash": "693252d18d9a43775535f713c068783a",
+    "semantic_hash": ""
+  },
+  "public/assets/characters/char_thocam_side.png": {
+    "mtime": 1790414701.002,
+    "seen": 1790414873.8507318,
+    "ast_hash": "e279e49e9f251d32fb8e3855d07f39ab",
+    "semantic_hash": ""
+  },
+  "public/assets/characters/char_thocam_suy_nghi.png": {
+    "mtime": 1790414701.476,
+    "seen": 1790414873.850733,
+    "ast_hash": "ac4aaeeceab7a1a762d29c3433898831",
+    "semantic_hash": ""
+  },
+  "public/assets/characters/char_thocam_vui.png": {
+    "mtime": 1790414701.104,
+    "seen": 1790414873.850734,
+    "ast_hash": "34333c5619bafb4daa29f91cd252ec34",
+    "semantic_hash": ""
+  },
+  "public/assets/mascot/mascot_gabong_front.png": {
+    "mtime": 1790414699.865,
+    "seen": 1790414873.8507378,
+    "ast_hash": "e58cc9752cfd918b2dbf863989659abd",
+    "semantic_hash": ""
+  },
+  "public/assets/mascot/mascot_gabong_side.png": {
+    "mtime": 1790414700.132,
+    "seen": 1790414873.8507392,
+    "ast_hash": "ad416cbb30c50b9bbb47706d1bbceb09",
+    "semantic_hash": ""
+  },
+  "public/assets/mascot/mascot_gabong_three_quarter.png": {
+    "mtime": 1790414700.002,
+    "seen": 1790414873.8507404,
+    "ast_hash": "fe72a8e942a646abddec66b91b3b1e41",
+    "semantic_hash": ""
+  },
+  "src/core/day.ts": {
+    "mtime": 1790414705.2464063,
+    "seen": 1790414873.8506422,
+    "ast_hash": "42d6b702f2a3a37f256e046e26509222",
+    "semantic_hash": ""
+  },
+  "docs/bao-cao/mo-phong-can-bang.md": {
+    "mtime": 1790414868.751253,
+    "seen": 1790414873.8506982,
+    "ast_hash": "6bf54314db8b721a2c03fbef49356d00",
+    "semantic_hash": ""
+  },
+  "docs/gemini/task-log.md": {
+    "mtime": 1790414675.3295703,
+    "seen": 1790414873.8507097,
+    "ast_hash": "187cc0bd9ab72402e36ef95f2f926e4d",
+    "semantic_hash": ""
+  }
+}

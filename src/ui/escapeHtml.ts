@@ -1,0 +1,14 @@
+// Dùng cho mọi chuỗi do người chơi nhập trước khi nhét vào template innerHTML.
+const ENTITIES: Record<string, string> = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;'
+};
+
+export function escapeHtml(text: string): string {
+  return text.replace(/[&<>"']/g, ch => ENTITIES[ch] ?? ch);
+}
+
+export const SHOP_NAME_MAX = 24;

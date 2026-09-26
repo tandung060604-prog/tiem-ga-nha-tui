@@ -1,0 +1,57 @@
+import { GameState } from '../../types/game';
+import { audio } from '../../core/audio';
+import { escapeHtml } from '../escapeHtml';
+
+export function renderHeader(state: GameState, _onOpenSettings?: () => void): string {
+  const phaseLabel = state.phase === 'prep' ? 'Chuẩn bị' : state.phase === 'selling' ? 'Mở bán' : 'Tổng kết';
+  const soundIcon = audio.getMuted() ? '🔇' : '🔊';
+
+  // Format VNĐ e.g. 850.000đ
+  const formattedMoney = state.money.toLocaleString('vi-VN') + 'đ';
+
+  // Stars representation
+  const starCount = Math.round(state.ratings.overall);
+  let starsHtml = '';
+  for (let i = 1; i <= 5; i++) {
+    starsHtml += i <= starCount ? '★' : '☆';
+  }
+
+  return `
+    <div class="h-l">
+      <button id="btn-audio-toggle" class="h-btn" aria-label="Âm thanh" title="Bật/Tắt âm thanh">${soundIcon}</button>
+      <button id="btn-settings-toggle" class="h-btn" aria-label="Cài đặt" title="Cài đặt tiệm">⚙️</button>
+      <div class="h-day-box">
+        <b>Ngày ${state.day}</b>
+        <small>${phaseLabel}</small>
+      </div>
+    </div>
+
+    <div class="h-m">
+      <span class="store-badge">🍗 ${escapeHtml(state.shopName)}</span>
+      <span class="money">${formattedMoney}</span>
+    </div>
+
+    <div class="h-r">
+      <span class="stars">${starsHtml}</span>
+      <small>${state.ratings.overall.toFixed(1)} / 5.0 (Chương ${state.currentChapter})</small>
+    </div>
+  `;
+}
+
+export function bindHeaderEvents(_state: GameState, onRefresh: () => void, onOpenSettings: () => void) {
+  const audioBtn = document.getElementById('btn-audio-toggle');
+  if (audioBtn) {
+    audioBtn.onclick = () => {
+      audio.toggleMute();
+      onRefresh();
+    };
+  }
+
+  const settingsBtn = document.getElementById('btn-settings-toggle');
+  if (settingsBtn) {
+    settingsBtn.onclick = () => {
+      audio.playPop();
+      onOpenSettings();
+    };
+  }
+}
