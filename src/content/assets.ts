@@ -108,6 +108,13 @@ export const ASSETS = {
     crispyChickenBurnt: url('assets/food/food_crispy_chicken_burnt.png'),
     shakeFries: url('assets/food/food_shake_fries.png'),
     soda: url('assets/food/food_soda.png')
+  },
+  ui: {
+    bunnyNote: url('assets/ui/ui_bunny_note.png'),
+    logoKoreanChicken: url('assets/ui/logo_korean_chicken.png'),
+    stickerDrumstick: url('assets/ui/sticker_drumstick.png'),
+    stickerNeon: url('assets/ui/sticker_neon.png'),
+    stickerFries: url('assets/ui/sticker_fries.png')
   }
 } as const;
 

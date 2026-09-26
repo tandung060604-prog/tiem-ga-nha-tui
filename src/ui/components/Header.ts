@@ -1,6 +1,7 @@
 import { GameState } from '../../types/game';
 import { audio } from '../../core/audio';
 import { escapeHtml } from '../escapeHtml';
+import { ASSETS } from '../../content/assets';
 
 export function renderHeader(state: GameState, _onOpenSettings?: () => void): string {
   const phaseLabel = state.phase === 'prep' ? 'Chuẩn bị' : state.phase === 'selling' ? 'Mở bán' : 'Tổng kết';
@@ -27,7 +28,10 @@ export function renderHeader(state: GameState, _onOpenSettings?: () => void): st
     </div>
 
     <div class="h-m">
-      <span class="store-badge">🍗 ${escapeHtml(state.shopName)}</span>
+      <span class="store-badge">
+        <img class="store-logo-badge" src="${ASSETS.ui.logoKoreanChicken}" alt="Logo" />
+        <span class="store-name-text">${escapeHtml(state.shopName)}</span>
+      </span>
       <span class="money">${formattedMoney}</span>
     </div>
 

@@ -33,12 +33,17 @@
   --oil-medium: #d38b28;
   --oil-dirty: #4a2810;
 
-  /* Chalkboard */
-  --chalk: #243b2f;
-  --chalk-border: #7b4f32;
-  --chalk-ink: #f4efe2;
-  --chalk-yellow: #f8df81;
-  --chalk-green: #9fe2bf;
+  /* Korean Chicken Bistro Board */
+  --chalk: #fffaf0;
+  --chalk-border: #9b5a2b;
+  --chalk-ink: #3b2011;
+  --chalk-yellow: #d84315;
+  --chalk-green: #2e7d32;
+  --k-red: #d92534;
+  --k-red-dark: #a61523;
+  --k-gold: #ffb703;
+  --k-orange: #fb8500;
+  --k-wood: #8d4f2b;
 
   /* Typography */
   --font-display: "Baloo 2", cursive, system-ui, sans-serif;

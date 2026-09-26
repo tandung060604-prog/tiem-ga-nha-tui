@@ -3,6 +3,7 @@ import { CHAPTERS } from '../../content/chapters';
 import { weekdayOf, isWeekend } from '../../core/clock';
 import { currentChapterData, chapterProgress, depositStatus } from '../../core/progression';
 import { finaleReady } from '../../content/endings';
+import { ASSETS } from '../../content/assets';
 
 export function renderChalkboard(state: GameState, currentEventTitle: string = 'Trời Nắng Ráo'): string {
   const currentChapter = currentChapterData(state);
@@ -13,15 +14,25 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
 
   return `
     <div class="board">
+      <div class="board-top-banner">
+        <span class="bistro-badge">
+          <span class="bistro-fire">🍗</span> KOREAN CHICKEN BISTRO
+        </span>
+        <img class="board-neon-sticker" src="${ASSETS.ui.stickerNeon}" alt="치킨" />
+      </div>
+
       <div class="board-header">
-        <h2>📋 Kế Hoạch Ngày ${state.day} · ${weekdayOf(state.day)}</h2>
+        <div class="board-title-box">
+          <span class="board-kicker">KẾ HOẠCH HÔM NAY</span>
+          <h2>📋 Ngày ${state.day} · ${weekdayOf(state.day)}</h2>
+        </div>
         <span class="weather-badge">${currentEventTitle}${isWeekend(state.day) ? ' · 🎉 Cuối tuần đông khách' : ''}</span>
       </div>
 
       <div class="board-goal deposit-card ${deposit.ready ? 'is-ready' : ''}">
         <div class="goal-info">
-          <span>🎯 Chương ${currentChapter.number}: ${currentChapter.title}</span>
-          <span>${vnd(state.money)} / ${vnd(deposit.required)} (${progressPercent}%)</span>
+          <span class="goal-chapter-label">🎯 Chương ${currentChapter.number}: ${currentChapter.title}</span>
+          <span class="goal-money-val">${vnd(state.money)} / ${vnd(deposit.required)} <b class="goal-pct">(${progressPercent}%)</b></span>
         </div>
         <div class="goal-bar deposit-progress">
           <div class="goal-bar-fill" style="width: ${progressPercent}%;"></div>
@@ -36,15 +47,18 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
         `}
       </div>
 
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; gap: 6px; flex-wrap: wrap;">
-        <div class="board-event-note" style="margin: 0; text-align: left; flex: 1; min-width: 160px;">
-          "${currentChapter.description}"
+      <div class="board-footer">
+        <div class="board-event-note-wrapper">
+          <img class="board-drumstick-sticker" src="${ASSETS.ui.stickerDrumstick}" alt="Gà sốt" />
+          <div class="board-event-note">
+            "${currentChapter.description}"
+          </div>
         </div>
-        <div style="display: flex; gap: 6px;">
-          <button id="btn-open-bunny-notes" class="btn-sm" style="font-size: 0.72rem; padding: 4px 8px; white-space: nowrap; background: #fff3e0; border: 1.5px solid #ff9800; color: #e65100; font-weight: 800;">
+        <div class="board-btns">
+          <button id="btn-open-bunny-notes" class="btn-sm btn-bunny-card">
             🐰 Thỏ Cam
           </button>
-          <button id="btn-read-story" class="btn-sm primary" style="font-size: 0.72rem; padding: 4px 8px; white-space: nowrap;">
+          <button id="btn-read-story" class="btn-sm primary btn-story-card">
             📖 Truyện Hẻm 1102
           </button>
         </div>

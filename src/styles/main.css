@@ -90,25 +90,40 @@ body.selling-mode .app {
 .h-m .store-badge {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  background: #fff0d8;
-  border: 1.5px solid #dfc3a1;
-  color: var(--red);
-  padding: 1px 8px;
+  gap: 5px;
+  background: linear-gradient(135deg, #fff7eb 0%, #ffe9cc 100%);
+  border: 1.5px solid #f4a261;
+  color: #b02a1a;
+  padding: 2px 8px 2px 3px;
   border-radius: 20px;
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 800;
   white-space: nowrap;
-  max-width: 130px;
+  max-width: 140px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(244, 162, 97, 0.25);
+}
+
+.store-logo-badge {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  border-radius: 50%;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+}
+
+.store-name-text {
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .h-m .money {
   display: block;
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: var(--ink);
+  font-size: 1.18rem;
+  font-weight: 900;
+  color: #9e2a2b;
   letter-spacing: -0.5px;
   white-space: nowrap;
 }
@@ -122,27 +137,28 @@ body.selling-mode .app {
 }
 
 .h-r .stars {
-  color: var(--gold-dark);
+  color: #f77f00;
   letter-spacing: 0.5px;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   white-space: nowrap;
+  filter: drop-shadow(0 1px 2px rgba(247, 127, 0, 0.3));
 }
 
 .h-r small {
   display: block;
-  color: var(--soft);
-  font-weight: 600;
+  color: #7d4e33;
+  font-weight: 700;
   font-size: 0.68rem;
   white-space: nowrap;
 }
 
-/* Awning (Mái che lượn sóng) */
+/* Awning (Mái che lượn sóng phong cách tiệm gà Hàn Quốc) */
 .awning {
-  height: 24px;
-  background: repeating-linear-gradient(90deg, var(--red) 0 28px, #ffffff 28px 56px);
+  height: 26px;
+  background: repeating-linear-gradient(90deg, #d92534 0 26px, #fff9ee 26px 52px);
   position: relative;
   z-index: 20;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 3px 8px rgba(160, 20, 30, 0.22);
 }
 
 .awning::after {
@@ -150,21 +166,22 @@ body.selling-mode .app {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -10px;
-  height: 10px;
-  background: radial-gradient(circle at 14px 0, var(--red) 10px, transparent 11px) 0 0/56px 10px repeat-x,
-              radial-gradient(circle at 42px 0, #ffffff 10px, transparent 11px) 0 0/56px 10px repeat-x;
+  bottom: -11px;
+  height: 12px;
+  background: radial-gradient(circle at 13px 0, #d92534 11px, transparent 12px) 0 0/52px 12px repeat-x,
+              radial-gradient(circle at 39px 0, #fff9ee 11px, transparent 12px) 0 0/52px 12px repeat-x;
+  filter: drop-shadow(0 3px 2px rgba(80, 20, 10, 0.16));
 }
 
 body.selling-mode .awning {
-  height: 12px;
+  height: 14px;
 }
 
 body.selling-mode .awning::after {
-  bottom: -6px;
-  height: 6px;
-  background: radial-gradient(circle at 14px 0, var(--red) 6px, transparent 7px) 0 0/56px 6px repeat-x,
-              radial-gradient(circle at 42px 0, #ffffff 6px, transparent 7px) 0 0/56px 6px repeat-x;
+  bottom: -7px;
+  height: 8px;
+  background: radial-gradient(circle at 13px 0, #d92534 7px, transparent 8px) 0 0/52px 8px repeat-x,
+              radial-gradient(circle at 39px 0, #fff9ee 7px, transparent 8px) 0 0/52px 8px repeat-x;
 }
 
 /* Main View Container */
@@ -180,45 +197,95 @@ body.selling-mode .awning::after {
 .prep-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 12px 12px 100px;
+  gap: 12px;
+  padding: 12px 12px 105px;
   flex: 1;
 }
 
-/* Chalkboard (Bảng phấn đen viền gỗ) */
+/* Korean Fried Chicken Bistro Board (Bảng thực đơn & kế hoạch tiệm gà ấm cúng) */
 .board {
-  background: var(--chalk);
-  color: var(--chalk-ink);
-  border-radius: var(--radius-md);
-  border: 7px solid var(--counter);
-  padding: 12px 14px 10px;
-  box-shadow: var(--shadow-wood);
+  background: linear-gradient(165deg, #fffefc 0%, #fff7eb 45%, #feedd2 100%);
+  color: #3b2011;
+  border-radius: var(--radius-lg);
+  border: 4px solid #b56b3a;
+  padding: 12px 14px 12px;
+  box-shadow: 0 4px 0 #7a411e, 0 10px 24px rgba(122, 65, 30, 0.16);
   position: relative;
+}
+
+.board-top-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.bistro-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #ffede0;
+  border: 1.5px solid #f4a261;
+  color: #b83a21;
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.6px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(184, 58, 33, 0.12);
+}
+
+.board-neon-sticker {
+  height: 28px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(255, 60, 140, 0.35));
+  transform: rotate(2deg);
 }
 
 .board-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px dashed rgba(244, 239, 226, 0.3);
+  border-bottom: 2px dashed #e8c79e;
   padding-bottom: 6px;
   margin-bottom: 8px;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.board-title-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.board-kicker {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #9e5b32;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
 }
 
 .board-header h2 {
   margin: 0;
-  font-size: 1.15rem;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  color: var(--chalk-yellow);
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #3b2011;
+  letter-spacing: -0.2px;
 }
 
 .board-header .weather-badge {
-  font-size: 0.8rem;
-  background: rgba(255, 255, 255, 0.15);
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-weight: 600;
+  font-size: 0.72rem;
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe3ba 100%);
+  color: #8c3809;
+  border: 1.5px solid #f4a261;
+  padding: 3px 8px;
+  border-radius: 14px;
+  font-weight: 800;
+  box-shadow: 0 2px 4px rgba(244, 162, 97, 0.2);
+  line-height: 1.25;
+  max-width: 100%;
 }
 
 .board-goal {
@@ -228,50 +295,125 @@ body.selling-mode .awning::after {
 .goal-info {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 0.8rem;
-  font-weight: 700;
-  margin-bottom: 4px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  gap: 6px;
 }
 
-.goal-info span:first-child {
-  color: #fff;
+.goal-info span:first-child,
+.goal-chapter-label {
+  color: #2b170c;
+  font-weight: 900;
 }
 
-.goal-info span:last-child {
-  color: var(--chalk-yellow);
+.goal-info span:last-child,
+.goal-money-val {
+  color: #c1271d;
+  font-weight: 900;
+  white-space: nowrap;
 }
 
-.goal-bar {
-  height: 8px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
+.goal-pct {
+  color: #8c3809;
+}
+
+.goal-bar.deposit-progress {
+  height: 10px;
+  background: #f1dfc9;
+  border-radius: 10px;
   overflow: hidden;
+  border: 1px solid #dfc3a1;
+  position: relative;
+  margin-bottom: 8px;
 }
 
 .goal-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--gold), var(--mint));
-  border-radius: 4px;
+  background: linear-gradient(90deg, #ffb703 0%, #fb8500 50%, #e63946 100%);
+  border-radius: 10px;
   transition: width 0.3s ease;
+  box-shadow: 0 0 6px rgba(251, 133, 0, 0.5);
+}
+
+.board-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.board-event-note-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 140px;
+}
+
+.board-drumstick-sticker {
+  width: 32px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.16));
+  transform: rotate(-8deg);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.board-drumstick-sticker:hover {
+  transform: rotate(5deg) scale(1.12);
 }
 
 .board-event-note {
-  font-size: 0.78rem;
-  margin-top: 6px;
-  color: #ffd8a8;
+  font-size: 0.76rem;
+  color: #5c351f;
   font-style: italic;
-  text-align: center;
+  font-weight: 600;
+  margin: 0;
+  text-align: left;
+  line-height: 1.35;
 }
 
-/* Tabs Bar */
+.board-btns {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-bunny-card {
+  font-size: 0.74rem !important;
+  padding: 5px 10px !important;
+  white-space: nowrap;
+  background: linear-gradient(135deg, #fff7eb 0%, #ffe9cc 100%) !important;
+  border: 1.5px solid #ff9800 !important;
+  color: #d84315 !important;
+  font-weight: 900 !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: 0 2px 0 #cc7000 !important;
+}
+
+.btn-story-card {
+  font-size: 0.74rem !important;
+  padding: 5px 10px !important;
+  white-space: nowrap;
+  border-radius: var(--radius-sm) !important;
+}
+
+/* Tabs Bar - Phong cách quầy gà Hàn Quốc */
 .tabs-bar {
   display: flex;
-  gap: 2px;
-  background: #ecdcc6;
-  padding: 4px 2px 0;
-  border-radius: 14px 14px 0 0;
+  gap: 3px;
+  background: linear-gradient(180deg, #ecd8be 0%, #dfc4a2 100%);
+  padding: 6px 4px 0;
+  border-radius: 16px 16px 0 0;
   overflow-x: auto;
   scrollbar-width: none;
+  border: 1.5px solid #d4b591;
+  border-bottom: none;
 }
 
 .tabs-bar::-webkit-scrollbar {
@@ -283,18 +425,23 @@ body.selling-mode .awning::after {
   min-width: 0;
   border: 0;
   background: transparent;
-  padding: 6px 2px;
-  font-size: 0.72rem;
+  padding: 7px 3px 5px;
+  font-size: 0.74rem;
   font-weight: 800;
-  color: var(--soft);
+  color: #633e24;
   cursor: pointer;
   white-space: nowrap;
   border-radius: 10px 10px 0 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  transition: background 0.15s ease, color 0.15s ease;
+  gap: 3px;
+  transition: all 0.15s ease;
+}
+
+.tab-btn:hover {
+  background: rgba(255, 255, 255, 0.4);
+  color: #2b170c;
 }
 
 .upgrade-effects {
@@ -314,12 +461,20 @@ body.selling-mode .awning::after {
 .tab-btn .tab-icon {
   font-size: 1.15rem;
   line-height: 1;
+  transition: transform 0.15s ease;
+}
+
+.tab-btn:active .tab-icon {
+  transform: scale(1.15);
 }
 
 .tab-btn.active {
   background: var(--panel);
-  color: var(--red);
-  box-shadow: 0 -2px 4px rgba(0,0,0,0.03);
+  color: #d92534;
+  box-shadow: 0 -3px 8px rgba(80, 30, 10, 0.08);
+  border-top: 3px solid #d92534;
+  padding-top: 5px;
+  font-weight: 900;
 }
 
 /* Tab Content Pane */
@@ -592,22 +747,34 @@ body.selling-mode .awning::after {
 .btn-big-open {
   width: 100%;
   max-width: 500px;
-  background: linear-gradient(180deg, #ff4d5a, var(--red));
-  color: #fff;
-  border: none;
-  border-radius: 18px;
+  background: linear-gradient(180deg, #ff3b4b 0%, #e6192a 52%, #be0e1d 100%);
+  color: #ffffff;
+  border: 2px solid #ff7e8a;
+  border-radius: 20px;
   padding: 14px 24px;
   font-size: 1.25rem;
-  font-weight: 800;
+  font-weight: 900;
   font-family: var(--font-display);
   cursor: pointer;
-  box-shadow: 0 5px 0 var(--red-dark), 0 8px 16px rgba(230, 57, 70, 0.35);
+  box-shadow: 0 6px 0 #7e0a13, 0 10px 24px rgba(230, 25, 42, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   letter-spacing: 0.5px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.btn-big-open:hover {
+  background: linear-gradient(180deg, #ff4d5a 0%, #f02435 50%, #d11323 100%);
+  box-shadow: 0 7px 0 #7e0a13, 0 12px 28px rgba(230, 25, 42, 0.55);
+  transform: translateY(-2px);
+}
+
+.btn-big-open:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #7e0a13, 0 4px 10px rgba(230, 25, 42, 0.3);
 }
 
 .btn-big-open:active {
@@ -1085,34 +1252,35 @@ body.selling-mode .awning::after {
    ĐẶT CỌC MẶT BẰNG TRÊN BẢNG PHẤN (.deposit-card, .deposit-progress)
    ========================================================================== */
 .deposit-card {
-  background: rgba(255, 255, 255, 0.08);
-  border: 2px dashed rgba(255, 209, 102, 0.45);
+  background: #ffffff;
+  border: 2px solid #ecd5b8;
   border-radius: var(--radius-lg);
   padding: var(--space-4);
   margin: var(--space-3) 0;
-  color: #FFFFFF;
+  color: #3b2011;
   text-align: center;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 3px 8px rgba(92, 45, 18, 0.06);
   transition: all 0.3s ease;
 }
 
 .deposit-card.is-ready {
-  background: rgba(255, 209, 102, 0.2);
-  border: 2px solid var(--yellow);
-  box-shadow: 0 0 18px rgba(255, 209, 102, 0.4);
+  background: linear-gradient(145deg, #fffdf2 0%, #fff4db 100%);
+  border: 2px solid #ffb703;
+  box-shadow: 0 0 18px rgba(255, 183, 3, 0.4), 0 4px 10px rgba(0, 0, 0, 0.06);
 }
 
 .deposit-title {
   font-size: 1rem;
   font-weight: 800;
-  color: var(--yellow);
+  color: #b83a21;
   margin-bottom: 4px;
 }
 
 .deposit-desc {
   font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: #5c351f;
   line-height: 1.4;
   margin-bottom: var(--space-3);
 }
@@ -1128,24 +1296,25 @@ body.selling-mode .awning::after {
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
+  font-weight: 800;
+  color: #3b2011;
 }
 
 .deposit-progress-bar {
-  background: rgba(0, 0, 0, 0.4);
+  background: #f1dfc9;
   border-radius: var(--radius-full);
   height: 12px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid #dfc3a1;
   position: relative;
 }
 
 .deposit-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--yellow), #FFA000);
+  background: linear-gradient(90deg, #ffb703 0%, #fb8500 50%, #e63946 100%);
   border-radius: var(--radius-full);
   transition: width 0.3s ease;
+  box-shadow: 0 0 6px rgba(251, 133, 0, 0.5);
 }
 
 #btn-deposit {
@@ -1154,29 +1323,35 @@ body.selling-mode .awning::after {
   font-weight: 800;
   font-size: 0.95rem;
   border-radius: var(--radius-md);
-  border: 2px solid var(--ink);
-  background: var(--yellow);
-  color: var(--ink);
+  border: 2px solid #9e3600;
+  background: linear-gradient(135deg, #ff9f1c 0%, #e85d04 100%);
+  color: #ffffff;
   cursor: pointer;
-  box-shadow: 0 4px 0 var(--ink);
+  box-shadow: 0 4px 0 #7a2a00;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   transition: transform 0.1s ease, filter 0.15s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 #btn-deposit:disabled {
-  opacity: 0.5;
-  filter: grayscale(80%);
+  background: #f8eee0;
+  border: 1.5px solid #dfc7ab;
+  color: #5c351f !important; /* RÕ RÀNG 100%, KHÔNG BỊ CHÌM! */
+  opacity: 1 !important; /* KHÔNG DÙNG OPACITY 0.5 GÂY TỐI */
+  filter: none !important;
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
+  font-weight: 800;
+  text-shadow: none;
 }
 
 #btn-deposit:not(:disabled):active {
   transform: translateY(2px);
-  box-shadow: 0 2px 0 var(--ink);
+  box-shadow: 0 2px 0 #7a2a00;
 }
 
 /* ==========================================================================
