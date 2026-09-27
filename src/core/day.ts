@@ -205,11 +205,120 @@ export function assembleAtCounter(draft: GameState, session: SellingSession, coo
 // ---------------------------------------------------------------------------
 
 export type ServeResult =
-  | { kind: 'no-order' | 'empty-tray' | 'no-match' | 'raw-rejected' | 'partial' }
-  | { kind: 'complete'; order: CustomerOrder; paid: number; tip: number; burnt: boolean };
+  | { kind: 'no-order' | 'empty-tray' | 'no-match' | 'raw-rejected' }
+  | { kind: 'partial'; missingItemIds?: string[] }
+  | { kind: 'complete'; order: CustomerOrder; paid: number; tip: number; burnt: boolean; feedbackNotes?: string[] };
+
+// Tính toán tiền Tip linh hoạt dựa trên tính cách khách hàng, tốc độ phục vụ và độ ngon của món
+export function calculateCustomerTip(order: CustomerOrder): { tip: number; feedbackNotes: string[] } {
+  const notes: string[] = [];
+  const ratio = order.patienceMax > 0 ? order.patienceCurrent / order.patienceMax : 0.5;
+  const isFast = ratio > 0.6;
+  const isMedium = ratio > 0.35;
+  const hasBurnt = (order.burntPenalty ?? 0) > 0;
+  const perfectBonus = order.perfectBonus ?? 0;
+
+  // Bé Thỏ Cam tri kỷ
+  if (order.isBunny) {
+    return { tip: BUNNY_VISIT_TIP, feedbackNotes: ['Tri kỷ tặng quà 💖'] };
+  }
+
+  // Nếu khách không có tính cách đặc thù (đơn test hoặc khách thường mặc định)
+  if (!order.personality) {
+    const tip = (isFast ? FAST_SERVICE_TIP : 0) + perfectBonus;
+    if (isFast) notes.push(`Giao nhanh đúng giờ (+${(FAST_SERVICE_TIP / 1000).toLocaleString('vi-VN')}k)`);
+    if (perfectBonus > 0) notes.push('Thưởng món vàng giòn/chuẩn vị');
+    return { tip, feedbackNotes: notes };
+  }
+
+  const personality = order.personality;
+
+  // 1. Keo Kiệt / Chi Ly: Tuyệt đối không tip
+  if (personality === 'frugal') {
+    if (hasBurnt) notes.push('Chê đắt và càu nhàu vì món cháy');
+    else notes.push('Đếm từng đồng tiền lẻ, không tip');
+    return { tip: 0, feedbackNotes: notes };
+  }
+
+  // 2. Tài Xế / Shipper: Không tip, vội vã
+  if (personality === 'driver') {
+    if (isFast) notes.push('Cảm ơn quán giao nhanh kịp chuyến!');
+    else if (!isMedium) notes.push('Càu nhàu vì trễ giờ cuốc xe');
+    return { tip: 0, feedbackNotes: notes };
+  }
+
+  let baseTip = 0;
+
+  // 3. Hào Phóng: Rất chuộng tip to
+  if (personality === 'generous') {
+    if (isFast) {
+      baseTip = 10000;
+      notes.push('Tip đậm phục vụ thần tốc! (+10k)');
+    } else if (isMedium) {
+      baseTip = 4000;
+      notes.push('Tip vừa lòng (+4k)');
+    } else {
+      baseTip = 1000;
+      notes.push('Tip khích lệ dù đợi hơi lâu (+1k)');
+    }
+    if (perfectBonus > 0) {
+      baseTip += perfectBonus;
+      notes.push('Thưởng tay nghề món chuẩn');
+    }
+  }
+  // 4. Vội Vã: Nhanh mới tip, chậm cắt sạch
+  else if (personality === 'impatient') {
+    if (isFast) {
+      baseTip = 5000;
+      notes.push('Tip cứu nguy giờ bận rộn (+5k)');
+    } else {
+      baseTip = 0;
+      notes.push('Không tip vì chờ sốt ruột');
+    }
+    if (isFast && perfectBonus > 0) baseTip += perfectBonus;
+  }
+  // 5. Sành Ăn: Khắt khe món cháy, chuộng Perfect
+  else if (personality === 'foodie') {
+    if (hasBurnt) {
+      baseTip = 0;
+      notes.push('Khách sành ăn cực chê món cháy!');
+    } else {
+      baseTip = isFast ? 4000 : 0;
+      if (perfectBonus > 0) {
+        baseTip += perfectBonus + 6000;
+        notes.push('Món Vàng Giòn đỉnh chóp! (+6k thưởng)');
+      }
+    }
+  }
+  // 6. Học Sinh: Tiền lẻ
+  else if (personality === 'student') {
+    if (isFast) {
+      baseTip = 1000;
+      notes.push('Gửi quán 1.000đ tiền lẻ');
+    } else {
+      baseTip = 0;
+      notes.push('Cười trừ chào quán');
+    }
+  }
+  // 7. Dễ Tính (Mặc định): Luôn tip nhẹ vui vẻ khi nhanh
+  else {
+    baseTip = isFast ? FAST_SERVICE_TIP : 0;
+    if (isFast) notes.push(`Khách dễ thương tip ${baseTip.toLocaleString('vi-VN')}đ`);
+    if (perfectBonus > 0) baseTip += perfectBonus;
+  }
+
+  // Món cháy làm tụt tip nếu không phải foodie (foodie đã xét ở trên)
+  if (hasBurnt && personality !== 'foodie') {
+    baseTip = Math.max(0, Math.round(baseTip * 0.4));
+    notes.push('Trừ bớt tip vì có món cháy');
+  }
+
+  return { tip: Math.max(0, baseTip), feedbackNotes: notes };
+}
+
 
 // Giao cho khách đầu hàng mọi món trong khay khách đang cần.
-// Gà sống: khách không nhận (để lại khay). Gà cháy: trả nửa giá món đó. Perfect: +2.000đ tip.
+// Gà sống: khách không nhận (để lại khay). Gà cháy: trả nửa giá món đó (khách foodie phạt 100%).
 // `removeAt` xóa món khỏi khay (khay thuộc CookingEngine). Cập nhật session; tiền vào ví do caller cộng.
 export function serveFirstOrder(
   session: SellingSession,
@@ -232,13 +341,18 @@ export function serveFirstOrder(
     }
     OrdersEngine.matchItemToOrder(order, item.menuItemId);
     (session.soldCounts ??= {})[item.menuItemId] = (session.soldCounts[item.menuItemId] ?? 0) + 1;
-    if (item.quality === 'burnt') order.burntPenalty = (order.burntPenalty ?? 0) + Math.round(prices(item.menuItemId) / 2);
+    if (item.quality === 'burnt') {
+      const penaltyRate = order.personality === 'foodie' ? 1.0 : 0.5;
+      order.burntPenalty = (order.burntPenalty ?? 0) + Math.round(prices(item.menuItemId) * penaltyRate);
+    }
     if (item.quality === 'perfect') order.perfectBonus = (order.perfectBonus ?? 0) + perfectTip(session.perfectStreak);
-    // Tip tương: chỉ khi khách DẶN đúng loại đó cho món này (trước đây món nào có tương cũng +2k → xịt bừa cày tiền)
+    // Tip tương: chỉ khi khách DẶN đúng loại đó cho món này
     const wantsSauce = item.condiment && order.items.find(it => it.menuItemId === item.menuItemId && it.condiment === item.condiment && (it.condimentServed ?? 0) < it.count);
     if (wantsSauce) {
       wantsSauce.condimentServed = (wantsSauce.condimentServed ?? 0) + 1;
-      order.perfectBonus = (order.perfectBonus ?? 0) + CONDIMENT_TIP;
+      if (order.personality !== 'frugal') {
+        order.perfectBonus = (order.perfectBonus ?? 0) + CONDIMENT_TIP;
+      }
     }
     if (item.condiment) session.squirts = (session.squirts ?? 0) + 1;
     removeAt(i);
@@ -246,18 +360,21 @@ export function serveFirstOrder(
   }
 
   if (!matched) return { kind: rejectedRaw ? 'raw-rejected' : 'no-match' };
-  if (!OrdersEngine.isOrderComplete(order)) return { kind: 'partial' };
+  if (!OrdersEngine.isOrderComplete(order)) {
+    const missingItemIds = order.items.filter(it => !it.completed).map(it => it.menuItemId);
+    return { kind: 'partial', missingItemIds };
+  }
 
   session.orders.shift();
   session.servedCount += 1;
   session.totalWaitSec += order.patienceMax - Math.max(0, order.patienceCurrent);
-  const paid = order.totalPrice - (order.burntPenalty ?? 0);
-  const tip = (order.patienceCurrent / order.patienceMax > 0.6 ? FAST_SERVICE_TIP : 0) + (order.perfectBonus ?? 0);
+  const paid = Math.max(0, order.totalPrice - (order.burntPenalty ?? 0));
+  const { tip, feedbackNotes } = calculateCustomerTip(order);
   session.grossRevenue += paid;
   session.tips += tip;
   recordOrderBooks(session, order, paid);
   pushFx(session, { kind: 'cash', paid, tip });
-  return { kind: 'complete', order, paid, tip, burnt: (order.burntPenalty ?? 0) > 0 };
+  return { kind: 'complete', order, paid, tip, burnt: (order.burntPenalty ?? 0) > 0, feedbackNotes };
 }
 
 // Sổ P&L của một đơn đã giao: kênh bán, bao bì, ly nước, tiền mất vì món cháy, món giải ngấy

@@ -124,8 +124,15 @@ export function tickSelling(session: SellingSession, gameDt: number, ctx: TickCo
   tickTimers(session.timers, gameDt);
 
   const stillWaiting: CustomerOrder[] = [];
-  for (const order of session.orders) {
-    order.patienceCurrent -= gameDt / 1000;
+  for (let i = 0; i < session.orders.length; i++) {
+    const order = session.orders[i];
+    if (!order) continue;
+    // Kiên nhẫn giãn cách theo hàng đợi FIFO: khách đến trước (i = 0) đang được phục vụ trực tiếp,
+    // khách đứng sau (i = 1, 2...) thấy có người trước nên kiên nhẫn chờ hơn
+    const queueFactor = i === 0 ? 1.0 : i === 1 ? 0.65 : 0.45;
+    const traitFactor = order.personality === 'impatient' ? 1.35 : order.personality === 'easygoing' ? 0.75 : 1.0;
+    order.patienceCurrent -= (gameDt / 1000) * queueFactor * traitFactor;
+
     if (order.patienceCurrent > 0) {
       stillWaiting.push(order);
     } else {
@@ -138,6 +145,7 @@ export function tickSelling(session: SellingSession, gameDt: number, ctx: TickCo
 
   session.spawnTimerMs += gameDt;
   const interval = EconomyEngine.spawnIntervalMs(ctx.expectedCustomers, isRushHour(session.gameHour));
+
   if (session.spawnTimerMs >= interval && session.orders.length < MAX_QUEUE) {
     session.spawnTimerMs = 0;
     const order = ctx.spawnCustomer();

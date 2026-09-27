@@ -1,6 +1,7 @@
 import { GameState, GamePhase, DayLedger, CustomerReview, StoryEndingId } from './types/game';
 import { stateManager } from './core/state';
 import { audio } from './core/audio';
+import { Haptics } from './core/haptics';
 import { music, babble, narrate, stopNarration } from './core/music';
 import { renderTitleScreen, bindTitleScreenInteractions } from './ui/components/TitleScreen';
 import { STORY_ACTS } from './content/storyNovel';
@@ -1074,6 +1075,13 @@ class AppController {
   private onFryerLifted(result: ReturnType<typeof cookingEngine.liftFryer>) {
     stateManager.update(draft => recordFryerLift(draft, this.sellingSession, result));
     if (!result.trayItem) this.showToast('Khay đầy, món vừa vớt bị bỏ!');
+    if (result.quality === 'perfect') {
+      Haptics.perfect();
+    } else if (result.quality === 'burnt') {
+      Haptics.warning();
+    } else {
+      Haptics.tap();
+    }
   }
 
   // Mọi click trong màn bán hàng đi qua đây (một listener gắn một lần trên #main-view).
@@ -1083,6 +1091,7 @@ class AppController {
 
     const trayEl = target.closest<HTMLElement>('.tray-item');
     if (trayEl) {
+      Haptics.tap();
       cookingEngine.removeFromTray(parseInt(trayEl.dataset.trayIdx ?? '0', 10));
       this.showToast('Đã dọn dẹp khay!');
       this.render();
@@ -1091,6 +1100,7 @@ class AppController {
 
     const lockedPan = target.closest<HTMLElement>('[data-prep-lock]');
     if (lockedPan) {
+      Haptics.tap();
       const root = document.getElementById('main-view');
       if (root) showPrepPopover(root, lockedPan.dataset.prepLock ?? '', stateManager.getState());
       return;
@@ -1098,6 +1108,7 @@ class AppController {
 
     const bunnyCard = target.closest<HTMLElement>('.customer-card[data-is-bunny="true"]');
     if (bunnyCard) {
+      Haptics.tap();
       const letter = BUNNY_LETTERS.find(l => l.id === bunnyCard.dataset.letterId);
       if (letter) this.openBunnyLetterDialog(letter);
       else this.openBunnyGreetingDialog();
@@ -1107,6 +1118,7 @@ class AppController {
     const button = target.closest<HTMLElement>('[id]');
     const action = button?.id.replace(/^btn-/, '');
     if (!button || button.hasAttribute('disabled')) return;
+    Haptics.tap();
     const station = parseStationAction(action);
     if (station) {
       this.runStationAction(station);
@@ -1347,26 +1359,35 @@ class AppController {
       case 'no-order':
         return;
       case 'empty-tray':
+        Haptics.warning();
         this.showToast('Khay đồ ăn đang trống, chưa có món để giao!');
         return;
       case 'raw-rejected':
+        Haptics.warning();
         this.showToast('🤢 Gà còn sống, khách không nhận! Chiên lại mẻ khác nhé.');
         return;
       case 'no-match':
+        Haptics.warning();
         this.showToast('Đồ ăn trong khay không khớp với món khách gọi!');
         return;
-      case 'partial':
+      case 'partial': {
         audio.playPop();
-        this.showToast('Đã giao trước một phần, hãy làm tiếp món còn lại!');
+        Haptics.tap();
+        const missingNames = (result.missingItemIds ?? [])
+          .map(id => menu.find(m => m.id === id)?.name || id)
+          .join(', ');
+        this.showToast(`Đã nhận một phần! Khách đang đợi: ${missingNames || 'món còn lại'} ⏳`);
         this.render();
         return;
+      }
       case 'complete':
+        Haptics.serveSuccess();
         break;
       default:
         assertNever(result);
     }
 
-    const { order, paid, tip, burnt } = result;
+    const { order, paid, tip, feedbackNotes } = result;
     let letter: BunnyLetter | undefined;
     stateManager.update(draft => {
       creditSale(draft, paid, tip);
@@ -1381,9 +1402,11 @@ class AppController {
       this.showToast(`🐰 Bé Thỏ Cam gật gù hạnh phúc, tip thêm ${BUNNY_VISIT_TIP.toLocaleString('vi-VN')}đ và vẫy tai chào! 💖`);
     } else {
       audio.playCash();
-      const notes = [tip > 0 ? `+${(tip / 1000).toLocaleString('vi-VN')}k tip` : '', burnt ? 'gà cháy bị trừ nửa giá' : '']
-        .filter(Boolean).join(', ');
-      this.showToast(`Phục vụ thành công! +${(paid + tip).toLocaleString('vi-VN')}đ ${notes ? `(${notes})` : ''} 💵`);
+      const personalityTag = order.personalityLabel ? `[${order.personalityLabel}] ` : '';
+      const notesStr = (feedbackNotes && feedbackNotes.length > 0)
+        ? feedbackNotes.join(' · ')
+        : (tip > 0 ? `+${(tip / 1000).toLocaleString('vi-VN')}k tip` : '0đ tip');
+      this.showToast(`${personalityTag}+${(paid + tip).toLocaleString('vi-VN')}đ (${notesStr}) 💵`);
     }
     this.render();
   }

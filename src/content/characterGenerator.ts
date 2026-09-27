@@ -1,5 +1,6 @@
-import { pick } from '../core/rng';
-// Hệ thống sinh nhân vật ngẫu nhiên (100 - 200 nhân vật) theo Archetype & Tên tương xứng
+import { pick, random } from '../core/rng';
+import { CustomerPersonality } from '../types/game';
+// Hệ thống sinh nhân vật ngẫu nhiên (100 - 200 nhân vật) theo Archetype, Tên & Tính cách riêng biệt
 
 export type CustomerArchetype = 'student' | 'delivery' | 'office' | 'genz' | 'demanding' | 'family';
 
@@ -7,6 +8,9 @@ export interface ModularCharacter {
   id: string;
   name: string;
   archetype: CustomerArchetype;
+  personality: CustomerPersonality;
+  personalityLabel: string;
+  personalityDesc: string;
   avatar: string;
   title: string;
   patienceMultiplier: number;
@@ -15,6 +19,44 @@ export interface ModularCharacter {
   outfit: string;
   accessory: string;
 }
+
+export const PERSONALITY_MAP: Record<CustomerPersonality, { label: string; desc: string; patienceRate: number }> = {
+  generous: {
+    label: '💎 Hào Phóng',
+    desc: 'Làm nhanh tip đậm (+10k-15k), món Perfect tip thêm',
+    patienceRate: 1.0
+  },
+  frugal: {
+    label: '🦀 Chi Ly',
+    desc: 'Tuyệt đối không bao giờ tip (0đ), đếm từng đồng lẻ',
+    patienceRate: 1.0
+  },
+  impatient: {
+    label: '⚡ Vội Vã',
+    desc: 'Tụt kiên nhẫn nhanh (1.4x), nhanh mới tip (+5k), chậm cắt sạch',
+    patienceRate: 1.4
+  },
+  easygoing: {
+    label: '🌸 Dễ Tính',
+    desc: 'Kiên nhẫn chờ lâu (0.7x), luôn tip nhẹ 2k-3k vui vẻ',
+    patienceRate: 0.7
+  },
+  foodie: {
+    label: '👑 Sành Ăn',
+    desc: 'Món Perfect tip to (+8k-12k), gà cháy phạt tiền gấp đôi',
+    patienceRate: 0.95
+  },
+  student: {
+    label: '🎓 Học Sinh',
+    desc: 'Tiền túi có hạn, tip tiền lẻ 1k-2k hoặc 0đ, rất lễ phép',
+    patienceRate: 1.1
+  },
+  driver: {
+    label: '🛵 Tài Xế',
+    desc: 'Cần đơn gấp đi giao, không tip nhưng đơn nhanh gọn',
+    patienceRate: 1.3
+  }
+};
 
 const ARCHETYPE_CONFIG: Record<CustomerArchetype, {
   titles: string[];
@@ -102,13 +144,40 @@ export class CharacterGenerator {
     const outfit = pick(config.outfits);
     const accessory = pick(config.accessories);
 
+    let personality: CustomerPersonality;
+    switch (chosenArchetype) {
+      case 'student':
+        personality = random() < 0.75 ? 'student' : 'easygoing';
+        break;
+      case 'delivery':
+        personality = random() < 0.7 ? 'driver' : 'impatient';
+        break;
+      case 'office':
+        personality = pick(['generous', 'impatient', 'frugal'] as const);
+        break;
+      case 'genz':
+        personality = pick(['generous', 'impatient', 'easygoing'] as const);
+        break;
+      case 'demanding':
+        personality = random() < 0.65 ? 'foodie' : 'frugal';
+        break;
+      case 'family':
+      default:
+        personality = random() < 0.6 ? 'easygoing' : 'generous';
+        break;
+    }
+    const pInfo = PERSONALITY_MAP[personality];
+
     return {
-      id: 'cust_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+      id: 'cust_' + Math.floor(random() * 10000000).toString(36),
       name,
       title,
       archetype: chosenArchetype,
+      personality,
+      personalityLabel: pInfo.label,
+      personalityDesc: pInfo.desc,
       avatar,
-      patienceMultiplier: config.patienceMultiplier,
+      patienceMultiplier: config.patienceMultiplier * (1 / pInfo.patienceRate),
       tipChance: config.tipChance,
       hairStyle,
       outfit,

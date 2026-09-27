@@ -140,6 +140,16 @@ export interface CustomerReview {
   ownerReply?: string;
 }
 
+// Tính cách khách hàng ảnh hưởng trực tiếp đến thời gian kiên nhẫn, thái độ và tiền tips
+export type CustomerPersonality =
+  | 'generous'   // 💎 Hào Phóng: Tip đậm (+10k-15k) khi làm nhanh và món ngon
+  | 'frugal'     // 🦀 Keo Kiệt: Không bao giờ tip (0đ), đếm từng đồng lẻ
+  | 'impatient'  // ⚡ Vội Vã: Tụt kiên nhẫn nhanh (1.4x), làm nhanh tip +5k, chậm cắt sạch tip
+  | 'easygoing'  // 🌸 Dễ Tính: Kiên nhẫn tụt chậm (0.7x), vui vẻ xí xóa, tip 2k-3k
+  | 'foodie'     // 👑 Sành Ăn: Cực chuộng Perfect (+8k-12k tip), gà cháy phạt gấp đôi
+  | 'student'    // 🎓 Học Sinh: Tiền túi có hạn, tip 1k-2k tiền lẻ hoặc không tip
+  | 'driver';    // 🛵 Tài Xế / Shipper: Cần đơn gấp chạy chuyến, không tip
+
 export interface CustomerOrder {
   id: string;
   customerName: string;
@@ -151,6 +161,9 @@ export interface CustomerOrder {
   isBunny?: boolean;
   bunnyLetterId?: string;
   archetypeBadge?: string;
+  personality?: CustomerPersonality;
+  personalityLabel?: string; // Ví dụ: "💎 Hào Phóng", "🦀 Keo Kiệt", "⚡ Vội Vã", "🌸 Dễ Tính", "👑 Sành Ăn"
+  personalityDesc?: string;  // Mô tả ngắn ảnh hưởng
   // condiment: khách dặn thêm tương (chỉ xịt đúng loại khách dặn mới có tip); condimentServed: số phần đã xịt đúng
   items: { menuItemId: string; count: number; served: number; completed: boolean; condiment?: Condiment; condimentServed?: number }[];
   patienceMax: number;

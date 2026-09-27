@@ -106,7 +106,7 @@ export class CookingEngine {
     return CookingEngine.qualityAt(this.cookState.progress);
   }
 
-  // Ngưỡng vùng trên thanh đo; phải khớp độ rộng .zone-* trong styles/kitchen.css
+  // Ngưỡng vùng trên thanh đo; phải khớp độ rộng .zone-* trong styles/kitchen.css (38/10/22/10/20)
   public static readonly ZONES = { raw: 38, goodLow: 48, perfect: 70, goodHigh: 80 } as const;
 
   public static qualityAt(p: number): QualityRating {

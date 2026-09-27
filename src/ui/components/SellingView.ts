@@ -424,15 +424,17 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       const name = menuItem ? menuItem.name : it.menuItemId;
       const img = foodImage(it.menuItemId, 'perfect');
       const qtyText = it.count > 1 ? (it.served > 0 ? `${it.served}/${it.count}` : `${it.count}×`) : '1×';
+      const statusClass = it.completed ? 'done' : it.served > 0 ? 'partial' : 'pending';
+      const statusText = it.completed ? '✓ Đủ' : it.served > 0 ? `⏳ ${it.served}/${it.count}` : '○ Đợi';
       return `
-        <div class="order-row">
+        <div class="order-row ${it.completed ? 'is-completed' : ''}">
           <span class="order-item-title">
             ${img ? `<img src="${img}" class="order-food-thumb" alt="${escapeHtml(name)}" width="28" height="28" />` : `<span class="order-food-emoji">${menuItem ? menuItem.icon : '🍗'}</span>`}
             <span class="order-qty">${qtyText}</span>
             <span class="order-food-name">${escapeHtml(name)}</span>
             ${it.condiment ? `<span class="order-condiment" data-condiment="${it.condiment}">${it.condiment === 'ketchup' ? '🍅 + tương cà' : '🌶️ + tương ớt'}</span>` : ''}
           </span>
-          <span class="order-check ${it.completed ? 'done' : ''}">${it.completed ? '✓' : '○'}</span>
+          <span class="order-check ${statusClass}" title="${it.completed ? 'Món đã giao đủ' : 'Đang chờ món này'}">${statusText}</span>
         </div>
       `;
     }).join('');
@@ -441,6 +443,11 @@ export function renderSellingView(state: GameState, session: SellingSession): st
     const initialSrc = isAngry ? visual.angry : isNew ? visual.walk : visual.stand;
     const initialCls = isAngry ? 'angry' : isNew ? 'walking' : 'standing';
     const actorHtml = `<img src="${initialSrc}" alt="${visual.name}" class="char-sprite-img ${initialCls}" />`;
+    const queueBadge = idx === 0 
+      ? '<span class="queue-pos-badge first">👑 Đang phục vụ</span>' 
+      : idx === 1 
+      ? '<span class="queue-pos-badge next">2️⃣ Kế tiếp</span>' 
+      : `<span class="queue-pos-badge wait">${idx + 1}️⃣ Xếp hàng</span>`;
 
     return `
       <div class="customer-card ${ord.isBunny ? 'bunny-card' : ''} ${isAngry ? 'angry' : ''} ${idx === 0 ? 'active' : ''}" 
@@ -468,7 +475,11 @@ export function renderSellingView(state: GameState, session: SellingSession): st
               <span class="cust-name">${visual.name}</span>
               <span class="mood-indicator">${isAngry ? '💢' : patienceColorClass === 'low' ? '🥺' : '✨'}</span>
             </div>
-            <span class="cust-badge ${visual.badgeClass}">${visual.badge}</span>
+            <div class="cust-badges-row">
+              ${queueBadge}
+              <span class="cust-badge ${visual.badgeClass}">${visual.badge}</span>
+              ${ord.personalityLabel ? `<span class="cust-badge trait-badge" title="${escapeHtml(ord.personalityDesc || '')}">${escapeHtml(ord.personalityLabel)}</span>` : ''}
+            </div>
           </div>
         </div>
 
@@ -499,34 +510,39 @@ export function renderSellingView(state: GameState, session: SellingSession): st
   const potProgressPercent = Math.min(100, Math.round(cookState.progress));
   const oilLabel = oilCondition === 'clean' ? 'Vàng óng (Thơm lừng)' : oilCondition === 'medium' ? 'Nâu hổ phách' : 'Đen khét (Bốc khói!)';
 
-  // Render food in pan
+  // Render food in pan: hiển thị đúng asset của từng loại món (gà giòn, má đùi cay, khoai lắc, gà viên, phô mai que)
   let panFoodHtml = '';
   if (cookState.isFrying) {
-    if (cookState.fryingType === 'chicken') {
-      const foodImg = quality === 'raw' 
-        ? ASSETS.food.crispyChickenRaw 
-        : quality === 'burnt' 
-        ? ASSETS.food.crispyChickenBurnt 
-        : ASSETS.food.crispyChickenPerfect;
-      
-      const qualityTag = quality === 'perfect' ? '⭐ VÀNG GIÒN' : quality === 'burnt' ? '💥 CHÁY KHÉT' : quality === 'good' ? 'VỪA CHÍN' : 'SỐNG';
+    let foodImg = ASSETS.food.crispyChickenPerfect;
+    let foodLabel = '🍗 GÀ RÁN';
 
-      panFoodHtml = `
-        <div class="frying-food-item ${quality} sizzle-active">
-          <img src="${foodImg}" alt="Gà chiên" class="food-pan-img" />
-          <div class="food-status-badge ${quality}">${qualityTag}</div>
-          ${quality === 'perfect' ? '<div class="perfect-sparkles">✨</div>' : ''}
-          ${quality === 'burnt' ? '<div class="burnt-smoke-puff">💨</div>' : ''}
-        </div>
-      `;
+    if (cookState.fryingType === 'thigh') {
+      foodImg = quality === 'raw' ? ASSETS.kitchen.gnPrepThighRaw : quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.spicyThigh;
+      foodLabel = '🍗 MÁ ĐÙI CAY';
+    } else if (cookState.fryingType === 'fries') {
+      foodImg = quality === 'raw' ? ASSETS.kitchen.gnPrepFriesRaw : quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.shakeFries;
+      foodLabel = '🍟 KHOAI LẮC';
+    } else if (cookState.fryingType === 'popcorn') {
+      foodImg = quality === 'raw' ? ASSETS.kitchen.gnPrepPopcornRaw : quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.popcornChicken;
+      foodLabel = '🍿 GÀ VIÊN';
+    } else if (cookState.fryingType === 'cheese') {
+      foodImg = quality === 'raw' ? ASSETS.kitchen.gnPrepCheeseStickRaw : quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.cheeseStick;
+      foodLabel = '🧀 PHÔ MAI QUE';
     } else {
-      panFoodHtml = `
-        <div class="frying-food-item perfect sizzle-active">
-          <img src="${ASSETS.food.shakeFries}" alt="Khoai tây chiên" class="food-pan-img" />
-          <div class="food-status-badge perfect">🍟 KHOAI LẮC</div>
-        </div>
-      `;
+      foodImg = quality === 'raw' ? ASSETS.food.crispyChickenRaw : quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.crispyChickenPerfect;
+      foodLabel = '🍗 GÀ GIÒN';
     }
+
+    const qualityTag = quality === 'perfect' ? '⭐ VÀNG GIÒN' : quality === 'burnt' ? '💥 CHÁY KHÉT' : quality === 'good' ? 'VỪA CHÍN' : 'SỐNG';
+
+    panFoodHtml = `
+      <div class="frying-food-item ${quality} sizzle-active">
+        <img src="${foodImg}" alt="${foodLabel}" class="food-pan-img" />
+        <div class="food-status-badge ${quality}">${foodLabel} · ${qualityTag}</div>
+        ${quality === 'perfect' ? '<div class="perfect-sparkles">✨</div>' : ''}
+        ${quality === 'burnt' ? '<div class="burnt-smoke-puff">💨</div>' : ''}
+      </div>
+    `;
   } else {
     panFoodHtml = `
       <div class="pot-idle-view">

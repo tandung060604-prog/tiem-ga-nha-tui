@@ -7,8 +7,8 @@ import { mkdirSync } from 'node:fs';
 const TARGET = process.argv[2] ?? 'http://localhost:3000';
 const OUT = 'ui-check-out';
 const WIDTHS = [360, 390];
-// Phải khớp CookingEngine.ZONES (38 / 48 / 70 / 80) → độ rộng 38, 10, 22, 10, 20 (%)
-const ZONE_PCT = [['zone-raw', 38], ['zone-good', 10], ['zone-perfect', 22], ['zone-good', 10], ['zone-burnt', 20]];
+// Phải khớp CookingEngine.ZONES (42 / 50 / 64 / 72) → độ rộng 42, 8, 14, 8, 28 (%)
+const ZONE_PCT = [['zone-raw', 42], ['zone-good', 8], ['zone-perfect', 14], ['zone-good', 8], ['zone-burnt', 28]];
 const MIN_TAP = 44;
 
 mkdirSync(OUT, { recursive: true });
@@ -77,7 +77,7 @@ for (const width of WIDTHS) {
   });
   const zonesOk = zones.length === ZONE_PCT.length
     && zones.every(([cls, pct], i) => cls === ZONE_PCT[i][0] && Math.abs(pct - ZONE_PCT[i][1]) <= 1.5);
-  record(zonesOk ? 'PASS' : 'FAIL', width, 'thanh đo khớp ngưỡng code (38/10/22/10/20)',
+  record(zonesOk ? 'PASS' : 'FAIL', width, 'thanh đo khớp ngưỡng code (42/8/14/8/28)',
     zones.map(([c, p]) => `${c}:${p.toFixed(0)}%`).join(' '));
 
   // Bấm nút thật + món trong khay nhìn thấy được
