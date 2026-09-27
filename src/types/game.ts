@@ -81,6 +81,9 @@ export interface UpgradeTier {
   name: string;
   cost: number;
   description: string;
+  minChapter?: number; // Chương tối thiểu (1..5)
+  minDay?: number;     // Ngày tối thiểu (vd: 2, 16, 51...)
+  unlockHint?: string; // Gợi ý hiển thị khi chưa đủ điều kiện
   bonus: {
     speed?: number;
     taste?: number;

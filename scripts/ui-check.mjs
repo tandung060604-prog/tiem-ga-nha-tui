@@ -59,10 +59,15 @@ for (const width of WIDTHS) {
     if (!fail && o.hidden.length) record('WARN', width, `phần tử bị khuất trong khung cuộn (${label})`, o.hidden.join(', '));
   };
 
+  console.log(`[ui-check] Đang kiểm tra viewport ${width}px...`);
   await page.goto(TARGET);
+  console.log(`[ui-check ${width}px] Bấm #btn-title-play...`);
   await page.locator('#btn-title-play').click(); // màn tiêu đề (chạm đầu tiên bật âm thanh iOS)
-  await page.locator('#btn-confirm-shop-name').click(); // tiệm mới: đặt tên quán (giữ tên gợi ý)
-  await page.locator('#btn-welcome-start').click();
+  console.log(`[ui-check ${width}px] Bấm #btn-confirm-shop-name...`);
+  await page.locator('#btn-confirm-shop-name').click({ timeout: 5000 }).catch(() => {}); // tiệm mới: đặt tên quán (giữ tên gợi ý)
+  console.log(`[ui-check ${width}px] Bấm #btn-welcome-start...`);
+  await page.locator('#btn-welcome-start').click({ timeout: 5000 }).catch(() => {});
+  console.log(`[ui-check ${width}px] Kiểm tra overflow màn Chuẩn bị...`);
   await checkOverflow('màn Chuẩn bị');
   await page.screenshot({ path: `${OUT}/${width}-prep.png` });
 

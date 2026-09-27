@@ -31,6 +31,10 @@ export function renderUpgradesTab(state: GameState): string {
     const curTier = branch.tiers[curLevel - 1];
     const nextTier = branch.tiers[curLevel];
     const isMax = !nextTier;
+    const isLocked = !isMax && Boolean(
+      (nextTier.minChapter !== undefined && state.currentChapter < nextTier.minChapter) ||
+      (nextTier.minDay !== undefined && state.day < nextTier.minDay)
+    );
 
     return `
       <div class="item-row" data-branch="${branch.id}">
@@ -40,14 +44,20 @@ export function renderUpgradesTab(state: GameState): string {
           <div class="item-name">
             ${branch.name}
             <span class="shelf-tag" style="background:#e8f4fd;color:#1976d2;">Cấp ${curLevel}</span>
+            ${isLocked ? '<span class="shelf-tag" style="background:#fee2e2;color:#b91c1c;">🔒 Chưa mở</span>' : ''}
           </div>
           <div class="item-sub">
             Hiện tại: <b>${curTier ? curTier.name : 'Chưa có'}</b>
           </div>
           ${!isMax ? `
-            <div style="font-size: 0.74rem; color: var(--mint-dark); font-weight: 700; margin-top: 3px;">
+            <div style="font-size: 0.74rem; color: ${isLocked ? 'var(--soft)' : 'var(--mint-dark)'}; font-weight: 700; margin-top: 3px;">
               Tiếp theo: ${nextTier.name} (${nextTier.cost.toLocaleString('vi-VN')}đ)
             </div>
+            ${isLocked ? `
+              <div style="font-size: 0.72rem; color: #dc2626; font-weight: 600; margin-top: 2px;">
+                🔒 ${nextTier.unlockHint || `Yêu cầu: Chương ${nextTier.minChapter ?? 1}, Ngày ${nextTier.minDay ?? 1}`}
+              </div>
+            ` : ''}
             <div style="font-size: 0.7rem; color: var(--soft); margin-top: 1px;">
               ${nextTier.description}
             </div>
@@ -59,11 +69,17 @@ export function renderUpgradesTab(state: GameState): string {
         </div>
 
         <div>
-          ${!isMax ? `
-            <button class="btn-sm primary btn-upgrade" data-branch="${branch.id}" ${state.money < nextTier.cost ? 'disabled' : ''}>
-              Nâng cấp<b>${(nextTier.cost / 1000).toLocaleString('vi-VN')}k</b>
-            </button>
-          ` : `
+          ${!isMax ? (
+            isLocked ? `
+              <button class="btn-sm btn-upgrade" data-branch="${branch.id}" disabled style="opacity: 0.6; cursor: not-allowed;" title="Chưa đạt điều kiện mở khóa">
+                🔒 Khóa
+              </button>
+            ` : `
+              <button class="btn-sm primary btn-upgrade" data-branch="${branch.id}" ${state.money < nextTier.cost ? 'disabled' : ''}>
+                Nâng cấp<b>${(nextTier.cost / 1000).toLocaleString('vi-VN')}k</b>
+              </button>
+            `
+          ) : `
             <button class="btn-sm" disabled>MAX</button>
           `}
         </div>
@@ -73,10 +89,10 @@ export function renderUpgradesTab(state: GameState): string {
 
   return `
     <div class="sec-title">
-      <span>🛠️ Nâng Cấp Tiệm Gà (7 Nhánh Chuyên Sâu)</span>
+      <span>🛠️ Nâng Cấp Tiệm Gà (7 Nhánh Chuyên Biệt)</span>
     </div>
     <div class="sec-desc">
-      Bếp & Kho: tăng tốc, hạn dùng. Vận hành & Dịch vụ: khách kiên nhẫn, tự rót nước. Marketing & Vệ sinh: thêm khách, miễn dịch chuột.
+      7 nhánh nội tại độc lập: Bếp (tốc độ & hương vị), Không gian (giá bán & khay), Vận hành (kiên nhẫn & app riêng), Marketing (lưu lượng khách), Kho lạnh (hạn dùng & giá sỉ), Dịch vụ (tự rót nước & tip tương), Vệ sinh (bền dầu & diệt chuột).
     </div>
     <div class="sec-desc upgrade-effects">${effectsSummary(upgradeEffects(state.upgrades))}</div>
     <div class="upgrades-list">
@@ -102,6 +118,16 @@ export function bindUpgradesEvents(
       const nextTier = branch.tiers[branch.currentLevel];
 
       if (!nextTier) return;
+
+      const isLocked = Boolean(
+        (nextTier.minChapter !== undefined && state.currentChapter < nextTier.minChapter) ||
+        (nextTier.minDay !== undefined && state.day < nextTier.minDay)
+      );
+
+      if (isLocked) {
+        showToast(`🔒 Hạng mục này chưa mở khóa! Yêu cầu: ${nextTier.unlockHint || `Chương ${nextTier.minChapter ?? 1}, Ngày ${nextTier.minDay ?? 1}`}`);
+        return;
+      }
 
       if (state.money < nextTier.cost) {
         showToast('Không đủ tiền để nâng cấp hạng mục này!');

@@ -124,13 +124,17 @@ function buyUpgrades(state: GameState, expected: number) {
   // Quán đang quá tải (hôm qua phục vụ chưa tới 60% khách dự kiến) → không mua thêm khách
   const last = state.dayHistory[state.dayHistory.length - 1];
   const overloaded = !!last && last.customersServed < expected * 0.6;
-  for (const id of ['marketing', 'kitchen', 'operations', 'space']) {
+  for (const id of ['marketing', 'kitchen', 'operations', 'space', 'storage', 'service', 'hygiene']) {
     if (id === 'marketing' && overloaded) continue;
     const branch = state.upgrades[id];
     const next = branch?.tiers[branch.currentLevel];
-    if (branch && next && next.cost <= state.money * 0.3) {
-      state.money -= next.cost;
-      branch.currentLevel += 1;
+    if (branch && next) {
+      if (next.minChapter !== undefined && state.currentChapter < next.minChapter) continue;
+      if (next.minDay !== undefined && state.day < next.minDay) continue;
+      if (next.cost <= state.money * 0.3) {
+        state.money -= next.cost;
+        branch.currentLevel += 1;
+      }
     }
   }
 }

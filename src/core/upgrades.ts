@@ -41,25 +41,24 @@ export const MAX_PRICE_PREMIUM_PCT = 30;
 const capacitySlots = (capacity: number) => (capacity >= 12 ? 3 : capacity >= 4 ? 2 : capacity >= 2 ? 1 : 0);
 
 export function upgradeEffects(upgrades: Upgrades): UpgradeEffects {
-  const { kitchen, operations, storage, service, hygiene } = upgrades;
-  const all = Object.values(upgrades);
+  const { kitchen, space, operations, marketing, storage, service, hygiene } = upgrades;
 
   const autoDrink = (service?.currentLevel ?? 1) >= 3;
   const pestImmunity = (hygiene?.currentLevel ?? 1) >= 4;
 
   return {
     fryRampPct: bestOwned(kitchen, 'speed'),
-    tastePct: all.reduce((sum, b) => sum + bestOwned(b, 'taste'), 0),
-    oilLifePct: all.reduce((sum, b) => sum + bestOwned(b, 'hygiene'), 0),
-    patiencePct: bestOwned(operations, 'speed') + bestOwned(service, 'speed'),
-    customersPct: all.reduce((sum, b) => sum + bestOwned(b, 'customers'), 0),
+    tastePct: bestOwned(kitchen, 'taste'),
+    oilLifePct: bestOwned(hygiene, 'hygiene'),
+    patiencePct: bestOwned(operations, 'speed'),
+    customersPct: bestOwned(marketing, 'customers'),
     autoLift: (kitchen?.currentLevel ?? 1) >= AUTO_LIFT_KITCHEN_LEVEL,
-    pricePremiumPct: Math.min(MAX_PRICE_PREMIUM_PCT, Math.round(all.reduce((sum, br) => sum + bestOwned(br, 'space'), 0) / 3)),
-    traySlots: Math.min(3, all.reduce((sum, br) => sum + capacitySlots(bestOwned(br, 'capacity')), 0)),
+    pricePremiumPct: Math.min(MAX_PRICE_PREMIUM_PCT, Math.round(bestOwned(space, 'space') / 3)),
+    traySlots: Math.min(3, capacitySlots(bestOwned(space, 'capacity'))),
     selfServe: (operations?.currentLevel ?? 1) >= SELF_SERVE_OPERATIONS_LEVEL,
     ownDeliveryApp: (operations?.currentLevel ?? 1) >= 5,
     shelfLifeBonus: bestOwned(storage, 'shelfLife'),
-    discountWholesale: Math.min(30, all.reduce((sum, b) => sum + bestOwned(b, 'discount'), 0)),
+    discountWholesale: Math.min(30, bestOwned(storage, 'discount')),
     sauceTipBonus: bestOwned(service, 'sauceTip'),
     autoDrink,
     pestImmunity,
