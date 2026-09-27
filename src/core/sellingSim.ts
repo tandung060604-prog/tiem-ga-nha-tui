@@ -46,6 +46,9 @@ export interface SellingSession {
   slowServeCount?: number;             // số đơn giao chậm (kiên nhẫn <= 35%)
   expensiveCount?: number;             // số đơn giá cao/chặt chém
   fairPriceCount?: number;             // số đơn giá hợp lý/rẻ
+  wrongOrderCount?: number;            // số đơn giao sai món
+  missedItemsCount?: number;           // số đơn giao thiếu món
+  apologiesCount?: number;             // số đơn hủy do hết hàng và xin lỗi khách
 }
 
 // Hiệu ứng "đã tay": core ghi lại chuyện vừa xảy ra, giao diện rút ra (drainFx) để vẽ đúng một lần.
@@ -90,7 +93,9 @@ export function createSellingSession(): SellingSession {
     fastServeCount: 0,
     slowServeCount: 0,
     expensiveCount: 0,
-    fairPriceCount: 0
+    fairPriceCount: 0,
+    wrongOrderCount: 0,
+    missedItemsCount: 0
   };
 }
 

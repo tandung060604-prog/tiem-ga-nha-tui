@@ -1,4 +1,4 @@
-import { Condiment, CustomerOrder, CustomerReview, DayLedger, GameEvent, GameState, QualityRating, TrayItem, UpgradeBranch } from '../types/game';
+import { Condiment, CustomerOrder, CustomerPersonality, CustomerReview, DayLedger, GameEvent, GameState, QualityRating, TrayItem, UpgradeBranch } from '../types/game';
 import { RANDOM_EVENTS } from '../content/events';
 import { BUNNY_LETTERS, BunnyLetter, MysteryBunnyEngine } from '../content/mysteryBunny';
 import { INITIAL_MENU } from '../content/menu';
@@ -74,9 +74,14 @@ export function createCustomerSource(state: GameState, event: GameEvent, resumeB
 
   return {
     opening(): CustomerOrder[] {
-      return letter
-        ? [OrdersEngine.generateBunnyOrder(state, letter), regularCustomer(state, event)]
-        : [regularCustomer(state, event), regularCustomer(state, event)];
+      if (letter) {
+        return [OrdersEngine.generateBunnyOrder(state, letter)];
+      }
+      // Ngày đầu (Chương 1, Ngày 1-2): chỉ 1 khách mở cửa để không bị dồn dập
+      if (state.currentChapter === 1 && state.day <= 2) {
+        return [regularCustomer(state, event)];
+      }
+      return [regularCustomer(state, event), regularCustomer(state, event)];
     },
     bunnyVisited: () => bunnyVisited,
     next(queue: readonly CustomerOrder[]): CustomerOrder {
@@ -206,9 +211,12 @@ export function assembleAtCounter(draft: GameState, session: SellingSession, coo
 // ---------------------------------------------------------------------------
 
 export type ServeResult =
-  | { kind: 'no-order' | 'empty-tray' | 'no-match' | 'raw-rejected' }
+  | { kind: 'no-order' | 'empty-tray' | 'raw-rejected' }
+  | { kind: 'no-match' }
   | { kind: 'partial'; missingItemIds?: string[] }
-  | { kind: 'complete'; order: CustomerOrder; paid: number; tip: number; burnt: boolean; feedbackNotes?: string[] };
+  | { kind: 'complete'; order: CustomerOrder; paid: number; tip: number; burnt: boolean; feedbackNotes?: string[] }
+  | { kind: 'wrong-item'; order: CustomerOrder; paid: number; tip: number; wrongItemName: string; requestedName: string; feedbackNotes?: string[] }
+  | { kind: 'incomplete-finish'; order: CustomerOrder; paid: number; tip: number; missingItemIds: string[]; feedbackNotes?: string[] };
 
 // Tính toán tiền Tip linh hoạt dựa trên tính cách khách hàng, tốc độ phục vụ và độ ngon của món
 export function calculateCustomerTip(order: CustomerOrder): { tip: number; feedbackNotes: string[] } {
@@ -318,7 +326,8 @@ export function calculateCustomerTip(order: CustomerOrder): { tip: number; feedb
 }
 
 
-// Giao cho khách đầu hàng mọi món trong khay khách đang cần.
+// Giao cho khách trong hàng đợi. Ưu tiên khách đầu hàng; nếu khách đầu hàng chưa có món khớp
+// nhưng khách tiếp theo (vị trí 2, 3...) có món trong khay đã làm xong thì tự động giao cho khách đó.
 // Gà sống: khách không nhận (để lại khay). Gà cháy: trả nửa giá món đó (khách foodie phạt 100%).
 // `removeAt` xóa món khỏi khay (khay thuộc CookingEngine). Cập nhật session; tiền vào ví do caller cộng.
 export function serveFirstOrder(
@@ -326,11 +335,58 @@ export function serveFirstOrder(
   tray: readonly TrayItem[],
   prices: (menuItemId: string) => number,
   removeAt: (trayIdx: number) => void,
-  upgrades?: { [id: string]: UpgradeBranch }
+  upgrades?: { [id: string]: UpgradeBranch },
+  targetOrderId?: string
 ): ServeResult {
-  const order = session.orders[0];
+  if (session.orders.length === 0) return { kind: 'no-order' };
+
+  // Xác định khách hàng cần phục vụ
+  let orderIndex = 0;
+  if (targetOrderId) {
+    const found = session.orders.findIndex(o => o.id === targetOrderId);
+    if (found >= 0) orderIndex = found;
+  } else {
+    // Ưu tiên khách đầu hàng nếu có món khớp
+    const firstOrderHasMatch = session.orders[0] && tray.some(t =>
+      session.orders[0]!.items.some(it => it.menuItemId === t.menuItemId && !it.completed)
+    );
+    if (!firstOrderHasMatch) {
+      // Nếu khách đầu không khớp, tìm khách kế tiếp nào có món khớp trong khay
+      const matchedIdx = session.orders.findIndex(ord =>
+        tray.some(t => ord.items.some(it => it.menuItemId === t.menuItemId && !it.completed))
+      );
+      if (matchedIdx >= 0) orderIndex = matchedIdx;
+    }
+  }
+
+  const order = session.orders[orderIndex];
   if (!order) return { kind: 'no-order' };
-  if (tray.length === 0) return { kind: 'empty-tray' };
+
+  if (tray.length === 0) {
+    const hasSomeServed = order.items.some(it => it.served > 0);
+    if (hasSomeServed) {
+      session.orders.splice(orderIndex, 1);
+      session.servedCount += 1;
+      session.missedItemsCount = (session.missedItemsCount ?? 0) + 1;
+      session.totalWaitSec += order.patienceMax - Math.max(0, order.patienceCurrent);
+
+      const missingItemIds = order.items.filter(it => !it.completed).map(it => it.menuItemId);
+      const deliveredValue = order.items.filter(it => it.served > 0).reduce((sum, it) => sum + prices(it.menuItemId) * it.served, 0);
+      const paid = Math.max(0, Math.round(deliveredValue * 0.7)); // Phạt 30% vì thiếu món
+      session.grossRevenue += paid;
+      recordOrderBooks(session, order, paid);
+      if (paid > 0) pushFx(session, { kind: 'cash', paid, tip: 0 });
+      return {
+        kind: 'incomplete-finish',
+        order,
+        paid,
+        tip: 0,
+        missingItemIds,
+        feedbackNotes: ['Giao thiếu món! Khách bực bội trừ 30% tiền.']
+      };
+    }
+    return { kind: 'empty-tray' };
+  }
 
   let matched = false;
   let rejectedRaw = false;
@@ -372,44 +428,152 @@ export function serveFirstOrder(
     }
   }
 
-  if (!matched) return { kind: rejectedRaw ? 'raw-rejected' : 'no-match' };
-  if (!OrdersEngine.isOrderComplete(order)) {
-    const missingItemIds = order.items.filter(it => !it.completed).map(it => it.menuItemId);
-    return { kind: 'partial', missingItemIds };
-  }
-
-  session.orders.shift();
-  session.servedCount += 1;
-  session.totalWaitSec += order.patienceMax - Math.max(0, order.patienceCurrent);
-
-  // Theo dõi tốc độ phục vụ đơn hàng (Nhanh vs Chậm)
-  const patienceRatio = order.patienceCurrent / Math.max(1, order.patienceMax);
-  if (patienceRatio >= 0.65) {
-    session.fastServeCount = (session.fastServeCount ?? 0) + 1;
-  } else if (patienceRatio <= 0.35) {
-    session.slowServeCount = (session.slowServeCount ?? 0) + 1;
-  }
-
-  // Theo dõi cảm nhận giá cả (Đắt vs Rẻ/Hợp lý)
-  if (order.totalPrice > 0) {
-    const isPricey = order.items.some(it => {
-      const def = INITIAL_MENU.find(m => m.id === it.menuItemId);
-      return def && prices(it.menuItemId) > def.basePrice * 1.18;
-    });
-    if (isPricey) {
-      session.expensiveCount = (session.expensiveCount ?? 0) + 1;
-    } else {
-      session.fairPriceCount = (session.fairPriceCount ?? 0) + 1;
+  if (matched) {
+    if (!OrdersEngine.isOrderComplete(order)) {
+      const missingItemIds = order.items.filter(it => !it.completed).map(it => it.menuItemId);
+      return { kind: 'partial', missingItemIds };
     }
+
+    session.orders.splice(orderIndex, 1);
+    session.servedCount += 1;
+    session.totalWaitSec += order.patienceMax - Math.max(0, order.patienceCurrent);
+
+    // Theo dõi tốc độ phục vụ đơn hàng (Nhanh vs Chậm)
+    const patienceRatio = order.patienceCurrent / Math.max(1, order.patienceMax);
+    if (patienceRatio >= 0.65) {
+      session.fastServeCount = (session.fastServeCount ?? 0) + 1;
+    } else if (patienceRatio <= 0.35) {
+      session.slowServeCount = (session.slowServeCount ?? 0) + 1;
+    }
+
+    // Theo dõi cảm nhận giá cả (Đắt vs Rẻ/Hợp lý)
+    if (order.totalPrice > 0) {
+      const isPricey = order.items.some(it => {
+        const def = INITIAL_MENU.find(m => m.id === it.menuItemId);
+        return def && prices(it.menuItemId) > def.basePrice * 1.18;
+      });
+      if (isPricey) {
+        session.expensiveCount = (session.expensiveCount ?? 0) + 1;
+      } else {
+        session.fairPriceCount = (session.fairPriceCount ?? 0) + 1;
+      }
+    }
+
+    const paid = Math.max(0, order.totalPrice - (order.burntPenalty ?? 0));
+    const { tip, feedbackNotes } = calculateCustomerTip(order);
+    session.grossRevenue += paid;
+    session.tips += tip;
+    recordOrderBooks(session, order, paid);
+    pushFx(session, { kind: 'cash', paid, tip });
+    return { kind: 'complete', order, paid, tip, burnt: (order.burntPenalty ?? 0) > 0, feedbackNotes };
   }
 
-  const paid = Math.max(0, order.totalPrice - (order.burntPenalty ?? 0));
-  const { tip, feedbackNotes } = calculateCustomerTip(order);
-  session.grossRevenue += paid;
-  session.tips += tip;
-  recordOrderBooks(session, order, paid);
-  pushFx(session, { kind: 'cash', paid, tip });
-  return { kind: 'complete', order, paid, tip, burnt: (order.burntPenalty ?? 0) > 0, feedbackNotes };
+  // Khách từ chối gà còn sống
+  if (rejectedRaw && tray.every(t => t.quality === 'raw')) {
+    return { kind: 'raw-rejected' };
+  }
+
+  // Khách đã nhận 1 phần trước đó, nay bấm KENG khi khay hết món khớp → lấy phần hiện có, phàn nàn thiếu món và rời đi
+  const hasSomeServed = order.items.some(it => it.served > 0);
+  if (hasSomeServed) {
+    session.orders.splice(orderIndex, 1);
+    session.servedCount += 1;
+    session.missedItemsCount = (session.missedItemsCount ?? 0) + 1;
+    session.totalWaitSec += order.patienceMax - Math.max(0, order.patienceCurrent);
+
+    const missingItemIds = order.items.filter(it => !it.completed).map(it => it.menuItemId);
+    const deliveredValue = order.items.filter(it => it.served > 0).reduce((sum, it) => sum + prices(it.menuItemId) * it.served, 0);
+    const paid = Math.max(0, Math.round(deliveredValue * 0.7)); // Phạt 30% vì thiếu món
+    session.grossRevenue += paid;
+    recordOrderBooks(session, order, paid);
+    if (paid > 0) pushFx(session, { kind: 'cash', paid, tip: 0 });
+    return {
+      kind: 'incomplete-finish',
+      order,
+      paid,
+      tip: 0,
+      missingItemIds,
+      feedbackNotes: ['Giao thiếu món! Khách bực bội trừ 30% tiền.']
+    };
+  }
+
+  // Khay có đồ ăn nhưng KHÔNG CÓ MÓN NÀO KHỚP (Người chơi đưa SAI MÓN!)
+  // Giao món sai: tiêu thụ món đầu tiên chín trên khay, tính đã phục vụ xong, chuyển khách kế tiếp, ghi nhận sai sót
+  const wrongItemIdx = tray.findIndex(t => t.quality !== 'raw');
+  if (wrongItemIdx >= 0) {
+    const wrongItem = tray[wrongItemIdx]!;
+    removeAt(wrongItemIdx);
+
+    session.orders.splice(orderIndex, 1);
+    session.servedCount += 1;
+    session.wrongOrderCount = (session.wrongOrderCount ?? 0) + 1;
+    session.totalWaitSec += order.patienceMax - Math.max(0, order.patienceCurrent);
+
+    const requestedNames = order.items.map(it => {
+      const def = INITIAL_MENU.find(m => m.id === it.menuItemId);
+      return def ? def.name : it.menuItemId;
+    }).join(' + ');
+
+    return {
+      kind: 'wrong-item',
+      order,
+      paid: 0, // Giao sai món không được tính tiền
+      tip: 0,
+      wrongItemName: wrongItem.name,
+      requestedName: requestedNames,
+      feedbackNotes: [`Giao nhầm ${wrongItem.name} cho đơn ${requestedNames}! Khách bỏ về không trả tiền.`]
+    };
+  }
+
+  return { kind: rejectedRaw ? 'raw-rejected' : 'no-match' };
+}
+
+export interface CancelOrderResult {
+  success: boolean;
+  order?: CustomerOrder;
+  paid: number;
+  apologyReply: string;
+}
+
+// Hủy đơn của khách hàng khi hết món/hết nguyên liệu và xin lỗi lịch sự
+export function cancelAndApologizeOrder(
+  session: SellingSession,
+  orderId: string,
+  prices: (menuItemId: string) => number
+): CancelOrderResult {
+  const idx = session.orders.findIndex(o => o.id === orderId);
+  if (idx < 0) return { success: false, paid: 0, apologyReply: '' };
+
+  const order = session.orders[idx]!;
+  session.orders.splice(idx, 1);
+  session.apologiesCount = (session.apologiesCount ?? 0) + 1;
+
+  // Nếu khách đã nhận 1 phần trước đó, tính tiền phần đã nhận với mức giá ưu đãi (80%)
+  const deliveredValue = order.items
+    .filter(it => it.served > 0)
+    .reduce((sum, it) => sum + prices(it.menuItemId) * it.served, 0);
+  const paid = deliveredValue > 0 ? Math.round(deliveredValue * 0.8) : 0;
+
+  if (paid > 0) {
+    session.grossRevenue += paid;
+    recordOrderBooks(session, order, paid);
+    pushFx(session, { kind: 'cash', paid, tip: 0 });
+  }
+
+  const replies: Record<CustomerPersonality, string> = {
+    easygoing: 'Dạ không sao đâu quán ơi, bán đắt hàng ghê! Hôm khác em ghé lại ủng hộ nha!',
+    student: 'Dạ hông sao đâu ạ, bữa sau tan học con lại qua ăn gà rán giòn rụm tiếp!',
+    driver: 'Ok tiệm nhé, để tui chạy cuốc khác, bữa sau có dịp ghé lại!',
+    generous: 'Quán đông khách hết món là mừng rồi, không sao nha tiệm!',
+    foodie: 'Tiếc ghê, món ngon nên mau hết hả tiệm? Bữa sau nhớ phần tui nghen!',
+    frugal: 'Hơi tiếc công ghé, nhưng tiệm xin lỗi nhiệt tình quá, để bữa khác vậy!',
+    impatient: 'Biết trước hết món thì đỡ đợi, nhưng cảm ơn quán đã báo sớm nha!'
+  };
+
+  const apologyReply = (order.personality && replies[order.personality])
+    || 'Dạ không sao đâu ạ, cảm ơn quán đã xin lỗi nha, để hôm khác mình ghé lại!';
+
+  return { success: true, order, paid, apologyReply };
 }
 
 // Sổ P&L của một đơn đã giao: kênh bán, bao bì, ly nước, tiền mất vì món cháy, món giải ngấy
@@ -518,7 +682,8 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   const avgWait = session.servedCount > 0 ? session.totalWaitSec / session.servedCount : 0;
   const { newRatings, generatedReview, advisorTip } = ReviewsEngine.evaluateDay(
     draft, perfectRatio, session.burntCount, avgWait, session.lostCount, session.servedCount, session.totalFriedCount,
-    session.fastServeCount, session.slowServeCount, session.expensiveCount, session.fairPriceCount
+    session.fastServeCount, session.slowServeCount, session.expensiveCount, session.fairPriceCount,
+    session.wrongOrderCount ?? 0, session.missedItemsCount ?? 0, session.topSellerId
   );
   if (karma.tasteDriftPerDay !== 0) { // Nghệ Nhân (karma): tiếng lành / tiếng dữ về độ ngon
     newRatings.taste = Math.max(1, Math.min(5, newRatings.taste + karma.tasteDriftPerDay));
@@ -543,6 +708,8 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   ledger.bestStreak = session.bestStreak ?? 0;
   ledger.friedCount = session.totalFriedCount;
   ledger.perfectCount = session.perfectCount;
+  ledger.wrongOrderCount = session.wrongOrderCount ?? 0;
+  ledger.missedItemsCount = session.missedItemsCount ?? 0;
   draft.money -= EconomyEngine.closingCharges(ledger);
   draft.debtStreak = draft.money < 0 ? (draft.debtStreak ?? 0) + 1 : 0; // phá sản khi âm quỹ nhiều ngày liền
   draft.ratings = newRatings;
@@ -556,6 +723,17 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   // Giá chặt chém → cả hẻm bàn tán (Tình Hẻm giảm, ảnh hưởng kết thúc); giá bình dân → được thương
   const priceDrift = communityDriftFromPrice(averagePriceRatio(draft));
   if (priceDrift !== 0) draft.karma = applyKarmaChange(draft.karma, { community: priceDrift });
+
+  // Sai sót trong ca bán (lên sai món, miss đơn, khách bỏ về) tác động tiêu cực đến Karma Nghệ Nhân và Tình Hẻm
+  const mistakes = (session.wrongOrderCount ?? 0) + (session.missedItemsCount ?? 0);
+  if (mistakes > 0 || session.lostCount > 0) {
+    const craftPenalty = -0.4 * mistakes - 0.2 * session.lostCount;
+    const commPenalty = -0.3 * mistakes - 0.2 * session.lostCount;
+    draft.karma = applyKarmaChange(draft.karma, {
+      craftsmanship: craftPenalty,
+      community: commPenalty
+    });
+  }
 
   flagIntegrity(draft, auditState(draft)); // chống gian lận: sổ sách phải hợp lý sau mỗi ngày
 

@@ -13,6 +13,22 @@ export function renderSettingsModal(state: GameState): string {
         <button id="btn-close-settings" style="border: 0; background: none; font-size: 1.4rem; cursor: pointer;">✕</button>
       </div>
 
+      ${state.phase === 'selling' ? `
+      <!-- Đóng Cửa Hàng Sớm Hôm Nay -->
+      <div style="background: #fff1f2; border: 2px solid #f43f5e; border-radius: 12px; padding: 12px; text-align: left; box-shadow: 0 4px 12px rgba(244, 63, 94, 0.15);">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+          <span style="font-size: 1.3rem;">🚪</span>
+          <b style="font-size: 0.95rem; color: #9f1239;">Đóng Cửa Hàng Sớm Hôm Nay</b>
+        </div>
+        <div style="font-size: 0.78rem; color: #881337; margin-bottom: 10px; line-height: 1.45;">
+          Nghỉ bán sớm nếu quán hết sạch nguyên liệu hoặc bạn muốn chốt ca ngay. Các đơn còn lại sẽ được kết thúc lịch sự và chuyển sang màn Tổng Kết Ngày.
+        </div>
+        <button id="btn-close-shop-early" class="btn-sm" style="width: 100%; min-height: 44px; font-weight: 800; font-size: 0.92rem; background: linear-gradient(135deg, #e11d48, #be123c); color: #fff; border: 0; border-radius: 10px; cursor: pointer; box-shadow: 0 3px 8px rgba(190, 18, 60, 0.35);">
+          🛑 NGHỈ BÁN SỚM & CHỐT SỔ NGÀY
+        </button>
+      </div>
+      ` : ''}
+
       <!-- Rename Shop -->
       <div>
         <label style="display: block; font-size: 0.8rem; font-weight: 800; color: var(--soft); margin-bottom: 4px;">

@@ -491,6 +491,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
   const rush = isRushHour(session.gameHour);
   const hourNum = session.gameHour;
   const timePeriodLabel = hourNum < 14 ? '☀️ Ca Trưa Hẻm 1102 · Nắng Vàng Giòn Rụm' : '🌙 Ca Tối Hẻm 1102 · Đèn Dầu Bập Bùng';
+  const tray = cookingEngine.getTray();
 
   // Customer Queue Lane
   const customerCardsHtml = session.orders.map((ord, idx) => {
@@ -498,6 +499,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
     const visual = getCustomerVisual(ord);
     const mood = getCustomerMood(ord);
     const thought = getMoodThought(mood, ord);
+    const hasMatchInTray = tray.some(t => ord.items.some(it => it.menuItemId === t.menuItemId && !it.completed));
 
     const comboHtml = ord.comboName ? `<div class="order-combo">🍱 ${escapeHtml(ord.comboName)}</div>` : '';
     const itemsHtml = comboHtml + ord.items.map(it => {
@@ -576,6 +578,18 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             <div class="patience-fill ${patienceColorClass}" style="width: ${patiencePercent}%;"></div>
           </div>
         </div>
+
+        <!-- Actions Row: Lên món nhanh & Hủy đơn xin lỗi -->
+        <div class="cust-card-actions">
+          ${hasMatchInTray ? `
+            <button class="btn-serve-cust" data-order-id="${ord.id}" title="Khay đã có món, lên món ngay cho khách này">
+              🛎️ LÊN MÓN
+            </button>
+          ` : ''}
+          <button class="btn-cancel-order" data-order-id="${ord.id}" title="Hết món/nguyên liệu, hủy đơn và xin lỗi khách">
+            🙏 Hết món · Xin lỗi
+          </button>
+        </div>
       </div>
     `;
   }).join('');
@@ -583,7 +597,6 @@ export function renderSellingView(state: GameState, session: SellingSession): st
   // Fryer Pot State
   const cookState = cookingEngine.getCookState();
   const quality = cookingEngine.calculateCurrentQuality();
-  const tray = cookingEngine.getTray();
   const oilCondition = state.oilCondition;
 
   const drinkStock = state.inventory.soft_drink?.amount ?? 0;

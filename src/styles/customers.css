@@ -5,8 +5,8 @@
   gap: 10px;
   overflow-x: auto;
   padding: 16px 12px 10px;
-  min-height: 135px;
-  max-height: 165px;
+  min-height: 145px;
+  max-height: 185px;
   background: var(--bg);
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
@@ -19,8 +19,8 @@
 }
 
 .customer-card {
-  flex: 0 0 170px;
-  max-height: 150px;
+  flex: 0 0 175px;
+  max-height: 175px;
   box-sizing: border-box;
   background: var(--panel);
   border: 2px solid var(--line);
@@ -745,5 +745,69 @@
     padding: 1px 3px;
   }
 }
+
+/* Card Action Buttons (Hủy đơn xin lỗi & Giao đơn linh hoạt) */
+.cust-card-actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 3px;
+  width: 100%;
+}
+
+.btn-cancel-order {
+  flex: 1;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 3px 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  transition: all 0.15s ease;
+  line-height: 1.2;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-cancel-order:hover {
+  background: #fee2e2;
+  border-color: #ef4444;
+}
+
+.btn-cancel-order:active {
+  transform: scale(0.96);
+  background: #fecaca;
+}
+
+.btn-serve-cust {
+  flex: 1;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: 1px solid #047857;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 3px 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.3);
+  line-height: 1.2;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-serve-cust:active {
+  transform: scale(0.96);
+}
+
 
 

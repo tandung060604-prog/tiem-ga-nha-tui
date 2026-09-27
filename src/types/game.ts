@@ -208,6 +208,8 @@ export interface DayLedger {
   customersServed: number;
   customersLost: number;
   burntCount: number;
+  wrongOrderCount?: number;  // số đơn giao sai món
+  missedItemsCount?: number; // số đơn giao thiếu món
   topSellerId: string;
   // Cho Gà Wrapped hằng tuần (save cũ không có)
   topSellerCount?: number;

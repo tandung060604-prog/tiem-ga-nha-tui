@@ -37,7 +37,7 @@ import { syncTutorialLayer } from './ui/components/TutorialLayer';
 import { weeklyWrapped } from './core/wrapped';
 import { drawWrapped, shareWrapped, shareImage } from './ui/components/WrappedCard';
 
-import { squeezeCondiment, recordHelperFry, StationResult, scoopSide, changeOil, OIL_CHANGE_COST, startTimerStation, pullTimerStation, assembleAtCounter, makeDrink, creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, SAUCE_STOCK, serveFirstOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP } from './core/day';
+import { squeezeCondiment, recordHelperFry, StationResult, scoopSide, changeOil, OIL_CHANGE_COST, startTimerStation, pullTimerStation, assembleAtCounter, makeDrink, creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, SAUCE_STOCK, serveFirstOrder, cancelAndApologizeOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP } from './core/day';
 import { upgradeEffects } from './core/upgrades';
 import { renderSummaryModal } from './ui/components/SummaryModal';
 import { renderSettingsModal } from './ui/components/SettingsModal';
@@ -1127,8 +1127,24 @@ class AppController {
       return;
     }
 
+    const cancelBtn = target.closest<HTMLElement>('.btn-cancel-order');
+    if (cancelBtn) {
+      Haptics.tap();
+      const orderId = cancelBtn.dataset.orderId;
+      if (orderId) this.cancelCustomerOrder(orderId);
+      return;
+    }
+
+    const serveCustBtn = target.closest<HTMLElement>('.btn-serve-cust');
+    if (serveCustBtn) {
+      Haptics.tap();
+      const orderId = serveCustBtn.dataset.orderId;
+      if (orderId) this.serveCurrentCustomer(orderId);
+      return;
+    }
+
     const bunnyCard = target.closest<HTMLElement>('.customer-card[data-is-bunny="true"]');
-    if (bunnyCard) {
+    if (bunnyCard && !target.closest('.btn-cancel-order') && !target.closest('.btn-serve-cust')) {
       Haptics.tap();
       const letter = BUNNY_LETTERS.find(l => l.id === bunnyCard.dataset.letterId);
       if (letter) this.openBunnyLetterDialog(letter);
@@ -1364,8 +1380,8 @@ class AppController {
     }
   }
 
-  // Giao món cho khách đầu hàng (luật ở core/day.ts); ở đây chỉ lo tiền vào ví, âm thanh, thông báo.
-  private serveCurrentCustomer() {
+  // Giao món cho khách trong hàng đợi (ưu tiên khách đầu hoặc khách có món khớp)
+  private serveCurrentCustomer(targetOrderId?: string) {
     const session = this.sellingSession;
     if (!session) return;
     const menu = stateManager.getState().menu;
@@ -1374,7 +1390,8 @@ class AppController {
       cookingEngine.getTray(),
       id => menu.find(m => m.id === id)?.currentPrice ?? 0,
       idx => cookingEngine.removeFromTray(idx),
-      stateManager.getState().upgrades
+      stateManager.getState().upgrades,
+      targetOrderId
     );
 
     switch (result.kind) {
@@ -1390,7 +1407,7 @@ class AppController {
         return;
       case 'no-match':
         Haptics.warning();
-        this.showToast('Đồ ăn trong khay không khớp với món khách gọi!');
+        this.showToast('Đồ ăn trong khay không khớp với món khách nào đang gọi!');
         return;
       case 'partial': {
         audio.playPop();
@@ -1402,11 +1419,32 @@ class AppController {
         this.render();
         return;
       }
+      case 'incomplete-finish': {
+        audio.playCash();
+        Haptics.warning();
+        const missingNames = (result.missingItemIds ?? [])
+          .map(id => menu.find(m => m.id === id)?.name || id)
+          .join(', ');
+        this.showToast(`⚠️ GIAO THIẾU MÓN! Khách nhận phần có sẵn (+${result.paid.toLocaleString('vi-VN')}đ) và bực bội bỏ đi vì thiếu ${missingNames}! 📦`);
+        stateManager.update(draft => {
+          creditSale(draft, result.paid, 0);
+        });
+        this.render();
+        return;
+      }
+      case 'wrong-item': {
+        audio.playBurnt();
+        Haptics.warning();
+        this.showToast(`❌ GIAO SAI MÓN! Đơn cần ${result.requestedName} nhưng khay đưa ${result.wrongItemName}, khách bực tức bỏ về! 😡`);
+        this.render();
+        return;
+      }
       case 'complete':
         Haptics.serveSuccess();
         break;
       default:
-        assertNever(result);
+        this.render();
+        return;
     }
 
     const { order, paid, tip, feedbackNotes } = result;
@@ -1429,6 +1467,32 @@ class AppController {
         ? feedbackNotes.join(' · ')
         : (tip > 0 ? `+${(tip / 1000).toLocaleString('vi-VN')}k tip` : '0đ tip');
       this.showToast(`${personalityTag}+${(paid + tip).toLocaleString('vi-VN')}đ (${notesStr}) 💵`);
+    }
+    this.render();
+  }
+
+  // Hủy đơn của khách hàng khi hết món/hết nguyên liệu và gửi lời xin lỗi lịch sự
+  private cancelCustomerOrder(orderId: string) {
+    const session = this.sellingSession;
+    if (!session) return;
+    const menu = stateManager.getState().menu;
+    const result = cancelAndApologizeOrder(
+      session,
+      orderId,
+      id => menu.find(m => m.id === id)?.currentPrice ?? 0
+    );
+    if (!result.success) return;
+
+    audio.playPop();
+    Haptics.tap();
+    if (result.paid > 0) {
+      audio.playCash();
+      stateManager.update(draft => {
+        creditSale(draft, result.paid, 0);
+      });
+      this.showToast(`🙏 Quán xin lỗi do hết món. Khách thanh toán ${result.paid.toLocaleString('vi-VN')}đ phần đã nhận: "${result.apologyReply}"`);
+    } else {
+      this.showToast(`🙏 Quán xin lỗi do hết món. Khách thông cảm: "${result.apologyReply}"`);
     }
     this.render();
   }
@@ -1667,6 +1731,21 @@ class AppController {
           return;
         }
         this.openEndingModal(last, false);
+      };
+    }
+
+    const closeShopEarlyBtn = document.getElementById('btn-close-shop-early');
+    if (closeShopEarlyBtn) {
+      closeShopEarlyBtn.onclick = () => {
+        void this.confirmDialog(
+          'Bạn có chắc chắn muốn <b>đóng cửa hàng sớm hôm nay</b> không?<br/><br/>Tiệm sẽ chốt ca bán và chuyển ngay sang màn hình Tổng Kết Ngày.',
+          'Đóng cửa sớm'
+        ).then(ok => {
+          if (!ok) return;
+          this.closeModal();
+          this.showToast('🚪 Tiệm đã đóng cửa sớm hôm nay. Tiến hành chốt sổ!');
+          this.finishDay();
+        });
       };
     }
 

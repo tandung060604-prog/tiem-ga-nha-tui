@@ -1,6 +1,7 @@
 import { isWrappedDay, weeklyWrapped } from '../../core/wrapped';
 import { GameState, DayLedger, CustomerReview } from '../../types/game';
 import { BUSINESS_FORM_LABEL, financialLedger } from '../../core/accounting';
+import { escapeHtml } from '../escapeHtml';
 
 const vnd = (n: number) => `${n.toLocaleString('vi-VN')}đ`;
 
@@ -138,6 +139,13 @@ export function renderSummaryModal(
         </div>
       </div>
 
+      ${(ledger.wrongOrderCount && ledger.wrongOrderCount > 0) || ledger.customersLost > 0 ? `
+        <div style="background: #fff1f2; border: 1.5px solid #fecdd3; border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 8px; font-size: 0.78rem; color: #be123c; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+          <span>⚠️</span>
+          <span>Sự cố phục vụ: ${ledger.wrongOrderCount ? `${ledger.wrongOrderCount} đơn giao nhầm món · ` : ''}${ledger.customersLost ? `${ledger.customersLost} khách bỏ về do đợi lâu` : ''}</span>
+        </div>
+      ` : ''}
+
       <!-- Highlight GenZ Review -->
       <div class="review-highlight-card">
         <span class="review-badge-top">REVIEW NỔI BẬT</span>
@@ -146,9 +154,19 @@ export function renderSummaryModal(
           <span class="review-user-name">${review.authorName}</span>
           <span class="review-stars">${'★'.repeat(review.stars)}${'☆'.repeat(5 - review.stars)}</span>
         </div>
+        ${review.orderSummary ? `
+          <div style="font-size: 0.72rem; color: #8c5b36; background: rgba(244, 162, 97, 0.2); padding: 2px 8px; border-radius: 8px; display: inline-block; margin-bottom: 6px; font-weight: 700;">
+            📦 Đơn gọi: ${escapeHtml(review.orderSummary)}
+          </div>
+        ` : ''}
         <p class="review-quote">
           "${review.comment}"
         </p>
+        ${review.tags && review.tags.length ? `
+          <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px;">
+            ${review.tags.map(t => `<span style="font-size: 0.68rem; background: rgba(0,0,0,0.06); color: #78350f; font-weight: 700; padding: 2px 6px; border-radius: 6px;">${escapeHtml(t)}</span>`).join('')}
+          </div>
+        ` : ''}
       </div>
 
       <!-- Advisor Tip Box -->
