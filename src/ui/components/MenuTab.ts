@@ -26,7 +26,7 @@ export function renderMenuTab(state: GameState): string {
             Giá bán: <b style="color: var(--red); font-size: 0.95rem;">${item.currentPrice.toLocaleString('vi-VN')}đ</b>
             ${item.currentPrice !== item.basePrice ? `<small style="color: var(--soft); text-decoration: line-through;">(${item.basePrice.toLocaleString('vi-VN')}đ)</small>` : ''}
           </div>
-          ${isUnlocked ? `<div class="price-band" data-band="${band}" style="font-size: 0.72rem; font-weight: 700;">${PRICE_BANDS[band].icon} ${PRICE_BANDS[band].label} · ${Math.round(ratio * 100)}% giá gốc · cho phép ${(limits.min / 1000).toLocaleString('vi-VN')}k–${(limits.max / 1000).toLocaleString('vi-VN')}k</div>` : ''}
+          ${isUnlocked ? `<div class="price-band" data-band="${band}">${PRICE_BANDS[band].icon} ${PRICE_BANDS[band].label} · ${Math.round(ratio * 100)}% giá gốc · cho phép ${(limits.min / 1000).toLocaleString('vi-VN')}k–${(limits.max / 1000).toLocaleString('vi-VN')}k</div>` : ''}
           <div style="font-size: 0.72rem; color: var(--soft); margin-top: 2px;">
             Công thức: ${item.steps.join(' ➔ ')}
           </div>
@@ -58,11 +58,16 @@ export function renderMenuTab(state: GameState): string {
   }).join('');
 
   const avg = averagePriceRatio(state);
-  const avgBand = PRICE_BANDS[priceBand(avg)];
+  const bandKey = priceBand(avg);
+  const avgBand = PRICE_BANDS[bandKey];
   const custPct = Math.round((customerMultiplierFromPrice(avg) - 1) * 100);
-  const priceSummary = `<div class="price-summary" style="font-size: 0.78rem; background: #fff7e8; border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 10px; margin-bottom: 8px; line-height: 1.45;">
-      <b>${avgBand.icon} Mặt bằng giá: ${avgBand.label}</b> (${Math.round(avg * 100)}% giá gốc)<br>
-      Khách tới quán ${custPct === 0 ? 'bình thường' : `${custPct > 0 ? '+' : ''}${custPct}%`} · sao Giá cả hướng về ${pricingTarget(avg).toFixed(1)}⭐${communityDriftFromPrice(avg) < 0 ? ' · <b style="color: var(--red);">hẻm bàn tán quán chặt chém (Tình Hẻm giảm mỗi ngày)</b>' : communityDriftFromPrice(avg) > 0 ? ' · hẻm thương quán bình dân (Tình Hẻm tăng)' : ''}
+  const priceSummary = `<div class="price-summary" data-band="${bandKey}">
+      <div class="price-summary-header">
+        <b>${avgBand.icon} Mặt bằng giá: ${avgBand.label}</b> <span class="price-summary-ratio">(${Math.round(avg * 100)}% giá gốc)</span>
+      </div>
+      <div class="price-summary-desc">
+        Khách tới quán ${custPct === 0 ? 'bình thường' : `${custPct > 0 ? '+' : ''}${custPct}%`} · sao Giá cả hướng về ${pricingTarget(avg).toFixed(1)}⭐${communityDriftFromPrice(avg) < 0 ? ' · <b class="drift-negative">hẻm bàn tán quán chặt chém (Tình Hẻm giảm mỗi ngày)</b>' : communityDriftFromPrice(avg) > 0 ? ' · <span class="drift-positive">hẻm thương quán bình dân (Tình Hẻm tăng)</span>' : ''}
+      </div>
     </div>`;
 
   return `
