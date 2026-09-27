@@ -59,7 +59,24 @@ const MANIFEST = [
   { src: 'icons/icon_sound_off.png', mode: 'single', size: [128, 128], out: ['icons/icon_sound_off.png'] },
   { src: 'icons/icon_share.png', mode: 'single', size: [128, 128], out: ['icons/icon_share.png'] },
   { src: 'icons/icon_clock.png', mode: 'single', size: [128, 128], out: ['icons/icon_clock.png'] },
-  { src: 'icons/icon_fire_rush.png', mode: 'single', size: [128, 128], out: ['icons/icon_fire_rush.png'] }
+  { src: 'icons/icon_fire_rush.png', mode: 'single', size: [128, 128], out: ['icons/icon_fire_rush.png'] },
+
+  // --- Quầy khay inox GN & Món mới (Bàn giao 27/09) ---
+  { src: 'kitchen/prep_chicken_raw.png', mode: 'single', size: [256, 256], out: ['kitchen/prep_chicken_raw.png'] },
+  { src: 'kitchen/prep_thigh_raw.png', mode: 'single', size: [256, 256], out: ['kitchen/prep_thigh_raw.png'] },
+  { src: 'kitchen/prep_fries_raw.png', mode: 'single', size: [256, 256], out: ['kitchen/prep_fries_raw.png'] },
+  { src: 'kitchen/prep_popcorn_raw.png', mode: 'single', size: [256, 256], out: ['kitchen/prep_popcorn_raw.png'] },
+  { src: 'kitchen/prep_cheese_stick_raw.png', mode: 'single', size: [256, 256], out: ['kitchen/prep_cheese_stick_raw.png'] },
+  { src: 'kitchen/side_radish_pickled.png', mode: 'single', size: [256, 256], out: ['kitchen/side_radish_pickled.png'] },
+  { src: 'kitchen/side_coleslaw.png', mode: 'single', size: [256, 256], out: ['kitchen/side_coleslaw.png'] },
+  { src: 'kitchen/pan_sauce_yangnyeom.png', mode: 'single', size: [256, 256], out: ['kitchen/pan_sauce_yangnyeom.png'] },
+  { src: 'kitchen/pan_sauce_soy_garlic.png', mode: 'single', size: [256, 256], out: ['kitchen/pan_sauce_soy_garlic.png'] },
+  { src: 'kitchen/pan_locked_slot.png', mode: 'single', size: [256, 256], out: ['kitchen/pan_locked_slot.png'] },
+  { src: 'kitchen/pan_empty.png', mode: 'single', size: [256, 256], out: ['kitchen/pan_empty.png'] },
+  { src: 'food/food_spicy_thigh.png', mode: 'single', size: [256, 256], out: ['food/food_spicy_thigh.png'] },
+  { src: 'food/food_cheese_stick.png', mode: 'single', size: [256, 256], out: ['food/food_cheese_stick.png'] },
+  { src: 'food/food_danmuji.png', mode: 'single', size: [256, 256], out: ['food/food_danmuji.png'] },
+  { src: 'food/food_coleslaw.png', mode: 'single', size: [256, 256], out: ['food/food_coleslaw.png'] }
 ];
 
 const BG_MIN = 228;        // mọi kênh ≥ 228 …
