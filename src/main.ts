@@ -191,10 +191,31 @@ class AppController {
     };
     const musicBtn = document.getElementById('btn-title-music')!;
     musicBtn.onclick = () => {
-      music.setEnabled(!music.isEnabled());
-      if (!this.titleDismissed) music.stop();
-      musicBtn.textContent = music.isEnabled() ? '🎵 Nhạc nền: Bật' : '🔇 Nhạc nền: Tắt';
+      music.unlock();
+      const on = !music.isEnabled();
+      music.setEnabled(on);
+      if (on && !this.titleDismissed) {
+        music.start('title');
+      }
+      const iconSpan = musicBtn.querySelector('.control-icon');
+      const textSpan = musicBtn.querySelector('.control-text');
+      if (iconSpan && textSpan) {
+        iconSpan.textContent = on ? '🎵' : '🔇';
+        textSpan.textContent = on ? 'Nhạc nền: Bật' : 'Nhạc nền: Tắt';
+      } else {
+        musicBtn.textContent = on ? '🎵 Nhạc nền: Bật' : '🔇 Nhạc nền: Tắt';
+      }
     };
+
+    const screenEl = document.getElementById('title-screen');
+    const onFirstUserTap = () => {
+      music.unlock();
+      if (music.isEnabled() && !this.titleDismissed) {
+        music.start('title');
+      }
+      screenEl?.removeEventListener('pointerdown', onFirstUserTap);
+    };
+    screenEl?.addEventListener('pointerdown', onFirstUserTap, { passive: true });
   }
 
   // Đặt tên quán khi mở tiệm mới (đổi lại được trong Cài đặt)

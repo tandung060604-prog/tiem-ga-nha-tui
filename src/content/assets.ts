@@ -8,6 +8,10 @@ const url = (path: string) => `${BASE}${path}`;
 
 // Đường dẫn ảnh do `npm run assets` sinh ra trong public/assets/. Test kiểm tra mọi file ở đây tồn tại.
 export const ASSETS = {
+  audio: {
+    bgmTitle: url('assets/audio/bgm_title.mp3'),
+    bgmSelling: url('assets/audio/bgm_selling.mp3')
+  },
   gabong: {
     front: url('assets/mascot/mascot_gabong_front.png'),
     threeQuarter: url('assets/mascot/mascot_gabong_three_quarter.png'),

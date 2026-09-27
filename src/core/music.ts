@@ -1,12 +1,15 @@
-// Nhạc nền, "giọng" nhân vật và đọc truyện — tự sinh bằng Web Audio / Web Speech, không cần file âm thanh.
-// iOS: AudioContext chỉ được bật trong một thao tác chạm → gọi unlock() từ màn tiêu đề.
+// Nhạc nền game (BGM MP3 chất lượng cao) kết hợp giọng nhân vật và đọc truyện.
+// Hỗ trợ 2 bài nhạc:
+// - Title & Chuẩn bị: Daily Beetle (Acoustic Ukulele ấm cúng, thư giãn)
+// - Bán hàng: Carefree (Nhịp điệu huýt sáo vui tươi, rộn ràng)
 import { audio } from './audio';
+import { ASSETS } from '../content/assets';
 
 const MUSIC_PREF_KEY = 'tiem_ga_music_on';
 
-type Mode = 'prep' | 'selling';
+export type Mode = 'title' | 'prep' | 'selling';
 
-// Vòng hợp âm C – Am – F – G (mỗi hợp âm 1 ô nhịp), tần số Hz
+// Vòng hợp âm C – Am – F – G dự phòng (Web Audio synth khi offline/fallback)
 const CHORDS: readonly (readonly number[])[] = [
   [261.63, 329.63, 392.0],  // C
   [220.0, 261.63, 329.63],  // Am
@@ -14,7 +17,6 @@ const CHORDS: readonly (readonly number[])[] = [
   [196.0, 246.94, 293.66]   // G
 ];
 const BASS = [130.81, 110.0, 87.31, 98.0];
-// Giai điệu ngũ cung (C D E G A) quãng cao, lặp lại theo mẫu cố định cho dễ nhớ
 const MELODY: readonly (number | 0)[] = [
   523.25, 0, 659.25, 587.33, 523.25, 0, 440.0, 0,
   440.0, 523.25, 0, 587.33, 659.25, 0, 587.33, 0,
@@ -27,50 +29,143 @@ class MusicBox {
   private timer: ReturnType<typeof setInterval> | null = null;
   private nextTime = 0;
   private step = 0;
-  private mode: Mode = 'prep';
+  private mode: Mode = 'title';
   private enabled = readPref();
+
+  // HTML5 Audio elements cho bản nhạc MP3
+  private titleAudio: HTMLAudioElement | null = null;
+  private sellingAudio: HTMLAudioElement | null = null;
+  private activeAudio: HTMLAudioElement | null = null;
+  private fadeTimer: ReturnType<typeof setInterval> | null = null;
 
   isEnabled() { return this.enabled; }
 
-  // Gọi trong một thao tác chạm (bắt buộc trên iOS Safari)
+  private getAudioElements() {
+    if (typeof Audio === 'undefined') return { title: null, selling: null };
+    if (!this.titleAudio) {
+      try {
+        this.titleAudio = new Audio(ASSETS.audio.bgmTitle);
+        this.titleAudio.loop = true;
+        this.titleAudio.preload = 'auto';
+
+        this.sellingAudio = new Audio(ASSETS.audio.bgmSelling);
+        this.sellingAudio.loop = true;
+        this.sellingAudio.preload = 'auto';
+      } catch {
+        // Fallback Web Audio
+      }
+    }
+    return { title: this.titleAudio, selling: this.sellingAudio };
+  }
+
+  // Gọi trong một thao tác chạm (bắt buộc trên iOS Safari / Chrome autoplay policy)
   unlock() {
     const ctx = audio.context();
     if (ctx && ctx.state === 'suspended') void ctx.resume();
+    const { title } = this.getAudioElements();
+    if (title && title.paused && this.enabled && (this.mode === 'title' || this.mode === 'prep')) {
+      title.play().catch(() => {});
+    }
   }
 
   setEnabled(on: boolean) {
     this.enabled = on;
-    try { localStorage.setItem(MUSIC_PREF_KEY, on ? '1' : '0'); } catch { /* chế độ riêng tư: bỏ qua */ }
+    try { localStorage.setItem(MUSIC_PREF_KEY, on ? '1' : '0'); } catch { /* chế độ riêng tư */ }
     if (on) this.start(this.mode); else this.stop();
   }
 
   setMode(mode: Mode) {
+    if (this.mode === mode) return;
     this.mode = mode;
+    if (this.enabled && (this.activeAudio || this.timer)) {
+      this.start(mode);
+    }
   }
 
   start(mode: Mode = this.mode) {
     this.mode = mode;
-    if (!this.enabled || this.timer || audio.getMuted()) return;
+    if (!this.enabled || audio.getMuted()) return;
+
+    const { title, selling } = this.getAudioElements();
+    const targetAudio = (mode === 'selling') ? selling : title;
+
+    if (targetAudio) {
+      this.crossFadeTo(targetAudio, 0.45);
+      return;
+    }
+
+    // Fallback Web Audio Synth nếu không hỗ trợ Audio element
+    this.startSynth();
+  }
+
+  private crossFadeTo(targetAudio: HTMLAudioElement, targetVol: number = 0.45) {
+    if (this.fadeTimer) clearInterval(this.fadeTimer);
+    this.fadeTimer = null;
+    this.stopSynth();
+
+    const prevAudio = this.activeAudio;
+    if (prevAudio === targetAudio && !targetAudio.paused) return;
+
+    targetAudio.volume = 0.05;
+    const playPromise = targetAudio.play();
+    if (playPromise) {
+      playPromise.then(() => {
+        let currentVol = 0.05;
+        this.fadeTimer = setInterval(() => {
+          currentVol += 0.05;
+          if (targetAudio) targetAudio.volume = Math.min(targetVol, currentVol);
+          if (prevAudio && prevAudio !== targetAudio) {
+            prevAudio.volume = Math.max(0, prevAudio.volume - 0.08);
+          }
+          if (currentVol >= targetVol) {
+            if (this.fadeTimer) clearInterval(this.fadeTimer);
+            this.fadeTimer = null;
+            if (prevAudio && prevAudio !== targetAudio) prevAudio.pause();
+          }
+        }, 60);
+      }).catch(() => {
+        // Trình duyệt chặn autoplay khi chưa chạm: fallback synth
+        this.startSynth();
+      });
+    }
+
+    this.activeAudio = targetAudio;
+  }
+
+  stop() {
+    if (this.fadeTimer) clearInterval(this.fadeTimer);
+    this.fadeTimer = null;
+    if (this.activeAudio) {
+      this.activeAudio.pause();
+      this.activeAudio = null;
+    }
+    const { title, selling } = this.getAudioElements();
+    if (title) title.pause();
+    if (selling) selling.pause();
+    this.stopSynth();
+  }
+
+  private startSynth() {
+    if (this.timer) return;
     const ctx = audio.context();
     if (!ctx) return;
     this.master = ctx.createGain();
     this.master.gain.value = 0.0001;
-    this.master.gain.exponentialRampToValueAtTime(0.55, ctx.currentTime + 1.2); // vào nhạc êm
+    this.master.gain.exponentialRampToValueAtTime(0.35, ctx.currentTime + 1.0);
     this.master.connect(ctx.destination);
     this.nextTime = ctx.currentTime + 0.1;
     this.step = 0;
-    // Lịch phát trước 0,2s, kiểm tra mỗi 50ms: nhịp đều dù tab bận vẽ
     this.timer = setInterval(() => this.schedule(ctx), 50);
   }
 
-  stop() {
+  private stopSynth() {
     if (this.timer) clearInterval(this.timer);
     this.timer = null;
     const ctx = audio.context();
     if (this.master && ctx) {
       const m = this.master;
       m.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.2);
-      setTimeout(() => m.disconnect(), 800);
+      setTimeout(() => m.disconnect(), 600);
     }
     this.master = null;
   }
