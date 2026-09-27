@@ -661,6 +661,18 @@
     min-height: 28px;
     height: 28px;
   }
+  .order-item-title {
+    gap: 3px;
+    min-width: 0;
+  }
+  .order-food-name {
+    font-size: 0.68rem;
+    line-height: 1.15;
+  }
+  .order-condiment {
+    font-size: 0.5rem;
+    padding: 1px 3px;
+  }
 }
 
 

@@ -1842,8 +1842,10 @@
 
   .tray-item .t-name {
     font-size: 0.56rem;
-    max-width: 52px;
+    max-width: 100% !important;
     line-height: 1.1;
+    text-align: center;
+    padding: 0 1px;
   }
 
   .tray-item .t-quality {

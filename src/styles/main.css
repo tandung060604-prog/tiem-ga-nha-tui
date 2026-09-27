@@ -541,7 +541,9 @@ body.selling-mode .awning::after {
   color: var(--ink);
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 6px;
+  word-break: break-word;
 }
 
 .item-sub {
