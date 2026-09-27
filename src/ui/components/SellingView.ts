@@ -317,7 +317,7 @@ export interface CustomerVisualModel {
 
 function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
   // Ưu tiên sử dụng model sprite từ bộ 36 nhân vật Hẻm 1102
-  if (order.avatar && (order.avatar.includes('/assets/') || order.avatar.endsWith('.png'))) {
+  if (order.avatar && (order.avatar.includes('assets/') || order.avatar.endsWith('.png'))) {
     return {
       stand: order.avatar,
       walk: order.avatar,

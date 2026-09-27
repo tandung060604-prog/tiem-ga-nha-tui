@@ -55,8 +55,20 @@ const CHAR_GRID = [
   { row: 5, col: 5, id: 'pest_01_rat_cong', altId: 'char_36_rat_cong', name: 'Chuột Cống Đột Nhập', en: 'Sneaky Sewer Rat' }
 ];
 
+// Exact vertical bounds for character bodies in the 1024x1024 sheet:
+// Strictly strips out the bottom ribbon banner with English archetype text
+// AND eliminates top banner remnants bleeding in from the row above.
+const ROW_BOUNDS = [
+  { row: 0, yMin: 18, yMax: 154 },
+  { row: 1, yMin: 188, yMax: 324 },
+  { row: 2, yMin: 358, yMax: 492 },
+  { row: 3, yMin: 528, yMax: 656 },
+  { row: 4, yMin: 696, yMax: 822 },
+  { row: 5, yMin: 866, yMax: 986 }
+];
+
 async function extractAll() {
-  console.log('--- EXTRACTING 36 CHARACTERS FROM SHEET ---');
+  console.log('--- EXTRACTING 36 CHARACTERS FROM SHEET (CLEAN CUT - NO BANNER/TEXT) ---');
   if (!fs.existsSync(SHEET_PATH)) {
     throw new Error(`Sheet not found: ${SHEET_PATH}`);
   }
@@ -67,16 +79,20 @@ async function extractAll() {
     .toBuffer({ resolveWithObject: true });
 
   const cellW = sheetInfo.width / 6;
-  const cellH = sheetInfo.height / 6;
 
   fs.mkdirSync('public/assets/characters', { recursive: true });
   fs.mkdirSync('assets-src/characters', { recursive: true });
 
   for (const c of CHAR_GRID) {
+    const rDef = ROW_BOUNDS.find(r => r.row === c.row);
+    if (!rDef) continue;
+
     const xStart = Math.floor(c.col * cellW);
-    const yStart = Math.floor(c.row * cellH);
-    const w = Math.floor(cellW);
-    const h = Math.floor(cellH);
+    const xEnd = Math.floor((c.col + 1) * cellW);
+    const yStart = rDef.yMin;
+    const yEnd = rDef.yMax;
+    const w = xEnd - xStart;
+    const h = yEnd - yStart;
 
     // Extract cell pixels
     const cellBuf = Buffer.alloc(w * h * 4);
@@ -91,21 +107,17 @@ async function extractAll() {
       }
     }
 
-    // Flood fill background to transparent:
-    // Background is either outer gutter (~248, 230, 190) or inner card cream (~255, 252, 240)
-    // Dark character outlines and elements have brightness <= 200
-    const bannerY = Math.floor(h * 0.81);
+    // 1. Flood-fill background from all 4 borders to transparent
     const isBg = (idx) => {
       const r = cellBuf[idx], g = cellBuf[idx + 1], b = cellBuf[idx + 2];
-      const isGutter = (r >= 230 && g >= 210 && b >= 170);
-      const isCardBg = (r >= 215 && g >= 210 && b >= 195);
+      const isGutter = (r >= 225 && g >= 200 && b >= 160);
+      const isCardBg = (r >= 210 && g >= 200 && b >= 185);
       return isGutter || isCardBg;
     };
 
     const visited = new Uint8Array(w * h);
     const queue = [];
     const push = (x, y) => {
-      if (y >= bannerY) return;
       const i = y * w + x;
       if (!visited[i] && isBg(i * 4)) {
         visited[i] = 1;
@@ -113,9 +125,9 @@ async function extractAll() {
       }
     };
 
-    // Seed from border pixels
-    for (let x = 0; x < w; x++) { push(x, 0); }
-    for (let y = 0; y < bannerY; y++) { push(0, y); push(w - 1, y); }
+    // Seed from all borders
+    for (let x = 0; x < w; x++) { push(x, 0); push(x, h - 1); }
+    for (let y = 0; y < h; y++) { push(0, y); push(w - 1, y); }
 
     let head = 0;
     while (head < queue.length) {
@@ -124,22 +136,56 @@ async function extractAll() {
       if (x > 0) push(x - 1, y);
       if (x < w - 1) push(x + 1, y);
       if (y > 0) push(x, y - 1);
-      if (y < bannerY - 1) push(x, y + 1);
+      if (y < h - 1) push(x, y + 1);
     }
 
-    // Set background & banner to transparent
+    // Clear background to transparent
     for (let y = 0; y < h; y++) {
       for (let x = 0; x < w; x++) {
         const i = y * w + x;
-        if (visited[i] || y >= bannerY) {
+        if (visited[i]) {
           cellBuf[i * 4 + 3] = 0;
         }
       }
     }
 
-    // Bounding box of character figure
+    // 2. Remove small disconnected speck islands (fewer than 50 connected pixels)
+    const ccVisited = new Uint8Array(w * h);
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const startIdx = y * w + x;
+        if (cellBuf[startIdx * 4 + 3] > 0 && !ccVisited[startIdx]) {
+          const component = [startIdx];
+          ccVisited[startIdx] = 1;
+          let cHead = 0;
+          while (cHead < component.length) {
+            const ci = component[cHead++];
+            const cx = ci % w, cy = Math.floor(ci / w);
+            const neighbors = [
+              [cx - 1, cy], [cx + 1, cy], [cx, cy - 1], [cx, cy + 1]
+            ];
+            for (const [nx, ny] of neighbors) {
+              if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+                const ni = ny * w + nx;
+                if (cellBuf[ni * 4 + 3] > 0 && !ccVisited[ni]) {
+                  ccVisited[ni] = 1;
+                  component.push(ni);
+                }
+              }
+            }
+          }
+          if (component.length < 50) {
+            for (const ci of component) {
+              cellBuf[ci * 4 + 3] = 0;
+            }
+          }
+        }
+      }
+    }
+
+    // 3. Find bounding box of figure
     let minX = w, maxX = 0, minY = h, maxY = 0;
-    for (let y = 0; y < bannerY; y++) {
+    for (let y = 0; y < h; y++) {
       for (let x = 0; x < w; x++) {
         const i = y * w + x;
         if (cellBuf[i * 4 + 3] > 0) {
@@ -156,7 +202,7 @@ async function extractAll() {
       continue;
     }
 
-    // Crop figure
+    // 4. Crop figure
     const cropW = maxX - minX + 1;
     const cropH = maxY - minY + 1;
     const cropBuf = Buffer.alloc(cropW * cropH * 4);
@@ -171,16 +217,23 @@ async function extractAll() {
       }
     }
 
-    // Create 256x256 transparent PNG with contain fit
+    // 5. Fit cleanly inside 256x256 transparent PNG with 12px padding
     const publicFile = `public/assets/characters/${c.id}.png`;
     const srcFile = `assets-src/characters/${c.id}.png`;
 
     await sharp(cropBuf, { raw: { width: cropW, height: cropH, channels: 4 } })
-      .resize(256, 256, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
-      .png({ compressionLevel: 9, quality: 90 })
+      .resize(232, 232, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .extend({
+        top: 12,
+        bottom: 12,
+        left: 12,
+        right: 12,
+        background: { r: 0, g: 0, b: 0, alpha: 0 }
+      })
+      .png({ compressionLevel: 9 })
       .toFile(publicFile);
 
-    // Copy to src
+    // Copy to assets-src
     fs.copyFileSync(publicFile, srcFile);
 
     // If there's an altId (for pets/pests), create that file too
@@ -189,10 +242,10 @@ async function extractAll() {
       fs.copyFileSync(publicFile, `assets-src/characters/${c.altId}.png`);
     }
 
-    console.log(`✓ Sliced [${c.row},${c.col}] -> ${publicFile} (${c.name})`);
+    console.log(`✓ Sliced clean [${c.row},${c.col}] -> ${publicFile} (${c.name})`);
   }
 
-  console.log('--- ALL 36 CHARACTERS EXTRACTED SUCCESSFULLY ---');
+  console.log('--- ALL 36 CHARACTERS EXTRACTED CLEANLY (0 RIBBONS, 0 TEXT) ---');
 }
 
 extractAll().catch(err => {

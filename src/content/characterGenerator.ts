@@ -2,6 +2,7 @@ import { pick, random } from '../core/rng';
 import { CustomerPersonality } from '../types/game';
 import { CHARACTERS_36 } from './characters36';
 import { mentionsStoryCharacter } from './storyCharacters';
+import { ASSETS } from './assets';
 
 // Hệ thống 36 nhân vật Hẻm 1102 (33 nhân vật người thực khách/cư dân hẻm + 3 động vật đặc biệt)
 export type CustomerArchetype = 'student' | 'delivery' | 'office' | 'genz' | 'demanding' | 'family';
@@ -104,7 +105,7 @@ export class CharacterGenerator {
       personality,
       personalityLabel: pInfo.label,
       personalityDesc: pInfo.desc,
-      avatar: `/assets/characters/${char.id}.png`,
+      avatar: (ASSETS.characters as Record<string, string>)[char.id] || `${import.meta.env?.BASE_URL ?? './'}assets/characters/${char.id}.png`,
       patienceMultiplier: char.patienceMultiplier * (1 / pInfo.patienceRate),
       tipChance,
       hairStyle: 'Chuẩn phong cách Sài Gòn',
