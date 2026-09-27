@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hệ Thống 36 Nhân Vật Hẻm 1102 — Tiệm Gà Nhà Tui</title>
+  <link rel="stylesheet" href="../../src/styles/tokens.css">
+  <style>
+    :root {
+      --bg-cream: #fbf7f0;
+      --card-border: #e0d0be;
+      --ink: #3c2a21;
+      --soft: #7f6e63;
+      --gold: #d48b28;
+      --red: #d93829;
+      --blue: #1971c2;
+      --green: #2b8a3e;
+      --orange: #e8590c;
+      --purple: #862e9c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #2a221b;
+      color: var(--ink);
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #d93829, #b02518);
+      color: #fff;
+      padding: 20px 24px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 900px;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      border: 2px solid #ff7675;
+    }
+    .header-banner h1 {
+      font-size: 1.6rem;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+    .header-banner p {
+      font-size: 0.9rem;
+      opacity: 0.95;
+    }
+    .concept-sheet-img {
+      max-width: 900px;
+      width: 100%;
+      border-radius: 20px;
+      border: 3px solid #ffeedb;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      max-width: 900px;
+      width: 100%;
+    }
+    @media (max-width: 768px) {
+      .grid-container {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    @media (max-width: 480px) {
+      .grid-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .char-card {
+      background: var(--bg-cream);
+      border: 2px solid var(--card-border);
+      border-radius: 16px;
+      padding: 12px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 6px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .char-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+    .char-card.animal {
+      border-color: #ffd43b;
+      background: #fffdf0;
+    }
+    .char-card.pest {
+      border-color: #ff6b6b;
+      background: #fff5f5;
+    }
+    .char-num {
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: #999;
+      align-self: flex-start;
+      margin-left: 4px;
+    }
+    .char-avatar-box {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid #ebd9c8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .char-name {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+    .char-role {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .role-staff { background: #ffe3e3; color: #c92a2a; }
+    .role-regular { background: #e7f5ff; color: #1971c2; }
+    .role-street { background: #fff3bf; color: #d9480f; }
+    .role-authority { background: #e6fcf5; color: #0ca678; }
+    .role-social { background: #f3f0ff; color: #7950f2; }
+    .role-pet { background: #fff9db; color: #f59f00; font-weight: 800; }
+    .role-pest { background: #ffe3e3; color: #e03131; font-weight: 800; }
+    .char-food {
+      font-size: 0.65rem;
+      color: var(--soft);
+      line-height: 1.25;
+      margin-top: 2px;
+    }
+    .char-food b { color: #555; }
+    .animals-callout {
+      background: #fff;
+      border: 2px dashed #f59f00;
+      border-radius: 16px;
+      padding: 16px;
+      max-width: 900px;
+      width: 100%;
+    }
+    .animals-callout h3 {
+      font-size: 1.05rem;
+      color: #d9480f;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .animals-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 10px;
+    }
+    @media (max-width: 600px) {
+      .animals-grid { grid-template-columns: 1fr; }
+    }
+    .animal-box {
+      background: #fff9db;
+      border-radius: 12px;
+      padding: 12px;
+      border: 1.5px solid #ffe066;
+    }
+    .animal-box.pest {
+      background: #fff5f5;
+      border-color: #ffc9c9;
+    }
+    .animal-box h4 {
+      font-size: 0.88rem;
+      margin-bottom: 4px;
+    }
+    .animal-box p {
+      font-size: 0.78rem;
+      line-height: 1.4;
+      color: #495057;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-banner">
+    <h1>🍗 HỆ THỐNG 36 NHÂN VẬT HẺM 1102 & TIỆM GÀ NHÀ TUI</h1>
+    <p>Chuyển hóa từ model đời thực Sài Gòn sang thế giới game F&B Cozy Retro Chibi</p>
+  </div>
+
+  <img src="characters_36_sheet.jpg" alt="36 Nhân Vật Hẻm 1102" class="concept-sheet-img">
+
+  <div class="animals-callout">
+    <h3>🐾 TUYẾN SỰ KIỆN ĐỘNG VẬT & DỊCH HẠI BẾP (3 Ô CUỐI)</h3>
+    <div class="animals-grid">
+      <div class="animal-box">
+        <h4>🐕 34. Chó Cỏ Vàng (Vệ sĩ trông quán)</h4>
+        <p>• <b>Adoption Quest:</b> Ngày 3 cho sụn gà + nước sạch.<br>• <b>Tác dụng:</b> Sủa đuổi giang hồ bảo kê, dẹp trộm đêm, tăng 10% kiên nhẫn cho khách đợi hàng.</p>
+      </div>
+      <div class="animal-box">
+        <h4>🐈 35. Mèo Mướp Tam Thể (Thần tài diệt chuột)</h4>
+        <p>• <b>Adoption Quest:</b> Đặt đĩa cá/vụn gà sau góc bếp.<br>• <b>Tác dụng:</b> Triệt tiêu 90% sự cố chuột cống cắn phá kho, tăng 8% tiền tip, nâng điểm vệ sinh ATTP loại A.</p>
+      </div>
+      <div class="animal-box pest">
+        <h4>🐀 36. Chuột Cống Đột Nhập (Sự cố khẩn cấp)</h4>
+        <p>• <b>Kích hoạt:</b> Không dọn rác/dầu bẩn cuối ngày.<br>• <b>Hậu quả:</b> Cắn thủng bao bột (-400k), khách hét bỏ về (-1.5 reputation).<br>• <b>Hóa giải:</b> Nuôi mèo mướp bắt chuột hoặc mua bẫy Dì Sáu.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-container">
+    <!-- Row 1 -->
+    <div class="char-card">
+      <span class="char-num">#01</span>
+      <div class="char-avatar-box">👨‍🍳</div>
+      <div class="char-name">Chủ Quầy (Bạn)</div>
+      <span class="char-role role-staff">Nhân Vật Chính</span>
+      <div class="char-food">Khởi nghiệp gà giòn Hẻm 1102</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#02</span>
+      <div class="char-avatar-box">👵</div>
+      <div class="char-name">Cô Bảy Vé Số</div>
+      <span class="char-role role-street">Lao Động Dạo</span>
+      <div class="char-food">Xin trà đá, mua que phô mai</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#03</span>
+      <div class="char-avatar-box">👧</div>
+      <div class="char-name">Bé Linh Phụ Quầy</div>
+      <span class="char-role role-staff">Nhân Viên Bếp</span>
+      <div class="char-food">Chuyên lắc khoai & rót soda</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#04</span>
+      <div class="char-avatar-box">🧑‍🍳</div>
+      <div class="char-name">Anh Khang Chiên</div>
+      <span class="char-role role-staff">Thợ Chiên Bếp</span>
+      <div class="char-food">Canh lửa Perfect, mến bé Linh</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#05</span>
+      <div class="char-avatar-box">👦</div>
+      <div class="char-name">Bé Bo Mê Gà</div>
+      <span class="char-role role-regular">Khách Nhí</span>
+      <div class="char-food">Đùi gà bự nhất + khoai lắc</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#06</span>
+      <div class="char-avatar-box">👵</div>
+      <div class="char-name">Cụ Ba Quạt Nón</div>
+      <span class="char-role role-regular">Bô Lão Hẻm</span>
+      <div class="char-food">Xúp gà thanh đạm, kể tích xưa</div>
+    </div>
+
+    <!-- Row 2 -->
+    <div class="char-card">
+      <span class="char-num">#07</span>
+      <div class="char-avatar-box">👩‍💼</div>
+      <div class="char-name">Vy Thư Ký</div>
+      <span class="char-role role-regular">Khách Sành Ăn</span>
+      <div class="char-food">Gà không xương sốt tỏi + tip</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#08</span>
+      <div class="char-avatar-box">👴</div>
+      <div class="char-name">Bác Hai Khó Tính</div>
+      <span class="char-role role-regular">Khách Giận Hối</span>
+      <div class="char-food">Đòi đúng giờ, gà giòn khen đậm</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#09</span>
+      <div class="char-avatar-box">👨‍🦳</div>
+      <div class="char-name">Chú Tám Xe Ôm</div>
+      <span class="char-role role-street">Khách Mua Số</span>
+      <div class="char-food">Cơm đùi gà xối mỡ + Coca</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#10</span>
+      <div class="char-avatar-box">🎉</div>
+      <div class="char-name">Anh Hưng Trúng Số</div>
+      <span class="char-role role-regular">Khách Trúng Độc</span>
+      <div class="char-food">Bao 3 xô gà tiệc cả xóm</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#11</span>
+      <div class="char-avatar-box">👩‍🦰</div>
+      <div class="char-name">Bà Năm Mối Sỉ</div>
+      <span class="char-role role-street">Đại Lý Sỉ Số</span>
+      <div class="char-food">Đặt gà số lượng lớn mang đi</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#12</span>
+      <div class="char-avatar-box">🚴</div>
+      <div class="char-name">Cậu Út Giao Vé</div>
+      <span class="char-role role-street">Giao Tốc Hành</span>
+      <div class="char-food">Gà popcorn xiên ăn vội 3 phút</div>
+    </div>
+
+    <!-- Row 3 -->
+    <div class="char-card">
+      <span class="char-num">#13</span>
+      <div class="char-avatar-box">🧺</div>
+      <div class="char-name">Chị Thắm Tàu Hũ</div>
+      <span class="char-role role-street">Gánh Hàng Rong</span>
+      <div class="char-food">Đổi chén tàu hũ lấy cánh gà</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#14</span>
+      <div class="char-avatar-box">📦</div>
+      <div class="char-name">Bác Năm Ve Chai</div>
+      <span class="char-role role-street">Thu Mua Phế Liệu</span>
+      <div class="char-food">Tặng vỏ lon & thùng carton</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#15</span>
+      <div class="char-avatar-box">🥖</div>
+      <div class="char-name">Chú Bảy Bánh Mì</div>
+      <span class="char-role role-street">Bánh Mì Dạo</span>
+      <div class="char-food">Hợp tác: Bánh Mì Kẹp Gà Giòn</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#16</span>
+      <div class="char-avatar-box">🍦</div>
+      <div class="char-name">Anh Tư Kem Ống</div>
+      <span class="char-role role-street">Xe Bán Kem</span>
+      <div class="char-food">Combo hè: Kem Dừa + Gà Cay</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#17</span>
+      <div class="char-avatar-box">🧹</div>
+      <div class="char-name">Cô Lan Lao Công</div>
+      <span class="char-role role-street">Quét Rác Ca Đêm</span>
+      <div class="char-food">Tặng gà nóng cuối ngày + may mắn</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#18</span>
+      <div class="char-avatar-box">🗑️</div>
+      <div class="char-name">Chú Hùng Gom Rác</div>
+      <span class="char-role role-street">Xe Rác Dân Lập</span>
+      <div class="char-food">Dọn dầu thải & rác bếp sạch sẽ</div>
+    </div>
+
+    <!-- Row 4 -->
+    <div class="char-card">
+      <span class="char-num">#19</span>
+      <div class="char-avatar-box">🛵</div>
+      <div class="char-name">Anh Tuấn Shipper</div>
+      <span class="char-role role-regular">Tài Xế App Ruột</span>
+      <div class="char-food">Giao 40% doanh thu mang về</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#20</span>
+      <div class="char-avatar-box">🏋️</div>
+      <div class="char-name">Anh Cường Bốc Vác</div>
+      <span class="char-role role-street">Khuân Vác Bàn Ghế</span>
+      <div class="char-food">Lắp đặt trang thiết bị nâng cấp</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#21</span>
+      <div class="char-avatar-box">🚚</div>
+      <div class="char-name">Bác Tài Long</div>
+      <span class="char-role role-street">Xe Tải Đông Lạnh</span>
+      <div class="char-food">Chở thịt gà tươi từ trang trại</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#22</span>
+      <div class="char-avatar-box">⚡</div>
+      <div class="char-name">Anh Dũng Thợ Điện</div>
+      <span class="char-role role-street">Thợ Điện Lực</span>
+      <div class="char-food">Cứu nguy sự cố chập bếp chiên</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#23</span>
+      <div class="char-avatar-box">👷</div>
+      <div class="char-name">Chú Bảy Thợ Hồ</div>
+      <span class="char-role role-street">Công Trình Hẻm</span>
+      <div class="char-food">Cơm gà xối mỡ ăn chắc bụng</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#24</span>
+      <div class="char-avatar-box">🏪</div>
+      <div class="char-name">Dì Sáu Tạp Hóa</div>
+      <span class="char-role role-regular">Chủ Tạp Hóa Đối Diện</span>
+      <div class="char-food">Cấp cứu dầu ăn, tương khi cháy kho</div>
+    </div>
+
+    <!-- Row 5 -->
+    <div class="char-card">
+      <span class="char-num">#25</span>
+      <div class="char-avatar-box">👮</div>
+      <div class="char-name">Đ/c Nam Công An</div>
+      <span class="char-role role-authority">Công An Phường</span>
+      <div class="char-food">Kiểm tra PCCC & an ninh hẻm</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#26</span>
+      <div class="char-avatar-box">👮‍♂️</div>
+      <div class="char-name">Đại Úy Hoàng CSGT</div>
+      <span class="char-role role-authority">Cảnh Sát Giao Thông</span>
+      <div class="char-food">Điều tiết trật tự shipper đỗ xe</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#27</span>
+      <div class="char-avatar-box">🛡️</div>
+      <div class="char-name">Anh Hải Dân Phòng</div>
+      <span class="char-role role-authority">Dân Phòng Hẻm</span>
+      <div class="char-food">Nhắc nhở kê lùi bàn ghế vỉa hè</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#28</span>
+      <div class="char-avatar-box">🦹</div>
+      <div class="char-name">Đại Ca Beo</div>
+      <span class="char-role role-social">Giang Hồ Bảo Kê</span>
+      <div class="char-food">Đòi thu tiền bảo kê (sự cố)</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#29</span>
+      <div class="char-avatar-box">🏧</div>
+      <div class="char-name">Chị Nga Rút Tiền</div>
+      <span class="char-role role-regular">Khách Rút ATM</span>
+      <div class="char-food">Rút tiền xong tạt mua bữa tối</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#30</span>
+      <div class="char-avatar-box">🚌</div>
+      <div class="char-name">Nữ Sinh Chờ Bus</div>
+      <span class="char-role role-regular">Khách Trạm Buýt</span>
+      <div class="char-food">Gà viên popcorn lắc phô mai</div>
+    </div>
+
+    <!-- Row 6 -->
+    <div class="char-card">
+      <span class="char-num">#31</span>
+      <div class="char-avatar-box">🪑</div>
+      <div class="char-name">Bà Tám Hóng Mát</div>
+      <span class="char-role role-social">Camera Bằng Cơm</span>
+      <div class="char-food">Review một câu kéo cả xóm ăn</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#32</span>
+      <div class="char-avatar-box">🏃</div>
+      <div class="char-name">Anh Tuấn Chạy Bộ</div>
+      <span class="char-role role-regular">Khách Thể Thao</span>
+      <div class="char-food">Chỉ ăn ức gà healthy không da</div>
+    </div>
+    <div class="char-card">
+      <span class="char-num">#33</span>
+      <div class="char-avatar-box">👩‍❤️‍👨</div>
+      <div class="char-name">Cặp Đôi Bách & Diệp</div>
+      <span class="char-role role-regular">GenZ Dạo Phố</span>
+      <div class="char-food">Combo tình nhân, chụp ảnh check-in</div>
+    </div>
+    <div class="char-card animal">
+      <span class="char-num">#34</span>
+      <div class="char-avatar-box">🐕</div>
+      <div class="char-name">Chó Cỏ Vàng</div>
+      <span class="char-role role-pet">Thú Cưng Trông Quán</span>
+      <div class="char-food">Sủa đuổi trộm, tăng kiên nhẫn</div>
+    </div>
+    <div class="char-card animal">
+      <span class="char-num">#35</span>
+      <div class="char-avatar-box">🐈</div>
+      <div class="char-name">Mèo Mướp Tam Thể</div>
+      <span class="char-role role-pet">Thần Tài Diệt Chuột</span>
+      <div class="char-food">Bắt chuột kho bếp, tăng tip 8%</div>
+    </div>
+    <div class="char-card pest">
+      <span class="char-num">#36</span>
+      <div class="char-avatar-box">🐀</div>
+      <div class="char-name">Chuột Cống Đột Nhập</div>
+      <span class="char-role role-pest">Sự Cố Dịch Hại</span>
+      <div class="char-food">Cắn bao bột, giảm danh tiếng</div>
+    </div>
+  </div>
+
+</body>
+</html>
