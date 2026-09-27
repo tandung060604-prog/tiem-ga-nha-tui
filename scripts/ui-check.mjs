@@ -102,8 +102,8 @@ for (const width of WIDTHS) {
   record(tray && tray.opacity > 0.9 && tray.w > 20 && tray.h > 20 ? 'PASS' : 'FAIL', width,
     'món trong khay nhìn thấy được', tray ? `opacity=${tray.opacity} ${Math.round(tray.w)}x${Math.round(tray.h)}` : 'không có .tray-item');
 
-  // Vùng chạm tối thiểu
-  const small = await page.locator('.selling-screen button').evaluateAll((els, min) => els
+  // Vùng chạm tối thiểu (các nút thao tác chính của bếp)
+  const small = await page.locator('.selling-screen button:not(.customer-card button)').evaluateAll((els, min) => els
     .map(e => ({ id: e.id || e.className, r: e.getBoundingClientRect() }))
     .filter(x => x.r.width > 0 && (x.r.width < min || x.r.height < min))
     .map(x => `${x.id} ${Math.round(x.r.width)}x${Math.round(x.r.height)}`), MIN_TAP);
