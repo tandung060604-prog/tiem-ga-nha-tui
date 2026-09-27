@@ -1,9 +1,10 @@
 import { StarRating, CustomerReview, GameState } from '../types/game';
 import { averagePriceRatio, pricingTarget } from './pricing';
-import { PROCEDURAL_REVIEW_TEMPLATES, PERSONA_AUTHORS, ReviewTemplate } from '../content/reviews';
+import { PROCEDURAL_REVIEW_TEMPLATES, PERSONA_AUTHORS, ReviewTemplate, TOPIC_SENTIMENTS, TOPIC_ADVISOR_HINTS, createReviewReplyOptions } from '../content/reviews';
 import { pick, weightedPick } from './rng';
 import { upgradeEffects } from './upgrades';
 import { REVIEW_HUMOR, REVIEW_BLOCKED } from '../content/reviewLabels.generated';
+import { applyKarmaChange } from '../content/endings';
 
 export class ReviewsEngine {
   // Trọng số 5 tiêu chí theo GDD
@@ -218,7 +219,11 @@ export class ReviewsEngine {
       comment,
       tags: chosenTemplate.tags ?? ['#TiemGaNhaTui', '#Hem1102'],
       weakestCriteria: weakest,
-      orderSummary
+      orderSummary,
+      personaGroup: author.group,
+      sentiment: TOPIC_SENTIMENTS[topic] || (reviewStars >= 4 ? 'delighted' : 'disappointed'),
+      advisorHint: TOPIC_ADVISOR_HINTS[topic] || this.generateAdvisorTip(weakest, r[weakest]),
+      replyOptions: createReviewReplyOptions(topic, orderSummary)
     };
 
     // Lời khuyên của "Cố vấn gợi ý" (Advisor tip) thực tế theo ngày
@@ -235,6 +240,57 @@ export class ReviewsEngine {
       newRatings: r,
       generatedReview,
       advisorTip
+    };
+  }
+
+  // Trả lời phản hồi đánh giá của khách hàng (Interactive Review Reply)
+  public static replyToReview(
+    draft: GameState,
+    reviewId: string,
+    optionId: string
+  ): { success: boolean; customerReaction: string; bonusText: string } {
+    const review = draft.recentReviews.find(r => r.id === reviewId);
+    if (!review || !review.replyOptions || review.playerReply) {
+      return { success: false, customerReaction: '', bonusText: '' };
+    }
+
+    const opt = review.replyOptions.find(o => o.id === optionId);
+    if (!opt) {
+      return { success: false, customerReaction: '', bonusText: '' };
+    }
+
+    review.playerReply = {
+      optionId: opt.id,
+      text: opt.text || opt.replyText || '',
+      customerReaction: opt.customerReaction,
+      repliedAtDay: draft.day,
+      starBonus: opt.starBonus,
+      karmaBonus: opt.karmaReward || {},
+    };
+    review.ownerReply = opt.text || opt.replyText || '';
+
+    const bonuses: string[] = [];
+
+    // Cứu vãn điểm sao tiêu chí nếu phản hồi đúng đắn
+    if (opt.starBonus && opt.starBonus > 0) {
+      const crit = review.weakestCriteria || 'taste';
+      draft.ratings[crit] = Math.min(5.0, Math.round((draft.ratings[crit] + opt.starBonus) * 10) / 10);
+      draft.ratings.overall = this.calculateOverallStars(draft.ratings);
+      bonuses.push(`+${opt.starBonus.toFixed(1)}⭐`);
+    }
+
+    // Tác động chỉ số ngầm Karma
+    if (opt.karmaReward) {
+      draft.karma = applyKarmaChange(draft.karma, opt.karmaReward);
+      if (opt.karmaReward.community) bonuses.push(`${opt.karmaReward.community > 0 ? '+' : ''}${opt.karmaReward.community} Tình Hẻm`);
+      if (opt.karmaReward.craftsmanship) bonuses.push(`${opt.karmaReward.craftsmanship > 0 ? '+' : ''}${opt.karmaReward.craftsmanship} Tay Nghề`);
+      if (opt.karmaReward.ambition) bonuses.push(`${opt.karmaReward.ambition > 0 ? '+' : ''}${opt.karmaReward.ambition} Tham Vọng`);
+    }
+
+    return {
+      success: true,
+      customerReaction: opt.customerReaction,
+      bonusText: bonuses.join(' · ')
     };
   }
 

@@ -284,7 +284,7 @@ export const PROCEDURAL_REVIEW_TEMPLATES: ReviewTemplate[] = [
   },
 
   // ==========================================
-  // ĐÁNH GIÁ TỐT: VỆ SINH SÁCH BONG (clean_hygiene) - 4..5 sao
+  // ĐÁNH GIÁ TỐT: VỆ SINH SẠCH BONG (clean_hygiene) - 4..5 sao
   // ==========================================
   {
     criteria: 'hygiene',
@@ -293,10 +293,348 @@ export const PROCEDURAL_REVIEW_TEMPLATES: ReviewTemplate[] = [
     maxStars: 5,
     text: 'Quán sạch bong kin kít! Dầu chiên vàng óng thơm phức, bếp mở nhìn thấy từng khâu yên tâm tuyệt đối 10/10!',
     tags: ['#SachBongKinKit', '#DauVangOng', '#YenTamATTP']
+  },
+
+  // ==========================================
+  // CÁC MẪU REVIEW ĐẶC BIỆT CHIỀU SÂU (ĐA DẠNG NGỮ CẢNH HẺM 1102)
+  // ==========================================
+  {
+    criteria: 'taste',
+    topic: 'perfect_food',
+    minStars: 5,
+    maxStars: 5,
+    text: 'Một buổi chiều mưa ngồi dưới mái hiên số 14, vị giòn tan của miếng gà nóng hổi như đánh thức ký ức Sài Gòn xưa. Bác Ba truyền nghề khéo quá!',
+    tags: ['#KyUcSaigon', '#MaiHien14', '#HuongViXua']
+  },
+  {
+    criteria: 'taste',
+    topic: 'perfect_food',
+    minStars: 5,
+    maxStars: 5,
+    text: 'Thách thức 24h ăn sập Tiệm Gà Nhà Tui: Gà giòn vỏ mỏng rộp rộp, sốt cay tê lưỡi, đáng tiền từng xu! Đã đăng clip lên TikTok 1M fl nha sếp!',
+    tags: ['#FoodReviewer1M', '#ClipTrieuView', '#GaNgonNhatSG']
+  },
+  {
+    criteria: 'speed',
+    topic: 'fast_speed',
+    minStars: 5,
+    maxStars: 5,
+    text: 'Giao đồ ăn cả ngày đói lả ghé mua 1 phần gà popcorn, tiệm lên món cái rẹt kịp chạy cuốc tiếp, còn tặng thêm ly nước lạnh. Ấm lòng shipper!',
+    tags: ['#AmLongShipper', '#GiaoNhanhKipCuoc', '#NghiaTinhHem']
+  },
+  {
+    criteria: 'hygiene',
+    topic: 'clean_hygiene',
+    minStars: 5,
+    maxStars: 5,
+    text: 'Tiệm gà ngăn nắp, bàn ghế xếp trật tự không lấn lòng lề đường, dầu mỡ thu gom chuẩn. Điểm cộng lớn cho ý thức cộng đồng của tiệm!',
+    tags: ['#VanMinhDoThi', '#BaoVeMoiTruong', '#KhenNgoi']
+  },
+  {
+    criteria: 'pricing',
+    topic: 'cheap_price',
+    minStars: 5,
+    maxStars: 5,
+    text: 'Tan học đói rã rời tấp vô tiệm làm combo gà giòn 25k no tới tối, nước sốt mật ong thơm lừng. Quán ruột của cả trường tụi em!',
+    tags: ['#HocSinhSinhVien', '#GiaSieuYeu', '#QuanRuotTruong']
   }
 ];
 
 export const GENZ_REVIEW_TEMPLATES: NonEmpty<ReviewTemplate> = PROCEDURAL_REVIEW_TEMPLATES as unknown as NonEmpty<ReviewTemplate>;
+
+// Ma trận Tâm lý khách hàng theo từng chủ đề sự cố
+export const TOPIC_SENTIMENTS: Record<string, 'furious' | 'disappointed' | 'neutral' | 'delighted' | 'amused'> = {
+  wrong_order: 'furious',
+  missed_order: 'disappointed',
+  burnt_food: 'furious',
+  dirty_oil: 'furious',
+  expensive: 'disappointed',
+  bad_space: 'disappointed',
+  great_space: 'delighted',
+  cheap_price: 'delighted',
+  fast_speed: 'delighted',
+  perfect_food: 'delighted',
+  clean_hygiene: 'delighted',
+  general_praise: 'delighted'
+};
+
+// Gợi ý của Bác Ba / AI Cố vấn phân tích tâm lý khách hàng cho từng chủ đề
+export const TOPIC_ADVISOR_HINTS: Record<string, string> = {
+  wrong_order: 'Bác Ba mách nước: Khách đang tức sôi máu vì đói mà nhận nhầm món. Đừng cãi lý hay đổ thừa! Hãy chọn phương án chân thành xin lỗi và tặng voucher mẻ mới để giữ chân khách.',
+  missed_order: 'Bác Ba mách nước: Khách chờ quá lâu nên tủi thân bỏ về. Hãy dùng sự chân thành cảm ơn vì đã kiên nhẫn và mời nước mát xoa dịu, cam kết cải thiện tốc độ bếp.',
+  burnt_food: 'Bác Ba mách nước: Ăn phải miếng gà khét đắng nghét là trải nghiệm rất tệ. Con hãy nhận lỗi tay nghề canh lửa, cam kết đổi mẻ vàng giòn Perfect để lấy lại uy tín.',
+  dirty_oil: 'Bác Ba mách nước: Vệ sinh ATTP là tính mạng của quán ăn! Tuyệt đối không cợt nhả. Hãy khẳng định tiệm đã lập tức thay 100% dầu mới tinh và khử trùng bếp.',
+  expensive: 'Bác Ba mách nước: Khách chê giá đắt so với vỉa hè. Con hãy giải thích về nguồn gốc thịt gà tươi mỗi ngày và gia vị hảo hạng, hoặc gợi ý các combo tiết kiệm.',
+  bad_space: 'Bác Ba mách nước: Khách thấy ngột ngạt khi ngồi ăn. Con hãy thông báo kế hoạch nâng cấp quạt hơi nước hoặc mở phòng lạnh view hẻm để khách an tâm.',
+  great_space: 'Bác Ba mách nước: Khách mê mẩn không gian check-in! Hãy đối đáp thân thiện, mời họ rủ thêm bạn bè ghé sống ảo thường xuyên nha con.',
+  cheap_price: 'Bác Ba mách nước: Khách khen giá hạt dẻ sinh viên! Hãy duy trì mức giá bình dân để giữ trọn tình nghĩa xóm giềng Hẻm 1102.',
+  fast_speed: 'Bác Ba mách nước: Khách khen phục vụ thần tốc! Đây là lúc thể hiện sự chuyên nghiệp và cam kết giữ vững phong độ giòn nóng nhanh lẹ.',
+  perfect_food: 'Bác Ba mách nước: Khách tấm tắc khen gà ngon chuẩn vị nghệ nhân! Hãy gửi lời cảm ơn từ đáy lòng và duy trì cái tâm làm bếp vàng giòn.',
+  clean_hygiene: 'Bác Ba mách nước: Bếp sạch dầu trong là niềm tự hào của tiệm. Hãy tự tin khẳng định tiêu chuẩn ATTP 5 sao của tiệm gà chúng ta.',
+  general_praise: 'Bác Ba mách nước: Khách yêu mến tiệm! Hãy gửi lời cảm ơn ngọt ngào để kết nối tình thân, biến khách vãng lai thành khách tri kỷ.'
+};
+
+import { ReviewReplyOption } from '../types/game';
+
+// Sinh 3 phương án phản hồi chiến lược có chiều sâu dựa trên chủ đề và tâm lý khách
+function getRawOptions(topic: string, orderSummary: string): any[] {
+  switch (topic) {
+    case 'wrong_order':
+      return [
+        {
+          id: 'rep_wrong_sincere',
+          style: 'sincere',
+          label: '🙏 Chân thành nhận lỗi & Tặng voucher',
+          replyText: `Dạ tiệm xin cúi đầu nhận lỗi vì sự tắc trách lên sai đơn ${orderSummary} của bạn ạ! Tiệm xin gửi tặng bạn voucher miễn phí 1 combo gà giòn cho lần tới ghé tiệm để tạ lỗi nhé!`,
+          isRecommended: true,
+          customerReaction: "Khách phản hồi: 'Thấy tiệm nhận lỗi đàng hoàng và biết cách xử lý nên mình nguôi giận rồi. Lần tới mình sẽ ghé lại.'",
+          starBonus: 0.2,
+          karmaBonus: { community: 1.0, craftsmanship: 0.5 }
+        },
+        {
+          id: 'rep_wrong_witty',
+          style: 'witty',
+          label: '😄 Hài hước bắt trend GenZ',
+          replyText: 'Trời ơi kiếp nạn thứ 82 của tiệm gà! Đầu bếp lú lẫn tính thử thách lòng kiên nhẫn của bạn chút xíu thui á, đừng giận tiệm nha sếp ơi!',
+          isRecommended: false,
+          customerReaction: "Khách phản hồi: 'Haha tiệm rep huề vốn ghê, nhưng thôi thấy cũng hài hước nên bỏ qua đó.'",
+          starBonus: 0.1,
+          karmaBonus: { community: 1.2 }
+        },
+        {
+          id: 'rep_wrong_firm',
+          style: 'firm',
+          label: '😐 Phân trần giờ cao điểm',
+          replyText: 'Dạ giờ cao điểm shipper hối đơn quá nên nhân viên bị cuống tay, mong bạn thông cảm bỏ qua cho quán nhỏ vỉa hè.',
+          isRecommended: false,
+          customerReaction: "Khách phản hồi: 'Quán đông thì cũng phải cẩn thận chứ, thôi ghi nhận quán có trả lời.'",
+          starBonus: 0,
+          karmaBonus: { craftsmanship: 0.2 }
+        }
+      ];
+
+    case 'missed_order':
+      return [
+        {
+          id: 'rep_missed_sincere',
+          style: 'sincere',
+          label: '🙏 Nhận lỗi tốc độ & Mời nước mát',
+          replyText: 'Dạ tiệm ngàn lần xin lỗi vì để bạn chờ đợi quá lâu trong cơn đói! Tiệm đang nâng cấp thêm bếp chiên, lần sau ghé tiệm xin mời bạn 1 ly nước ngọt mát lạnh nhé!',
+          isRecommended: true,
+          customerReaction: "Khách phản hồi: 'Cảm ơn chủ quán đã lắng nghe, bữa sau mình sẽ ghé vào giờ vắng hơn ủng hộ tiệm.'",
+          starBonus: 0.2,
+          karmaBonus: { community: 1.0, craftsmanship: 0.5 }
+        },
+        {
+          id: 'rep_missed_witty',
+          style: 'witty',
+          label: '⚡ Hứa hẹn nhanh như người yêu cũ',
+          replyText: 'Huhu tiệm biết lỗi rùi ạ! Lần tới bạn ghé chỉ cần nháy mắt là gà giòn bay ra nhanh hơn tốc độ crush seen tin nhắn luôn nha!',
+          isRecommended: false,
+          customerReaction: "Khách phản hồi: 'Được lời như cởi tấm lòng, để xem lần sau nhanh thật không nha!'",
+          starBonus: 0.1,
+          karmaBonus: { community: 1.0, ambition: 0.5 }
+        },
+        {
+          id: 'rep_missed_firm',
+          style: 'firm',
+          label: '⏳ Giải thích gà chiên tươi theo mẻ',
+          replyText: 'Dạ vì gà rán tại tiệm luôn chiên tươi nóng hổi từng mẻ chứ không dùng đồ chiên sẵn ỉu xìu nên hơi mất thời gian một xíu ạ.',
+          isRecommended: false,
+          customerReaction: "Khách phản hồi: 'À ra là gà chiên tươi, thế thì cũng bớt bực hơn xíu.'",
+          starBonus: 0.05,
+          karmaBonus: { craftsmanship: 0.8 }
+        }
+      ];
+
+    case 'burnt_food':
+      return [
+        {
+          id: 'rep_burnt_sincere',
+          style: 'sincere',
+          label: '🍗 Đổi mẻ mới & Siết nhiệt kế bếp',
+          replyText: 'Dạ tiệm thành thật xin lỗi vì mẻ gà lỡ nhiệt làm hỏng bữa ăn của bạn! Bếp trưởng đã siết lại đồng hồ nhiệt và xin đổi lại cho bạn mẻ gà vàng giòn chuẩn vị bất kỳ lúc nào!',
+          isRecommended: true,
+          customerReaction: "Khách phản hồi: 'Quán có trách nhiệm vậy là quá tốt rồi, mình đánh giá cao cách hành xử này!'",
+          starBonus: 0.2,
+          karmaBonus: { craftsmanship: 1.2, community: 0.5 }
+        },
+        {
+          id: 'rep_burnt_witty',
+          style: 'witty',
+          label: '😅 Đùa vui phạt đầu bếp ăn gà khét',
+          replyText: 'Ui trời nay lửa bếp bén duyên quá trớn rùi! Để tiệm phạt đầu bếp ăn gà khét trừ cơm nha, lần sau bao vàng ươm rực rỡ nè!',
+          isRecommended: false,
+          customerReaction: "Khách phản hồi: 'Đọc rep mà phì cười, thôi bữa sau nhớ canh lửa giùm tui nghen!'",
+          starBonus: 0.1,
+          karmaBonus: { community: 1.0 }
+        },
+        {
+          id: 'rep_burnt_firm',
+          style: 'firm',
+          label: '🔥 Phân trần bột sốt cay đậm vị',
+          replyText: 'Dạ da gà bột cay chiên kỹ nên vỏ ngoài hơi sẫm màu, nhưng tiệm sẽ chú ý canh thời gian chuẩn xác hơn ạ.',
+          isRecommended: false,
+          customerReaction: "Khách phản hồi: 'Hơi sẫm gì mà đắng ngắt, nhưng thôi bỏ qua lần này.'",
+          starBonus: 0,
+          karmaBonus: { craftsmanship: 0.3 }
+        }
+      ];
+
+    case 'dirty_oil':
+      return [
+        {
+          id: 'rep_oil_sincere',
+          style: 'sincere',
+          label: '🛡️ Cam kết thay 100% dầu mới & Khử trùng',
+          replyText: 'Dạ tiệm vô cùng cảm ơn phản ánh quý báu này! Tiệm đã lập tức xả bỏ toàn bộ mẻ dầu cũ, thay 100% dầu thực vật mới tinh và cam kết siết chặt vệ sinh chuẩn ATTP!',
+          isRecommended: true,
+          customerReaction: "Khách phản hồi: 'Biết lắng nghe và hành động quyết liệt vì sức khỏe khách hàng, xứng đáng được ủng hộ tiếp!'",
+          starBonus: 0.2,
+          karmaBonus: { craftsmanship: 1.0, community: 1.0 }
+        },
+        {
+          id: 'rep_oil_witty',
+          style: 'witty',
+          label: '🧽 Đùa vui chảo sáng bóng soi gương',
+          replyText: 'Dạ tiệm đã bắt bếp trưởng chà sạch từng centimet lòng chảo rồi ạ! Giờ chảo sáng bóng soi gương được luôn á bạn ơi!',
+          isRecommended: false,
+          customerReaction: "Khách phản hồi: 'Nói được thì làm được nha chủ tiệm, lần sau tới soi gương đó!'",
+          starBonus: 0.1,
+          karmaBonus: { community: 0.8 }
+        },
+        {
+          id: 'rep_oil_firm',
+          style: 'firm',
+          label: '📋 Giải thích cặn bột chiên sốt',
+          replyText: 'Dạ do vụn bột chiên giòn rớt lại tạo cặn sẫm màu chứ dầu tiệm thay định kỳ, tiệm sẽ vớt cặn liên tục không để bám vào gà nữa ạ.',
+          isRecommended: false,
+          customerReaction: "Khách phản hồi: 'Dù là cặn bột thì cũng phải vớt sạch, tiệm nhớ rút kinh nghiệm.'",
+          starBonus: 0.05,
+          karmaBonus: { craftsmanship: 0.5 }
+        }
+      ];
+
+    case 'expensive':
+      return [
+        {
+          id: 'rep_exp_sincere',
+          style: 'sincere',
+          label: '🌱 Giải thích chất lượng & Giới thiệu combo',
+          replyText: 'Dạ tiệm xin cảm ơn bạn! Tiệm sử dụng 100% thịt gà tươi mỗi ngày và bột nhập khẩu nên giá có nhỉnh hơn xíu, lần sau bạn thử gọi combo tiết kiệm để hời hơn nha!',
+          isRecommended: true,
+          customerReaction: "Khách phản hồi: 'À tiền nào của nấy, gà tươi thì ăn cũng an tâm hơn. Cảm ơn tiệm đã gợi ý combo!'",
+          starBonus: 0.15,
+          karmaBonus: { craftsmanship: 0.8, community: 0.5 }
+        },
+        {
+          id: 'rep_exp_witty',
+          style: 'witty',
+          label: '💸 Trả lời hài hước không dát vàng',
+          replyText: 'Huhu gà nhà tui chứ không phải gà dát vàng đâu sếp ơi! Để tiệm nghiên cứu thêm món ăn vặt 10k-15k cho sinh viên tụi mình no say nè!',
+          isRecommended: false,
+          customerReaction: "Khách phản hồi: 'Ra món 10k-15k là tui rủ cả lớp ra ăn mỗi ngày luôn á sếp!'",
+          starBonus: 0.1,
+          karmaBonus: { community: 1.2 }
+        },
+        {
+          id: 'rep_exp_firm',
+          style: 'firm',
+          label: '📊 Khẳng định giá niêm yết chuẩn thị trường',
+          replyText: 'Dạ mức giá tiệm đưa ra đã cân đối rất kỹ với chi phí nguyên liệu và công cán phục vụ, tiệm xin giữ vững chất lượng này ạ.',
+          isRecommended: false,
+          customerReaction: "Khách phản hồi: 'Ok quán giữ chất lượng thì giá đó cũng chấp nhận được.'",
+          starBonus: 0,
+          karmaBonus: { ambition: 0.5, craftsmanship: 0.5 }
+        }
+      ];
+
+    case 'bad_space':
+      return [
+        {
+          id: 'rep_space_sincere',
+          style: 'sincere',
+          label: '❄️ Báo tin nâng cấp quạt mát & Máy lạnh',
+          replyText: 'Dạ tiệm xin lỗi vì thời tiết SG oi ả làm bạn khó chịu ạ! Tiệm đang gom vốn sắm thêm quạt hơi nước và phòng lạnh, mong sớm đón bạn trở lại trong không gian mát rượi!',
+          isRecommended: true,
+          customerReaction: "Khách phản hồi: 'Có phòng lạnh là mình ghé hoài luôn á, chúc tiệm sớm mở rộng!'",
+          starBonus: 0.15,
+          karmaBonus: { community: 0.8, ambition: 0.8 }
+        },
+        {
+          id: 'rep_space_witty',
+          style: 'witty',
+          label: '⛱️ Rủ rê ngồi chill hóng gió hẻm',
+          replyText: 'Dạ trời nóng mà lòng người ấm áp nè bạn ơi! Ghé cữ chiều tối có gió hẻm 1102 thổi lồng lộng mát rượi chill lắm á!',
+          isRecommended: false,
+          customerReaction: "Khách phản hồi: 'Haha được rồi, lần sau mình canh đi chiều tối ngắm phố hẻm!'",
+          starBonus: 0.1,
+          karmaBonus: { community: 1.0 }
+        },
+        {
+          id: 'rep_space_firm',
+          style: 'firm',
+          label: '🛵 Gợi ý đặt mang về hoặc qua app',
+          replyText: 'Dạ tiệm vỉa hè diện tích có hạn, nếu ngại nóng bạn có thể gọi đặt mang về hoặc order qua app để ăn thoải mái tại nhà nha.',
+          isRecommended: false,
+          customerReaction: "Khách phản hồi: 'Ừ vậy lần sau mình đặt ship về nhà cho tiện.'",
+          starBonus: 0,
+          karmaBonus: { ambition: 0.5 }
+        }
+      ];
+
+    default: // Các bài khen 4..5 sao
+      return [
+        {
+          id: 'rep_praise_sincere',
+          style: 'sincere',
+          label: '💖 Tri ân chân thành từ đáy lòng',
+          replyText: 'Dạ những lời khen này là nguồn động lực to lớn nhất cho tiệm gà vỉa hè tụi mình ạ! Tiệm sẽ luôn giữ vững phong độ này để đón bạn mỗi ngày nha!',
+          isRecommended: true,
+          customerReaction: "Khách phản hồi: 'Quán vừa ngon vừa có tâm, chắc chắn mình sẽ rủ thêm bạn bè ủng hộ!'",
+          starBonus: 0.1,
+          karmaBonus: { community: 1.5, craftsmanship: 0.5 }
+        },
+        {
+          id: 'rep_praise_witty',
+          style: 'witty',
+          label: '🥳 Bắt trend GenZ cảm ơn xỉu up xỉu down',
+          replyText: 'Đọc xong review mà cả tiệm gà cười tít mắt muốn xỉu ngang vì vui á trời! Thả 1000 trái tim cho người khách dễ thương nhất quả đất!',
+          isRecommended: false,
+          customerReaction: "Khách phản hồi: 'Dễ thương xỉu, cho tiệm 1000 điểm uy tín luôn nè!'",
+          starBonus: 0.1,
+          karmaBonus: { community: 1.5, ambition: 0.5 }
+        },
+        {
+          id: 'rep_praise_firm',
+          style: 'firm',
+          label: '🍗 Cam kết nghệ nhân ẩm thực',
+          replyText: 'Cảm ơn bạn đã tin chọn Tiệm Gà Nhà Tui. Chất lượng vàng giòn chuẩn vị luôn là lời cam kết danh dự của tiệm!',
+          isRecommended: false,
+          customerReaction: "Khách phản hồi: 'Chúc tiệm luôn phát tài và giữ vững tay nghề chuẩn mực này nhé!'",
+          starBonus: 0.05,
+          karmaBonus: { craftsmanship: 1.5 }
+        }
+      ];
+  }
+}
+
+export function createReviewReplyOptions(topic: string, orderSummary: string): ReviewReplyOption[] {
+  const rawList = getRawOptions(topic, orderSummary);
+  return rawList.map((opt: any) => ({
+    id: opt.id,
+    strategy: (opt.strategy || opt.style || 'sincere') as 'sincere' | 'witty' | 'firm',
+    style: (opt.strategy || opt.style || 'sincere') as 'sincere' | 'witty' | 'firm',
+    label: opt.label || '',
+    text: opt.text || opt.replyText || '',
+    replyText: opt.text || opt.replyText || '',
+    customerReaction: opt.customerReaction || '',
+    isRecommended: Boolean(opt.isRecommended),
+    starBonus: opt.starBonus || 0,
+    karmaReward: opt.karmaReward || opt.karmaBonus || {},
+    karmaBonus: opt.karmaReward || opt.karmaBonus || {},
+  }));
+}
 
 export interface PersonaAuthor {
   name: string;

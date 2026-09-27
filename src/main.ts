@@ -23,6 +23,8 @@ import { renderInventoryTab, bindInventoryEvents } from './ui/components/Invento
 import { renderUpgradesTab, bindUpgradesEvents } from './ui/components/UpgradesTab';
 import { renderStaffTab, bindStaffEvents } from './ui/components/StaffTab';
 import { renderReviewsTab, bindReviewsEvents } from './ui/components/ReviewsTab';
+import { renderReviewReplyModal } from './ui/components/ReviewReplyModal';
+import { ReviewsEngine } from './core/reviewsEngine';
 import { renderMenuTab, bindMenuEvents } from './ui/components/MenuTab';
 import { renderSellingView, patchSellingView, sellingStructureKey, renderFx } from './ui/components/SellingView';
 import { SellingSession, createSellingSession, gameDeltaMs, tickSelling, drainFx } from './core/sellingSim';
@@ -796,8 +798,7 @@ class AppController {
       case 'reviews':
         bindReviewsEvents(
           state,
-          fn => stateManager.update(fn),
-          msg => this.showToast(msg)
+          (rev) => this.openReviewReplyDialog(rev, () => this.render())
         );
         break;
       case 'menu':
@@ -1521,7 +1522,63 @@ class AppController {
 
     audio.playPerfect();
     this.openModal(renderSummaryModal(stateManager.getState(), result.ledger, result.review, result.advisorTip));
-    this.bindSummaryEvents(result.ledger, result.review);
+    this.bindSummaryEvents(result.ledger, result.review, result.advisorTip);
+  }
+
+  // Mở hộp thoại phản hồi đánh giá khách hàng (Có Bác Ba / AI Cố vấn mách nước)
+  private openReviewReplyDialog(review: CustomerReview, onFinished?: () => void) {
+    const currentReview = stateManager.getState().recentReviews.find(r => r.id === review.id) || review;
+    this.openModal(renderReviewReplyModal(currentReview));
+
+    const closeBtn = document.getElementById('btn-close-reply-modal');
+    if (closeBtn) {
+      closeBtn.onclick = () => {
+        audio.playPop();
+        if (onFinished) {
+          onFinished();
+        } else {
+          this.closeModal();
+        }
+      };
+    }
+
+    const cancelBtn = document.getElementById('btn-cancel-reply-modal');
+    if (cancelBtn) {
+      cancelBtn.onclick = () => {
+        audio.playPop();
+        if (onFinished) {
+          onFinished();
+        } else {
+          this.closeModal();
+        }
+      };
+    }
+
+    const chooseBtns = document.querySelectorAll('.btn-choose-reply');
+    chooseBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const btnEl = e.currentTarget as HTMLElement;
+        const reviewId = btnEl.getAttribute('data-review-id');
+        const optionId = btnEl.getAttribute('data-option-id');
+        if (!reviewId || !optionId) return;
+
+        let resultOutcome: { customerReaction: string; bonusText: string } | null = null;
+        stateManager.update(draft => {
+          resultOutcome = ReviewsEngine.replyToReview(draft, reviewId, optionId);
+        });
+        stateManager.flush();
+
+        audio.playPerfect();
+        Haptics.serveSuccess();
+
+        if (resultOutcome) {
+          this.showToast(`Đã phản hồi! ${(resultOutcome as any).bonusText} 💌`);
+        }
+
+        const updatedReview = stateManager.getState().recentReviews.find(r => r.id === reviewId) || currentReview;
+        this.openReviewReplyDialog(updatedReview, onFinished);
+      });
+    });
   }
 
   // Màn chúc mừng qua chương: hiện sau khi đóng tổng kết ngày (thay cho alert() cũ)
@@ -1569,8 +1626,22 @@ class AppController {
     });
   }
 
-  private bindSummaryEvents(ledger: DayLedger, review: CustomerReview) {
+  private bindSummaryEvents(ledger: DayLedger, review: CustomerReview, advisorTip: string) {
     this.bindWrappedButton();
+
+    // Nút phản hồi review trực tiếp từ màn Tổng Kết Cuối Ngày
+    const summaryReplyBtn = document.getElementById('btn-summary-reply-review');
+    if (summaryReplyBtn) {
+      summaryReplyBtn.onclick = () => {
+        audio.playPop();
+        this.openReviewReplyDialog(review, () => {
+          const freshReview = stateManager.getState().recentReviews.find(r => r.id === review.id) || review;
+          this.openModal(renderSummaryModal(stateManager.getState(), ledger, freshReview, advisorTip));
+          this.bindSummaryEvents(ledger, freshReview, advisorTip);
+        });
+      };
+    }
+
     // Nút Bắt đầu Ngày mới
     const nextDayBtn = document.getElementById('btn-start-next-day');
     if (nextDayBtn) {

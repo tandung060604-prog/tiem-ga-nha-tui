@@ -40,7 +40,27 @@ export const MAX_PRICE_PREMIUM_PCT = 30;
 // capacity 2 → +1 ô, 4 → +2, 12 → +3 (cấp 1 miễn phí không có capacity → khay gốc 4 ô)
 const capacitySlots = (capacity: number) => (capacity >= 12 ? 3 : capacity >= 4 ? 2 : capacity >= 2 ? 1 : 0);
 
-export function upgradeEffects(upgrades: Upgrades): UpgradeEffects {
+export function upgradeEffects(upgrades?: Upgrades | null): UpgradeEffects {
+  if (!upgrades) {
+    return {
+      fryRampPct: 0,
+      tastePct: 0,
+      oilLifePct: 0,
+      patiencePct: 0,
+      customersPct: 0,
+      autoLift: false,
+      pricePremiumPct: 0,
+      traySlots: 0,
+      selfServe: false,
+      ownDeliveryApp: false,
+      shelfLifeBonus: 0,
+      discountWholesale: 0,
+      autoDrink: false,
+      sauceTipBonus: 0,
+      hygieneBoost: 0,
+      pestImmunity: false,
+    };
+  }
   const { kitchen, space, operations, marketing, storage, service, hygiene } = upgrades;
 
   const autoDrink = (service?.currentLevel ?? 1) >= 3;

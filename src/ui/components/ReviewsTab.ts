@@ -1,6 +1,13 @@
-import { GameState } from '../../types/game';
-import { audio } from '../../core/audio';
-import { pick } from '../../core/rng';
+import { CustomerReview, GameState } from '../../types/game';
+import { escapeHtml } from '../escapeHtml';
+
+const PERSONA_LABELS: Record<string, { label: string; icon: string; color: string }> = {
+  student: { label: 'Học Sinh GenZ', icon: '🎒', color: '#3b82f6' },
+  office: { label: 'Dân Công Sở', icon: '💼', color: '#6366f1' },
+  foodie: { label: 'Food Reviewer', icon: '📸', color: '#ec4899' },
+  elder: { label: 'Cô Bác Hàng Xóm', icon: '👵', color: '#f59e0b' },
+  creator: { label: 'Nghệ Sĩ Sáng Tạo', icon: '🎬', color: '#8b5cf6' },
+};
 
 export function renderReviewsTab(state: GameState): string {
   const r = state.ratings;
@@ -21,29 +28,84 @@ export function renderReviewsTab(state: GameState): string {
     `;
   };
 
-  const reviewsHtml = state.recentReviews.map((rev, idx) => {
+  const reviewsHtml = state.recentReviews.map((rev) => {
+    const persona = (rev.personaGroup && PERSONA_LABELS[rev.personaGroup]) || {
+      label: 'Thực Khách Hẻm',
+      icon: '🍗',
+      color: '#8c5b36',
+    };
+    const isReplied = Boolean(rev.playerReply || rev.ownerReply);
+
     return `
-      <div class="review-item" style="border-bottom: 1px solid var(--line); padding: 10px 0;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-          <div style="display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 0.85rem;">
-            <span>${rev.avatar}</span>
-            <span>${rev.authorName}</span>
+      <div class="review-item" style="border-bottom: 1.5px solid var(--line); padding: 12px 0;">
+        <!-- Header khách hàng -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.5rem; line-height: 1;">${rev.avatar}</span>
+            <div>
+              <div style="font-weight: 800; font-size: 0.88rem; color: var(--ink);">${escapeHtml(rev.authorName)}</div>
+              <div style="display: inline-flex; align-items: center; gap: 3px; font-size: 0.66rem; font-weight: 700; color: ${persona.color}; background: ${persona.color}15; padding: 1px 6px; border-radius: 4px; margin-top: 2px;">
+                <span>${persona.icon}</span> ${persona.label}
+              </div>
+            </div>
           </div>
-          <div style="color: var(--gold-dark); font-size: 0.82rem; font-weight: 800;">
-            ${'★'.repeat(rev.stars)}${'☆'.repeat(5 - rev.stars)} <small style="color: var(--soft); font-weight: normal;">(Ngày ${rev.day})</small>
+          <div style="text-align: right;">
+            <div style="color: var(--gold-dark); font-size: 0.88rem; font-weight: 800;">
+              ${'★'.repeat(rev.stars)}${'☆'.repeat(5 - rev.stars)}
+            </div>
+            <small style="color: var(--soft); font-size: 0.68rem;">(Ngày ${rev.day})</small>
           </div>
         </div>
-        <div style="font-size: 0.82rem; color: #4a2c1d; line-height: 1.35; font-style: italic;">
-          "${rev.comment}"
+
+        <!-- Món ăn đã gọi nếu có -->
+        ${rev.orderSummary ? `
+          <div style="font-size: 0.72rem; color: #8c5b36; background: rgba(244, 162, 97, 0.16); padding: 2px 7px; border-radius: 6px; display: inline-block; margin-bottom: 5px; font-weight: 700;">
+            📦 Đơn: ${escapeHtml(rev.orderSummary)}
+          </div>
+        ` : ''}
+
+        <!-- Nội dung nhận xét -->
+        <div style="font-size: 0.84rem; color: #4a2c1d; line-height: 1.35; font-style: italic; background: #fffcf8; padding: 6px 10px; border-radius: 6px; border-left: 3px solid #f97316;">
+          "${escapeHtml(rev.comment)}"
         </div>
-        ${rev.ownerReply ? `
-          <div style="background: #f7ede0; border-left: 3px solid var(--red); border-radius: 4px 8px 8px 4px; padding: 4px 8px; margin-top: 6px; font-size: 0.76rem;">
-            <b style="color: var(--red);">Chủ Tiệm:</b> <span>${rev.ownerReply}</span>
+
+        <!-- Tags ngữ cảnh -->
+        ${rev.tags && rev.tags.length > 0 ? `
+          <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px;">
+            ${rev.tags.map(t => `<span style="font-size: 0.65rem; background: rgba(0,0,0,0.05); color: #7c2d12; font-weight: 700; padding: 1px 6px; border-radius: 4px;">${escapeHtml(t)}</span>`).join('')}
+          </div>
+        ` : ''}
+
+        <!-- Phản hồi tương tác 2 chiều -->
+        ${isReplied ? `
+          <div style="background: #f7ede0; border-left: 3px solid var(--red); border-radius: 4px 8px 8px 4px; padding: 6px 10px; margin-top: 8px; font-size: 0.76rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+              <b style="color: var(--red);">🍗 Chủ Tiệm Đã Trả Lời:</b>
+              ${rev.playerReply ? `<span style="font-size: 0.65rem; font-weight: 800; background: #10b981; color: #fff; padding: 1px 6px; border-radius: 4px;">+${(rev.playerReply.starBonus ?? 0.2).toFixed(1)}⭐ Cứu sao</span>` : ''}
+            </div>
+            <div style="color: #431407; font-style: italic;">"${escapeHtml(rev.playerReply?.text || rev.ownerReply || '')}"</div>
+
+            ${rev.playerReply?.customerReaction ? `
+              <div style="margin-top: 6px; padding-top: 4px; border-top: 1px dashed #fdba74; color: #166534; font-size: 0.74rem;">
+                <b>${rev.avatar} ${escapeHtml(rev.authorName)}:</b> "${escapeHtml(rev.playerReply.customerReaction)}"
+              </div>
+            ` : ''}
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 4px;">
+            <button class="btn-sm btn-open-reply" data-review-id="${rev.id}" style="font-size: 0.68rem; padding: 3px 8px; background: transparent; border: 1px solid var(--line); color: var(--soft);">
+              🔍 Xem Lại Lịch Sử Đối Thoại
+            </button>
           </div>
         ` : `
-          <button class="btn-sm btn-reply" data-index="${idx}" style="font-size: 0.68rem; margin-top: 4px; padding: 2px 8px;">
-            💬 Phản hồi khách
-          </button>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+            <span style="font-size: 0.68rem; color: #b45309; font-weight: 700;">
+              💡 Có lời khuyên từ Bác Ba Cố Vấn
+            </span>
+            <button class="btn-sm btn-open-reply primary" data-review-id="${rev.id}" style="font-size: 0.72rem; padding: 4px 10px; font-weight: 800;">
+              💬 Trả Lời Đánh Giá (Bác Ba Mách Nước)
+            </button>
+          </div>
         `}
       </div>
     `;
@@ -54,7 +116,7 @@ export function renderReviewsTab(state: GameState): string {
       <span>⭐ Đánh Giá Sao Tiệm (5 Tiêu Chí)</span>
     </div>
     <div class="sec-desc">
-      Đánh giá tiệm được tính từ trung bình có trọng số của các review gần nhất. Review tốt trực tiếp kéo thêm khách!
+      Đánh giá tiệm phản ánh thực tế từ trải nghiệm khách. Phản hồi khéo léo với sự cố vấn của Bác Ba giúp cứu vãn điểm sao và gia tăng Tình Làng Nghĩa Xóm!
     </div>
 
     <!-- 5 Criteria Scorecard -->
@@ -67,7 +129,7 @@ export function renderReviewsTab(state: GameState): string {
     </div>
 
     <div class="sec-title" style="margin-top: 10px;">
-      <span>💬 Review Của Khách Hàng (${state.recentReviews.length})</span>
+      <span>💬 Danh Sách Đánh Giá Thực Khách (${state.recentReviews.length})</span>
     </div>
     <div class="reviews-list">
       ${reviewsHtml.length > 0 ? reviewsHtml : '<div style="font-size: 0.8rem; color: var(--soft); text-align: center; padding: 14px;">Chưa có review nào. Hãy mở bán để đón những vị khách đầu tiên!</div>'}
@@ -76,29 +138,18 @@ export function renderReviewsTab(state: GameState): string {
 }
 
 export function bindReviewsEvents(
-  _state: GameState,
-  onUpdateState: (fn: (draft: GameState) => void) => void,
-  showToast: (msg: string) => void
+  state: GameState,
+  onOpenReplyModal: (review: CustomerReview) => void
 ) {
-  const replyBtns = document.querySelectorAll('.btn-reply');
+  const replyBtns = document.querySelectorAll('.btn-open-reply');
   replyBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
-      const idx = parseInt((e.currentTarget as HTMLElement).getAttribute('data-index') || '0', 10);
-      const replies = [
-        'Dạ tiệm xin ghi nhận và rút kinh nghiệm sâu sắc ạ! Lần tới ghé tiệm tặng bạn thêm lon nước ngọt nha!',
-        'Dạ cảm ơn bạn nhiều thiệt nhiều ạ, nghe bạn khen mà cả tiệm cười tít mắt luôn á! 🥰',
-        'Cảm ơn bạn đã đóng góp! Tiệm vừa nâng cấp chảo mới, đảm bảo lần sau ngon xỉu luôn ạ!',
-        'Hiuhiu tiệm xin lỗi vì sơ sót này nha, lần tới ghé nhớ bảo tiệm để được phục vụ chu đáo nhất nhé!'
-      ];
-      const randomReply = pick(replies);
-
-      onUpdateState(draft => {
-        const review = draft.recentReviews[idx];
-        if (review) review.ownerReply = randomReply;
-      });
-
-      audio.playPop();
-      showToast('Đã gửi phản hồi chân thành đến khách hàng! 💌');
+      const reviewId = (e.currentTarget as HTMLElement).getAttribute('data-review-id');
+      if (!reviewId) return;
+      const review = state.recentReviews.find(r => r.id === reviewId);
+      if (review) {
+        onOpenReplyModal(review);
+      }
     });
   });
 }

@@ -44,7 +44,43 @@ export function createInitialState(): GameState {
         stars: 4,
         comment: 'Xe đẩy đầu hẻm mà gà giòn rụm thơm nức mũi! Giá 35k học sinh sinh viên quá chừng!',
         weakestCriteria: 'space',
-        orderSummary: '1 Gà Giòn Nhà Tui'
+        orderSummary: '1 Gà Giòn Nhà Tui',
+        tags: ['#GiaHatDe', '#GaGionThomPhuc', '#DauHem1102'],
+        personaGroup: 'genz',
+        sentiment: 'delighted',
+        advisorHint: 'Bác Ba mách nước: Bé Trúc mở hàng khen gà giòn giá rẻ! Hãy gửi lời cảm ơn ngọt ngào để kết nối tình thân, tạo hảo cảm xóm giềng Hẻm 1102 nha.',
+        replyOptions: [
+          {
+            id: 'init_rep_sincere',
+            style: 'sincere',
+            label: '💖 Cảm ơn mở hàng & Tặng nụ cười',
+            replyText: 'Dạ tiệm cảm ơn Bé Trúc nhiều thiệt nhiều nè! Tiệm luôn giữ giá học sinh sinh viên để tụi mình cùng no bụng nha!',
+            isRecommended: true,
+            customerReaction: "Bé Trúc: 'Dạ con cảm ơn chú chủ quán, tan học con lại ghé mua tiếp ạ! 🥰'",
+            starBonus: 0.1,
+            karmaBonus: { community: 1.0, craftsmanship: 0.5 }
+          },
+          {
+            id: 'init_rep_witty',
+            style: 'witty',
+            label: '🥳 Đối đáp GenZ dí dỏm',
+            replyText: 'Gà giòn thơm nức mũi mà người khen cũng dễ thương 10 điểm luôn á! Nhớ rủ bạn bè ghé quậy tiệm nha!',
+            isRecommended: false,
+            customerReaction: "Bé Trúc: 'Haha chú tiệm GenZ xịn sò ghê, để con rủ cả lớp ghé!'",
+            starBonus: 0.05,
+            karmaBonus: { community: 1.2 }
+          },
+          {
+            id: 'init_rep_firm',
+            style: 'firm',
+            label: '🍗 Cam kết chất lượng gà tươi',
+            replyText: 'Tiệm luôn dùng gà tươi giòn rụm mỗi ngày, chúc Bé Trúc có bữa ăn ngon miệng!',
+            isRecommended: false,
+            customerReaction: "Bé Trúc: 'Dạ ngon lắm chú ơi!'",
+            starBonus: 0,
+            karmaBonus: { craftsmanship: 0.8 }
+          }
+        ]
       }
     ],
 

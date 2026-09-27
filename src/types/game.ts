@@ -136,6 +136,42 @@ export interface StarRating {
 
 export type Criteria = Exclude<keyof StarRating, 'overall'>;
 
+export interface ReviewReplyOption {
+  id: string;
+  strategy?: 'sincere' | 'witty' | 'firm';
+  style?: 'sincere' | 'witty' | 'firm'; // alias
+  label: string;
+  text?: string;
+  replyText?: string; // alias
+  isRecommended: boolean; // Gợi ý của Bác Ba: câu trả lời đúng tâm lý khách nhất
+  customerReaction: string; // Phản hồi cảm xúc của khách sau khi nhận được câu trả lời
+  starBonus?: number; // Cứu vãn điểm sao bị trừ (+0.1 - +0.2 sao)
+  karmaReward?: {
+    community?: number;
+    craftsmanship?: number;
+    ambition?: number;
+  };
+  karmaBonus?: {
+    community?: number;
+    craftsmanship?: number;
+    ambition?: number;
+  };
+}
+
+export interface PlayerReviewReply {
+  optionId: string;
+  text: string;
+  replyText?: string;
+  customerReaction: string;
+  repliedAtDay: number;
+  starBonus?: number;
+  karmaBonus?: {
+    community?: number;
+    craftsmanship?: number;
+    ambition?: number;
+  };
+}
+
 export interface CustomerReview {
   id: string;
   authorName: string;
@@ -147,6 +183,11 @@ export interface CustomerReview {
   orderSummary: string;
   tags?: string[];
   ownerReply?: string;
+  personaGroup?: 'genz' | 'office' | 'resident' | 'reviewer' | 'shipper' | 'foodie';
+  sentiment?: 'furious' | 'disappointed' | 'neutral' | 'delighted' | 'amused';
+  advisorHint?: string; // Bác Ba mách nước phân tích tâm lý khách và gợi ý cách đối đáp
+  replyOptions?: ReviewReplyOption[];
+  playerReply?: PlayerReviewReply;
 }
 
 // Tính cách khách hàng ảnh hưởng trực tiếp đến thời gian kiên nhẫn, thái độ và tiền tips
