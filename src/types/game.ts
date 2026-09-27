@@ -324,6 +324,33 @@ export interface DailyIncident {
   emoteBubble?: string; // Biểu tượng trái tim / cảm xúc bay bổng trên đỉnh avatar: '❤️', '🔥', '💸', '🐾', '👮'
 }
 
+// Định danh mở rộng cho 36 nhân vật Hẻm 1102 & Tuyến Động Vật
+export type CharacterId =
+  | 'char_01_owner' | 'char_02_lottery_lady' | 'char_03_helper_linh' | 'char_04_fryer_khang'
+  | 'char_05_kid_bo' | 'char_06_granny_ba' | 'char_07_trendy_vy' | 'char_08_grumpy_hai'
+  | 'char_09_buyer_tam' | 'char_10_winner_hung' | 'char_11_wholesale_nam' | 'char_12_courier_ut'
+  | 'char_13_vendor_tham' | 'char_14_scrap_nam' | 'char_15_bread_bay' | 'char_16_icecream_tu'
+  | 'char_17_sweeper_lan' | 'char_18_garbage_hung' | 'char_19_shipper_tuan' | 'char_20_mover_cuong'
+  | 'char_21_trucker_long' | 'char_22_electrician_dung' | 'char_23_builder_bay' | 'char_24_grocer_sau'
+  | 'char_25_police_nam' | 'char_26_traffic_hoang' | 'char_27_warden_hai' | 'char_28_tough_beo'
+  | 'char_29_atm_nga' | 'char_30_student_bus' | 'char_31_gossip_tam' | 'char_32_jogger_tuan'
+  | 'char_33_couple_genz'
+  // Tuyến động vật & dịch hại
+  | 'pet_01_dog_vang' | 'pet_02_cat_muop' | 'pest_01_rat_cong';
+
+export interface CharacterProfile {
+  id: CharacterId;
+  name: string;
+  roleTitle: string;
+  category: 'staff' | 'regular' | 'street_worker' | 'authority' | 'transit' | 'animal';
+  unlockChapter: number;
+  favoriteOrder: string[];
+  patienceMultiplier: number;
+  tipTendency: 'low' | 'normal' | 'generous';
+  karmaAffinity: 'community' | 'craftsmanship' | 'ambition';
+  incidentIds: string[];
+}
+
 export interface GameState {
   version: number;
   day: number;
@@ -377,4 +404,6 @@ export interface GameState {
   pausedShift?: import('../core/sellingSim').ShiftSnapshot | null; // ca bán dở (thoát giữa ca)
   tutorialDone?: boolean;      // Bác Ba đã dẫn ca đầu (core/tutorial.ts)
   todayOilCost?: number;       // tiền thay dầu trong ngày (đã trừ ví) → ghi vào sổ lúc đóng cửa
+  adoptedPets?: ('pet_01_dog_vang' | 'pet_02_cat_muop')[]; // Thú cưng đã nhận nuôi (Chó Cỏ, Mèo Mướp)
+  pestIncidentsCount?: number; // Số lần xuất hiện chuột cống bếp
 }

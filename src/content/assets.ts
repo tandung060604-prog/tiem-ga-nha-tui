@@ -109,7 +109,19 @@ export const ASSETS = {
     stationSodaFountain: url('assets/kitchen/station_soda_fountain.png'),
     bottleKetchup: url('assets/kitchen/bottle_ketchup.png'),
     bottleChili: url('assets/kitchen/bottle_chili.png'),
-    sauceDish: url('assets/kitchen/sauce_dish.png')
+    sauceDish: url('assets/kitchen/sauce_dish.png'),
+    // Khay Inox GN Âm Bàn (Gastronorm Pan)
+    gnPanEmpty: url('assets/kitchen/pan_empty.png'),
+    gnPanLocked: url('assets/kitchen/pan_locked_slot.png'),
+    gnPanSauceYangnyeom: url('assets/kitchen/pan_sauce_yangnyeom.png'),
+    gnPanSauceSoyGarlic: url('assets/kitchen/pan_sauce_soy_garlic.png'),
+    gnPrepChickenRaw: url('assets/kitchen/prep_chicken_raw.png'),
+    gnPrepThighRaw: url('assets/kitchen/prep_thigh_raw.png'),
+    gnPrepFriesRaw: url('assets/kitchen/prep_fries_raw.png'),
+    gnPrepPopcornRaw: url('assets/kitchen/prep_popcorn_raw.png'),
+    gnPrepCheeseStickRaw: url('assets/kitchen/prep_cheese_stick_raw.png'),
+    gnSideRadishPickled: url('assets/kitchen/side_radish_pickled.png'),
+    gnSideColeslaw: url('assets/kitchen/side_coleslaw.png')
   },
   food: {
     crispyChickenPerfect: url('assets/food/food_crispy_chicken_perfect.png'),
@@ -129,7 +141,11 @@ export const ASSETS = {
     chickenRice: url('assets/food/food_chicken_rice.png'),
     tokbokkiChicken: url('assets/food/food_korean_tokbokki_chicken.png'),
     sundaeIcecream: url('assets/food/food_sundae_icecream.png'),
-    familyBucket: url('assets/food/food_family_bucket.png')
+    familyBucket: url('assets/food/food_family_bucket.png'),
+    spicyThigh: url('assets/food/food_spicy_thigh.png'),
+    cheeseStick: url('assets/food/food_cheese_stick.png'),
+    danmuji: url('assets/food/food_danmuji.png'),
+    coleslaw: url('assets/food/food_coleslaw.png')
   },
   ui: {
     bunnyNote: url('assets/ui/ui_bunny_note.png'),
@@ -159,6 +175,14 @@ export function foodImage(menuItemId: string, quality: QualityRating): string | 
       return quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.popcornChicken;
     case 'shake_fries':
       return quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.shakeFries;
+    case 'spicy_thigh':
+      return quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.spicyThigh;
+    case 'cheese_stick':
+      return quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.cheeseStick;
+    case 'danmuji':
+      return ASSETS.food.danmuji;
+    case 'coleslaw':
+      return ASSETS.food.coleslaw;
     case 'soda':
       return ASSETS.food.soda;
     case 'seven_up':

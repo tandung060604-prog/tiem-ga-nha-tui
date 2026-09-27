@@ -26,6 +26,10 @@ describe('ảnh món theo chất lượng', () => {
     expect(foodImage('honey_garlic_chicken', 'perfect')).toContain('honey');
     expect(foodImage('chicken_burger', 'perfect')).toContain('burger');
     expect(foodImage('korean_tokbokki_chicken', 'perfect')).toContain('tokbokki');
+    expect(foodImage('spicy_thigh', 'perfect')).toContain('spicy_thigh');
+    expect(foodImage('cheese_stick', 'perfect')).toContain('cheese_stick');
+    expect(foodImage('danmuji', 'perfect')).toContain('danmuji');
+    expect(foodImage('coleslaw', 'perfect')).toContain('coleslaw');
     expect(foodImage('unknown_food_xyz', 'perfect')).toBeNull();
   });
 });

@@ -2,15 +2,12 @@ import { GameState, PrepSlotState } from '../../types/game';
 import { prepStationSlots } from '../../core/prepStation';
 import { cookingEngine } from '../../core/cooking';
 import { FRY_RECIPES } from '../../core/staff';
+import { ASSETS } from '../../content/assets';
 import { escapeHtml } from '../escapeHtml';
 
 // Quầy khay inox âm bàn GN (luật khóa + bố cục ở core/prepStation.ts). Khay luôn đủ số, khóa thì phủ nắp + ổ khóa.
-// Class cho CSS (Gemini): .prep-station, .prep-row.top/.bottom, .gn-pan[data-pan][data-state][data-active],
+// CSS chuyên biệt tại src/styles/kitchen.css: .prep-station, .prep-row.top/.bottom, .gn-pan[data-pan][data-state][data-active],
 // .gn-pan-img, .gn-pan-emoji, .gn-pan-badge, .gn-pan-label, .gn-pan-lock, .gn-pan-lock-label, .prep-popover, .prep-board
-// Style inline bên dưới (TMP_*) là TẠM cho tới khi có CSS trong kitchen.css; Gemini thay xong thì xóa.
-const TMP_ROW = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(52px,1fr));gap:4px;margin-bottom:4px';
-const TMP_PAN = 'position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:56px;padding:2px;font-size:.62rem;line-height:1.1;overflow:hidden';
-const TMP_IMG = 'width:30px;height:30px;object-fit:contain';
 
 export function prepStationKey(state: GameState): string {
   return prepStationSlots(state).map(s => `${s.id}:${s.status}:${s.stock}`).join(',');
@@ -18,23 +15,30 @@ export function prepStationKey(state: GameState): string {
 
 function panHtml(slot: PrepSlotState, frying: boolean, activeAction: string | null): string {
   const label = escapeHtml(slot.label);
-  const art = slot.asset
-    ? `<img class="gn-pan-img" src="${slot.asset}" alt="${label}" width="30" height="30" style="${TMP_IMG}" />`
-    : `<span class="gn-pan-emoji" aria-hidden="true">${slot.icon}</span>`;
   if (slot.status === 'locked' && slot.lock) {
+    const lockArt = ASSETS.kitchen.gnPanLocked
+      ? `<img class="gn-pan-img" src="${ASSETS.kitchen.gnPanLocked}" alt="Đã khóa" width="30" height="30" />`
+      : slot.asset
+      ? `<img class="gn-pan-img" src="${slot.asset}" alt="${label}" width="30" height="30" />`
+      : `<span class="gn-pan-emoji" aria-hidden="true">${slot.icon}</span>`;
     return `
-      <button type="button" class="gn-pan" style="${TMP_PAN};opacity:.6" data-pan="${slot.pan}" data-state="locked" data-prep-lock="${slot.id}"
+      <button type="button" class="gn-pan" data-pan="${slot.pan}" data-state="locked" data-prep-lock="${slot.id}"
         aria-label="${label} — khóa: ${escapeHtml(slot.lock.label)}">
-        ${art}
+        ${lockArt}
         <span class="gn-pan-lock" aria-hidden="true">🔒</span>
-        <span class="gn-pan-lock-label" style="font-weight:800">${escapeHtml(slot.lock.label)}</span>
+        <span class="gn-pan-lock-label">${escapeHtml(slot.lock.label)}</span>
         <span class="gn-pan-label">${label}</span>
       </button>`;
   }
+  const art = slot.status === 'empty'
+    ? `<img class="gn-pan-img" src="${ASSETS.kitchen.gnPanEmpty}" alt="${label} — hết hàng" width="30" height="30" />`
+    : slot.asset
+    ? `<img class="gn-pan-img" src="${slot.asset}" alt="${label}" width="30" height="30" />`
+    : `<span class="gn-pan-emoji" aria-hidden="true">${slot.icon}</span>`;
   // Hàng dưới là đồ sống thả chảo: chảo đang bận thì chưa bấm được
   const busy = slot.row === 'bottom' && frying;
   return `
-    <button type="button" id="btn-${slot.action}" class="gn-pan" style="${TMP_PAN}" data-pan="${slot.pan}" data-state="${slot.status}"
+    <button type="button" id="btn-${slot.action}" class="gn-pan" data-pan="${slot.pan}" data-state="${slot.status}"
       data-active="${activeAction === slot.action}" ${busy ? 'disabled' : ''} title="${label}">
       ${art}
       <span class="gn-pan-badge">${slot.stock}</span>
@@ -66,8 +70,8 @@ export function renderPrepStation(state: GameState): string {
     .map(s => panHtml(s, frying, active.includes(s.action) ? s.action : null)).join('');
   return `
     <div class="prep-station">
-      <div class="prep-row top" style="${TMP_ROW}" aria-label="Khay món kèm và sốt">${row('top')}</div>
-      <div class="prep-row bottom" style="${TMP_ROW}" aria-label="Khay đồ sống thả chảo">${row('bottom')}</div>
+      <div class="prep-row top" aria-label="Khay món kèm và sốt">${row('top')}</div>
+      <div class="prep-row bottom" aria-label="Khay đồ sống thả chảo">${row('bottom')}</div>
     </div>`;
 }
 
