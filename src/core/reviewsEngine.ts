@@ -104,7 +104,14 @@ export class ReviewsEngine {
     if (currentState.oilCondition === 'clean') {
       r.hygiene = Math.min(5.0, r.hygiene + 0.1 * (1 + hygieneBoost));
     } else if (currentState.oilCondition === 'dirty') {
-      r.hygiene = Math.max(1.5, r.hygiene - 0.45);
+      // Dầu đen: phạt nặng vệ sinh + hương vị (khách ăn thấy ngấy, mùi khét)
+      r.hygiene = Math.max(1.2, r.hygiene - 0.6);
+      r.taste = Math.max(1.5, r.taste - 0.2);
+    }
+    // Carry-over: hôm trước đóng cửa lúc dầu đen → tiếng xấu lan truyền
+    if ((currentState.dirtyOilPenaltyDays ?? 0) > 0) {
+      r.hygiene = Math.max(1.5, r.hygiene - 0.15);
+      r.taste = Math.max(1.8, r.taste - 0.1);
     }
 
     // 4. Không gian (15%): Nâng cấp không gian
@@ -294,7 +301,7 @@ export class ReviewsEngine {
     };
   }
 
-  // Cố vấn chỉ thẳng nguyên nhân và giải pháp theo thực tế xảy ra trong ngày
+  // Cố vấn chỉ thẳng nguyên nhân và giải pháp theo thực tế xảy ra trong ngày (giọng miền Tây)
   public static generateAdvisorTip(
     weakest: keyof StarRating,
     score: number,
@@ -304,35 +311,35 @@ export class ReviewsEngine {
     oilCondition: string = 'clean'
   ): string {
     if (wrongOrderCount > 0) {
-      return `Bác Ba nhắc: Hôm nay quán có ${wrongOrderCount} đơn bị lên sai món! Con nhớ quan sát kỹ bong bóng gọi món của khách trước khi bấm KENG lên món nhé.`;
+      return `Bác Ba dặn nè: Bữa nay quán mình có ${wrongOrderCount} đơn bị lên lộn món rồi đó con! Coi chừng coi kỹ bong bóng gọi món của khách rồi hẵng bấm KENG lên món nghen.`;
     }
     if (lostCount > 0) {
-      return `Bác Ba nhắc: Có ${lostCount} khách bỏ về vì đợi lâu! Con nhớ chiên sẵn vài mẻ gà để sẵn trong khay giữ nóng vào giờ cao điểm nha.`;
+      return `Bác Ba nhắc nè: Có ${lostCount} khách bỏ về vì đợi lâu quá trời! Con nhớ chiên sẵn mấy mẻ gà để dành trong khay giữ nóng lúc giờ cao điểm nghen con.`;
     }
     if (burntCount > 0) {
-      return `Bác Ba nhắc: Gà bị cháy ${burntCount} mẻ làm khách chê đắng! Canh kim nhiệt độ chạm vạch vàng kim (Perfect) là vớt ngay nhé con.`;
+      return `Bác Ba nói thiệt nè: Gà bị cháy tới ${burntCount} mẻ, khách chê đắng nghét luôn! Canh kim nhiệt độ chạm vạch vàng kim (Perfect) là vớt liền nghen con.`;
     }
     if (oilCondition === 'dirty') {
-      return 'Bác Ba nhắc: Dầu chiên đen quá rồi con ơi, khách chê nồng mùi khét kìa! Vào bếp bấm "Thay dầu mới (150k)" ngay đi.';
+      return 'Bác Ba la nè: Dầu chiên đen thui rồi con ơi, khách chê nồng mùi khét quá hà! Dzô bếp bấm "Thay dầu mới (150k)" liền đi con.';
     }
 
     switch (weakest) {
       case 'speed':
-        return 'Tốc độ phục vụ đang làm mất khách! Hãy nâng cấp Thiết bị bếp hoặc tuyển thêm Phụ bếp / Thu ngân.';
+        return 'Tốc độ phục vụ đang làm mất khách dữ lắm! Nâng cấp Thiết bị bếp hoặc tuyển thêm Phụ bếp / Thu ngân đi con.';
       case 'taste':
         return score <= 3.0
-          ? 'Hương vị bị phàn nàn! Hãy nâng cấp Tủ giữ nóng hoặc mua thêm nước sốt đặc biệt.'
-          : 'Gà ngon chuẩn vị! Giữ vững phong độ và mua thêm Tủ giữ nóng giòn 70°C để hương vị luôn 5 sao.';
+          ? 'Hương vị bị chê quá trời! Nâng cấp Tủ giữ nóng hoặc mua thêm nước sốt đặc biệt dzô đi con.'
+          : 'Gà ngon chuẩn vị rồi đó! Giữ vậy hén, mua thêm Tủ giữ nóng giòn 70°C cho hương vị luôn 5 sao nha.';
       case 'hygiene':
-        return 'Dầu chiên xuống cấp khiến sao Vệ sinh tụt! Hãy thay dầu thường xuyên hoặc sắm Thùng rác nắp kín / Máy lọc dầu.';
+        return 'Dầu chiên xuống cấp nên sao Vệ sinh tụt te tua! Thay dầu thường xuyên hoặc sắm Thùng rác nắp kín / Máy lọc dầu đi con.';
       case 'space':
         return score <= 3.0
-          ? 'Khách chê ngồi vỉa hè nóng bức hoặc chật chội! Hãy gom tiền nâng cấp Máy lạnh và Bàn ghế gỗ ấm cúng.'
-          : 'Không gian ấm cúng, decor đẹp mắt! Nâng cấp tiếp phòng lạnh view hẻm để đón khách sang.';
+          ? 'Khách chê ngồi ngoài vỉa hè nóng bức chật chội quá hà! Gom tiền nâng cấp Máy lạnh với Bàn ghế gỗ ấm cúng đi con.'
+          : 'Không gian ấm cúng, decor coi dzô con mắt lắm! Nâng cấp tiếp phòng lạnh view hẻm để đón khách sang nha.';
       case 'pricing':
-        return 'Khách phàn nàn giá món hơi chát so với vỉa hè. Bạn có thể giảm nhẹ giá trong Thực đơn để khách quay lại đông hơn.';
+        return 'Khách kêu ca giá món hơi mắc so với vỉa hè. Con giảm nhẹ giá trong Thực đơn chút để khách quay lại đông hơn nghen.';
       default:
-        return 'Tiệm đang vận hành cực kỳ mượt mà! Hãy tiếp tục duy trì phong độ để tích lũy tiền mở rộng tiệm nhé.';
+        return 'Tiệm đang chạy ngon lành cành đào! Giữ phong độ dậy để tích lũy tiền mở rộng tiệm nha con.';
     }
   }
 }

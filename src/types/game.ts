@@ -471,4 +471,7 @@ export interface GameState {
   todayOilCost?: number;       // tiền thay dầu trong ngày (đã trừ ví) → ghi vào sổ lúc đóng cửa
   adoptedPets?: ('pet_01_dog_vang' | 'pet_02_cat_muop')[]; // Thú cưng đã nhận nuôi (Chó Cỏ, Mèo Mướp)
   pestIncidentsCount?: number; // Số lần xuất hiện chuột cống bếp
+  dirtyOilPenaltyDays?: number;  // Số ngày còn bị phạt vì đóng cửa lúc dầu đen (giảm sao Vệ sinh + Hương vị)
+  gangsterThreatDays?: number;   // Số ngày giang hồ gây khó (giảm 30% khách) do chưa trả tiền mặt bằng
+  lastRentPaidWeek?: number;     // Tuần gần nhất đã trả tiền mặt bằng (tính theo day / 7)
 }

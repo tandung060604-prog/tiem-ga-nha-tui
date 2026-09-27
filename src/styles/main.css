@@ -2654,17 +2654,38 @@ body.selling-mode .awning::after {
   margin-top: 3px;
 }
 
-/* Nút 1: Đỏ Cam Coral Rực Rỡ (Cho nghỉ 1 ngày) */
-.btn-coral-choice {
-  background: linear-gradient(180deg, #f05041 0%, #e63c2c 100%);
+/* Nút 1: Vàng Hổ Phách Ấm Áp (Warm Amber) — trung lập, không gây hiểu nhầm "phải chọn" */
+.btn-warm-choice {
+  background: linear-gradient(180deg, #f5a623 0%, #e8941c 100%);
   border: none;
   color: #ffffff;
-  box-shadow: 0 4px 14px rgba(230, 60, 44, 0.35);
+  box-shadow: 0 4px 14px rgba(245, 166, 35, 0.3);
+}
+
+.btn-warm-choice:hover:not(:disabled) {
+  filter: brightness(1.06);
+  box-shadow: 0 6px 18px rgba(245, 166, 35, 0.4);
+}
+
+.btn-warm-choice .choice-tier1 {
+  color: #ffffff;
+}
+
+.btn-warm-choice .choice-tier2 {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Legacy: giữ .btn-coral-choice cho tương thích ngược */
+.btn-coral-choice {
+  background: linear-gradient(180deg, #f5a623 0%, #e8941c 100%);
+  border: none;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(245, 166, 35, 0.3);
 }
 
 .btn-coral-choice:hover:not(:disabled) {
-  filter: brightness(1.04);
-  box-shadow: 0 6px 18px rgba(230, 60, 44, 0.42);
+  filter: brightness(1.06);
+  box-shadow: 0 6px 18px rgba(245, 166, 35, 0.4);
 }
 
 .btn-coral-choice .choice-tier1 {
@@ -2672,7 +2693,7 @@ body.selling-mode .awning::after {
 }
 
 .btn-coral-choice .choice-tier2 {
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 /* Nút 2: Kem Be Sữa Nhẹ Nhàng (Không cho nghỉ, ai nghỉ trừ lương) */

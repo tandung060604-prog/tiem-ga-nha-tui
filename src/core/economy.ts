@@ -43,7 +43,13 @@ export class EconomyEngine {
     // Tiếng giá của quán: đắt → ít người ghé, rẻ → đông hơn (core/pricing.ts)
     const priceMultiplier = customerMultiplierFromPrice(averagePriceRatio(state));
 
-    const total = Math.round(base * starMultiplier * marketingMultiplier * weatherMultiplier * weekendMultiplier * priceMultiplier);
+    // Giang hồ đe dọa: khách sợ không dám ghé (chưa trả tiền mặt bằng)
+    const gangsterMultiplier = (state.gangsterThreatDays ?? 0) > 0 ? 0.7 : 1;
+
+    // Dầu đen carry-over: tiếng xấu lan → ít khách hơn
+    const oilRepMultiplier = (state.dirtyOilPenaltyDays ?? 0) > 0 ? 0.9 : 1;
+
+    const total = Math.round(base * starMultiplier * marketingMultiplier * weatherMultiplier * weekendMultiplier * priceMultiplier * gangsterMultiplier * oilRepMultiplier);
     return Math.max(8, total);
   }
 

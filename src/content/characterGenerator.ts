@@ -61,8 +61,8 @@ export const PERSONALITY_MAP: Record<CustomerPersonality, { label: string; desc:
   }
 };
 
-// 33 nhân vật thực khách và cư dân Hẻm 1102 (loại trừ động vật và nhân vật cốt truyện Hẻm 1102)
-const HUMAN_CHARACTERS = CHARACTERS_36.filter(c => c.category !== 'animal' && !mentionsStoryCharacter(c.name));
+// Khách hàng Hẻm 1102: loại trừ động vật, nhân viên quán (chủ quán + phụ bếp), và nhân vật cốt truyện
+const HUMAN_CHARACTERS = CHARACTERS_36.filter(c => c.category !== 'animal' && c.category !== 'staff' && !mentionsStoryCharacter(c.name));
 
 export class CharacterGenerator {
   public static generateCharacter(): ModularCharacter {

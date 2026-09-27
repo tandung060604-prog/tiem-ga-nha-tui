@@ -39,7 +39,7 @@ import { syncTutorialLayer } from './ui/components/TutorialLayer';
 import { weeklyWrapped } from './core/wrapped';
 import { drawWrapped, shareWrapped, shareImage } from './ui/components/WrappedCard';
 
-import { squeezeCondiment, recordHelperFry, StationResult, scoopSide, changeOil, OIL_CHANGE_COST, startTimerStation, pullTimerStation, assembleAtCounter, makeDrink, creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, SAUCE_STOCK, serveFirstOrder, cancelAndApologizeOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP } from './core/day';
+import { squeezeCondiment, recordHelperFry, StationResult, scoopSide, changeOil, OIL_CHANGE_COST, startTimerStation, pullTimerStation, assembleAtCounter, makeDrink, creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, SAUCE_STOCK, serveFirstOrder, cancelAndApologizeOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP, payWeeklyRent, applyGangsterThreat } from './core/day';
 import { upgradeEffects } from './core/upgrades';
 import { renderSummaryModal } from './ui/components/SummaryModal';
 import { renderSettingsModal } from './ui/components/SettingsModal';
@@ -826,19 +826,19 @@ class AppController {
             if (granted) {
               audio.playCash();
               babble('Con ơi cầm lấy mà xoay xở', 'bacba');
-              this.showToast('❤️ Bác Ba tiếp tế 15 miếng gà tươi & 150k vốn! Chương này bác chỉ giúp được một lần thôi đó.');
+              this.showToast('❤️ Bác Ba tiếp tế 15 miếng gà tươi & 150k vốn! Chương này bác chỉ giúp được một lần thôi đó con.');
             } else {
-              this.showToast('Hết gà và hết vốn… Bác Ba đã giúp một lần trong chương này rồi. Bán bớt đồ hoặc nhận thưởng Thỏ Cam nhé.');
+              this.showToast('Hết gà với hết vốn rồi… Bác Ba đã giúp một lần trong chương này rồi. Bán bớt đồ hoặc nhận thưởng Thỏ Cam đi con.');
             }
             this.render();
             return;
           }
-          this.showToast('Kho đã hết thịt gà! Hãy vào tab Kho hàng để nhập thêm!');
+          this.showToast('Kho hết thịt gà rồi nè! Dzô tab Kho hàng nhập thêm đi con!');
           return;
         }
 
         audio.playPerfect();
-        this.showToast('Quán chính thức mở cửa! Chúc buôn may bán đắt! 🎊');
+        this.showToast('Quán chính thức mở cửa! Chúc buôn may bán đắt nha! 🎊');
         this.setPhase('selling');
       };
     }
@@ -973,7 +973,7 @@ class AppController {
     } else if (cookResult.finished && cookResult.quality === 'burnt') {
       // Gà bị cháy khét do để quá lâu trong chảo (nguyên liệu đã tính lúc thả gà)
       this.onFryerLifted(cookingEngine.liftFryer());
-      this.showToast('Gà chiên bị cháy khét bốc khói rồi! Mau vứt đi! 😭');
+      this.showToast('Gà chiên bị cháy khét bốc khói rồi! Vớt ra mau đi con ơi! 😭');
     }
 
     const events = tickSelling(session, gameDt, {
@@ -986,7 +986,7 @@ class AppController {
       switch (event.type) {
         case 'customerLeft':
           audio.playBurnt();
-          this.showToast('Khách chờ lâu quá đã quạu bỏ về! Tụt sao tốc độ! ⚠️');
+          this.showToast('Khách chờ lâu quá quạu bỏ về rồi nè! Tụt sao tốc độ luôn! ⚠️');
           break;
         case 'customerArrived':
           break;
@@ -1520,9 +1520,16 @@ class AppController {
     };
     if (result.inspection) this.showToast(inspectionToast[result.inspection]);
 
+    // Cảnh báo dầu đen khi đóng cửa
+    if (result.dirtyOilWarning) {
+      this.showToast('⚠️ Dầu chiên đen thui! Ngày mai sao Vệ sinh + Hương vị sẽ bị trừ. Nhớ thay dầu sớm nha!');
+    }
+
     audio.playPerfect();
+    // Lưu lại kết quả rent để hiển thị modal sau summary
+    const rentResult = result.rentDue;
     this.openModal(renderSummaryModal(stateManager.getState(), result.ledger, result.review, result.advisorTip));
-    this.bindSummaryEvents(result.ledger, result.review, result.advisorTip);
+    this.bindSummaryEvents(result.ledger, result.review, result.advisorTip, rentResult);
   }
 
   // Mở hộp thoại phản hồi đánh giá khách hàng (Có Bác Ba / AI Cố vấn mách nước)
@@ -1626,7 +1633,7 @@ class AppController {
     });
   }
 
-  private bindSummaryEvents(ledger: DayLedger, review: CustomerReview, advisorTip: string) {
+  private bindSummaryEvents(ledger: DayLedger, review: CustomerReview, advisorTip: string, rentDue?: DayResult['rentDue']) {
     this.bindWrappedButton();
 
     // Nút phản hồi review trực tiếp từ màn Tổng Kết Cuối Ngày
@@ -1637,7 +1644,7 @@ class AppController {
         this.openReviewReplyDialog(review, () => {
           const freshReview = stateManager.getState().recentReviews.find(r => r.id === review.id) || review;
           this.openModal(renderSummaryModal(stateManager.getState(), ledger, freshReview, advisorTip));
-          this.bindSummaryEvents(ledger, freshReview, advisorTip);
+          this.bindSummaryEvents(ledger, freshReview, advisorTip, rentDue);
         });
       };
     }
@@ -1646,28 +1653,12 @@ class AppController {
     const nextDayBtn = document.getElementById('btn-start-next-day');
     if (nextDayBtn) {
       nextDayBtn.onclick = () => {
-        this.closeModal();
-        const currentEnding = evaluateEnding(stateManager.getState());
-        if (currentEnding) {
-          this.openEndingModal(currentEnding);
+        // === Tiền mặt bằng cuối tuần ===
+        if (rentDue) {
+          this.showRentModal(rentDue, ledger, review, advisorTip);
           return;
         }
-        stateManager.update(draft => {
-          draft.day += 1;
-          draft.phase = 'prep';
-          draft.todayIncidentsCount = 0;
-        });
-        this.pickDailyEvent();
-        this.setPhase('prep');
-        this.showToast(`Chào buổi sáng Ngày ${stateManager.getState().day}! Chuẩn bị hàng nào! ☀️`);
-
-        // Kích hoạt Sự kiện 1 (Tình huống đầu ngày)
-        setTimeout(() => {
-          const morningIncident = pickDailyIncident(stateManager.getState(), 'morning');
-          if (morningIncident) {
-            this.whenModalFree(() => this.openDailyIncidentDialog(morningIncident));
-          }
-        }, 500);
+        this.proceedToNextDay();
       };
     }
 
@@ -1687,6 +1678,106 @@ class AppController {
           `Khách vừa review tiệm gà của tui nè: "${review.comment}" ⭐ ${review.stars}/5 sao! Chơi ngay nha!`);
         if (outcome === 'downloaded') this.showToast('Đã tải ảnh thẻ review về máy! Hãy đăng lên Threads nhé! 📸');
       };
+    }
+  }
+
+  // Modal tiền mặt bằng cuối tuần
+  private showRentModal(rentDue: NonNullable<DayResult['rentDue']>, _ledger: DayLedger, _review: CustomerReview, _advisorTip: string) {
+    const vnd = (n: number) => n.toLocaleString('vi-VN') + 'đ';
+    const html = `
+      <div class="incident-dialog" style="text-align:center;">
+        <div class="incident-avatar-wrap">
+          <div class="incident-chibi-circle"><div class="chibi-avatar-emoji">🏠</div></div>
+          <div class="incident-heart-badge">💰</div>
+        </div>
+        <div class="incident-pill-badge">TIỀN MẶT BẰNG TUẦN ${rentDue.weekNum}</div>
+        <h2 class="incident-main-title">Tới hẹn đóng tiền mặt bằng rồi nè!</h2>
+        <div class="incident-story-box">
+          <p class="incident-story-desc">
+            Chủ nhà tới thu tiền mặt bằng tuần ${rentDue.weekNum}. 
+            ${rentDue.canPay 
+              ? `Bạn cần trả <b>${vnd(rentDue.amount)}</b>. Tiền trong ví đủ chi trả.`
+              : `Bạn cần <b>${vnd(rentDue.amount)}</b> nhưng ví chỉ còn <b>${vnd(stateManager.getState().money)}</b>. Thiếu tiền rồi nè!`}
+          </p>
+          ${!rentDue.canPay ? `
+            <div class="incident-security-tip">
+              ⚠️ <i>Nếu không trả được, giang hồ khu phố sẽ tới "hỏi thăm" — khách sợ không dám ghé tiệm 3 ngày liền!</i>
+            </div>
+          ` : ''}
+        </div>
+        <div class="incident-choices-list">
+          ${rentDue.canPay ? `
+            <button id="btn-pay-rent" class="incident-choice-btn btn-warm-choice">
+              <div class="choice-tier1">💵 Đóng tiền mặt bằng (${vnd(rentDue.amount)})</div>
+              <div class="choice-tier2">Trả đàng hoàng, yên ổn làm ăn</div>
+            </button>
+          ` : ''}
+          <button id="btn-skip-rent" class="incident-choice-btn btn-cream-choice">
+            <div class="choice-tier1">${rentDue.canPay ? '🙈 Xù nợ, giấu mặt' : '😰 Chịu, hổng có tiền...'}</div>
+            <div class="choice-tier2">Giang hồ sẽ tới gây khó dễ, giảm 30% khách 3 ngày</div>
+          </button>
+        </div>
+      </div>
+    `;
+    this.openModal(html);
+
+    const payBtn = document.getElementById('btn-pay-rent');
+    if (payBtn) {
+      payBtn.onclick = () => {
+        audio.playPop();
+        let ok = false;
+        stateManager.update(draft => { ok = payWeeklyRent(draft); });
+        if (ok) {
+          this.showToast(`✅ Đã đóng tiền mặt bằng ${vnd(rentDue.amount)}. Yên tâm làm ăn!`);
+        }
+        this.closeModal();
+        this.proceedToNextDay();
+      };
+    }
+
+    const skipBtn = document.getElementById('btn-skip-rent');
+    if (skipBtn) {
+      skipBtn.onclick = () => {
+        audio.playPop();
+        stateManager.update(draft => { applyGangsterThreat(draft); });
+        this.showToast('🔥 Giang hồ tới quán dằn mặt! Khách sợ bỏ chạy, 3 ngày tới ế khách nặng...');
+        this.closeModal();
+        this.proceedToNextDay();
+      };
+    }
+  }
+
+  // Chuyển sang ngày mới (tách ra để dùng chung)
+  private proceedToNextDay() {
+    this.closeModal();
+    const currentEnding = evaluateEnding(stateManager.getState());
+    if (currentEnding) {
+      this.openEndingModal(currentEnding);
+      return;
+    }
+    stateManager.update(draft => {
+      draft.day += 1;
+      draft.phase = 'prep';
+      draft.todayIncidentsCount = 0;
+    });
+    this.pickDailyEvent();
+    this.setPhase('prep');
+    this.showToast(`Chào buổi sáng Ngày ${stateManager.getState().day}! Chuẩn bị hàng nào! ☀️`);
+
+    // Kích hoạt Sự kiện 1 (Tình huống đầu ngày)
+    setTimeout(() => {
+      const morningIncident = pickDailyIncident(stateManager.getState(), 'morning');
+      if (morningIncident) {
+        this.whenModalFree(() => this.openDailyIncidentDialog(morningIncident));
+      }
+    }, 500);
+
+    // Thông báo giang hồ đe dọa nếu đang bị
+    const state = stateManager.getState();
+    if ((state.gangsterThreatDays ?? 0) > 0) {
+      setTimeout(() => {
+        this.showToast(`⚠️ Giang hồ vẫn canh tiệm! Khách giảm 30% (còn ${state.gangsterThreatDays} ngày)`);
+      }, 1500);
     }
   }
 

@@ -20,6 +20,7 @@ import { applyKarmaChange } from '../content/endings';
 import { auditState, flagIntegrity } from './integrity';
 import { SellingSession, pushFx } from './sellingSim';
 import { random } from './rng';
+import { weekdayOf } from './clock';
 
 // Luật của một ngày (sự kiện, khách, giao món, chốt sổ), không DOM/âm thanh.
 // main.ts và mô phỏng cân bằng (scripts/balance-sim.ts) gọi CÙNG các hàm này.
@@ -645,6 +646,8 @@ export interface DayResult {
   review: CustomerReview;
   advisorTip: string;
   inspection: 'fined' | 'praised' | 'warned' | null;
+  rentDue?: { amount: number; canPay: boolean; weekNum: number }; // Cuối tuần chưa trả mặt bằng
+  dirtyOilWarning?: boolean; // Cảnh báo đầu đen khi đóng cửa
 }
 
 // Gọi một lần lúc đóng cửa, trong stateManager.update: hàng hết hạn, sổ sách, sao, lịch sử, qua chương.
@@ -658,6 +661,21 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   const fine = inspected && oil === 'dirty' ? INSPECTION_FINE : 0;
   const team = staffEffects(draft.staff, 12, draft.upgrades);
   const karma = karmaEffects(draft.karma);
+
+  // === Dầu đen carry-over: đóng cửa lúc dầu dirty → phạt sao 2 ngày tiếp theo ===
+  if (oil === 'dirty') {
+    draft.dirtyOilPenaltyDays = 2;
+  }
+  // Trừ ngày phạt dầu đen (từ hôm trước): sao Vệ sinh & Hương vị bị giảm
+  if ((draft.dirtyOilPenaltyDays ?? 0) > 0) {
+    draft.dirtyOilPenaltyDays = (draft.dirtyOilPenaltyDays ?? 0) - 1;
+  }
+
+  // === Giảm ngày giang hồ đe dọa ===
+  if ((draft.gangsterThreatDays ?? 0) > 0) {
+    draft.gangsterThreatDays = (draft.gangsterThreatDays ?? 0) - 1;
+  }
+
 
   // Món bán chạy nhất trong ca (trước đây topSellerId không bao giờ được cập nhật → luôn là Gà Giòn)
   const sold = Object.entries(session.soldCounts ?? {}).sort((a, b) => b[1] - a[1])[0];
@@ -739,8 +757,48 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
 
   // Qua chương không còn tự động ở đây: người chơi bấm "Đặt cọc" (core/progression.ts)
 
+  // === Tiền mặt bằng cuối tuần ===
+  const weekNum = Math.ceil(draft.day / 7);
+  const isSunday = weekdayOf(draft.day) === 'Chủ Nhật';
+  const rentAmount = weeklyRentAmount(draft.currentChapter);
+  let rentDue: DayResult['rentDue'];
+  if (isSunday && draft.currentChapter >= 2 && (draft.lastRentPaidWeek ?? 0) < weekNum) {
+    // Cuối tuần chưa trả tiền mặt bằng: thông báo cho UI hiển modal
+    rentDue = { amount: rentAmount, canPay: draft.money >= rentAmount, weekNum };
+  }
+
+  // === Cảnh báo dầu đen ===
+  const dirtyOilWarning = oil === 'dirty';
+
+  // Ngày tiếp: dầu đen carry-over đã ghi ở closeDay bên trên
+
   return {
     ledger, review: generatedReview, advisorTip,
-    inspection: !inspected ? null : fine > 0 ? 'fined' : oil === 'clean' ? 'praised' : 'warned'
+    inspection: !inspected ? null : fine > 0 ? 'fined' : oil === 'clean' ? 'praised' : 'warned',
+    rentDue,
+    dirtyOilWarning
   };
+}
+
+// === Tiền mặt bằng tuần (nhân 7 ngày overhead.rent) ===
+export function weeklyRentAmount(chapter: number): number {
+  const { rent } = EconomyEngine.getOverheadCosts(chapter);
+  return rent * 7; // Tiền mặt bằng 1 tuần
+}
+
+// Trả tiền mặt bằng: trừ ví, ghi tuần đã trả
+export function payWeeklyRent(draft: GameState): boolean {
+  const weekNum = Math.ceil(draft.day / 7);
+  const amount = weeklyRentAmount(draft.currentChapter);
+  if (draft.money < amount) return false;
+  draft.money -= amount;
+  draft.lastRentPaidWeek = weekNum;
+  return true;
+}
+
+// Không trả tiền: giang hồ tìm đến, giảm 30% khách 3 ngày
+export function applyGangsterThreat(draft: GameState): void {
+  draft.gangsterThreatDays = 3;
+  // Phạt thêm karma cộng đồng (hẻm mất lòng tin)
+  draft.karma = applyKarmaChange(draft.karma, { community: -2 });
 }

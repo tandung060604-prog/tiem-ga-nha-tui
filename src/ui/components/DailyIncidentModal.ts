@@ -15,7 +15,7 @@ export function renderIncidentPrompt(
     // Nút 0: Đỏ cam rực rỡ (Coral Red)
     // Nút 1: Kem be sữa ấm áp (Warm Cream)
     // Nút Bảo Vệ: Xanh an ninh (Security Green)
-    let btnThemeClass = idx === 0 ? 'btn-coral-choice' : 'btn-cream-choice';
+    let btnThemeClass = idx === 0 ? 'btn-warm-choice' : 'btn-cream-choice';
     if (isSecOnly) {
       btnThemeClass = canChoose ? 'btn-security-choice' : 'btn-locked-choice';
     }
@@ -24,7 +24,7 @@ export function renderIncidentPrompt(
     let subText = choice.subDesc || choice.kicker || '';
     if (isSecOnly) {
       if (!hasSec) {
-        subText = '🔒 Cần tuyển Chú Tư Giữ Xe tại tab Nhân viên để kích hoạt';
+        subText = '🔒 Cần tuyển Chú Tư Giữ Xe tại tab Nhân viên mới xài được nè';
       } else if (!subText.includes('Bảo Vệ') && !subText.includes('Chú Tư')) {
         subText = `👮 Có Chú Tư Bảo Vệ canh chừng: 100% bình yên`;
       }
@@ -88,7 +88,7 @@ export function renderIncidentPrompt(
 
       ${!hasSec && incident.isSecurityRisk ? `
         <div class="incident-security-tip">
-          💡 <i>Mẹo: Quán chưa có Bảo Vệ! Hãy vào tab <b>Nhân viên</b> tuyển Chú Tư Giữ Xe để hóa giải 100% trộm cắp và quỵt tiền.</i>
+          💡 <i>Mẹo nè: Quán chưa có Bảo Vệ! Dzô tab <b>Nhân viên</b> tuyển Chú Tư Giữ Xe để hóa giải 100% trộm cắp với quỵt tiền nha.</i>
         </div>
       ` : ''}
 

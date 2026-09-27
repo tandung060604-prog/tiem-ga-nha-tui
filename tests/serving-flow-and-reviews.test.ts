@@ -144,7 +144,7 @@ describe('Đánh giá review cuối ngày đa dạng và ngữ nghĩa theo lỗi
 
     expect(evaluation.generatedReview.stars).toBeLessThanOrEqual(2);
     expect(evaluation.generatedReview.tags.some(t => ['#GiaoNhamMon', '#LenSaiMon', '#GiaoSaiMon', '#SaiDon'].includes(t))).toBe(true);
-    expect(evaluation.advisorTip).toContain('lên sai món');
+    expect(evaluation.advisorTip).toContain('lên lộn món');
   });
 
   it('Dầu đen dơ -> Review phản ánh dầu khét, mất vệ sinh với tag cảnh báo ATTP', () => {
@@ -169,7 +169,7 @@ describe('Đánh giá review cuối ngày đa dạng và ngữ nghĩa theo lỗi
 
     expect(evaluation.generatedReview.stars).toBeLessThanOrEqual(2);
     expect(evaluation.generatedReview.tags.some(t => ['#DauDenXi', '#DauCuKhet', '#DauBan', '#ATTP', '#MatVeSinh'].includes(t))).toBe(true);
-    expect(evaluation.advisorTip).toContain('Dầu chiên đen quá');
+    expect(evaluation.advisorTip).toContain('Dầu chiên đen thui');
   });
 
   it('Sai sót trong ngày trừ điểm Karma Nghệ Nhân và Tình Hẻm', () => {
