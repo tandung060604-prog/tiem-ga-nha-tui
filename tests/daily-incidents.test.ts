@@ -244,7 +244,7 @@ describe('Hệ Thống 25 Sự Kiện Hài Hước Bắt Trend & Quyết Định
 
       const html = renderIncidentAlbumModal(state);
       expect(html).toContain('SỔ TAY TÌNH HUỐNG HẺM 1102');
-      expect(html).toContain('2/25');
+      expect(html).toContain(`2/${DAILY_INCIDENTS.length}`);
       expect(html).toContain('ĐÃ KHÁM PHÁ');
       expect(html).toContain('CHƯA MỞ KHÓA');
       expect(html).toContain('Tình Huống Bí Ẩn');

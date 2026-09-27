@@ -35,18 +35,19 @@ export class ReviewsEngine {
     averageWaitTimeSec: number,
     lostCustomerCount: number,
     servedCount?: number,
-    friedCount?: number
+    friedCount?: number,
+    fastServeCount?: number,
+    slowServeCount?: number,
+    expensiveCount?: number,
+    fairPriceCount?: number
   ): { newRatings: StarRating; generatedReview: CustomerReview; advisorTip: string } {
     const r = { ...currentState.ratings };
-    // Chấm theo TỈ LỆ (mô phỏng: ngưỡng tuyệt đối "bỏ >1 khách / cháy >1 mẻ" làm sao Tốc độ, Hương vị kẹt đáy
-    // khi tiệm đông khách ở chương sau). Không truyền số khách/số mẻ → giữ luật cũ.
     const lostRatio = servedCount === undefined ? (lostCustomerCount > 1 ? 1 : lostCustomerCount === 0 ? 0 : 0.1)
       : lostCustomerCount / Math.max(1, servedCount + lostCustomerCount);
     const burntRatio = friedCount === undefined ? (burntCount > 1 ? 1 : burntCount === 0 ? 0 : 0.1)
       : burntCount / Math.max(1, friedCount);
 
     // 1. Hương vị (30%): Phụ thuộc vào tỉ lệ Perfect chiên và mẻ cháy
-    // Nâng cấp bếp (tủ giữ nóng, nồi áp suất): tăng nhanh hơn, tụt chậm hơn
     const tasteBoost = upgradeEffects(currentState.upgrades).tastePct / 100;
     if (perfectFriedRatio >= 0.75 && burntRatio <= 0.05) {
       r.taste = Math.min(5.0, r.taste + 0.15 * (1 + tasteBoost));
@@ -54,19 +55,23 @@ export class ReviewsEngine {
       r.taste = Math.max(2.0, r.taste - 0.25 * (1 - tasteBoost / 2));
     }
 
-    // 2. Tốc độ (25%): Phụ thuộc thời gian chờ và khách bỏ đi
-    if (lostRatio <= 0.05 && averageWaitTimeSec <= 22) {
-      r.speed = Math.min(5.0, r.speed + 0.2);
-    } else if (lostRatio > 0.2 || averageWaitTimeSec > 35) {
-      r.speed = Math.max(1.5, r.speed - 0.3);
+    // 2. Tốc độ (25%): Phụ thuộc vào số đơn giao nhanh vs chậm, thời gian chờ và khách bỏ đi
+    const fastCount = fastServeCount ?? 0;
+    const slowCount = slowServeCount ?? 0;
+    if (fastCount > slowCount * 1.5 && lostRatio <= 0.05 && averageWaitTimeSec <= 24) {
+      // Phục vụ nhanh vượt trội: sao Tốc độ tăng mạnh
+      r.speed = Math.min(5.0, r.speed + 0.3);
+    } else if (slowCount > fastCount || lostRatio > 0.15 || averageWaitTimeSec > 35) {
+      // Phục vụ chậm, khách đợi mỏi mòn: sao Tốc độ tụt dốc
+      r.speed = Math.max(1.5, r.speed - 0.35);
     } else if (servedCount !== undefined) {
-      // Ngày bình thường: dần về mức trung bình 3,5 (mô phỏng: sao Tốc độ từng kẹt đáy 1,5 vĩnh viễn)
       r.speed = r.speed < 3.5 ? Math.min(3.5, r.speed + 0.15) : Math.max(3.5, r.speed - 0.05);
     }
 
-    // 3. Vệ sinh (15%): Dầu chiên sạch / dơ
+    // 3. Vệ sinh (15%): Dầu chiên sạch / dơ & nâng cấp Vệ sinh
+    const hygieneBoost = (upgradeEffects(currentState.upgrades).hygieneBoost || 0) / 100;
     if (currentState.oilCondition === 'clean') {
-      r.hygiene = Math.min(5.0, r.hygiene + 0.1);
+      r.hygiene = Math.min(5.0, r.hygiene + 0.1 * (1 + hygieneBoost));
     } else if (currentState.oilCondition === 'dirty') {
       r.hygiene = Math.max(1.8, r.hygiene - 0.4);
     }
@@ -76,35 +81,52 @@ export class ReviewsEngine {
     const targetSpaceScore = Math.min(5.0, 3.0 + spaceLevel * 0.4);
     r.space = Math.round((r.space * 0.8 + targetSpaceScore * 0.2) * 10) / 10;
 
-    // 5. Giá cả (15%): So sánh giá bán với giá gốc
-    // Theo giá trung bình các món đang bán so với giá gốc (core/pricing.ts), nhích dần 40%/ngày về đích.
-    // Trước: trừ bậc thang 0,6 sao cho MỖI món vượt 125%, tính cả món chưa mở; không có mức giữa.
+    // 5. Giá cả (15%): So sánh số đơn giá cao vs giá hợp lý trong ngày kết hợp tỷ lệ giá niêm yết
+    const expensive = expensiveCount ?? 0;
+    const fair = fairPriceCount ?? 0;
     const pricingGoal = pricingTarget(averagePriceRatio(currentState));
-    r.pricing = Math.round((r.pricing + (pricingGoal - r.pricing) * 0.4) * 100) / 100;
+
+    if (expensive > fair && expensive >= 2) {
+      // Khách phàn nàn giá mắc, chặt chém so với vỉa hè
+      r.pricing = Math.max(1.8, r.pricing - 0.35);
+    } else if (fair >= expensive * 1.5 && fair >= 3) {
+      // Khách khen giá hợp lý, hạt dẻ sinh viên
+      r.pricing = Math.min(5.0, r.pricing + 0.25);
+    } else {
+      r.pricing = Math.round((r.pricing + (pricingGoal - r.pricing) * 0.4) * 100) / 100;
+    }
 
     r.overall = this.calculateOverallStars(r);
 
-    // Xác định tiêu chí yếu nhất
-    const criteriaScores: NonEmpty<{ key: keyof StarRating; score: number }> = [
-      { key: 'taste', score: r.taste },
-      { key: 'speed', score: r.speed },
-      { key: 'hygiene', score: r.hygiene },
-      { key: 'space', score: r.space },
-      { key: 'pricing', score: r.pricing }
-    ];
-
-    const lowest = criteriaScores.reduce((min, c) => (c.score < min.score ? c : min));
-    const weakest = lowest.key;
+    // Xác định tiêu chí ưu tiên cho review hôm nay:
+    // Nếu hôm nay phục vụ quá chậm -> ưu tiên review chê tốc độ
+    // Nếu bán quá nhiều món đắt -> ưu tiên review chê giá
+    // Ngược lại chọn tiêu chí có điểm thấp nhất
+    let weakest: keyof StarRating;
+    if (slowCount > fastCount && slowCount >= 3) {
+      weakest = 'speed';
+    } else if (expensive > fair && expensive >= 3) {
+      weakest = 'pricing';
+    } else {
+      const criteriaScores: NonEmpty<{ key: keyof StarRating; score: number }> = [
+        { key: 'taste', score: r.taste },
+        { key: 'speed', score: r.speed },
+        { key: 'hygiene', score: r.hygiene },
+        { key: 'space', score: r.space },
+        { key: 'pricing', score: r.pricing }
+      ];
+      const lowest = criteriaScores.reduce((min, c) => (c.score < min.score ? c : min));
+      weakest = lowest.key;
+    }
 
     // Tính sao của review ngày hôm nay (1 đến 5 sao)
-    const reviewStars = Math.max(1, Math.min(5, Math.round(lowest.score)));
+    const reviewStars = Math.max(1, Math.min(5, Math.round(r[weakest])));
 
-    // Chọn câu review GenZ phù hợp với tiêu chí yếu nhất
+    // Chọn câu review GenZ phù hợp với tiêu chí
     const matchingTemplates = GENZ_REVIEW_TEMPLATES.filter(
       t => t.criteria === weakest && reviewStars >= t.minStars && reviewStars <= t.maxStars
     );
 
-    // Độ hài do Jev chấm sẵn (npm run jev:content): câu hài hơn được chọn nhiều hơn; câu phản cảm bị loại
     const usable = matchingTemplates.filter(t => !REVIEW_BLOCKED.includes(t.text));
     const chosenTemplate = usable.length > 0
       ? weightedPick(usable, t => 1 + (REVIEW_HUMOR[t.text] ?? 1))

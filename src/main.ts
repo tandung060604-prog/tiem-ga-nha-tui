@@ -1352,7 +1352,8 @@ class AppController {
       session,
       cookingEngine.getTray(),
       id => menu.find(m => m.id === id)?.currentPrice ?? 0,
-      idx => cookingEngine.removeFromTray(idx)
+      idx => cookingEngine.removeFromTray(idx),
+      stateManager.getState().upgrades
     );
 
     switch (result.kind) {

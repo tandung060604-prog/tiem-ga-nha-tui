@@ -39,7 +39,8 @@ describe('tác dụng nâng cấp (core/upgrades)', () => {
   it('chưa mua gì → không có tác dụng', () => {
     expect(upgradeEffects(createInitialState().upgrades)).toEqual({
       fryRampPct: 0, tastePct: 0, oilLifePct: 0, patiencePct: 0, customersPct: 0, autoLift: false, ownDeliveryApp: false,
-      pricePremiumPct: 0, traySlots: 0, selfServe: false
+      pricePremiumPct: 0, traySlots: 0, selfServe: false,
+      shelfLifeBonus: 0, discountWholesale: 0, sauceTipBonus: 0, autoDrink: false, pestImmunity: false, hygieneBoost: 0
     });
   });
 

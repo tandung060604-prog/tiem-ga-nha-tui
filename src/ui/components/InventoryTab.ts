@@ -1,9 +1,12 @@
 import { GameState } from '../../types/game';
 import { audio } from '../../core/audio';
 import { addStock, refundPurchase, refundableUnits, signIngredientContract, isIngredientUnlocked, UnlockResult } from '../../core/inventory';
+import { upgradeEffects } from '../../core/upgrades';
 
 export function renderInventoryTab(state: GameState): string {
   const items = Object.values(state.inventory);
+  const effects = upgradeEffects(state.upgrades);
+  const discount = effects.discountWholesale || 0;
 
   const rowsHtml = items.map(item => {
     const isLocked = item.unlocked === false;
@@ -45,6 +48,9 @@ export function renderInventoryTab(state: GameState): string {
 
     const isLow = item.amount <= 5;
     const isUrgentShelf = item.currentLifeDays <= 1;
+    const unitCost = Math.round(item.cost * (1 - discount / 100));
+    const totalCost5 = unitCost * 5;
+    const totalCost10 = unitCost * 10;
 
     return `
       <div class="item-row" data-id="${item.id}">
@@ -56,7 +62,7 @@ export function renderInventoryTab(state: GameState): string {
             ${isUrgentShelf ? '<span class="shelf-tag" style="background:#ffd2d2;color:#b71c1c;">HSD: ' + item.currentLifeDays + ' ngày!</span>' : '<span class="shelf-tag">HSD: ' + item.currentLifeDays + ' ngày</span>'}
           </div>
           <div class="item-sub ${isLow ? 'low-stock' : ''}">
-            Tồn kho: <b>${item.amount} ${item.unit}</b> · Giá nhập: ${item.cost.toLocaleString('vi-VN')}đ
+            Tồn kho: <b>${item.amount} ${item.unit}</b> · Giá sỉ: <b>${unitCost.toLocaleString('vi-VN')}đ</b> ${discount > 0 ? `<small style="color:var(--mint-dark,#10b981);font-weight:700;">(-${discount}%)</small>` : ''}
           </div>
           ${item.batches && item.batches.length > 1 ? `
             <div style="font-size: 0.65rem; color: var(--soft); margin-top: 2px;">
@@ -67,13 +73,13 @@ export function renderInventoryTab(state: GameState): string {
 
         <div class="btn-group">
           <button class="btn-sm btn-refund" data-id="${item.id}" data-qty="5" ${refundableUnits(item) < 5 ? 'disabled' : ''} title="Đổi trả trong ngày: chỉ hàng vừa nhập hôm nay">
-            -5<small>(+${(item.cost * 5 / 1000)}k)</small>
+            -5<small>(+${(unitCost * 5 / 1000)}k)</small>
           </button>
-          <button class="btn-sm btn-buy" data-id="${item.id}" data-qty="5" ${state.money < item.cost * 5 ? 'disabled' : ''}>
-            +5<small>(${(item.cost * 5 / 1000)}k)</small>
+          <button class="btn-sm btn-buy" data-id="${item.id}" data-qty="5" ${state.money < totalCost5 ? 'disabled' : ''}>
+            +5<small>(${(totalCost5 / 1000)}k)</small>
           </button>
-          <button class="btn-sm primary btn-buy" data-id="${item.id}" data-qty="10" ${state.money < item.cost * 10 ? 'disabled' : ''}>
-            +10<small>(${(item.cost * 10 / 1000)}k)</small>
+          <button class="btn-sm primary btn-buy" data-id="${item.id}" data-qty="10" ${state.money < totalCost10 ? 'disabled' : ''}>
+            +10<small>(${(totalCost10 / 1000)}k)</small>
           </button>
         </div>
       </div>
@@ -87,6 +93,7 @@ export function renderInventoryTab(state: GameState): string {
     </div>
     <div class="sec-desc">
       Nhập đủ gà tươi, bột, dầu và gia vị trước giờ mở bán (10:00). Bấm <b>-5</b> để hoàn trả nếu lỡ tay mua nhầm!
+      ${effects.shelfLifeBonus > 0 ? `<br><b style="color:var(--mint-dark,#10b981);">❄️ Kho lạnh bảo quản: +${effects.shelfLifeBonus} ngày hạn dùng cho mọi lô nhập mới!</b>` : ''}
     </div>
     <div class="inventory-list">
       ${rowsHtml}
@@ -114,7 +121,11 @@ export function bindInventoryEvents(
         showToast('Chưa ký hợp đồng cung ứng nguyên liệu này!');
         return;
       }
-      const totalCost = item.cost * qty;
+
+      const effects = upgradeEffects(state.upgrades);
+      const discount = effects.discountWholesale || 0;
+      const unitCost = Math.round(item.cost * (1 - discount / 100));
+      const totalCost = unitCost * qty;
 
       if (state.money < totalCost) {
         showToast('Không đủ tiền để nhập nguyên liệu này!');
@@ -125,8 +136,8 @@ export function bindInventoryEvents(
         const targetItem = draft.inventory[itemId];
         if (!targetItem || draft.money < totalCost) return;
         draft.money -= totalCost;
-        // Lô mới có hạn riêng; lô cũ giữ nguyên hạn (xuất FIFO); ghi giá đã trả để đổi trả trong ngày
-        addStock(targetItem, qty, targetItem.cost);
+        // Lô mới có hạn riêng; cộng thêm ngày bảo quản của kho lạnh; ghi giá sỉ đã trả
+        addStock(targetItem, qty, unitCost, effects.shelfLifeBonus);
       });
 
       audio.playCash();

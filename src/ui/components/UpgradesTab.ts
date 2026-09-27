@@ -13,7 +13,12 @@ function effectsSummary(e: UpgradeEffects): string {
     e.pricePremiumPct ? `khách trả thêm ${e.pricePremiumPct}%` : '',
     e.traySlots ? `khay +${e.traySlots} ô` : '',
     e.selfServe ? 'khách tự nhận món (kiosk)' : '',
-    e.ownDeliveryApp ? 'không mất hoa hồng app' : ''
+    e.ownDeliveryApp ? 'không mất hoa hồng app' : '',
+    e.shelfLifeBonus ? `kho bảo quản +${e.shelfLifeBonus} ngày` : '',
+    e.discountWholesale ? `giảm giá sỉ -${e.discountWholesale}%` : '',
+    e.sauceTipBonus ? `tip tương +${e.sauceTipBonus / 1000}k` : '',
+    e.autoDrink ? 'tự rót nước tự động' : '',
+    e.pestImmunity ? 'miễn dịch chuột cống 100%' : ''
   ].filter(Boolean);
   return `⚡ Đang có hiệu lực: ${parts.length ? parts.join(' · ') : 'chưa có (mua nâng cấp đầu tiên nhé!)'}`;
 }
@@ -68,10 +73,10 @@ export function renderUpgradesTab(state: GameState): string {
 
   return `
     <div class="sec-title">
-      <span>🛠️ Nâng Cấp Tiệm Gà (4 Nhánh)</span>
+      <span>🛠️ Nâng Cấp Tiệm Gà (7 Nhánh Chuyên Sâu)</span>
     </div>
     <div class="sec-desc">
-      Bếp: gà lên vàng nhanh, hương vị, dầu bền. Vận hành: khách chờ được lâu hơn. Marketing & Không gian: thêm khách.
+      Bếp & Kho: tăng tốc, hạn dùng. Vận hành & Dịch vụ: khách kiên nhẫn, tự rót nước. Marketing & Vệ sinh: thêm khách, miễn dịch chuột.
     </div>
     <div class="sec-desc upgrade-effects">${effectsSummary(upgradeEffects(state.upgrades))}</div>
     <div class="upgrades-list">

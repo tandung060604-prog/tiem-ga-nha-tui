@@ -3,6 +3,7 @@ import { DAILY_INCIDENTS } from '../content/dailyIncidents';
 import { applyKarmaChange } from '../content/endings';
 import { pick, random } from './rng';
 import { ReviewsEngine } from './reviewsEngine';
+import { upgradeEffects } from './upgrades';
 
 export const MAX_REPUTATION_DELTA = 0.3;
 export const MAX_RESOLVED_HISTORY = 60;
@@ -63,25 +64,53 @@ export function resolveIncidentChoice(
   incident: DailyIncident,
   choice: IncidentChoice
 ): IncidentResolutionResult {
-  const hasSec = hasSecurityStaff(draft);
+  const hasDog = !!draft.adoptedPets?.includes('pet_01_dog_vang');
+  const hasCat = !!draft.adoptedPets?.includes('pet_02_cat_muop');
+  const hasSec = hasSecurityStaff(draft) || (hasDog && incident.isSecurityRisk);
+  const upEffects = upgradeEffects(draft.upgrades ?? {});
+  const isPest = incident.id.includes('pest') || incident.id.includes('rat') || incident.id.includes('fly');
+
   let succeeded = true;
 
-  // Nếu lựa chọn có rủi ro và không có bảo vệ
-  if (choice.riskRate && choice.riskRate > 0 && !hasSec) {
-    const roll = random();
-    if (roll < choice.riskRate) {
+  // Nếu là sự cố côn trùng/chuột và có miễn nhiễm vệ sinh (pestImmunity) hoặc có Mèo Mướp
+  if (isPest && (upEffects.pestImmunity || hasCat)) {
+    succeeded = true;
+  } else {
+    // Nếu lựa chọn có rủi ro và không có bảo vệ
+    if (choice.riskRate && choice.riskRate > 0 && !hasSec) {
+      const roll = random();
+      if (roll < choice.riskRate) {
+        succeeded = false;
+      }
+    }
+
+    // Nếu lựa chọn bắt buộc có bảo vệ mà quán lại không có (fallback phòng vệ)
+    if (choice.requiresSecurity && !hasSec) {
       succeeded = false;
     }
   }
 
-  // Nếu lựa chọn bắt buộc có bảo vệ mà quán lại không có (fallback phòng vệ)
-  if (choice.requiresSecurity && !hasSec) {
-    succeeded = false;
+  // Ghi nhận nhận nuôi thú cưng
+  if (choice.id === 'cat_adopt_mascot' || choice.id === 'cat_nest_feast') {
+    if (!draft.adoptedPets) draft.adoptedPets = [];
+    if (!draft.adoptedPets.includes('pet_02_cat_muop')) draft.adoptedPets.push('pet_02_cat_muop');
+  }
+  if (choice.id === 'dog_adopt_guard') {
+    if (!draft.adoptedPets) draft.adoptedPets = [];
+    if (!draft.adoptedPets.includes('pet_01_dog_vang')) draft.adoptedPets.push('pet_01_dog_vang');
   }
 
   let finalMoneyDelta = choice.moneyDelta ?? 0;
   let reactionTitle = choice.reactionTitle;
   let reactionNarrative = choice.reactionNarrative;
+
+  if (isPest && succeeded && upEffects.pestImmunity) {
+    reactionTitle = '🛡️ Nâng Cấp Vệ Sinh Bảo Vệ Tuyệt Đối!';
+    reactionNarrative = 'Nhờ lưới thép chống chuột và tinh dầu sinh học 5 sao, lũ chuột dịch hại hoàn toàn bị xua tan khỏi gian bếp!';
+  } else if (isPest && succeeded && hasCat && choice.id === 'rat_cat_ambush') {
+    reactionTitle = '🐱 Mèo Mướp Ra Tay Tóm Gọn!';
+    reactionNarrative = 'Bé Mèo Mướp lao ra như tia chớp tóm gọn chuột cống, lập đại công bảo vệ kho bột của tiệm!';
+  }
 
   if (!succeeded) {
     // Thất bại: dùng lời kể thất bại nếu có

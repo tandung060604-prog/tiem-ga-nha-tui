@@ -20,11 +20,12 @@ export function ensureBatches(item: InventoryItem) {
 }
 
 // `unitCost` có nghĩa là lô MUA bằng tiền (được đổi trả trong ngày); bỏ trống = hàng tặng/tiếp tế.
-export function addStock(item: InventoryItem, qty: number, unitCost?: number) {
+export function addStock(item: InventoryItem, qty: number, unitCost?: number, shelfLifeBonus: number = 0) {
   ensureBatches(item);
+  const totalDays = item.shelfLifeDays + Math.max(0, shelfLifeBonus);
   item.batches.push(unitCost === undefined
-    ? { amount: qty, daysLeft: item.shelfLifeDays }
-    : { amount: qty, daysLeft: item.shelfLifeDays, refundable: qty, unitCost });
+    ? { amount: qty, daysLeft: totalDays }
+    : { amount: qty, daysLeft: totalDays, refundable: qty, unitCost });
   sync(item);
 }
 

@@ -88,11 +88,17 @@ export interface UpgradeTier {
     space?: number;
     customers?: number;
     capacity?: number;
+    shelfLife?: number;
+    discount?: number;
+    sauceTip?: number;
+    pestShield?: number;
+    autoDrink?: boolean;
+    pestImmunity?: boolean;
   };
 }
 
 export interface UpgradeBranch {
-  id: 'kitchen' | 'space' | 'operations' | 'marketing';
+  id: 'kitchen' | 'space' | 'operations' | 'marketing' | 'storage' | 'service' | 'hygiene';
   name: string;
   icon: string;
   currentLevel: number;

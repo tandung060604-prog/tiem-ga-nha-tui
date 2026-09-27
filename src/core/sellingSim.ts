@@ -42,6 +42,10 @@ export interface SellingSession {
   burntWaste?: number;                 // tiền mất vì món cháy (khách trả nửa giá)
   friedMainOrders?: number;            // đơn có món chính chiên ngập dầu
   cleanserOrders?: number;             // … và có món giải ngấy (củ cải, bắp cải) → sao Hương vị
+  fastServeCount?: number;             // số đơn giao nhanh (kiên nhẫn >= 65%)
+  slowServeCount?: number;             // số đơn giao chậm (kiên nhẫn <= 35%)
+  expensiveCount?: number;             // số đơn giá cao/chặt chém
+  fairPriceCount?: number;             // số đơn giá hợp lý/rẻ
 }
 
 // Hiệu ứng "đã tay": core ghi lại chuyện vừa xảy ra, giao diện rút ra (drainFx) để vẽ đúng một lần.
@@ -82,7 +86,11 @@ export function createSellingSession(): SellingSession {
     burntCount: 0,
     perfectCount: 0,
     totalFriedCount: 0,
-    topSellerId: 'crispy_chicken'
+    topSellerId: 'crispy_chicken',
+    fastServeCount: 0,
+    slowServeCount: 0,
+    expensiveCount: 0,
+    fairPriceCount: 0
   };
 }
 

@@ -1,6 +1,7 @@
-import { Condiment, CustomerOrder, CustomerReview, DayLedger, GameEvent, GameState, QualityRating, TrayItem } from '../types/game';
+import { Condiment, CustomerOrder, CustomerReview, DayLedger, GameEvent, GameState, QualityRating, TrayItem, UpgradeBranch } from '../types/game';
 import { RANDOM_EVENTS } from '../content/events';
 import { BUNNY_LETTERS, BunnyLetter, MysteryBunnyEngine } from '../content/mysteryBunny';
+import { INITIAL_MENU } from '../content/menu';
 import { OrdersEngine, basketRoleOf } from './orders';
 import { maintenanceCost } from './accounting';
 import { EconomyEngine } from './economy';
@@ -324,7 +325,8 @@ export function serveFirstOrder(
   session: SellingSession,
   tray: readonly TrayItem[],
   prices: (menuItemId: string) => number,
-  removeAt: (trayIdx: number) => void
+  removeAt: (trayIdx: number) => void,
+  upgrades?: { [id: string]: UpgradeBranch }
 ): ServeResult {
   const order = session.orders[0];
   if (!order) return { kind: 'no-order' };
@@ -346,17 +348,28 @@ export function serveFirstOrder(
       order.burntPenalty = (order.burntPenalty ?? 0) + Math.round(prices(item.menuItemId) * penaltyRate);
     }
     if (item.quality === 'perfect') order.perfectBonus = (order.perfectBonus ?? 0) + perfectTip(session.perfectStreak);
-    // Tip tương: chỉ khi khách DẶN đúng loại đó cho món này
+    // Tip tương: chỉ khi khách DẶN đúng loại đó cho món này (cộng thêm bonus từ Quầy Sốt Dịch Vụ)
     const wantsSauce = item.condiment && order.items.find(it => it.menuItemId === item.menuItemId && it.condiment === item.condiment && (it.condimentServed ?? 0) < it.count);
     if (wantsSauce) {
       wantsSauce.condimentServed = (wantsSauce.condimentServed ?? 0) + 1;
       if (order.personality !== 'frugal') {
-        order.perfectBonus = (order.perfectBonus ?? 0) + CONDIMENT_TIP;
+        const sauceBonus = upgrades ? (upgradeEffects(upgrades).sauceTipBonus || 0) : 0;
+        order.perfectBonus = (order.perfectBonus ?? 0) + CONDIMENT_TIP + sauceBonus;
       }
     }
     if (item.condiment) session.squirts = (session.squirts ?? 0) + 1;
     removeAt(i);
     matched = true;
+  }
+
+  // Máy rót nước tự động (Nâng cấp Dịch vụ cấp 3+): tự động phục vụ các món nước ngọt
+  if (upgrades && upgradeEffects(upgrades).autoDrink) {
+    for (const it of order.items) {
+      if (basketRoleOf(it.menuItemId) === 'drink' && !it.completed) {
+        it.served = it.count;
+        it.completed = true;
+      }
+    }
   }
 
   if (!matched) return { kind: rejectedRaw ? 'raw-rejected' : 'no-match' };
@@ -368,6 +381,28 @@ export function serveFirstOrder(
   session.orders.shift();
   session.servedCount += 1;
   session.totalWaitSec += order.patienceMax - Math.max(0, order.patienceCurrent);
+
+  // Theo dõi tốc độ phục vụ đơn hàng (Nhanh vs Chậm)
+  const patienceRatio = order.patienceCurrent / Math.max(1, order.patienceMax);
+  if (patienceRatio >= 0.65) {
+    session.fastServeCount = (session.fastServeCount ?? 0) + 1;
+  } else if (patienceRatio <= 0.35) {
+    session.slowServeCount = (session.slowServeCount ?? 0) + 1;
+  }
+
+  // Theo dõi cảm nhận giá cả (Đắt vs Rẻ/Hợp lý)
+  if (order.totalPrice > 0) {
+    const isPricey = order.items.some(it => {
+      const def = INITIAL_MENU.find(m => m.id === it.menuItemId);
+      return def && prices(it.menuItemId) > def.basePrice * 1.18;
+    });
+    if (isPricey) {
+      session.expensiveCount = (session.expensiveCount ?? 0) + 1;
+    } else {
+      session.fairPriceCount = (session.fairPriceCount ?? 0) + 1;
+    }
+  }
+
   const paid = Math.max(0, order.totalPrice - (order.burntPenalty ?? 0));
   const { tip, feedbackNotes } = calculateCustomerTip(order);
   session.grossRevenue += paid;
@@ -482,7 +517,8 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   const perfectRatio = session.totalFriedCount > 0 ? session.perfectCount / session.totalFriedCount : 0.8;
   const avgWait = session.servedCount > 0 ? session.totalWaitSec / session.servedCount : 0;
   const { newRatings, generatedReview, advisorTip } = ReviewsEngine.evaluateDay(
-    draft, perfectRatio, session.burntCount, avgWait, session.lostCount, session.servedCount, session.totalFriedCount
+    draft, perfectRatio, session.burntCount, avgWait, session.lostCount, session.servedCount, session.totalFriedCount,
+    session.fastServeCount, session.slowServeCount, session.expensiveCount, session.fairPriceCount
   );
   if (karma.tasteDriftPerDay !== 0) { // Nghệ Nhân (karma): tiếng lành / tiếng dữ về độ ngon
     newRatings.taste = Math.max(1, Math.min(5, newRatings.taste + karma.tasteDriftPerDay));

@@ -16,85 +16,124 @@ export const ASSETS = {
     khoc: url('assets/mascot/mascot_gabong_khoc.png'),
     vui: url('assets/mascot/mascot_gabong_vui.png')
   },
+  characters: {
+    char_01_owner: url('assets/characters/char_01_owner.png'),
+    char_02_lottery_lady: url('assets/characters/char_02_lottery_lady.png'),
+    char_03_helper_linh: url('assets/characters/char_03_helper_linh.png'),
+    char_04_fryer_khang: url('assets/characters/char_04_fryer_khang.png'),
+    char_05_kid_bo: url('assets/characters/char_05_kid_bo.png'),
+    char_06_granny_ba: url('assets/characters/char_06_granny_ba.png'),
+    char_07_trendy_vy: url('assets/characters/char_07_trendy_vy.png'),
+    char_08_grumpy_hai: url('assets/characters/char_08_grumpy_hai.png'),
+    char_09_buyer_tam: url('assets/characters/char_09_buyer_tam.png'),
+    char_10_winner_hung: url('assets/characters/char_10_winner_hung.png'),
+    char_11_wholesale_nam: url('assets/characters/char_11_wholesale_nam.png'),
+    char_12_courier_ut: url('assets/characters/char_12_courier_ut.png'),
+    char_13_vendor_tham: url('assets/characters/char_13_vendor_tham.png'),
+    char_14_scrap_nam: url('assets/characters/char_14_scrap_nam.png'),
+    char_15_bread_bay: url('assets/characters/char_15_bread_bay.png'),
+    char_16_icecream_tu: url('assets/characters/char_16_icecream_tu.png'),
+    char_17_sweeper_lan: url('assets/characters/char_17_sweeper_lan.png'),
+    char_18_garbage_hung: url('assets/characters/char_18_garbage_hung.png'),
+    char_19_shipper_tuan: url('assets/characters/char_19_shipper_tuan.png'),
+    char_20_mover_cuong: url('assets/characters/char_20_mover_cuong.png'),
+    char_21_trucker_long: url('assets/characters/char_21_trucker_long.png'),
+    char_22_electrician_dung: url('assets/characters/char_22_electrician_dung.png'),
+    char_23_builder_bay: url('assets/characters/char_23_builder_bay.png'),
+    char_24_grocer_sau: url('assets/characters/char_24_grocer_sau.png'),
+    char_25_police_nam: url('assets/characters/char_25_police_nam.png'),
+    char_26_traffic_hoang: url('assets/characters/char_26_traffic_hoang.png'),
+    char_27_warden_hai: url('assets/characters/char_27_warden_hai.png'),
+    char_28_tough_beo: url('assets/characters/char_28_tough_beo.png'),
+    char_29_atm_nga: url('assets/characters/char_29_atm_nga.png'),
+    char_30_student_bus: url('assets/characters/char_30_student_bus.png'),
+    char_31_gossip_tam: url('assets/characters/char_31_gossip_tam.png'),
+    char_32_jogger_tuan: url('assets/characters/char_32_jogger_tuan.png'),
+    char_33_couple_genz: url('assets/characters/char_33_couple_genz.png'),
+    pet_01_dog_vang: url('assets/characters/pet_01_dog_vang.png'),
+    pet_02_cat_muop: url('assets/characters/pet_02_cat_muop.png'),
+    pest_01_rat_cong: url('assets/characters/pest_01_rat_cong.png')
+  },
+  // Ánh xạ tương thích cho các component cũ (dùng ảnh từ bộ 36 nhân vật chuẩn)
   bacba: {
-    front: url('assets/characters/char_bacba_front.png'),
-    threeQuarter: url('assets/characters/char_bacba_three_quarter.png')
+    front: url('assets/characters/char_08_grumpy_hai.png'),
+    threeQuarter: url('assets/characters/char_08_grumpy_hai.png')
   },
   thocam: {
-    front: url('assets/characters/char_thocam_front.png'),
-    notes: url('assets/characters/char_thocam_notes.png'),
-    side: url('assets/characters/char_thocam_side.png'),
-    vui: url('assets/characters/char_thocam_vui.png'),
-    buon: url('assets/characters/char_thocam_buon.png'),
-    ngacNhien: url('assets/characters/char_thocam_ngac_nhien.png'),
-    suyNghi: url('assets/characters/char_thocam_suy_nghi.png'),
-    ngu: url('assets/characters/char_thocam_ngu.png')
+    front: url('assets/mascot/mascot_gabong_front.png'),
+    notes: url('assets/mascot/mascot_gabong_vui.png'),
+    side: url('assets/mascot/mascot_gabong_side.png'),
+    vui: url('assets/mascot/mascot_gabong_vui.png'),
+    buon: url('assets/mascot/mascot_gabong_khoc.png'),
+    ngacNhien: url('assets/mascot/mascot_gabong_hoang.png'),
+    suyNghi: url('assets/mascot/mascot_gabong_three_quarter.png'),
+    ngu: url('assets/mascot/mascot_gabong_front.png')
   },
   shipper: {
-    walk: url('assets/characters/char_shipper_walk.png'),
-    stand: url('assets/characters/char_shipper_stand.png'),
-    angry: url('assets/characters/char_shipper_angry.png'),
-    leave: url('assets/characters/char_shipper_leave.png')
+    walk: url('assets/characters/char_19_shipper_tuan.png'),
+    stand: url('assets/characters/char_19_shipper_tuan.png'),
+    angry: url('assets/characters/char_19_shipper_tuan.png'),
+    leave: url('assets/characters/char_19_shipper_tuan.png')
   },
   hocsinh: {
-    walk: url('assets/characters/char_hocsinh_walk.png'),
-    stand: url('assets/characters/char_hocsinh_stand.png'),
-    angry: url('assets/characters/char_hocsinh_angry.png'),
-    leave: url('assets/characters/char_hocsinh_leave.png')
+    walk: url('assets/characters/char_30_student_bus.png'),
+    stand: url('assets/characters/char_30_student_bus.png'),
+    angry: url('assets/characters/char_30_student_bus.png'),
+    leave: url('assets/characters/char_30_student_bus.png')
   },
   vanphong: {
-    walk: url('assets/characters/char_vanphong_walk.png'),
-    stand: url('assets/characters/char_vanphong_stand.png'),
-    angry: url('assets/characters/char_vanphong_angry.png'),
-    leave: url('assets/characters/char_vanphong_leave.png')
+    walk: url('assets/characters/char_07_trendy_vy.png'),
+    stand: url('assets/characters/char_07_trendy_vy.png'),
+    angry: url('assets/characters/char_07_trendy_vy.png'),
+    leave: url('assets/characters/char_07_trendy_vy.png')
   },
   karen: {
-    walk: url('assets/characters/char_karen_walk.png'),
-    stand: url('assets/characters/char_karen_stand.png'),
-    angry: url('assets/characters/char_karen_angry.png'),
-    leave: url('assets/characters/char_karen_leave.png')
+    walk: url('assets/characters/char_31_gossip_tam.png'),
+    stand: url('assets/characters/char_31_gossip_tam.png'),
+    angry: url('assets/characters/char_31_gossip_tam.png'),
+    leave: url('assets/characters/char_31_gossip_tam.png')
   },
   gamethu: {
-    walk: url('assets/characters/char_gamethu_walk.png'),
-    stand: url('assets/characters/char_gamethu_stand.png'),
-    angry: url('assets/characters/char_gamethu_angry.png'),
-    leave: url('assets/characters/char_gamethu_leave.png')
+    walk: url('assets/characters/char_12_courier_ut.png'),
+    stand: url('assets/characters/char_12_courier_ut.png'),
+    angry: url('assets/characters/char_12_courier_ut.png'),
+    leave: url('assets/characters/char_12_courier_ut.png')
   },
   tiktoker: {
-    walk: url('assets/characters/char_tiktoker_walk.png'),
-    stand: url('assets/characters/char_tiktoker_stand.png'),
-    angry: url('assets/characters/char_tiktoker_angry.png'),
-    leave: url('assets/characters/char_tiktoker_leave.png')
+    walk: url('assets/characters/char_07_trendy_vy.png'),
+    stand: url('assets/characters/char_07_trendy_vy.png'),
+    angry: url('assets/characters/char_07_trendy_vy.png'),
+    leave: url('assets/characters/char_07_trendy_vy.png')
   },
   capdoi: {
-    walk: url('assets/characters/char_capdoi_walk.png'),
-    stand: url('assets/characters/char_capdoi_stand.png'),
-    angry: url('assets/characters/char_capdoi_angry.png'),
-    leave: url('assets/characters/char_capdoi_leave.png')
+    walk: url('assets/characters/char_33_couple_genz.png'),
+    stand: url('assets/characters/char_33_couple_genz.png'),
+    angry: url('assets/characters/char_33_couple_genz.png'),
+    leave: url('assets/characters/char_33_couple_genz.png')
   },
   becon: {
-    walk: url('assets/characters/char_becon_walk.png'),
-    stand: url('assets/characters/char_becon_stand.png'),
-    angry: url('assets/characters/char_becon_angry.png'),
-    leave: url('assets/characters/char_becon_leave.png')
+    walk: url('assets/characters/char_05_kid_bo.png'),
+    stand: url('assets/characters/char_05_kid_bo.png'),
+    angry: url('assets/characters/char_05_kid_bo.png'),
+    leave: url('assets/characters/char_05_kid_bo.png')
   },
   truongphong: {
-    walk: url('assets/characters/char_truongphong_walk.png'),
-    stand: url('assets/characters/char_truongphong_stand.png'),
-    angry: url('assets/characters/char_truongphong_angry.png'),
-    leave: url('assets/characters/char_truongphong_leave.png')
+    walk: url('assets/characters/char_10_winner_hung.png'),
+    stand: url('assets/characters/char_10_winner_hung.png'),
+    angry: url('assets/characters/char_10_winner_hung.png'),
+    leave: url('assets/characters/char_10_winner_hung.png')
   },
   mecon: {
-    walk: url('assets/characters/char_mecon_walk.png'),
-    stand: url('assets/characters/char_mecon_stand.png'),
-    angry: url('assets/characters/char_mecon_angry.png'),
-    leave: url('assets/characters/char_mecon_leave.png')
+    walk: url('assets/characters/char_06_granny_ba.png'),
+    stand: url('assets/characters/char_06_granny_ba.png'),
+    angry: url('assets/characters/char_06_granny_ba.png'),
+    leave: url('assets/characters/char_06_granny_ba.png')
   },
   babay: {
-    walk: url('assets/characters/char_babay_walk.png'),
-    stand: url('assets/characters/char_babay_stand.png'),
-    angry: url('assets/characters/char_babay_angry.png'),
-    leave: url('assets/characters/char_babay_leave.png')
+    walk: url('assets/characters/char_02_lottery_lady.png'),
+    stand: url('assets/characters/char_02_lottery_lady.png'),
+    angry: url('assets/characters/char_02_lottery_lady.png'),
+    leave: url('assets/characters/char_02_lottery_lady.png')
   },
   kitchen: {
     panEmpty: url('assets/kitchen/kitchen_pan_empty.png'),

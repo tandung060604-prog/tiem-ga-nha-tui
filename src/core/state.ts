@@ -157,6 +157,19 @@ export function migrateSave(raw: unknown): { state: GameState; repaired: string[
       Object.assign(saved, { ...item, currentPrice: saved.currentPrice });
     }
   }
+  // Nâng cấp: bổ sung các nhánh mới (kho lạnh, dịch vụ, vệ sinh) và cập nhật tiers mới nhất
+  for (const [id, branch] of Object.entries(defaults.upgrades)) {
+    const saved = state.upgrades[id];
+    if (!saved) {
+      state.upgrades[id] = branch;
+      repaired.push(`upgrades.${id}`);
+    } else {
+      saved.tiers = branch.tiers;
+      saved.name = branch.name;
+      saved.icon = branch.icon;
+    }
+  }
+
   // Karma & Narrative migration
   if (!state.karma || typeof state.karma.community !== 'number' || !Number.isFinite(state.karma.community)) {
     state.karma = { community: 50, craftsmanship: 50, ambition: 50 };

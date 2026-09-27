@@ -1,7 +1,9 @@
 import { UpgradeBranch } from '../types/game';
 
-// Giá theo lãi thêm đo bằng scripts/upgrade-roi.ts (người chơi trung bình có nhân viên):
-// cấp 2 hoàn vốn ~8 ngày, cấp 3 ~12, cấp 4–6 ~15–20 ngày; cấp sau luôn đắt hơn cấp trước.
+// Hệ thống 7 nhánh nâng cấp mở rộng (Bếp, Không gian, Vận hành, Marketing, Kho lạnh, Dịch vụ, Vệ sinh)
+// Đảm bảo người chơi có tiến trình lâu dài tới Chương 5 (hơn 50 mốc nâng cấp, giá từ 500k đến 150 triệu).
+// Mọi nâng cấp đều có tác dụng thực tế lên tốc độ, bảo quản, miễn dịch chuột, hoa hồng, tiền tip và giá bán.
+
 export const INITIAL_UPGRADES: { [id: string]: UpgradeBranch } = {
   kitchen: {
     id: 'kitchen',
@@ -20,7 +22,7 @@ export const INITIAL_UPGRADES: { [id: string]: UpgradeBranch } = {
         level: 2,
         name: 'Nồi Chiên Đôi 2 Giỏ',
         cost: 1000000,
-        description: 'Giỏ lớn, lửa đều: gà lên vàng nhanh hơn 35% (vùng Perfect vẫn dài như cũ).',
+        description: 'Giỏ lớn, lửa đều: gà lên vàng nhanh hơn 35% (vùng Perfect vẫn giữ nguyên độ dài).',
         bonus: { speed: 35 }
       },
       {
@@ -41,7 +43,7 @@ export const INITIAL_UPGRADES: { [id: string]: UpgradeBranch } = {
         level: 5,
         name: 'Hệ Thống Lọc Dầu Tuần Hoàn',
         cost: 4500000,
-        description: 'Dầu luôn vàng trong: dầu bền hơn 45%, lâu phải thay.',
+        description: 'Dầu luôn vàng trong: dầu bền hơn 45%, lâu phải thay dầu mới.',
         bonus: { hygiene: 45 }
       },
       {
@@ -50,6 +52,34 @@ export const INITIAL_UPGRADES: { [id: string]: UpgradeBranch } = {
         cost: 8000000,
         description: 'Thêm một giỏ chiên robot tự chạy (95% Perfect, không cần người đứng), tự nhấc giỏ của chủ quán đúng lúc Perfect.',
         bonus: { speed: 60, taste: 20 }
+      },
+      {
+        level: 7,
+        name: 'Trạm Chiên 3 Hộc Công Nghiệp',
+        cost: 15000000,
+        description: 'Nâng công suất toàn bếp: gà chín nhanh hơn 75%, hương vị đậm đà thơm ngát.',
+        bonus: { speed: 75, taste: 30 }
+      },
+      {
+        level: 8,
+        name: 'Nồi Chiên Áp Suất Kép Robot AI',
+        cost: 30000000,
+        description: 'Công nghệ chiên chân không áp suất kép: gà giòn tan mọng nước, tốc độ chiên +90%, sao Hương vị +45%.',
+        bonus: { speed: 90, taste: 45 }
+      },
+      {
+        level: 9,
+        name: 'Hệ Thống Bếp Master Chef',
+        cost: 60000000,
+        description: 'Đỉnh cao kỹ nghệ chiên giòn: gà chín siêu tốc +100%, sao Hương vị vĩnh viễn vững chắc.',
+        bonus: { speed: 100, taste: 60 }
+      },
+      {
+        level: 10,
+        name: 'Lò Luyện Kim Bí Truyền Hẻm 1102',
+        cost: 120000000,
+        description: 'Bảo vật gia truyền Bác Ba: gà giòn rực rỡ, khách trả thêm 10%, tốc độ +120%, hương vị +80%.',
+        bonus: { speed: 120, taste: 80, space: 30 }
       }
     ]
   },
@@ -94,6 +124,34 @@ export const INITIAL_UPGRADES: { [id: string]: UpgradeBranch } = {
         cost: 7000000,
         description: 'Đèn neon, nhạc lofi, quầy lớn: khách trả thêm 20%, quầy rộng thêm 3 ô khay, thêm 40% khách.',
         bonus: { space: 60, capacity: 12, customers: 40 }
+      },
+      {
+        level: 6,
+        name: 'Phòng Lạnh Kính Cường Lực View Hẻm',
+        cost: 16000000,
+        description: 'Không gian máy lạnh kính tràn viền: khách trả thêm 25%, tăng thêm 60% lượng khách.',
+        bonus: { space: 75, capacity: 12, customers: 60 }
+      },
+      {
+        level: 7,
+        name: 'Bistro 2 Tầng Phong Cách Hàn Quốc',
+        cost: 35000000,
+        description: 'Nhà hàng K-Bistro 2 tầng ấm cúng: khách trả thêm 30%, tăng 85% khách ghé tiệm.',
+        bonus: { space: 90, capacity: 12, customers: 85 }
+      },
+      {
+        level: 8,
+        name: 'Mặt Tiền Phố Đi Bộ Sầm Uất',
+        cost: 75000000,
+        description: 'Tọa độ kim cương giữa lòng thành phố: khách trả thêm 35%, lượng khách tăng gấp đôi (+120%).',
+        bonus: { space: 105, capacity: 12, customers: 120 }
+      },
+      {
+        level: 9,
+        name: 'Tòa Nhà Gà Rán 5 Tầng Landmark',
+        cost: 150000000,
+        description: 'Đại bản doanh chuỗi tiệm gà số 1 Việt Nam: khách trả thêm 40%, khách đổ về tấp nập (+160%).',
+        bonus: { space: 120, capacity: 12, customers: 160 }
       }
     ]
   },
@@ -138,6 +196,34 @@ export const INITIAL_UPGRADES: { [id: string]: UpgradeBranch } = {
         cost: 4500000,
         description: 'App riêng của tiệm: không còn mất 8% hoa hồng cho app giao hàng ngoài, thêm 70% khách mỗi ngày.',
         bonus: { customers: 70 }
+      },
+      {
+        level: 6,
+        name: 'Màn Hình Quản Lý Bếp KDS',
+        cost: 10000000,
+        description: 'Hệ thống KDS đồng bộ quầy bán & bếp: khách kiên nhẫn tăng thêm 50%, thêm 80% khách.',
+        bonus: { speed: 50, customers: 80 }
+      },
+      {
+        level: 7,
+        name: 'Robot Thu Dọn Bàn Tự Động',
+        cost: 24000000,
+        description: 'Robot bưng khay và dọn bàn: phục vụ siêu tốc, khách kiên nhẫn +65%, vệ sinh tăng +30%.',
+        bonus: { speed: 65, hygiene: 30 }
+      },
+      {
+        level: 8,
+        name: 'Hệ Thống ERP Chuỗi Cung Ứng AI',
+        cost: 55000000,
+        description: 'AI tối ưu vận hành: giảm 10% chi phí nguyên liệu sỉ, tăng kiên nhẫn khách +80%.',
+        bonus: { speed: 80, discount: 10 }
+      },
+      {
+        level: 9,
+        name: 'Mạng Lưới Drone Giao Hàng Siêu Tốc',
+        cost: 110000000,
+        description: 'Giao hàng hỏa tốc trong 5 phút: thêm 150% khách giao hàng, khách kiên nhẫn +100%.',
+        bonus: { speed: 100, customers: 150 }
       }
     ]
   },
@@ -182,6 +268,187 @@ export const INITIAL_UPGRADES: { [id: string]: UpgradeBranch } = {
         cost: 3200000,
         description: 'Reviewer khen nức nở: thêm 85% khách, khách trả thêm 8% cho quán nổi tiếng.',
         bonus: { customers: 85, space: 24 }
+      },
+      {
+        level: 6,
+        name: 'Billboard Đèn LED Ngã Tư Hàng Xanh',
+        cost: 8500000,
+        description: 'Biển quảng cáo khổng lồ cửa ngõ thành phố: thêm 110% khách, khách trả thêm 10%.',
+        bonus: { customers: 110, space: 30 }
+      },
+      {
+        level: 7,
+        name: 'Tài Trợ Gameshow Ẩm Thực Giờ Vàng',
+        cost: 20000000,
+        description: 'Phủ sóng truyền hình quốc gia: thương hiệu quốc dân, thêm 140% khách mỗi ngày.',
+        bonus: { customers: 140, space: 40 }
+      },
+      {
+        level: 8,
+        name: 'Đại Sứ Thương Hiệu Idol Hạng A',
+        cost: 50000000,
+        description: 'Idol K-pop/V-pop làm đại diện: fan hâm mộ xếp hàng mua gà, thêm 180% khách.',
+        bonus: { customers: 180, space: 50 }
+      },
+      {
+        level: 9,
+        name: 'Chiến Dịch Toàn Cầu Gà Rán Nam Bộ Viral',
+        cost: 100000000,
+        description: 'Gà rán Sài Gòn bước ra thế giới: khách quốc tế săn đón, thêm 230% khách tấp nập.',
+        bonus: { customers: 230, space: 60 }
+      }
+    ]
+  },
+
+  storage: {
+    id: 'storage',
+    name: 'Kho & Bảo Quản Lạnh',
+    icon: '❄️',
+    currentLevel: 1,
+    tiers: [
+      {
+        level: 1,
+        name: 'Tủ Mát Mini Đầu Hẻm',
+        cost: 0,
+        description: 'Để tạm vài khay thịt gà và lon nước ngọt trong ngày.',
+        bonus: {}
+      },
+      {
+        level: 2,
+        name: 'Thùng Giữ Lạnh Foam Dày',
+        cost: 800000,
+        description: 'Giữ thịt gà tươi thêm 1 ngày hạn dùng, giảm hao hụt nguyên liệu tồn kho.',
+        bonus: { shelfLife: 1 }
+      },
+      {
+        level: 3,
+        name: 'Tủ Đông Sanaky 2 Cánh 400L',
+        cost: 2200000,
+        description: 'Bảo quản nguyên liệu lâu hơn 2 ngày, giảm 5% giá mua nguyên liệu sỉ.',
+        bonus: { shelfLife: 2, discount: 5 }
+      },
+      {
+        level: 4,
+        name: 'Phòng Lạnh Hút Chân Không Bếp',
+        cost: 5500000,
+        description: 'Nguyên liệu không hỏng trước 4 ngày (+3 ngày hạn dùng), giảm 10% giá mua sỉ.',
+        bonus: { shelfLife: 3, discount: 10 }
+      },
+      {
+        level: 5,
+        name: 'Kho Đông Lạnh Cấp Tốc -18°C',
+        cost: 12000000,
+        description: 'Khóa trọn độ tươi sống (+4 ngày hạn), giảm 15% giá nhập sỉ toàn bộ kho.',
+        bonus: { shelfLife: 4, discount: 15 }
+      },
+      {
+        level: 6,
+        name: 'Dây Chuyền Bảo Quản Khí Nitơ Lỏng',
+        cost: 25000000,
+        description: 'Bảo quản hoàn hảo (+5 ngày hạn), giảm 20% giá sỉ, thịt ngọt thơm tăng sao Hương vị.',
+        bonus: { shelfLife: 5, discount: 20, taste: 15 }
+      }
+    ]
+  },
+
+  service: {
+    id: 'service',
+    name: 'Dịch Vụ & Trạm Pha Chế',
+    icon: '🥤',
+    currentLevel: 1,
+    tiers: [
+      {
+        level: 1,
+        name: 'Bình Nước Nhựa & Khăn Giấy',
+        cost: 0,
+        description: 'Phục vụ nước uống và khăn ăn đơn sơ tại quầy.',
+        bonus: {}
+      },
+      {
+        level: 2,
+        name: 'Bình Giữ Nhiệt Trà Đá Tự Phục Vụ',
+        cost: 750000,
+        description: 'Khách tự rót trà đá trong lúc đợi: khách vui vẻ chờ lâu hơn 15%.',
+        bonus: { speed: 15 }
+      },
+      {
+        level: 3,
+        name: 'Máy Rót Nước Tự Động 2 Vòi',
+        cost: 2500000,
+        description: 'Rót nước ngọt trong chớp mắt: tự động hoàn thành món nước ngọt khi khách order!',
+        bonus: { autoDrink: true, speed: 25 }
+      },
+      {
+        level: 4,
+        name: 'Quầy Sốt Đầy Đủ Tự Phục Vụ',
+        cost: 4800000,
+        description: 'Tương cà, tương ớt, mayonnaise: khách dặn tương được thưởng tip gấp đôi (+4.000đ/món).',
+        bonus: { sauceTip: 4000 }
+      },
+      {
+        level: 5,
+        name: 'Thẻ Rung Báo Lấy Món Điện Tử',
+        cost: 9500000,
+        description: 'Khách ngồi yên tâm chờ thẻ rung: khách kiên nhẫn +35%, quầy rộng thêm 1 ô khay.',
+        bonus: { speed: 35, capacity: 2 }
+      },
+      {
+        level: 6,
+        name: 'Quầy Pha Chế Barista K-Chicken',
+        cost: 22000000,
+        description: 'Tự động phục vụ nước ngọt và tráng miệng, tip tương tăng +8.000đ, phục vụ siêu mượt.',
+        bonus: { autoDrink: true, sauceTip: 8000, speed: 45 }
+      }
+    ]
+  },
+
+  hygiene: {
+    id: 'hygiene',
+    name: 'Vệ Sinh & Phòng Dịch Hại',
+    icon: '✨',
+    currentLevel: 1,
+    tiers: [
+      {
+        level: 1,
+        name: 'Chổi Tre & Xô Nước Đầu Hẻm',
+        cost: 0,
+        description: 'Quét dọn vỉa hè và gom rác thủ công cuối mỗi ca.',
+        bonus: {}
+      },
+      {
+        level: 2,
+        name: 'Thùng Rác Đạp Chân Có Nắp Kín',
+        cost: 500000,
+        description: 'Dọn sạch dầu thừa và rác bếp: sao Vệ sinh +15%, giảm 20% nguy cơ chuột bọ.',
+        bonus: { hygiene: 15, pestShield: 20 }
+      },
+      {
+        level: 3,
+        name: 'Cửa Lưới Chắn Côn Trùng Inox',
+        cost: 1800000,
+        description: 'Ngăn ruồi muỗi và chuột bọ: sao Vệ sinh +30%, giảm 50% nguy cơ chuột kho.',
+        bonus: { hygiene: 30, pestShield: 50 }
+      },
+      {
+        level: 4,
+        name: 'Bẫy Chuột Sóng Siêu Âm Thông Minh',
+        cost: 4200000,
+        description: 'Sóng âm xua đuổi 100% loài gặm nhấm: Miễn nhiễm hoàn toàn sự cố Chuột Cống đột nhập!',
+        bonus: { pestImmunity: true, hygiene: 40 }
+      },
+      {
+        level: 5,
+        name: 'Hệ Thống Hút Khói & Khử Khuẩn UV',
+        cost: 10000000,
+        description: 'Gian bếp vô trùng chuẩn nhà hàng: dầu chiên lâu đen gấp đôi (+60%), miễn dịch chuột 100%.',
+        bonus: { hygiene: 60, pestImmunity: true }
+      },
+      {
+        level: 6,
+        name: 'Chứng Nhận ATTP 5 Sao Quốc Tế',
+        cost: 28000000,
+        description: 'Đạt chuẩn vàng vệ sinh: đoàn thanh tra khen ngợi, khách tin tưởng trả thêm 10% giá trị món.',
+        bonus: { hygiene: 80, space: 30, pestImmunity: true }
       }
     ]
   }

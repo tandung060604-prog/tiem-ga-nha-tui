@@ -5,7 +5,8 @@
 // Cách tách nền: loang từ mép ảnh vào, chỉ xóa vùng trắng THÔNG RA MÉP; dừng ở nét viền nâu.
 // Nhờ vậy phần trắng bên trong nhân vật (thân thỏ, mũ đầu bếp, khăn vai) được giữ.
 import sharp from 'sharp';
-import { mkdirSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, statSync, writeFileSync, existsSync } from 'node:fs';
+import { execSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 
 const SRC = 'assets-src';
@@ -32,14 +33,6 @@ const MANIFEST = [
   { src: 'mascot/mascot_gabong_on_ap.png', mode: 'single', size: [512, 512], out: ['mascot/mascot_gabong_on_ap.png'] },
   { src: 'mascot/mascot_gabong_hoang.png', mode: 'single', size: [512, 512], out: ['mascot/mascot_gabong_hoang.png'] },
   { src: 'mascot/mascot_gabong_ngai.png', mode: 'single', size: [512, 512], out: ['mascot/mascot_gabong_ngai.png'] },
-  { src: 'characters/char_bacba_sheet.jpg', mode: 'split', size: [512, 1024],
-    out: ['characters/char_bacba_front.png', 'characters/char_bacba_three_quarter.png'] },
-  { src: 'characters/char_thocam_sheet.jpg', mode: 'split', size: [512, 512],
-    out: [
-      'characters/char_thocam_notes.png', 'characters/char_thocam_front.png', 'characters/char_thocam_side.png',
-      'characters/char_thocam_vui.png', 'characters/char_thocam_buon.png', 'characters/char_thocam_ngac_nhien.png',
-      'characters/char_thocam_suy_nghi.png', 'characters/char_thocam_ngu.png'
-    ] },
   { src: 'kitchen/kitchen_pan_empty.png', mode: 'single', size: [512, 512], out: ['kitchen/kitchen_pan_empty.png'] },
   { src: 'kitchen/kitchen_oil_clean.png', mode: 'single', size: [512, 512], out: ['kitchen/kitchen_oil_clean.png'] },
   { src: 'kitchen/kitchen_oil_medium.png', mode: 'single', size: [512, 512], out: ['kitchen/kitchen_oil_medium.png'] },
@@ -212,6 +205,18 @@ for (const item of MANIFEST) {
   for (let k = 0; k < figures.length; k++) {
     const bytes = await exportFigure(img, label, figures[k], item.size, item.out[k]);
     console.log(`✓ ${item.src} → ${OUT}/${item.out[k]} (${item.size.join('×')}, ${(bytes / 1024).toFixed(0)}KB)`);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 36 Nhân vật Hẻm 1102: sinh tự động từ characters_36_sheet.jpg
+// ---------------------------------------------------------------------------
+if (existsSync('docs/gemini/characters_36_sheet.jpg') && existsSync('scripts/extract-36-characters.mjs')) {
+  try {
+    execSync('node scripts/extract-36-characters.mjs', { stdio: 'inherit' });
+  } catch (e) {
+    console.error('Lỗi khi extract 36 nhân vật:', e);
+    failed = true;
   }
 }
 
