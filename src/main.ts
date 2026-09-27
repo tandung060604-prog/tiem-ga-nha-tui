@@ -52,7 +52,7 @@ import { ShareCardEngine } from './ui/components/ShareCard';
 import { ASSETS } from './content/assets';
 import { pickDailyIncident, resolveIncidentChoice } from './core/dailyIncidentsEngine';
 import { DAILY_INCIDENTS } from './content/dailyIncidents';
-import { renderIncidentPrompt, renderIncidentReaction, renderIncidentAlbumModal } from './ui/components/DailyIncidentModal';
+import { renderIncidentPrompt, renderIncidentConfirmPrompt, renderIncidentReaction, renderIncidentAlbumModal } from './ui/components/DailyIncidentModal';
 import type { DailyIncident } from './types/game';
 
 type TabId = 'inventory' | 'upgrades' | 'staff' | 'reviews' | 'menu';
@@ -406,38 +406,60 @@ class AppController {
         const choice = incident.choices.find(c => c.id === choiceId);
         if (!choice) return;
 
-        let result: ReturnType<typeof resolveIncidentChoice> | undefined;
-        stateManager.update(draft => {
-          result = resolveIncidentChoice(draft, incident, choice);
-        });
+        // Bác Ba hỏi lại: "Chắc chưa con? Nghĩ kỹ nghen!"
+        audio.playPop();
+        Haptics.tap();
+        const confirmHtml = renderIncidentConfirmPrompt(incident, choice);
+        this.openModal(confirmHtml);
 
-        if (!result) return;
+        const confirmYesBtn = document.getElementById('btn-incident-confirm-yes');
+        const confirmNoBtn = document.getElementById('btn-incident-confirm-no');
 
-        if (result.succeeded) {
-          audio.playCash();
-        } else {
-          audio.playPop();
+        if (confirmNoBtn) {
+          confirmNoBtn.onclick = () => {
+            audio.playPop();
+            Haptics.tap();
+            // Quay lại danh sách lựa chọn sự kiện
+            this.openDailyIncidentDialog(incident, onDone);
+          };
         }
 
-        const reactionHtml = renderIncidentReaction(
-          result.reactionTitle,
-          result.reactionNarrative,
-          result.succeeded,
-          result.moneyDelta
-        );
-        this.openModal(reactionHtml);
+        if (confirmYesBtn) {
+          confirmYesBtn.onclick = () => {
+            let result: ReturnType<typeof resolveIncidentChoice> | undefined;
+            stateManager.update(draft => {
+              result = resolveIncidentChoice(draft, incident, choice);
+            });
 
-        const continueBtn = document.getElementById('btn-incident-continue');
-        if (continueBtn) {
-          continueBtn.onclick = () => {
-            audio.playPop();
-            this.closeModal();
-            if (wasSelling && this.sellingSession) {
-              this.sellingSession.isPaused = false;
-              this.lastTimestamp = performance.now();
+            if (!result) return;
+
+            if (result.succeeded) {
+              audio.playCash();
+            } else {
+              audio.playPop();
             }
-            this.render();
-            if (onDone) onDone();
+
+            const reactionHtml = renderIncidentReaction(
+              result.reactionTitle,
+              result.reactionNarrative,
+              result.succeeded,
+              result.moneyDelta
+            );
+            this.openModal(reactionHtml);
+
+            const continueBtn = document.getElementById('btn-incident-continue');
+            if (continueBtn) {
+              continueBtn.onclick = () => {
+                audio.playPop();
+                this.closeModal();
+                if (wasSelling && this.sellingSession) {
+                  this.sellingSession.isPaused = false;
+                  this.lastTimestamp = performance.now();
+                }
+                this.render();
+                if (onDone) onDone();
+              };
+            }
           };
         }
       };
@@ -984,10 +1006,21 @@ class AppController {
     let dayOver = false;
     for (const event of events) {
       switch (event.type) {
-        case 'customerLeft':
+        case 'customerLeft': {
           audio.playBurnt();
           this.showToast('Khách chờ lâu quá quạu bỏ về rồi nè! Tụt sao tốc độ luôn! ⚠️');
+          const menu = stateManager.getState().menu;
+          const review = ReviewsEngine.generateCustomerReview(stateManager.getState().day, event.order, {
+            kind: 'lost',
+            patienceRatio: 0,
+            menuLookup: id => menu.find(m => m.id === id)?.name || id
+          });
+          stateManager.update(draft => {
+            draft.recentReviews.unshift(review);
+            if (draft.recentReviews.length > 200) draft.recentReviews.pop();
+          });
           break;
+        }
         case 'customerArrived':
           break;
         case 'dayOver':
@@ -1427,8 +1460,15 @@ class AppController {
           .map(id => menu.find(m => m.id === id)?.name || id)
           .join(', ');
         this.showToast(`⚠️ GIAO THIẾU MÓN! Khách nhận phần có sẵn (+${result.paid.toLocaleString('vi-VN')}đ) và bực bội bỏ đi vì thiếu ${missingNames}! 📦`);
+        const review = ReviewsEngine.generateCustomerReview(stateManager.getState().day, result.order, {
+          kind: 'incomplete',
+          patienceRatio: result.order.patienceCurrent / Math.max(1, result.order.patienceMax),
+          menuLookup: id => menu.find(m => m.id === id)?.name || id
+        });
         stateManager.update(draft => {
           creditSale(draft, result.paid, 0);
+          draft.recentReviews.unshift(review);
+          if (draft.recentReviews.length > 200) draft.recentReviews.pop();
         });
         this.render();
         return;
@@ -1437,6 +1477,15 @@ class AppController {
         audio.playBurnt();
         Haptics.warning();
         this.showToast(`❌ GIAO SAI MÓN! Đơn cần ${result.requestedName} nhưng khay đưa ${result.wrongItemName}, khách bực tức bỏ về! 😡`);
+        const review = ReviewsEngine.generateCustomerReview(stateManager.getState().day, result.order, {
+          kind: 'wrong',
+          patienceRatio: result.order.patienceCurrent / Math.max(1, result.order.patienceMax),
+          menuLookup: id => menu.find(m => m.id === id)?.name || id
+        });
+        stateManager.update(draft => {
+          draft.recentReviews.unshift(review);
+          if (draft.recentReviews.length > 200) draft.recentReviews.pop();
+        });
         this.render();
         return;
       }
@@ -1450,9 +1499,25 @@ class AppController {
 
     const { order, paid, tip, feedbackNotes } = result;
     let letter: BunnyLetter | undefined;
+    const curState = stateManager.getState();
+    const patienceRatio = order.patienceCurrent / Math.max(1, order.patienceMax);
+    const hasBurnt = (order.burntPenalty ?? 0) > 0;
+    const hasDirtyOil = curState.oilCondition === 'dirty';
+    const isPerfect = (order.perfectBonus ?? 0) > 0;
+    const review = ReviewsEngine.generateCustomerReview(curState.day, order, {
+      kind: 'complete',
+      patienceRatio,
+      hasBurnt,
+      hasDirtyOil,
+      isPerfect,
+      menuLookup: id => menu.find(m => m.id === id)?.name || id
+    });
+
     stateManager.update(draft => {
       creditSale(draft, paid, tip);
       if (order.isBunny) letter = applyBunnyReward(draft, order);
+      draft.recentReviews.unshift(review);
+      if (draft.recentReviews.length > 200) draft.recentReviews.pop();
     });
 
     if (letter) {
@@ -1482,17 +1547,30 @@ class AppController {
       orderId,
       id => menu.find(m => m.id === id)?.currentPrice ?? 0
     );
-    if (!result.success) return;
+    if (!result.success || !result.order) return;
 
     audio.playPop();
     Haptics.tap();
+    const curState = stateManager.getState();
+    const review = ReviewsEngine.generateCustomerReview(curState.day, result.order, {
+      kind: 'apologized',
+      patienceRatio: result.order.patienceCurrent / Math.max(1, result.order.patienceMax),
+      menuLookup: id => menu.find(m => m.id === id)?.name || id
+    });
+
     if (result.paid > 0) {
       audio.playCash();
       stateManager.update(draft => {
         creditSale(draft, result.paid, 0);
+        draft.recentReviews.unshift(review);
+        if (draft.recentReviews.length > 200) draft.recentReviews.pop();
       });
       this.showToast(`🙏 Quán xin lỗi do hết món. Khách thanh toán ${result.paid.toLocaleString('vi-VN')}đ phần đã nhận: "${result.apologyReply}"`);
     } else {
+      stateManager.update(draft => {
+        draft.recentReviews.unshift(review);
+        if (draft.recentReviews.length > 200) draft.recentReviews.pop();
+      });
       this.showToast(`🙏 Quán xin lỗi do hết món. Khách thông cảm: "${result.apologyReply}"`);
     }
     this.render();

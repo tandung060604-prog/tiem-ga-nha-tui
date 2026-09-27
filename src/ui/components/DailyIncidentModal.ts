@@ -7,15 +7,13 @@ export function renderIncidentPrompt(
 ): string {
   const hasSec = hasSecurityStaff(state);
 
-  const choicesHtml = incident.choices.map((choice: IncidentChoice, idx: number) => {
+  const choicesHtml = incident.choices.map((choice: IncidentChoice) => {
     const isSecOnly = choice.requiresSecurity === true;
     const canChoose = !isSecOnly || hasSec;
 
-    // Xác định theme màu nút theo phong cách Mì Cay Bà Tám:
-    // Nút 0: Đỏ cam rực rỡ (Coral Red)
-    // Nút 1: Kem be sữa ấm áp (Warm Cream)
-    // Nút Bảo Vệ: Xanh an ninh (Security Green)
-    let btnThemeClass = idx === 0 ? 'btn-warm-choice' : 'btn-cream-choice';
+    // Nút sự kiện: Các lựa chọn bình thường có màu sắc đồng đều, trung lập (btn-neutral-choice),
+    // không có nút nào nổi bật gây hiểu nhầm là bắt buộc phải chọn.
+    let btnThemeClass = 'btn-neutral-choice';
     if (isSecOnly) {
       btnThemeClass = canChoose ? 'btn-security-choice' : 'btn-locked-choice';
     }
@@ -95,6 +93,62 @@ export function renderIncidentPrompt(
       <!-- 5. Danh sách các nút lựa chọn 2 tầng chữ phong cách Mì Cay Bà Tám -->
       <div class="incident-choices-list">
         ${choicesHtml}
+      </div>
+    </div>
+  `;
+}
+
+export function renderIncidentConfirmPrompt(
+  _incident: DailyIncident,
+  choice: IncidentChoice
+): string {
+  const subText = choice.subDesc || choice.kicker || '';
+
+  return `
+    <div class="incident-dialog incident-confirm-box">
+      <!-- Avatar tròn Bác Ba ân cần nhắc nhở -->
+      <div class="incident-avatar-wrap">
+        <div class="incident-chibi-circle" style="background: #fef3c7; border: 3px solid #f59e0b;">
+          <div class="chibi-avatar-emoji" style="font-size: 2.2rem;">👨‍🦳</div>
+        </div>
+        <div class="incident-heart-badge" title="Bác Ba hỏi lại">❓</div>
+      </div>
+
+      <!-- Tag Pill Bác Ba -->
+      <div class="incident-pill-badge" style="background: #f59e0b; color: #fff;">BÁC BA HỎI LẠI</div>
+
+      <h2 class="incident-main-title" style="margin-top: 6px;">Chắc chưa con? Nghĩ kỹ nghen!</h2>
+
+      <div class="incident-char-subtitle">
+        <span class="char-role-dot" style="color: #f59e0b;">●</span> <b>Bác Ba</b> · Cố Vấn Tiệm Gà
+      </div>
+
+      <!-- Lời Bác Ba miền Tây ân cần -->
+      <div class="incident-story-box" style="text-align: center; margin: 10px 0;">
+        <p class="incident-story-desc" style="font-size: 0.94rem; color: #431407; line-height: 1.45;">
+          Ủa con, tính chọn phương án này thiệt hả bây? Mọi chuyện trong Hẻm 1102 đồn lẹ lắm đó nghen, liệu đường tính toán chưa con?
+        </p>
+
+        <!-- Thẻ tóm tắt lựa chọn đang được cân nhắc -->
+        <div class="chosen-preview-card" style="margin: 12px 0 6px; padding: 12px 14px; background: #fffcf8; border: 1.5px dashed #f59e0b; border-radius: 12px; text-align: left; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.08);">
+          <div style="font-size: 0.72rem; color: #b45309; font-weight: 800; text-transform: uppercase;">👉 Phương án con vừa chọn:</div>
+          <div style="font-weight: 800; font-size: 0.98rem; color: #78350f; margin-top: 2px;">${choice.label}</div>
+          ${subText ? `
+            <div style="font-size: 0.8rem; color: #92400e; margin-top: 3px; font-style: italic;">
+              ${subText}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+
+      <!-- 2 Nút Xác nhận / Nghĩ lại -->
+      <div class="incident-confirm-actions" style="display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 6px;">
+        <button id="btn-incident-confirm-yes" class="btn-big-open" style="background: linear-gradient(180deg, #10b981 0%, #059669 100%); color: #fff; font-weight: 800; border: none; padding: 12px 16px; border-radius: 12px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); font-size: 0.95rem; cursor: pointer;">
+          ✅ Dạ chắc rồi Bác Ba, con quyết định vậy nè!
+        </button>
+        <button id="btn-incident-confirm-no" class="btn-sm" style="background: #fff; color: #4b5563; font-weight: 700; border: 1.5px solid #d1d5db; padding: 10px 14px; border-radius: 12px; font-size: 0.88rem; cursor: pointer;">
+          ↩️ Khoan Bác ơi, để con suy nghĩ lại chút nghen!
+        </button>
       </div>
     </div>
   `;

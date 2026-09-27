@@ -183,7 +183,8 @@ export interface CustomerReview {
   orderSummary: string;
   tags?: string[];
   ownerReply?: string;
-  personaGroup?: 'genz' | 'office' | 'resident' | 'reviewer' | 'shipper' | 'foodie';
+  topic?: string;
+  personaGroup?: 'genz' | 'office' | 'resident' | 'reviewer' | 'shipper' | 'foodie' | 'student' | 'elder' | 'creator';
   sentiment?: 'furious' | 'disappointed' | 'neutral' | 'delighted' | 'amused';
   advisorHint?: string; // Bác Ba mách nước phân tích tâm lý khách và gợi ý cách đối đáp
   replyOptions?: ReviewReplyOption[];

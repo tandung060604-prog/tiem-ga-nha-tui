@@ -1,12 +1,15 @@
 import { StarRating, CustomerReview, GameState } from '../types/game';
 import { averagePriceRatio, pricingTarget } from './pricing';
-import { PROCEDURAL_REVIEW_TEMPLATES, PERSONA_AUTHORS, ReviewTemplate, TOPIC_SENTIMENTS, TOPIC_ADVISOR_HINTS, createReviewReplyOptions } from '../content/reviews';
+import { PROCEDURAL_REVIEW_TEMPLATES, PERSONA_AUTHORS, ReviewTemplate, TOPIC_SENTIMENTS, TOPIC_ADVISOR_HINTS, createReviewReplyOptions, generateIndividualCustomerReview } from '../content/reviews';
 import { pick, weightedPick } from './rng';
 import { upgradeEffects } from './upgrades';
 import { REVIEW_HUMOR, REVIEW_BLOCKED } from '../content/reviewLabels.generated';
 import { applyKarmaChange } from '../content/endings';
 
 export class ReviewsEngine {
+  // Sinh review riêng cho từng thực khách dựa trên trải nghiệm thực tế
+  public static generateCustomerReview = generateIndividualCustomerReview;
+
   // Trọng số 5 tiêu chí theo GDD
   public static readonly WEIGHTS = {
     taste: 0.30,

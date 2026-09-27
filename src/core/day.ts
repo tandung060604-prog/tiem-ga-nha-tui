@@ -733,7 +733,7 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   draft.ratings = newRatings;
   draft.dayHistory.push(ledger);
   draft.recentReviews.unshift(generatedReview);
-  if (draft.recentReviews.length > 50) draft.recentReviews.pop();
+  if (draft.recentReviews.length > 200) draft.recentReviews.pop();
   draft.lifetimeStats.totalFried += session.totalFriedCount;
   draft.lifetimeStats.totalBurnt += session.burntCount;
   draft.lifetimeStats.perfectFriedCount += session.perfectCount;

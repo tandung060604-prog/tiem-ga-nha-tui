@@ -2654,6 +2654,31 @@ body.selling-mode .awning::after {
   margin-top: 3px;
 }
 
+/* Nút Lựa Chọn Sự Kiện Đồng Đều (Neutral & Balanced) — Không có nút nào nổi bật áp đặt người chơi */
+.btn-neutral-choice {
+  background: #fdfbf7;
+  border: 1.5px solid #ded3c0;
+  color: #3b2a20;
+  box-shadow: 0 2px 8px rgba(92, 64, 51, 0.06);
+  transition: all 0.16s ease;
+}
+
+.btn-neutral-choice:hover:not(:disabled) {
+  background: #fcf4e8;
+  border-color: #f5a623;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(245, 166, 35, 0.18);
+}
+
+.btn-neutral-choice .choice-tier1 {
+  color: #3b2416;
+  font-weight: 800;
+}
+
+.btn-neutral-choice .choice-tier2 {
+  color: #785a44;
+}
+
 /* Nút 1: Vàng Hổ Phách Ấm Áp (Warm Amber) — trung lập, không gây hiểu nhầm "phải chọn" */
 .btn-warm-choice {
   background: linear-gradient(180deg, #f5a623 0%, #e8941c 100%);

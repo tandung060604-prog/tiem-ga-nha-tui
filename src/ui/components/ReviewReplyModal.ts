@@ -3,9 +3,12 @@ import { escapeHtml } from '../escapeHtml';
 
 const PERSONA_LABELS: Record<string, { label: string; icon: string; color: string }> = {
   student: { label: 'Học Sinh / GenZ', icon: '🎒', color: '#3b82f6' },
+  genz: { label: 'GenZ Bắt Trend', icon: '💅', color: '#ec4899' },
   office: { label: 'Dân Công Sở', icon: '💼', color: '#6366f1' },
-  foodie: { label: 'Food Reviewer / TikTok', icon: '📸', color: '#ec4899' },
+  foodie: { label: 'Food Reviewer / TikTok', icon: '📸', color: '#f43f5e' },
   elder: { label: 'Cô Bác Hàng Xóm', icon: '👵', color: '#f59e0b' },
+  resident: { label: 'Cư Dân Hẻm 1102', icon: '🏘️', color: '#d97706' },
+  shipper: { label: 'Tài Xế Shipper', icon: '🛵', color: '#10b981' },
   creator: { label: 'Nghệ Sĩ Sáng Tạo', icon: '🎬', color: '#8b5cf6' },
 };
 
@@ -139,11 +142,9 @@ export function renderReviewReplyModal(review: CustomerReview): string {
                 </div>
 
                 <div class="opt-footer">
-                  <div class="opt-effects-preview">
-                    ${(opt.starBonus ?? 0) > 0 ? `<span class="eff-pill star-eff">+${(opt.starBonus ?? 0).toFixed(1)}⭐ Cứu Sao</span>` : '<span class="eff-pill">0⭐</span>'}
-                    ${opt.karmaReward?.community ? `<span class="eff-pill karma-eff">💖 Hẻm +${opt.karmaReward.community}</span>` : ''}
-                    ${opt.karmaReward?.craftsmanship ? `<span class="eff-pill karma-eff">🔪 Nghề +${opt.karmaReward.craftsmanship}</span>` : ''}
-                    ${opt.karmaReward?.ambition ? `<span class="eff-pill karma-eff">🏆 Vọng +${opt.karmaReward.ambition}</span>` : ''}
+                  <!-- Đã ẩn điểm số cộng thưởng theo yêu cầu người chơi, chỉ giữ phong cách hồi đáp -->
+                  <div class="opt-tone-pill" style="font-size: 0.72rem; font-weight: 700; color: var(--soft); display: flex; align-items: center; gap: 4px;">
+                    <span>${strat.icon}</span> ${strat.label}
                   </div>
                   <button 
                     class="btn-sm btn-choose-reply ${isRec ? 'primary' : ''}" 
