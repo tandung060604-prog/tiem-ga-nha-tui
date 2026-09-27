@@ -681,6 +681,235 @@
 }
 
 /* ==========================================================================
+   Quầy Khay Inox Âm Bàn GN (Gastronorm Prep Station)
+   ========================================================================== */
+
+.prep-station {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: linear-gradient(180deg, #e4e7eb 0%, #d8dce2 100%);
+  border: 1.5px solid #b8bec5;
+  border-radius: 10px;
+  padding: 5px 6px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.06);
+  margin-top: 2px;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+/* Hàng khay: top (4 khay GN 1/6 nông) & bottom (5 khay GN 1/3 sâu) */
+.prep-row {
+  display: flex !important;
+  flex-wrap: nowrap;
+  gap: 5px !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  margin-bottom: 2px !important;
+  padding: 2px 1px 4px 1px;
+  scrollbar-width: thin;
+  scrollbar-color: #adb5bd transparent;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.prep-row::-webkit-scrollbar {
+  height: 3px;
+}
+
+.prep-row::-webkit-scrollbar-thumb {
+  background: #adb5bd;
+  border-radius: 3px;
+}
+
+.prep-row.bottom {
+  margin-bottom: 0 !important;
+}
+
+/* Khay Inox GN (Gastronorm Pan) */
+.gn-pan {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 48px !important;
+  min-width: 46px !important;
+  min-height: 52px !important;
+  padding: 3px 2px !important;
+  border-radius: 7px;
+  border: 1.5px solid #a8b0b8;
+  background: linear-gradient(145deg, #ffffff 0%, #edf0f2 60%, #e2e6ea 100%);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9), inset 0 -2px 3px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  transition: transform 0.12s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  overflow: hidden !important;
+  line-height: 1.1 !important;
+  font-size: 0.62rem !important;
+}
+
+/* Khay sâu GN 1/3 (hàng dưới - đồ sống chiên) */
+.gn-pan[data-pan="1-3"] {
+  min-height: 54px !important;
+  border-color: #9aa2aa;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.14), inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Khay nông GN 1/6 (hàng trên - sốt & đồ kèm) */
+.gn-pan[data-pan="1-6"] {
+  min-height: 50px !important;
+}
+
+.gn-pan:active:not(:disabled) {
+  transform: translateY(1.5px) scale(0.97);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Khay đang bận khi chảo đang chiên (hàng dưới) */
+.gn-pan:disabled {
+  opacity: 0.6;
+  filter: grayscale(30%);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Trạng thái data-state="empty": Hết hàng (đáy trơn + viền đỏ) */
+.gn-pan[data-state="empty"] {
+  border-color: #e63946 !important;
+  background: repeating-linear-gradient(45deg, #f8f9fa, #f8f9fa 6px, #fff1f2 6px, #fff1f2 12px) !important;
+  box-shadow: inset 0 2px 4px rgba(230, 57, 70, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.gn-pan[data-state="empty"] .gn-pan-badge {
+  background: #e63946 !important;
+  color: #ffffff;
+}
+
+/* Trạng thái data-state="locked": Nắp inox mờ (frosted metal) + ổ khóa */
+.gn-pan[data-state="locked"] {
+  background: linear-gradient(135deg, #d5dbe0 0%, #b8c2c8 50%, #9faab2 100%) !important;
+  border: 1.5px dashed #788896 !important;
+  opacity: 0.9 !important;
+  cursor: pointer;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.gn-pan[data-state="locked"] .gn-pan-lock {
+  font-size: 1.1rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+  margin-bottom: 1px;
+}
+
+.gn-pan[data-state="locked"] .gn-pan-lock-label {
+  font-size: 0.52rem !important;
+  font-weight: 800 !important;
+  color: #2b3a42;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+  white-space: nowrap;
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+/* Trạng thái data-active="true": Khay đang chiên hoặc thau sốt đang chọn */
+.gn-pan[data-active="true"] {
+  border: 2px solid #e76f51 !important;
+  background: #fff8f5 !important;
+  box-shadow: 0 0 0 2px rgba(231, 111, 81, 0.35), 0 3px 6px rgba(231, 111, 81, 0.2) !important;
+  animation: shelfPulse 1.2s infinite alternate;
+}
+
+/* Phần tử bên trong khay */
+.gn-pan-img {
+  width: 28px !important;
+  height: 28px !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.15));
+  margin-bottom: 1px;
+  flex-shrink: 0;
+}
+
+.gn-pan-emoji {
+  font-size: 1.25rem;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18));
+  margin-bottom: 1px;
+}
+
+.gn-pan-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: #2b5368;
+  color: #ffffff;
+  font-size: 0.52rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: 1.5px 3.5px;
+  border-radius: 5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+.gn-pan-label {
+  font-size: 0.54rem;
+  font-weight: 800;
+  color: #333d45;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  text-align: center;
+  line-height: 1.1;
+  margin-top: 1px;
+}
+
+/* Bóng hướng dẫn khi bấm vào khay khóa (Prep Popover) */
+.prep-popover {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e293b;
+  color: #f8fafc;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  z-index: 60;
+  pointer-events: none;
+  animation: prepPopoverFade 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid #475569;
+}
+
+.prep-popover::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #1e293b transparent transparent transparent;
+}
+
+@keyframes prepPopoverFade {
+  from { opacity: 0; transform: translate(-50%, 4px) scale(0.96); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+/* ==========================================================================
    Food Shelf / Topping Rack (Kệ Topping & Nguyên Liệu theo mẫu Mì Cay Bà Tám)
    ========================================================================== */
 
@@ -1642,6 +1871,62 @@
     font-size: 0.44rem;
     padding: 0 2px;
     bottom: -1px;
+  }
+
+  /* Quầy khay inox GN trên màn 320px */
+  .prep-station {
+    padding: 4px 3px;
+    gap: 3px;
+  }
+
+  .prep-row {
+    gap: 4px !important;
+    padding: 1px 0 3px 0;
+  }
+
+  .gn-pan {
+    flex: 0 0 45px !important;
+    min-width: 44px !important;
+    min-height: 48px !important;
+    padding: 2px 1px !important;
+  }
+
+  .gn-pan[data-pan="1-3"] {
+    min-height: 50px !important;
+  }
+
+  .gn-pan[data-pan="1-6"] {
+    min-height: 46px !important;
+  }
+
+  .gn-pan-img {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  .gn-pan-emoji {
+    font-size: 1.1rem;
+  }
+
+  .gn-pan-label {
+    font-size: 0.5rem;
+    max-width: 42px;
+  }
+
+  .gn-pan-lock {
+    font-size: 0.95rem;
+  }
+
+  .gn-pan-lock-label {
+    font-size: 0.46rem !important;
+    max-width: 40px;
+  }
+
+  .gn-pan-badge {
+    font-size: 0.48rem;
+    padding: 1px 2.5px;
+    top: 1px;
+    right: 1px;
   }
 }
 
