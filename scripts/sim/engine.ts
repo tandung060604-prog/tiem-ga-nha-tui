@@ -4,10 +4,10 @@
 // Trả lời: người chơi giỏi / trung bình / vụng qua Chương 1 (850k → 5 triệu, ≥3,5 sao) vào ngày mấy?
 import { createInitialState } from '../../src/core/state';
 import { CookingEngine } from '../../src/core/cooking';
-import { TIMER_RECIPES, TimerStationId, timerPhase, isDrinkId, isAssemblyId, ASSEMBLY_RECIPES } from '../../src/core/stations';
+import { TIMER_RECIPES, TimerStationId, timerPhase, isDrinkId, isAssemblyId, isScoopId, ASSEMBLY_RECIPES } from '../../src/core/stations';
 import { createSellingSession, gameDeltaMs, tickSelling, SellingSession } from '../../src/core/sellingSim';
 import {
-  SAUCE_STOCK, recordHelperFry, startTimerStation, pullTimerStation, makeDrink, assembleAtCounter, creditSale, eventForDay, createCustomerSource, serveFirstOrder, applyBunnyReward, closeDay, useIngredients, recordFryerLift
+  SAUCE_STOCK, recordHelperFry, scoopSide, changeOil, startTimerStation, pullTimerStation, makeDrink, assembleAtCounter, creditSale, eventForDay, createCustomerSource, serveFirstOrder, applyBunnyReward, closeDay, useIngredients, recordFryerLift
 } from '../../src/core/day';
 import { EconomyEngine } from '../../src/core/economy';
 import { upgradeEffects } from '../../src/core/upgrades';
@@ -18,6 +18,8 @@ import { seedRandom, random } from '../../src/core/rng';
 import { audio } from '../../src/core/audio';
 import { CHAPTERS } from '../../src/content/chapters';
 import { INITIAL_MENU } from '../../src/content/menu';
+import { BASKET_RULE, basketChance, canMake } from '../../src/core/orders';
+import { BasketRole } from '../../src/types/game';
 import { GameState, CustomerOrder, TrayItem, StaffRole } from '../../src/types/game';
 import { staffEffects, tickStaff, fryingItemId, missingItems, maxStaff, FRY_RECIPES, extraTraySlots, severancePay, traySizeFor, hasAutoWork } from '../../src/core/staff';
 import { generateCandidate } from '../../src/content/staff';
@@ -84,15 +86,23 @@ function buy(state: GameState, id: string, qty: number): boolean {
   return true;
 }
 
-// Nhập đủ cho số khách dự kiến: mỗi order ~1,35 món, chia đều cho các món bếp làm được
+// Nhập đủ cho số khách dự kiến theo giỏ hàng (core/orders.ts): 1 món chính (+15% phần thứ hai từ Chương 2),
+// món kèm / nước theo xác suất của chương; trong mỗi nhóm chia đều cho các món bếp làm được.
 // Lượng đã dùng của từng nguyên liệu trong các ngày gần đây (người thật nhìn kho cuối ngày để nhập)
 const usageLog = new WeakMap<GameState, Record<string, number>[]>();
 function restock(state: GameState, expected: number) {
-  const servable = INITIAL_MENU.filter(m => m.station && m.station !== 'combo' && m.chapter <= state.currentChapter
-    && Object.keys(m.ingredients).every(id => state.inventory[id]?.unlocked !== false));
+  const ch = state.currentChapter;
+  const perOrder: Record<BasketRole, number> = {
+    main: 1 + (ch >= 2 ? 0.15 : 0),
+    side: basketChance(BASKET_RULE.sideChance, ch),
+    drink: basketChance(BASKET_RULE.drinkChance, ch),
+    dessert: BASKET_RULE.dessertChance
+  };
+  const servable = INITIAL_MENU.filter(m => m.basketRole && canMake(state, m.id));
   const need: Record<string, number> = {};
   for (const m of servable) {
-    for (const [ing, n] of Object.entries(m.ingredients)) need[ing] = (need[ing] ?? 0) + n * expected * 1.35 / servable.length;
+    const share = perOrder[m.basketRole!] / servable.filter(x => x.basketRole === m.basketRole).length;
+    for (const [ing, n] of Object.entries(m.ingredients)) need[ing] = (need[ing] ?? 0) + n * expected * share;
   }
   // gà sốt cần thêm sốt, không có trong ingredients của gà giòn
   // Mua xoay vòng từng lô 5 cho mọi nguyên liệu (hết tiền thì món nào cũng có một ít), chừa tiền trả mặt bằng + lương
@@ -151,11 +161,7 @@ export function playDay(state: GameState, p: Profile, policy: UpgradePolicy, sta
   const recent = state.dayHistory.slice(-5);
   const peak = recent.length ? Math.max(...recent.map(l => l.customersServed + l.customersLost)) : expected;
   restock(state, Math.min(expected, Math.ceil(peak * 1.4)));
-  if (state.oilCondition !== 'clean' && state.money >= 150000 + 300000) {
-    state.money -= 150000;
-    state.oilCondition = 'clean';
-    state.oilBatchesCooked = 0;
-  }
+  if (state.oilCondition !== 'clean' && state.money >= 150000 + 300000) changeOil(state);
   if (policy === 'có nâng cấp') buyUpgrades(state, expected);
   if (staffPolicy === 'có nhân viên') {
     // Quỹ cạn (không đủ 3 ngày chi phí cố định) → cho người mới nhất nghỉ, như người thật
@@ -201,7 +207,7 @@ export function playDay(state: GameState, p: Profile, policy: UpgradePolicy, sta
       const cs = cook.getCookState();
       const staffEvents = tickStaff(session, cook.getTray(), dt, eff,
         cs.isFrying ? fryingItemId(cs.fryingType, cook.getActiveSeasoning()) : null,
-        { use: ids => useIngredients(state, session, ids), place: item => cook.addToTray(item), pour: d => makeDrink(state, session, cook, d) === 'ok', traySize: cook.getTraySize() });
+        { use: ids => useIngredients(state, session, ids), place: item => cook.addToTray(item), pour: d => makeDrink(state, session, cook, d) === 'ok', scoop: id => scoopSide(state, session, cook, id) === 'ok', traySize: cook.getTraySize() });
       for (const e of staffEvents) {
         if (e.type === 'helperDone') recordHelperFry(state, session, e.item.quality);
         else {
@@ -243,12 +249,7 @@ export function playDay(state: GameState, p: Profile, policy: UpgradePolicy, sta
     }
 
     // Dầu đen giữa ca → thay (người vụng thì ráng dùng tiếp)
-    if (state.oilCondition === 'dirty' && p.name !== 'Vụng' && state.money >= 150000 && !cook.getCookState().isFrying) {
-      state.money -= 150000;
-      state.oilCondition = 'clean';
-      state.oilBatchesCooked = 0;
-      continue;
-    }
+    if (state.oilCondition === 'dirty' && p.name !== 'Vụng' && !cook.getCookState().isFrying && changeOil(state)) continue;
 
     // Nồi mì / lò bánh chín → vớt trước khi hỏng
     const readyTimer = (Object.keys(session.timers) as TimerStationId[]).find(id => {
@@ -283,6 +284,7 @@ export function playDay(state: GameState, p: Profile, policy: UpgradePolicy, sta
 
   function act(needed: string): boolean {
     if (isDrinkId(needed)) return makeDrink(state, session, cook, needed) === 'ok';
+    if (isScoopId(needed)) return scoopSide(state, session, cook, needed) === 'ok';
     const timer = TIMER_FOR[needed];
     if (timer) return session.timers[timer] === null && startTimerStation(state, session, timer) === 'ok';
     let fryId = needed;

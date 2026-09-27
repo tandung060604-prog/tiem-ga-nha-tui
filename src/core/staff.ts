@@ -1,6 +1,6 @@
 import { CustomerOrder, QualityRating, StaffMember, TrayItem } from '../types/game';
 import type { FryType, Sauce } from './cooking';
-import { ASSEMBLY_RECIPES, DrinkId, isAssemblyId, isDrinkId } from './stations';
+import { ASSEMBLY_RECIPES, DrinkId, ScoopId, isAssemblyId, isDrinkId, isScoopId } from './stations';
 import { random } from './rng';
 import { upgradeEffects } from './upgrades';
 import type { UpgradeBranch } from '../types/game';
@@ -17,7 +17,8 @@ type Upgrades = { [id: string]: UpgradeBranch };
 export const MAX_HELPER_FRYERS = 2;
 export const SELF_SERVE_MS = 2000;
 export const ROBOT_CYCLE_MS = 4200;
-export const BASE_APP_COMMISSION = 0.08;
+// Hoa hồng sàn giao hàng trên doanh thu đơn app (22%); shipper nhà giảm tới 60%, app riêng về 0
+export const BASE_APP_COMMISSION = 0.22;
 // Quán càng lớn càng chứa được nhiều người (Chương 2: 3 người … Chương 5: 6 người)
 export const maxStaff = (chapter: number) => (chapter < 2 ? 0 : chapter + 1);
 export const SHIFT_HOURS = 8;
@@ -37,21 +38,26 @@ export const FRY_RECIPES: Record<string, FryRecipe> = {
   spicy_chicken: { type: 'chicken', sauce: 'spicy', stock: ['chicken_meat', 'flour', 'spicy_sauce'] },
   honey_garlic_chicken: { type: 'chicken', sauce: 'honey', stock: ['chicken_meat', 'flour', 'garlic_honey'] },
   shake_fries: { type: 'fries', sauce: null, stock: ['potato_cheese'] },
-  popcorn_chicken: { type: 'popcorn', sauce: null, stock: ['chicken_meat', 'flour'] }
+  popcorn_chicken: { type: 'popcorn', sauce: null, stock: ['chicken_meat', 'flour'] },
+  spicy_thigh: { type: 'thigh', sauce: null, stock: ['chicken_thigh', 'flour'] },
+  cheese_stick: { type: 'cheese', sauce: null, stock: ['cheese_stick_raw'] }
 };
-const FRY_LOOK: Record<string, { name: string; icon: string }> = {
-  crispy_chicken: { name: 'Gà Giòn Nhà Tui', icon: '🍗' },
-  spicy_chicken: { name: 'Gà Sốt Cay Xé Lưỡi', icon: '🌶️' },
-  honey_garlic_chicken: { name: 'Gà Mật Ong Bơ Tỏi', icon: '🍯' },
+export const FRY_LOOK: Record<string, { name: string; icon: string }> = {
+  crispy_chicken: { name: 'Gà Rán Giòn Truyền Thống', icon: '🍗' },
+  spicy_chicken: { name: 'Cánh Gà Sốt Cay Yangnyeom', icon: '🌶️' },
+  honey_garlic_chicken: { name: 'Gà Sốt Bơ Tỏi Đậu Nành', icon: '🍯' },
   shake_fries: { name: 'Khoai Lắc Phô Mai', icon: '🍟' },
-  popcorn_chicken: { name: 'Gà Viên Popcorn', icon: '🍿' }
+  popcorn_chicken: { name: 'Gà Viên Popcorn', icon: '🍿' },
+  spicy_thigh: { name: 'Má Đùi Gà Rán Giòn Cay', icon: '🍗' },
+  cheese_stick: { name: 'Phô Mai Que Kéo Sợi', icon: '🧀' }
 };
 
-// Món đang nằm trong chảo của người chơi (để phụ bếp không chiên trùng)
+// Món ra khỏi chảo: loại mẻ + sốt (sốt chỉ phủ lên gà miếng). Cũng là món đang trong chảo của người chơi
+// (để phụ bếp không chiên trùng).
 export function fryingItemId(type: FryType, sauce: Sauce | null): string {
-  if (type === 'fries') return 'shake_fries';
-  if (type === 'popcorn') return 'popcorn_chicken';
-  return sauce === 'spicy' ? 'spicy_chicken' : sauce === 'honey' ? 'honey_garlic_chicken' : 'crispy_chicken';
+  if (type === 'chicken') return sauce === 'spicy' ? 'spicy_chicken' : sauce === 'honey' ? 'honey_garlic_chicken' : 'crispy_chicken';
+  const plain = Object.entries(FRY_RECIPES).find(([, r]) => r.type === type && r.sauce === null);
+  return plain?.[0] ?? 'crispy_chicken';
 }
 
 // Món còn thiếu của một khách, sau khi trừ món đã có trong khay (không tính gà sống)
@@ -185,6 +191,7 @@ export interface StaffHooks {
   use: (stock: readonly string[]) => boolean;   // trừ nguyên liệu (all-or-nothing)
   place: (item: TrayItem) => boolean;           // đặt vào khay; khay đầy → false (giữ trong giỏ, thử lại)
   pour: (drink: DrinkId) => boolean;           // phục vụ rót nước (trừ kho, đặt vào khay)
+  scoop?: (side: ScoopId) => boolean;          // phục vụ múc món kèm từ khay inox (củ cải, bắp cải)
   traySize: number;
 }
 
@@ -254,13 +261,16 @@ export function tickStaff(
     session.totalFriedCount += 1;
   });
 
-  // Phục vụ rót nước cho 2 khách đầu (mỗi ly một nhịp), chừa 1 ô khay cho chủ quán
+  // Phục vụ rót nước / múc món kèm cho 2 khách đầu (mỗi phần một nhịp), chừa 1 ô khay cho chủ quán
   if (eff.waiterServeMs !== null) {
     session.pourMs = (session.pourMs ?? 0) + gameDt;
     const busy = session.helpers.filter(Boolean).length;
     if (session.pourMs >= eff.waiterServeMs && tray.length + busy < hooks.traySize - 1) {
-      const drink = session.orders.slice(0, 2).flatMap(o => missingItems(o, tray)).find(isDrinkId);
+      const missing = session.orders.slice(0, 2).flatMap(o => missingItems(o, tray));
+      const drink = missing.find(isDrinkId);
+      const side = missing.find(isScoopId);
       if (drink && hooks.pour(drink)) session.pourMs = 0;
+      else if (side && hooks.scoop?.(side)) session.pourMs = 0;
     }
   }
 

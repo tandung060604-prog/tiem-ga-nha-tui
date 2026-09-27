@@ -1,28 +1,28 @@
 # Graph Report - TiemGaRan  (2026-09-27)
 
 ## Corpus Check
-- 144 files · ~761,688 words
+- 152 files · ~770,276 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 15 file(s) not represented in the graph (top: .css 6, .bat 3, (none) 2)
 
 ## Summary
-- 1202 nodes · 2908 edges · 72 communities (66 shown, 6 thin omitted)
-- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 40 edges (avg confidence: 0.93)
+- 1288 nodes · 3166 edges · 78 communities (73 shown, 5 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 48 edges (avg confidence: 0.93)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `c98eb481`
+- Built from commit: `d5384cc4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- main.ts
+- mysteryBunny.ts
 - 4. Danh sách màn hình
 - AppController
 - logic.ts
 - Story Bible v2 — Hẻm 1102
-- audio.ts
-- sellingSim.ts
+- music.ts
+- orders.ts
 - Brief asset hình ảnh — Tiệm Gà Nhà Tui
 - Kế hoạch game: Tiệm Gà Nhà Tui
 - compilerOptions
@@ -35,19 +35,19 @@
 - 2. QUY TẮC PHỐI HỢP & LIÊN KẾT TỰ ĐỘNG (INTER-AGENT COORDINATION)
 - 2. Các Quyết Định UX & Giao Diện Chính
 - parallel-agents.md
-- save-and-name.test.ts
+- main.ts
 - 2. Kết quả công việc: Việc xong & Việc chưa xong
 - Game Gameplay Systems & Economy Balancer — Tiệm Gà Nhà Tui
 - HƯỚNG DẪN DÀNH CHO CLAUDE — TIỆM GÀ NHÀ TUI
 - KarmaState
 - Yêu Cầu Markup (Gemini → Claude)
 - Nhiệm vụ Gemini — Giờ 1 (14:35 → 15:35)
-- bao-cao-gio-1.md
+- Báo cáo Claude — Giờ 1 (26/09/2026, 14:35 → 15:05)
 - Game Feel & Visual Juice Polish — Tiệm Gà Nhà Tui
 - Procedural Content Generator — Tiệm Gà Nhà Tui
 - SellingView.ts
 - core/staff.ts
-- day.ts
+- state.ts
 - 04_TYPES_GAME_CONTRACT.ts
 - Tiệm Gà Nhà Tui — Review mã nguồn & Kế hoạch tối ưu
 - Game Narrative Director — Tiệm Gà Nhà Tui
@@ -60,47 +60,55 @@
 - Nhiệm vụ Gemini — Giờ 2
 - Review toàn diện & sửa lỗi — 26/09/2026 (tối)
 - 11_CUSTOMERS_12_NHAN_VAT.ts
-- Cân bằng lần 2 — đêm 27/09 (Claude)
-- game.ts
+- Mô phỏng cân bằng — 26/09/2026
+- economy.ts
 - cookingEngine
 - 2. CHI TIẾT KỸ THUẬT TỪNG MỤC
-- DayLedger
-- pick
+- day.ts
+- sellingSim.ts
 - 2. CHI TIẾT CÁC MỤC ĐÃ HOÀN THÀNH
-- MusicBox
+- p0-fixes.test.ts
 - Brief thiết kế giao diện — Tiệm Gà Nhà Tui
-- cooking.ts
+- assets.ts
 - 2. CÁC KHU VỰC VẼ CHI TIẾT (TỪ TRÊN XUỐNG DƯỚI)
 - Tiệm Gà Nhà Tui — Review mã nguồn & Kế hoạch tối ưu
 - Đợt 1 — Chương 1 (cần trước để làm vertical slice)
-- story-characters.test.ts
-- Báo cáo đêm 27/09 — Claude + Gemini
-- 4. Tuyến theo chương
-- wrapped.test.ts
-- .evaluateDay
+- endings.ts
+- 3. Bảng trạng thái / yêu cầu qua lại
+- cooking.ts
+- prepStation.ts
+- wrapped.ts
+- progression.ts
 - tutorial.test.ts
-- core/upgrades.ts
-- reviewsEngine.ts
+- game.ts
+- 5. Tối ưu UI/UX (P2)
 - staff.test.ts
-- content/staff.ts
 - gemini-dem-27-09.md
 - compilerOptions
-- Báo cáo Claude — Giờ 1 (26/09/2026, 14:35 → 15:05)
 - Máy chủ Tiệm Gà Nhà Tui (Cloudflare Worker) — chưa deploy
+- BÁO CÁO NGHIỆM THU CSS VÒNG 3 — GEMINI
+- EconomyEngine
+- 13_MENU_TAB_UI.ts
+- ref_types_game
+- 05_STATE_VA_VONG_LAP_NGAY.ts
+- ensureBatches
+- StoryModal.ts
 
 ## God Nodes (most connected - your core abstractions)
-1. `GameState` - 57 edges
+1. `GameState` - 60 edges
 2. `AppController` - 49 edges
-3. `createInitialState()` - 39 edges
-4. `cookingEngine` - 34 edges
-5. `vitest` - 27 edges
-6. `audio` - 26 edges
-7. `upgradeEffects` - 22 edges
-8. `closeDay()` - 21 edges
-9. `staffEffects` - 20 edges
-10. `createSellingSession()` - 18 edges
+3. `createInitialState()` - 43 edges
+4. `cookingEngine` - 36 edges
+5. `vitest` - 30 edges
+6. `audio` - 28 edges
+7. `closeDay()` - 24 edges
+8. `upgradeEffects` - 22 edges
+9. `createSellingSession()` - 20 edges
+10. `staffEffects` - 20 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `3. Ảnh cần tạo` --references--> `foodImage()`  [INFERRED]
+  docs/bao-cao/hop-dong-pnl-quay-inox.md → src/content/assets.ts
 - `7. Dùng Jev (TypeSafe) ở đâu và không dùng ở đâu` --references--> `ReviewsEngine`  [INFERRED]
   claude-review-pack/03_GDD_KE_HOACH_TONG_QUAN.md → src/core/reviewsEngine.ts
 - `7. Dùng Jev (TypeSafe) ở đâu và không dùng ở đâu` --references--> `ReviewsEngine`  [INFERRED]
@@ -109,25 +117,23 @@
   docs/phan-cong.md → src/content/assets.ts
 - `3. Bảng nhân vật (chốt để tránh mâu thuẫn)` --references--> `CharacterGenerator`  [INFERRED]
   claude-review-pack/02_STORY_BIBLE_HEM_1102.md → src/content/characterGenerator.ts
-- `3. Bảng nhân vật (chốt để tránh mâu thuẫn)` --references--> `CharacterGenerator`  [INFERRED]
-  docs/02-story-bible-v2.md → src/content/characterGenerator.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (72 total, 6 thin omitted)
+## Communities (78 total, 5 thin omitted)
 
-### Community 0 - "main.ts"
-Cohesion: 0.16
-Nodes (18): BUNNY_LETTERS, BUNNY_RANDOM_VISIT_NOTES, BunnyLetter, MYSTERY_QUESTS, MysteryGuestQuest, StoryTrigger, isAssemblyId(), isTimerStationId() (+10 more)
+### Community 0 - "mysteryBunny.ts"
+Cohesion: 0.23
+Nodes (9): BUNNY_RANDOM_VISIT_NOTES, BunnyLetter, MYSTERY_QUESTS, MysteryGuestQuest, StoryTrigger, Criteria, bindBunnyModalEvents(), renderBunnyAlbumModal() (+1 more)
 
 ### Community 1 - "4. Danh sách màn hình"
 Cohesion: 0.22
 Nodes (9): 4.1 Header (dùng chung), 4.2 Chuẩn bị (Prep), 4.3 Mở bán (màn quan trọng nhất), 4.4 Tổng kết ngày (modal toàn màn), 4.5 Cảnh truyện (visual novel mini), 4.6 Thư Thỏ Cam, 4.7 Thẻ chia sẻ (ảnh xuất ra, 1080×1350), 4.8 Trang giới thiệu (landing.html) (+1 more)
 
 ### Community 2 - "AppController"
-Cohesion: 0.12
-Nodes (14): Đã làm, pickDailyIncident(), createCustomerSource(), recordHelperFry(), babble(), stopNarration(), SellingSession, HelperFry (+6 more)
+Cohesion: 0.08
+Nodes (27): Đã làm, Báo cáo đêm 27/09 — Claude + Gemini, Claude đã làm, Còn tồn / cần anh/chị, Gemini đã làm (theo `docs/gemini/bao-cao-dem-27-09.md`, Claude đã kiểm), Kiểm chứng cuối đêm, pickDailyIncident(), createCustomerSource() (+19 more)
 
 ### Community 3 - "logic.ts"
 Cohesion: 0.17
@@ -137,13 +143,13 @@ Nodes (22): Env, fetch(), json(), KV, RATE_LIMIT, rateLimited(), readBoard(), co
 Cohesion: 0.14
 Nodes (13): 1. Vấn đề của tuyến truyện hiện tại, 2. Xương sống mới, 4. Tuyến theo chương, 5. Cách trình bày trong game, 6. Kiểu dữ liệu đề xuất, Ba đối thủ hư cấu (theo GDD: 3 chuỗi, phản diện hài, không nhại linh vật có thật), Chương 1 — Xe Đẩy Đầu Hẻm (ngày 1–15), Chương 2 — Tiệm Trong Hẻm (ngày 16–50) (+5 more)
 
-### Community 5 - "audio.ts"
-Cohesion: 0.14
-Nodes (14): audio, BASS, CHORDS, MELODY, Mode, music, narrate(), vietnameseVoice() (+6 more)
+### Community 5 - "music.ts"
+Cohesion: 0.15
+Nodes (9): BASS, CHORDS, MELODY, Mode, MusicBox, narrate(), vietnameseVoice(), Voice (+1 more)
 
-### Community 6 - "sellingSim.ts"
+### Community 6 - "orders.ts"
 Cohesion: 0.06
-Nodes (84): vitest, CUSTOMER_GROUPS, REGULAR_CUSTOMERS, RegularCustomer, INITIAL_INVENTORY, INITIAL_MENU, INITIAL_CANDIDATES, CLOSE_HOUR (+76 more)
+Nodes (59): 3. Bảng nhân vật (chốt để tránh mâu thuẫn), 3. Bảng nhân vật (chốt để tránh mâu thuẫn), ARCHETYPE_CONFIG, CharacterGenerator, CustomerArchetype, ModularCharacter, CUSTOMER_GROUPS, REGULAR_CUSTOMERS (+51 more)
 
 ### Community 7 - "Brief asset hình ảnh — Tiệm Gà Nhà Tui"
 Cohesion: 0.22
@@ -162,8 +168,8 @@ Cohesion: 0.14
 Nodes (13): 1. Danh Mục Asset Đã Tạo & Đường Dẫn Artifacts, 2.1. Linh vật Gà Bông (`mascot_gabong_sheet`), 2.2. Bé Thỏ Cam Mimi (`char_thocam_sheet`), 2.3. Bác Ba Tổ Trưởng (`char_bacba_sheet`), 2.4. Món Gà Giòn Nhà Tui (`food_crispy_chicken_perfect`), 2.5. Mockup Màn Hình Mở Bán (`mockup_mo_ban`), 2.6. Khoai Lắc Phô Mai (`food_shake_fries`), 2.7. Ly Soda Đá Không Logo (`food_soda`) (+5 more)
 
 ### Community 11 - "cookingEngine"
-Cohesion: 0.12
-Nodes (6): cookingEngine, StaffHooks, DrinkId, QualityRating, TrayItem, perfectWindow()
+Cohesion: 0.14
+Nodes (3): cookingEngine, QualityRating, TrayItem
 
 ### Community 12 - "package.json"
 Cohesion: 0.06
@@ -174,8 +180,8 @@ Cohesion: 0.13
 Nodes (14): 1.1. Cốt lõi cảm xúc (Emotional Core), 1.2. Thước đo thành công của câu chuyện, 1. Tinh Thần Cốt Truyện & Thế Giới Hẻm 1102, 2. Bảng Nhân Vật Hạt Nhân (12 Archetypes & Voice Matrix), 3. Lộ Trình Cốt Truyện 5 Chương (100k – 200k Chữ), 4. Chuẩn Kịch Bản Phân Nhánh (Branching Dialogue Format), 5. Quy Chuẩn Viết Thư Thỏ Cam (Mimi's Letters), 6. Quy Tắc Bất Di Bất Dịch (Golden Narrative Rules) (+6 more)
 
 ### Community 15 - "stateManager"
-Cohesion: 0.05
-Nodes (26): createInitialState(), migrateSave(), stateManager, EconomyEngine, CookingState, Sauce, addStock(), ageOneDay() (+18 more)
+Cohesion: 0.29
+Nodes (3): createInitialState(), migrateSave(), stateManager
 
 ### Community 16 - "2. QUY TẮC PHỐI HỢP & LIÊN KẾT TỰ ĐỘNG (INTER-AGENT COORDINATION)"
 Cohesion: 0.22
@@ -185,9 +191,9 @@ Nodes (8): 1. MA TRẬN PHÂN CHIA QUYỀN HẠN (RESPONSIBILITY MATRIX), 2. QUY
 Cohesion: 0.22
 Nodes (8): 1. Quyết Định Quan Trọng Về Nhân Vật Bé Thỏ Cam (Mimi), 2.1. Thumb-Zone (Vùng Một Ngón Cái 40% Dưới Màn Hình), 2.2. Hệ Thống Màu & Tương Phản WCAG AA, 2.3. Kiểu Chữ (Typography), 2.4. Hiệu Năng & Animation, 2. Các Quyết Định UX & Giao Diện Chính, 3. Danh Mục File Giao Nộp, Ghi Chú Thiết Kế UI & Kiến Trúc Thị Giác — Tiệm Gà Nhà Tui
 
-### Community 19 - "save-and-name.test.ts"
-Cohesion: 0.15
-Nodes (14): DEFAULT_SHOP_NAME, normalizeShopName(), SHOP_NAME_MAX, SHOP_NAME_SUGGESTIONS, bindHeaderEvents(), renderHeader(), renderSettingsModal(), BACBA_QUOTES (+6 more)
+### Community 19 - "main.ts"
+Cohesion: 0.13
+Nodes (21): music, CHAPTER_PRICE_STEP, DEFAULT_SHOP_NAME, SHOP_NAME_MAX, SHOP_NAME_SUGGESTIONS, FRY_ACTION_ITEM, isSellingAction(), SELLING_ACTIONS (+13 more)
 
 ### Community 20 - "2. Kết quả công việc: Việc xong & Việc chưa xong"
 Cohesion: 0.22
@@ -213,9 +219,9 @@ Nodes (10): 1. Màn Bán Hàng (SellingView.ts), 2. Màn Tổng Kết (SummaryMo
 Cohesion: 0.33
 Nodes (6): Lỗi hình ảnh cần sửa (xem `screenshots/ban-hang-390px.png`), Nhiệm vụ Gemini — Giờ 1 (14:35 → 15:35), Ràng buộc bắt buộc (đã gây lỗi thật, Claude vừa sửa, bản `components.css` của bạn đang làm hỏng lại), Việc 1 — Tạo file ảnh thật cho Đợt 1 (ưu tiên cao nhất), Việc 2 — Đưa `design-tokens.css` + `components.css` vào game, Việc 3 — Báo cáo (10 phút cuối)
 
-### Community 26 - "bao-cao-gio-1.md"
-Cohesion: 0.24
-Nodes (4): 1. Ranh giới file (không sửa file của bên kia), 2. Việc của mỗi bên trong giờ này, 4. Báo cáo cuối giờ, Phân công Claude ↔ Gemini
+### Community 26 - "Báo cáo Claude — Giờ 1 (26/09/2026, 14:35 → 15:05)"
+Cohesion: 0.21
+Nodes (5): Báo cáo Claude — Giờ 1 (26/09/2026, 14:35 → 15:05), Bổ sung sau giờ 1 (theo quyết định của chủ dự án, xong 16:17), Cần bạn quyết, Kết quả kiểm chứng cuối giờ, Đối chiếu báo cáo của Gemini ([bao-cao-gio-1.md](../gemini/bao-cao-gio-1.md))
 
 ### Community 27 - "Game Feel & Visual Juice Polish — Tiệm Gà Nhà Tui"
 Cohesion: 0.17
@@ -226,16 +232,16 @@ Cohesion: 0.22
 Nodes (8): 1. Công Thức Đặt Tên Thực Khách Sài Gòn (Naming Formula), 2. Hệ Thống Ghép Tầng Ngoại Hình (Modular Visual Generation), 3. Ngân Hàng Câu Thoại Ngữ Cảnh (Contextual Dialogue Bank), 4. Cơ Chế Khách Bí Ẩn & Chuỗi Nhiệm Vụ (Mystery Quests), 5. Quy Chuẩn Sinh Review GenZ Hài Hước (Viral Review Generator), Các nhóm danh xưng phổ biến:, Cấu trúc Quest:, Procedural Content Generator — Tiệm Gà Nhà Tui
 
 ### Community 29 - "SellingView.ts"
-Cohesion: 0.08
-Nodes (43): ref_node_fs, ASSETS, foodImage(), assembleAtCounter(), stationOpen(), FxEvent, assemble(), assemblyBaseIndex() (+35 more)
+Cohesion: 0.15
+Nodes (28): assembleAtCounter(), perfectTip(), startTimerStation(), stationOpen(), assemble(), assemblyBaseIndex(), timerPhase, CustomerMood (+20 more)
 
 ### Community 30 - "core/staff.ts"
-Cohesion: 0.14
-Nodes (17): endShiftForStaff(), FRY_LOOK, FRY_RECIPES, fryingItemId(), has(), hasAutoWork(), HelperCook, managerBoost() (+9 more)
+Cohesion: 0.11
+Nodes (29): FryType, Sauce, endShiftForStaff(), FRY_LOOK, FryRecipe, has(), hasAutoWork(), HelperCook (+21 more)
 
-### Community 31 - "day.ts"
-Cohesion: 0.12
-Nodes (21): RANDOM_EVENTS, BA_BA_AID_MONEY, BUNNY_VISIT_TIP, FAST_SERVICE_TIP, INSPECTION_FINE, PERFECT_TIP, pullTimerStation(), SAUCE_STOCK (+13 more)
+### Community 31 - "state.ts"
+Cohesion: 0.19
+Nodes (12): INITIAL_INVENTORY, INITIAL_MENU, INITIAL_CANDIDATES, createInitialState(), migrateSave(), chicken(), good(), fullyStocked() (+4 more)
 
 ### Community 32 - "04_TYPES_GAME_CONTRACT.ts"
 Cohesion: 0.09
@@ -250,8 +256,8 @@ Cohesion: 0.13
 Nodes (14): 1.1. Cốt lõi cảm xúc (Emotional Core), 1.2. Thước đo thành công của câu chuyện, 1. Tinh Thần Cốt Truyện & Thế Giới Hẻm 1102, 2. Bảng Nhân Vật Hạt Nhân (12 Archetypes & Voice Matrix), 3. Lộ Trình Cốt Truyện 5 Chương (100k – 200k Chữ), 4. Chuẩn Kịch Bản Phân Nhánh (Branching Dialogue Format), 5. Quy Chuẩn Viết Thư Thỏ Cam (Mimi's Letters), 6. Quy Tắc Bất Di Bất Dịch (Golden Narrative Rules) (+6 more)
 
 ### Community 35 - "Story Bible v2 — Hẻm 1102"
-Cohesion: 0.25
-Nodes (7): 1. Vấn đề của tuyến truyện hiện tại, 2. Xương sống mới, 5. Cách trình bày trong game, 6. Kiểu dữ liệu đề xuất, Ba đối thủ hư cấu (theo GDD: 3 chuỗi, phản diện hài, không nhại linh vật có thật), Danh tính Thỏ Cam (lộ diện chương 5), Story Bible v2 — Hẻm 1102
+Cohesion: 0.14
+Nodes (13): 1. Vấn đề của tuyến truyện hiện tại, 2. Xương sống mới, 4. Tuyến theo chương, 5. Cách trình bày trong game, 6. Kiểu dữ liệu đề xuất, Ba đối thủ hư cấu (theo GDD: 3 chuỗi, phản diện hài, không nhại linh vật có thật), Chương 1 — Xe Đẩy Đầu Hẻm (ngày 1–15), Chương 2 — Tiệm Trong Hẻm (ngày 16–50) (+5 more)
 
 ### Community 36 - "2. Nhật Ký Chi Tiết Từng Phiên (Activity Log)"
 Cohesion: 0.22
@@ -266,12 +272,12 @@ Cohesion: 0.18
 Nodes (10): 1. SƠ ĐỒ PHÂN VAI & RANH GIỚI TRÁCH NHIỆM (RESPONSIBILITY MATRIX), 2. CÁCH KHỞI ĐỘNG 3 TÀI KHOẢN GEMINI RIÊNG BIỆT, 3. CHU TRÌNH LÀM VIỆC 5 BƯỚC (5-STEP SPRINT WORKFLOW), 📌 Bước 1: Giao Task & Khóa Phạm Vi (Lock & Brief), ⚡ Bước 2: Chạy Tác Vụ Song Song Độc Lập (Parallel Execution), 🔍 Bước 3: Tự Kiểm Chứng Cục Bộ (Self-Verification), 🤝 Bước 4: Đồng Bộ & Bàn Giao (Handoff), 👑 Bước 5: Claude Audit & Quyết Định Phê Duyệt (Claude Lead Review) (+2 more)
 
 ### Community 39 - "review-fixes-2709.test.ts"
-Cohesion: 0.10
-Nodes (25): 3. Bảng trạng thái / yêu cầu qua lại, DAILY_INCIDENTS, getIncidentById(), hasSecurityStaff(), IncidentResolutionResult, MAX_REPUTATION_DELTA, MAX_RESOLVED_HISTORY, resolveIncidentChoice() (+17 more)
+Cohesion: 0.17
+Nodes (15): DAILY_INCIDENTS, getIncidentById(), hasSecurityStaff(), IncidentResolutionResult, MAX_REPUTATION_DELTA, MAX_RESOLVED_HISTORY, resolveIncidentChoice(), CONDIMENT_TIP (+7 more)
 
 ### Community 40 - "GameState"
-Cohesion: 0.07
-Nodes (44): CHAPTERS, applyKarmaChange(), BANKRUPTCY_DEBT_DAYS, evaluateEnding(), FINALE_CHAPTER, finaleReady(), STORY_ENDINGS, chooseDialogueOption() (+36 more)
+Cohesion: 0.16
+Nodes (14): closeDay(), requestBaBaAid(), auditState(), flagIntegrity(), isTampered(), signSave(), START_MONEY, exportSaveCode() (+6 more)
 
 ### Community 41 - "Nhiệm vụ Gemini — Giờ 2"
 Cohesion: 0.33
@@ -285,121 +291,149 @@ Nodes (13): Chất game: âm thanh, tiếng, Chống gian lận, Gameplay (đo b
 Cohesion: 0.50
 Nodes (3): CUSTOMER_GROUPS, REGULAR_CUSTOMERS, RegularCustomer
 
-### Community 44 - "Cân bằng lần 2 — đêm 27/09 (Claude)"
-Cohesion: 0.25
-Nodes (7): Cân bằng lần 2 — đêm 27/09 (Claude), Kết quả (`npm run sim -- --days 330 --seeds 5 --policy 3`, có nâng cấp + nhân viên), Kết quả (trung vị ngày qua Chương 1; GDD: ngày 15), Mô phỏng cân bằng — 26/09/2026, Thay đổi, Vấn đề, Vấn đề thiết kế còn lại (không chỉnh bằng số được)
+### Community 44 - "Mô phỏng cân bằng — 26/09/2026"
+Cohesion: 0.22
+Nodes (8): 27/09: P&L + thuế, giỏ hàng thực tế, thực đơn K-chicken, Cân bằng lần 2 — đêm 27/09 (Claude), Kết quả (`npm run sim -- --days 330 --seeds 5 --policy 3`, có nâng cấp + nhân viên), Kết quả (trung vị ngày qua Chương 1; GDD: ngày 15), Mô phỏng cân bằng — 26/09/2026, Thay đổi, Vấn đề, Vấn đề thiết kế còn lại (không chỉnh bằng số được)
 
-### Community 46 - "game.ts"
-Cohesion: 0.17
-Nodes (11): Quy tắc 3: Hiệp Thương Contract-First Qua `src/types/game.ts`, Chapter, Condiment, GamePhase, Station, StockBatch, StoryEnding, StoryEndingId (+3 more)
+### Community 46 - "economy.ts"
+Cohesion: 0.05
+Nodes (55): 1. Quầy khay inox âm bàn: `src/ui/components/PrepStation.ts`, 2. Bảng P&L cuối ngày: `renderPnl()` trong `src/ui/components/SummaryModal.ts`, 3. Ảnh cần tạo, 4. Đổi tên món (giữ nguyên id), Bàn giao cho Gemini: quầy khay inox GN + bảng P&L cuối ngày (27/09), BUSINESS_FORM_LABEL, businessForm(), COMPANY_CIT_RATE (+47 more)
 
 ### Community 48 - "2. CHI TIẾT KỸ THUẬT TỪNG MỤC"
 Cohesion: 0.17
 Nodes (12): 1. Dòng Khách Dặn Thêm Tương (`.order-condiment`), 1. TỔNG QUAN KẾT QUẢ HOÀN THÀNH, 2. CHI TIẾT KỸ THUẬT TỪNG MỤC, 2. Khối Tác Động Karma Trong Cảnh Truyện (`.story-karma-effects`), 3. DANH SÁCH ẢNH CHỤP KIỂM THỬ TRỰC QUAN (`ui-check-out/`), 3. Hiệu Ứng Tiền Bay & Khách Bỏ Về (`.fx-layer`, `.money-float.lost-float`), 4. KẾT QUẢ BỘ CÔNG CỤ NGHIỆM THU KÉP (QUALITY GATES), 4. Nút Gà Wrapped & Xem Trước Thẻ Tuần (`.btn-wrapped`, `.wrapped-preview-img`) (+4 more)
 
-### Community 49 - "DayLedger"
-Cohesion: 0.36
-Nodes (4): DayResult, CustomerReview, DayLedger, ShareCardEngine
+### Community 49 - "day.ts"
+Cohesion: 0.10
+Nodes (28): RANDOM_EVENTS, BA_BA_AID_MONEY, BUNNY_VISIT_TIP, CLEANSER_IDS, CLEANSER_TASTE_PER_DAY, FAST_SERVICE_TIP, INSPECTION_FINE, PERFECT_TIP (+20 more)
 
-### Community 50 - "pick"
-Cohesion: 0.33
-Nodes (3): MysteryBunnyEngine, pick(), bindReviewsEvents()
+### Community 50 - "sellingSim.ts"
+Cohesion: 0.12
+Nodes (25): CookingSnapshot, recordOrderBooks(), serveFirstOrder(), OrdersEngine, createSellingSession(), drainFx(), FAST_FORWARD, FxEvent (+17 more)
 
 ### Community 51 - "2. CHI TIẾT CÁC MỤC ĐÃ HOÀN THÀNH"
 Cohesion: 0.15
 Nodes (12): 1. TỔNG QUAN KẾT QUẢ ĐẠT ĐƯỢC, 2. CHI TIẾT CÁC MỤC ĐÃ HOÀN THÀNH, 3. DANH SÁCH ẢNH CHỤP KIỂM THỬ TRỰC QUAN (`ui-check-out/`), 4. BẢNG TỔNG HỢP KIỂM TRA CHẤT LƯỢNG (QUALITY GATES), 5. TÌNH TRẠNG HIỆN TẠI & BÀN GIAO CHO CLAUDE LEAD, BÁO CÁO TỔNG KẾT CA ĐÊM 27/09/2026, G0. Hoàn tất giao diện Sự Cố & Máy Nước Ngọt Fanta (Commit `02b2927`), G1. Nén ảnh Assets $\le 4\text{MB}$ & Mọi PNG $\le 40\text{KB}$ (Commit `7e207ef`) (+4 more)
 
+### Community 52 - "p0-fixes.test.ts"
+Cohesion: 0.25
+Nodes (18): vitest, addStock(), ageOneDay(), canUnlockIngredient(), consumeStock(), ensureBatches(), isIngredientUnlocked(), refundableUnits() (+10 more)
+
 ### Community 53 - "Brief thiết kế giao diện — Tiệm Gà Nhà Tui"
 Cohesion: 0.29
 Nodes (7): 0. Bạn cần giao lại gì, 1. Sản phẩm là gì, 2. Hệ thống thị giác hiện có (giữ và mở rộng), 3. Nguyên tắc UX bắt buộc, 5. Class CSS đang có (giữ nguyên tên), 6. Ràng buộc kỹ thuật, Brief thiết kế giao diện — Tiệm Gà Nhà Tui
 
-### Community 54 - "cooking.ts"
-Cohesion: 0.25
-Nodes (7): CookingSnapshot, FRY_SPEED, FryType, Sauce, ShiftSnapshot, FryRecipe, OilCondition
+### Community 54 - "assets.ts"
+Cohesion: 0.18
+Nodes (13): ref_node_fs, ASSETS, foodImage(), TutorialActions, drawWrapped(), loadImage(), money(), roundRect() (+5 more)
 
 ### Community 55 - "2. CÁC KHU VỰC VẼ CHI TIẾT (TỪ TRÊN XUỐNG DƯỚI)"
 Cohesion: 0.17
 Nodes (11): 1. THÔNG SỐ KHUNG CANVAS TỔNG THỂ, 2. CÁC KHU VỰC VẼ CHI TIẾT (TỪ TRÊN XUỐNG DƯỚI), 3. CÔNG THỨC SINH DANH HIỆU TỰ ĐỘNG (DỰA TRÊN STATE), Khu vực 1: Mái hiên sọc đỏ - trắng K-Chicken (Y: 16 → 46), Khu vực 2: Header Quán & Huy Hiệu Chương (Y: 60 → 170), Khu vực 3: Tiêu đề Báo Cáo & Danh Hiệu Vinh Danh (Y: 190 → 360), Khu vực 4: Lưới 4 Thẻ Chỉ Số Vàng (2×2 Hero Stats Grid) (Y: 415 → 765), Khu vực 5: Món Ăn 'Ruột' Spotlight & Review Viral (Y: 780 → 980) (+3 more)
 
 ### Community 56 - "Tiệm Gà Nhà Tui — Review mã nguồn & Kế hoạch tối ưu"
-Cohesion: 0.12
-Nodes (16): 1. Tóm tắt, 2. Lỗi nghiêm trọng (P0), 3. Hiệu năng & UX kỹ thuật (P1), 4. Kiến trúc type-safe (P1), 5. Tối ưu UI/UX (P2), 6. Bài học từ các repo/game mã nguồn mở, 7. Dùng Jev (TypeSafe) ở đâu và không dùng ở đâu, 8. Lộ trình thực hiện (+8 more)
+Cohesion: 0.20
+Nodes (10): 1. Tóm tắt, 2. Lỗi nghiêm trọng (P0), 3. Hiệu năng & UX kỹ thuật (P1), 4. Kiến trúc type-safe (P1), 6. Bài học từ các repo/game mã nguồn mở, 7. Dùng Jev (TypeSafe) ở đâu và không dùng ở đâu, 8. Lộ trình thực hiện, 9. Về các skill đã nêu (+2 more)
 
 ### Community 57 - "Đợt 1 — Chương 1 (cần trước để làm vertical slice)"
 Cohesion: 0.25
 Nodes (8): 4.1 Linh vật & nhân vật chính, 4.2 Khách ngẫu nhiên (hệ ghép phần), 4.3 Món ăn chương 1 (256×256), 4.4 Bếp & quầy chương 1, 4.5 Icon UI (128×128, cùng nét viền), 4.6 Hiệu ứng (sprite sheet ngang, mỗi khung 256×256, 6–8 khung), 4.7 Giấy thư Thỏ Cam, Đợt 1 — Chương 1 (cần trước để làm vertical slice)
 
-### Community 58 - "story-characters.test.ts"
+### Community 58 - "endings.ts"
+Cohesion: 0.30
+Nodes (10): applyKarmaChange(), BANKRUPTCY_DEBT_DAYS, evaluateEnding(), FINALE_CHAPTER, finaleReady(), STORY_ENDINGS, chooseDialogueOption(), DialogueOption (+2 more)
+
+### Community 59 - "3. Bảng trạng thái / yêu cầu qua lại"
+Cohesion: 0.20
+Nodes (9): Quy tắc 3: Hiệp Thương Contract-First Qua `src/types/game.ts`, 1. Ranh giới file (không sửa file của bên kia), 2. Việc của mỗi bên trong giờ này, 3. Bảng trạng thái / yêu cầu qua lại, Phân công Claude ↔ Gemini, StoryEnding, StoryEndingId, bindEndingEvents() (+1 more)
+
+### Community 60 - "cooking.ts"
+Cohesion: 0.39
+Nodes (4): audio, FRY_SPEED, fryingItemId(), OilCondition
+
+### Community 61 - "prepStation.ts"
+Cohesion: 0.24
+Nodes (13): k(), PREP_LAYOUT, prepLock(), PrepPanDef, prepStationSlots(), PrepView, FRY_RECIPES, PrepSlotState (+5 more)
+
+### Community 62 - "wrapped.ts"
+Cohesion: 0.50
+Nodes (4): honorTitle(), weeklyWrapped(), WRAPPED_EVERY, WrappedData
+
+### Community 63 - "progression.ts"
 Cohesion: 0.19
-Nodes (9): 3. Bảng nhân vật (chốt để tránh mâu thuẫn), 3. Bảng nhân vật (chốt để tránh mâu thuẫn), ARCHETYPE_CONFIG, CharacterGenerator, CustomerArchetype, ModularCharacter, mentionsStoryCharacter(), STORY_CHARACTER_NAMES (+1 more)
-
-### Community 59 - "Báo cáo đêm 27/09 — Claude + Gemini"
-Cohesion: 0.29
-Nodes (6): Báo cáo đêm 27/09 — Claude + Gemini, Claude đã làm, Còn tồn / cần anh/chị, Gemini đã làm (theo `docs/gemini/bao-cao-dem-27-09.md`, Claude đã kiểm), Kiểm chứng cuối đêm, capacitySlots()
-
-### Community 60 - "4. Tuyến theo chương"
-Cohesion: 0.33
-Nodes (6): 4. Tuyến theo chương, Chương 1 — Xe Đẩy Đầu Hẻm (ngày 1–15), Chương 2 — Tiệm Trong Hẻm (ngày 16–50), Chương 3 — Mặt Tiền Phố (ngày 51–100), Chương 4 — Tiệm Hot Trend (ngày 101–150), Chương 5 — Chuỗi Gà Quốc Dân (ngày 151–210)
-
-### Community 62 - "wrapped.test.ts"
-Cohesion: 0.38
-Nodes (7): honorTitle(), isWrappedDay(), weeklyWrapped(), WRAPPED_EVERY, renderSummaryModal(), ledger(), withDays()
-
-### Community 63 - ".evaluateDay"
-Cohesion: 0.48
-Nodes (4): ReviewTemplate, applyBunnyReward(), ReviewsEngine, StarRating
+Nodes (15): CHAPTERS, BUNNY_LETTERS, MysteryBunnyEngine, eventForDay(), applyChapterPrices(), chapterProgress(), currentChapterData(), DEPOSIT_SHARE (+7 more)
 
 ### Community 64 - "tutorial.test.ts"
 Cohesion: 0.23
-Nodes (8): CookingState, isDrinkId(), shouldRunTutorial(), TUTORIAL_TEXT, TutorialState, tutorialStep, idle, started
+Nodes (7): CookingState, shouldRunTutorial(), TUTORIAL_TEXT, tutorialHint, TutorialState, idle, started
 
-### Community 65 - "core/upgrades.ts"
-Cohesion: 0.22
-Nodes (7): INITIAL_UPGRADES, AUTO_LIFT_KITCHEN_LEVEL, bestOwned(), MAX_PRICE_PREMIUM_PCT, SELF_SERVE_OPERATIONS_LEVEL, Upgrades, UpgradeBranch
+### Community 65 - "game.ts"
+Cohesion: 0.18
+Nodes (11): 4. Báo cáo cuối giờ, INITIAL_UPGRADES, BasketRole, BasketRule, Condiment, FinancialLedger, GamePhase, Station (+3 more)
 
-### Community 66 - "reviewsEngine.ts"
-Cohesion: 0.39
-Nodes (6): REVIEW_BLOCKED, REVIEW_HUMOR, CUST_AVATARS, GENZ_REVIEW_TEMPLATES, GENZ_USERNAMES, NonEmpty
+### Community 66 - "5. Tối ưu UI/UX (P2)"
+Cohesion: 0.33
+Nodes (6): 5. Tối ưu UI/UX (P2), Màn Chuẩn bị, Màn Mở bán (quan trọng nhất), Onboarding, Truyện, Tổng kết ngày
 
-### Community 67 - "staff.test.ts"
-Cohesion: 0.19
-Nodes (12): eventForDay(), makeDrink(), startTimerStation(), useIngredients(), BASE_APP_COMMISSION, extraTraySlots(), missingItems(), nextFryTarget() (+4 more)
-
-### Community 68 - "content/staff.ts"
-Cohesion: 0.30
-Nodes (10): generateCandidate(), STAFF_ROLES_INFO, STAFF_TRAITS, describeStaffEffect(), maxStaff(), severancePay(), StaffMember, StaffRole (+2 more)
+### Community 68 - "staff.test.ts"
+Cohesion: 0.18
+Nodes (16): generateCandidate(), STAFF_ROLES_INFO, STAFF_TRAITS, makeDrink(), recordHelperFry(), useIngredients(), describeStaffEffect(), extraTraySlots() (+8 more)
 
 ### Community 70 - "compilerOptions"
 Cohesion: 0.18
 Nodes (10): compilerOptions, lib, module, moduleResolution, noEmit, noUncheckedIndexedAccess, skipLibCheck, strict (+2 more)
 
-### Community 71 - "Báo cáo Claude — Giờ 1 (26/09/2026, 14:35 → 15:05)"
-Cohesion: 0.40
-Nodes (5): Báo cáo Claude — Giờ 1 (26/09/2026, 14:35 → 15:05), Bổ sung sau giờ 1 (theo quyết định của chủ dự án, xong 16:17), Cần bạn quyết, Kết quả kiểm chứng cuối giờ, Đối chiếu báo cáo của Gemini ([bao-cao-gio-1.md](../gemini/bao-cao-gio-1.md))
-
 ### Community 72 - "Máy chủ Tiệm Gà Nhà Tui (Cloudflare Worker) — chưa deploy"
 Cohesion: 0.50
 Nodes (3): Chưa làm (chờ deploy), Máy chủ Tiệm Gà Nhà Tui (Cloudflare Worker) — chưa deploy, Việc anh/chị cần làm (khoảng 10 phút)
 
+### Community 73 - "BÁO CÁO NGHIỆM THU CSS VÒNG 3 — GEMINI"
+Cohesion: 0.15
+Nodes (12): 1. TỔNG QUAN KẾT QUẢ HOÀN THÀNH, 2.1. Cấu trúc Markup & Dỡ Bỏ Inline Styles, 2.2. CSS Chuyên Biệt Cho Dòng Món Ăn, 2.3. Tối Ưu Chiều Cao Thẻ Khách ≤ 150px Trên 320px, 2. CHI TIẾT KỸ THUẬT MỤC 1 — THẺ KHÁCH GỌN GÀNG MOBILE, 3.1. Dải Màu Trực Quan 5 Mức (Xanh → Đỏ), 3.2. Khối `.price-summary` Nổi Bật, 3.3. Tối Ưu Màn Hình Hẹp 320px (+4 more)
+
+### Community 74 - "EconomyEngine"
+Cohesion: 0.22
+Nodes (3): EconomyEngine, ref_clock, ref_upgrades
+
+### Community 75 - "13_MENU_TAB_UI.ts"
+Cohesion: 0.20
+Nodes (4): ref_content_assets, ref_content_customers, ref_core_audio, ref_core_inventory
+
+### Community 76 - "ref_types_game"
+Cohesion: 0.22
+Nodes (6): CookingState, Sauce, INITIAL_INVENTORY, INITIAL_MENU, ref_audio, ref_types_game
+
+### Community 79 - "05_STATE_VA_VONG_LAP_NGAY.ts"
+Cohesion: 0.33
+Nodes (5): ref_content_inventory, ref_content_menu, ref_content_staff, ref_content_upgrades, ref_inventory
+
+### Community 80 - "ensureBatches"
+Cohesion: 0.80
+Nodes (5): addStock(), ageOneDay(), consumeStock(), ensureBatches(), sync()
+
+### Community 82 - "StoryModal.ts"
+Cohesion: 0.27
+Nodes (10): StoryEpisode, describeKarmaEffects(), KARMA_LIMITS, karmaEffects, lean(), canNarrate(), bindStoryEvents(), getCharacterPortrait() (+2 more)
+
 ## Knowledge Gaps
-- **424 isolated node(s):** `NonEmpty`, `GamePhase`, `QualityRating`, `OilCondition`, `BaseMenuItemId` (+419 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 512 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **449 isolated node(s):** `NonEmpty`, `GamePhase`, `QualityRating`, `OilCondition`, `BaseMenuItemId` (+444 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 539 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **5 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `vitest` connect `sellingSim.ts` to `tutorial.test.ts`, `staff.test.ts`, `logic.ts`, `review-fixes-2709.test.ts`, `GameState`, `package.json`, `save-and-name.test.ts`, `story-characters.test.ts`, `SellingView.ts`, `wrapped.test.ts`?**
-  _High betweenness centrality (0.081) - this node is a cross-community bridge._
-- **Why does `Tiệm Gà Nhà Tui — Review mã nguồn & Kế hoạch tối ưu` connect `Tiệm Gà Nhà Tui — Review mã nguồn & Kế hoạch tối ưu` to `bao-cao-gio-1.md`?**
-  _High betweenness centrality (0.068) - this node is a cross-community bridge._
-- **Why does `KarmaState` connect `KarmaState` to `GameState`, `game.ts`, `sellingSim.ts`, `review-fixes-2709.test.ts`?**
-  _High betweenness centrality (0.047) - this node is a cross-community bridge._
+- **Why does `vitest` connect `p0-fixes.test.ts` to `tutorial.test.ts`, `logic.ts`, `staff.test.ts`, `orders.ts`, `review-fixes-2709.test.ts`, `GameState`, `package.json`, `state.ts`, `economy.ts`, `sellingSim.ts`, `StoryModal.ts`, `assets.ts`, `endings.ts`, `cooking.ts`, `progression.ts`?**
+  _High betweenness centrality (0.078) - this node is a cross-community bridge._
+- **Why does `KarmaState` connect `KarmaState` to `game.ts`, `endings.ts`, `3. Bảng trạng thái / yêu cầu qua lại`, `StoryModal.ts`?**
+  _High betweenness centrality (0.062) - this node is a cross-community bridge._
+- **Why does `Tiệm Gà Nhà Tui — Review mã nguồn & Kế hoạch tối ưu` connect `Tiệm Gà Nhà Tui — Review mã nguồn & Kế hoạch tối ưu` to `Báo cáo Claude — Giờ 1 (26/09/2026, 14:35 → 15:05)`, `5. Tối ưu UI/UX (P2)`?**
+  _High betweenness centrality (0.045) - this node is a cross-community bridge._
 - **What connects `NonEmpty`, `GamePhase`, `QualityRating` to the rest of the system?**
-  _424 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _449 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `AppController` be split into smaller, more focused modules?**
-  _Cohesion score 0.11805961426066627 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08108108108108109 - nodes in this community are weakly interconnected._
 - **Should `Story Bible v2 — Hẻm 1102` be split into smaller, more focused modules?**
   _Cohesion score 0.14285714285714285 - nodes in this community are weakly interconnected._
-- **Should `audio.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.14210526315789473 - nodes in this community are weakly interconnected._
+- **Should `music.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.14736842105263157 - nodes in this community are weakly interconnected._

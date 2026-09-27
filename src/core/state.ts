@@ -76,6 +76,7 @@ export function createInitialState(): GameState {
     integrity: { tampered: false, reasons: [] },
     pausedShift: null,
     tutorialDone: false,
+    todayOilCost: 0,
     lifetimeStats: {
       totalFried: 0,
       totalBurnt: 0,
@@ -145,11 +146,15 @@ export function migrateSave(raw: unknown): { state: GameState; repaired: string[
     }
   }
   Object.values(state.inventory).forEach(ensureBatches);
-  // Menu: giữ giá người chơi đã chỉnh + combo tự tạo, bổ sung món content còn thiếu (bản cập nhật mới)
+  // Menu: giữ giá người chơi đã chỉnh + combo tự tạo, bổ sung món content còn thiếu (bản cập nhật mới).
+  // Món có sẵn lấy lại tên / ảnh / chương / vai trò từ content (bản cập nhật đổi tên món), giữ giá đã chỉnh.
   for (const item of defaults.menu) {
-    if (!state.menu.some(m => m?.id === item.id)) {
+    const saved = state.menu.find(m => m?.id === item.id);
+    if (!saved) {
       state.menu.push(item);
       repaired.push(`menu.${item.id}`);
+    } else {
+      Object.assign(saved, { ...item, currentPrice: saved.currentPrice });
     }
   }
   // Karma & Narrative migration

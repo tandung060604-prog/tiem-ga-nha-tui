@@ -27,14 +27,16 @@ import { renderSellingView, patchSellingView, sellingStructureKey, renderFx } fr
 import { SellingSession, createSellingSession, gameDeltaMs, tickSelling, drainFx } from './core/sellingSim';
 import { OPEN_HOUR, CLOSE_HOUR } from './core/clock';
 import type { ShiftSnapshot } from './core/sellingSim';
-import { DRINK_RECIPES, TIMER_RECIPES, timerPhase, TimerStationId, AssemblyId, DrinkId, isTimerStationId, isAssemblyId, isDrinkId } from './core/stations';
-import { staffEffects, tickStaff, fryingItemId, traySizeFor, hasAutoWork, missingItems } from './core/staff';
+import { DRINK_RECIPES, TIMER_RECIPES, timerPhase, TimerStationId, AssemblyId, DrinkId, isTimerStationId, isAssemblyId, isDrinkId, ScoopId, isScoopId } from './core/stations';
+import { PREP_LAYOUT, prepLock } from './core/prepStation';
+import { showPrepPopover } from './ui/components/PrepStation';
+import { staffEffects, tickStaff, fryingItemId, traySizeFor, hasAutoWork, missingItems, FRY_RECIPES, FRY_LOOK } from './core/staff';
 import { TutorialState, tutorialStep, tutorialHint, shouldRunTutorial } from './core/tutorial';
 import { syncTutorialLayer } from './ui/components/TutorialLayer';
 import { weeklyWrapped } from './core/wrapped';
 import { drawWrapped, shareWrapped, shareImage } from './ui/components/WrappedCard';
 
-import { squeezeCondiment, recordHelperFry, StationResult, startTimerStation, pullTimerStation, assembleAtCounter, makeDrink, creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, SAUCE_STOCK, serveFirstOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP } from './core/day';
+import { squeezeCondiment, recordHelperFry, StationResult, scoopSide, changeOil, OIL_CHANGE_COST, startTimerStation, pullTimerStation, assembleAtCounter, makeDrink, creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, SAUCE_STOCK, serveFirstOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP } from './core/day';
 import { upgradeEffects } from './core/upgrades';
 import { renderSummaryModal } from './ui/components/SummaryModal';
 import { renderSettingsModal } from './ui/components/SettingsModal';
@@ -53,17 +55,24 @@ import type { DailyIncident } from './types/game';
 type TabId = 'inventory' | 'upgrades' | 'staff' | 'reviews' | 'menu';
 
 const SELLING_ACTIONS = [
-  'toggle-fast', 'fry-chicken', 'fry-fries', 'fry-popcorn',
+  'toggle-fast', 'fry-chicken', 'fry-fries', 'fry-popcorn', 'fry-thigh', 'fry-cheese',
   'add-drink', 'pour-coca', 'pour-7up', 'pour-fanta', 'squeeze-ketchup', 'squeeze-chili',
   'fry-pot', 'change-oil', 'season-spicy', 'season-honey', 'serve-order'
 ] as const;
 type SellingAction = typeof SELLING_ACTIONS[number];
 
-// Nút của trạm mở theo chương: btn-timer-<nồi>, btn-assemble-<món>, btn-drink-<đồ uống>
+// Nút chiên trên quầy khay inox → món chiên (công thức ở core/staff.ts FRY_RECIPES)
+const FRY_ACTION_ITEM = {
+  'fry-chicken': 'crispy_chicken', 'fry-fries': 'shake_fries', 'fry-popcorn': 'popcorn_chicken',
+  'fry-thigh': 'spicy_thigh', 'fry-cheese': 'cheese_stick'
+} as const;
+
+// Nút của trạm mở theo chương: btn-timer-<nồi>, btn-assemble-<món>, btn-drink-<đồ uống>, btn-scoop-<món kèm>
 type StationAction =
   | { kind: 'timer'; id: TimerStationId }
   | { kind: 'assemble'; id: AssemblyId }
-  | { kind: 'drink'; id: DrinkId };
+  | { kind: 'drink'; id: DrinkId }
+  | { kind: 'scoop'; id: ScoopId };
 
 function parseStationAction(action: string | undefined): StationAction | null {
   const [kind, ...rest] = (action ?? '').split('-');
@@ -71,6 +80,7 @@ function parseStationAction(action: string | undefined): StationAction | null {
   if (kind === 'timer' && isTimerStationId(id)) return { kind, id };
   if (kind === 'assemble' && isAssemblyId(id)) return { kind, id };
   if (kind === 'drink' && isDrinkId(id)) return { kind, id };
+  if (kind === 'scoop' && isScoopId(id)) return { kind, id };
   return null;
 }
 
@@ -1025,6 +1035,11 @@ class AppController {
         stateManager.update(draft => { r = makeDrink(draft, session, cookingEngine, drink); });
         return r === 'ok';
       },
+      scoop: side => {
+        let r = 'locked' as StationResult;
+        stateManager.update(draft => { r = scoopSide(draft, session, cookingEngine, side); });
+        return r === 'ok';
+      },
       traySize: cookingEngine.getTraySize()
     });
     for (const ev of events) {
@@ -1074,6 +1089,13 @@ class AppController {
       return;
     }
 
+    const lockedPan = target.closest<HTMLElement>('[data-prep-lock]');
+    if (lockedPan) {
+      const root = document.getElementById('main-view');
+      if (root) showPrepPopover(root, lockedPan.dataset.prepLock ?? '', stateManager.getState());
+      return;
+    }
+
     const bunnyCard = target.closest<HTMLElement>('.customer-card[data-is-bunny="true"]');
     if (bunnyCard) {
       const letter = BUNNY_LETTERS.find(l => l.id === bunnyCard.dataset.letterId);
@@ -1105,6 +1127,8 @@ class AppController {
           : pullTimerStation(session, cookingEngine, action.id);
       } else if (action.kind === 'assemble') {
         result = assembleAtCounter(draft, session, cookingEngine, action.id);
+      } else if (action.kind === 'scoop') {
+        result = scoopSide(draft, session, cookingEngine, action.id);
       } else {
         result = makeDrink(draft, session, cookingEngine, action.id);
       }
@@ -1135,19 +1159,28 @@ class AppController {
 
       case 'fry-chicken':
       case 'fry-fries':
-      case 'fry-popcorn': {
-        const type = action === 'fry-fries' ? 'fries' : action === 'fry-popcorn' ? 'popcorn' : 'chicken';
-        if (cookingEngine.getCookState().isFrying) return;
+      case 'fry-popcorn':
+      case 'fry-thigh':
+      case 'fry-cheese': {
+        const itemId = FRY_ACTION_ITEM[action];
+        const recipe = FRY_RECIPES[itemId];
+        if (!recipe || cookingEngine.getCookState().isFrying) return;
+        const pan = PREP_LAYOUT.find(p => p.action === action);
+        const lock = pan ? prepLock(stateManager.getState(), pan) : undefined;
+        if (lock) {
+          this.showToast(`🔒 ${lock.hint}`);
+          return;
+        }
         if (cookingEngine.isTrayFull()) {
           this.showToast('Khay đầy rồi, giao bớt món trước đã!');
           return;
         }
-        if (!this.useIngredients(type === 'fries' ? ['potato_cheese'] : ['chicken_meat', 'flour'])) {
-          this.showToast(type === 'fries' ? 'Hết khoai tây & phô mai!' : 'Hết thịt gà hoặc bột chiên giòn!');
+        if (!this.useIngredients([...recipe.stock])) {
+          this.showToast(`Hết nguyên liệu cho ${FRY_LOOK[itemId]?.name ?? 'món này'}! Vào Kho hàng để nhập thêm.`);
           return;
         }
         session.totalFriedCount += 1;
-        cookingEngine.startFrying(type);
+        cookingEngine.startFrying(recipe.type);
         break;
       }
 
@@ -1254,19 +1287,17 @@ class AppController {
         break;
       }
 
-      case 'change-oil':
-        if (stateManager.getState().money < 150000) {
-          this.showToast('Không đủ 150.000đ để thay dầu mới!');
+      case 'change-oil': {
+        let changed = false;
+        stateManager.update(draft => { changed = changeOil(draft); });
+        if (!changed) {
+          this.showToast(`Không đủ ${OIL_CHANGE_COST.toLocaleString('vi-VN')}đ để thay dầu mới!`);
           return;
         }
-        stateManager.update(draft => {
-          draft.money -= 150000;
-          draft.oilCondition = 'clean';
-          draft.oilBatchesCooked = 0;
-        });
         audio.playCash();
         this.showToast('Đã thay dầu chiên mới tinh vàng óng! Vệ sinh 5 sao! ✨');
         break;
+      }
 
       case 'season-spicy':
       case 'season-honey': {

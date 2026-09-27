@@ -47,16 +47,20 @@ describe('#8 kho theo lô', () => {
 
 describe('#1 #2 tiền không bị tính 2 lần', () => {
   it('cuối ngày chỉ trừ chi phí cố định, không cộng lại doanh thu hay trừ lại nguyên liệu', () => {
-    const ledger = EconomyEngine.finalizeDayLedger(1, 500000, 20000, 200000, 30000, 0, 2, 12, 1, 0, 'crispy_chicken');
-    expect(EconomyEngine.closingCharges(ledger)).toBe(150000 + 60000); // mặt bằng + điện nước chương 2
-    expect(ledger.netProfit).toBe(500000 + 20000 - 200000 - 30000 - 210000);
+    const ledger = EconomyEngine.finalizeDayLedger({
+      day: 1, chapter: 2, revenueCounter: 500000, tips: 20000, ingredientCost: 200000, wasteCost: 30000, wages: 0,
+      servedCount: 12, lostCount: 1, burntCount: 0, topSellerId: 'crispy_chicken'
+    });
+    const tax = 500000 * 0.045; // hộ kinh doanh: 4,5% doanh thu, tip không tính
+    expect(EconomyEngine.closingCharges(ledger)).toBe(150000 + 60000 + tax); // mặt bằng + điện nước chương 2 + thuế
+    expect(ledger.netProfit).toBe(500000 + 20000 - 200000 - 30000 - 210000 - tax);
   });
 });
 
 describe('#3 order chỉ gồm món bếp làm được', () => {
   it('chương 1 không bao giờ gọi món không có trạm', () => {
     const state = createInitialState();
-    const allowed = new Set(['crispy_chicken', 'shake_fries', 'soda', 'seven_up']);
+    const allowed = new Set(['crispy_chicken', 'shake_fries', 'soda', 'seven_up', 'danmuji']); // ngày 1: chưa có má đùi, phô mai que
     for (let i = 0; i < 300; i++) {
       for (const it of OrdersEngine.generateOrder(state).items) expect(allowed.has(it.menuItemId)).toBe(true);
     }
@@ -151,9 +155,12 @@ describe('P1: số khách và sự kiện có tác dụng', () => {
   });
 
   it('tiền phạt kiểm tra vệ sinh bị trừ lúc đóng cửa và hiện trong lãi', () => {
-    const ledger = EconomyEngine.finalizeDayLedger(1, 100000, 0, 0, 0, 0, 1, 3, 0, 0, 'crispy_chicken', 200000);
-    expect(EconomyEngine.closingCharges(ledger)).toBe(25000 + 200000);
-    expect(ledger.netProfit).toBe(100000 - 25000 - 200000);
+    const ledger = EconomyEngine.finalizeDayLedger({
+      day: 1, chapter: 1, revenueCounter: 100000, tips: 0, ingredientCost: 0, wasteCost: 0, wages: 0,
+      servedCount: 3, lostCount: 0, burntCount: 0, topSellerId: 'crispy_chicken', fines: 200000
+    });
+    expect(EconomyEngine.closingCharges(ledger)).toBe(25000 + 200000 + 4500);
+    expect(ledger.netProfit).toBe(100000 - 25000 - 200000 - 4500);
   });
 
   it('hệ số giá của sự kiện áp vào tổng tiền order', () => {

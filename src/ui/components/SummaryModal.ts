@@ -1,5 +1,68 @@
 import { isWrappedDay, weeklyWrapped } from '../../core/wrapped';
 import { GameState, DayLedger, CustomerReview } from '../../types/game';
+import { BUSINESS_FORM_LABEL, financialLedger } from '../../core/accounting';
+
+const vnd = (n: number) => `${n.toLocaleString('vi-VN')}đ`;
+
+// Một dòng sổ; khoản 0đ không hiện (trừ dòng bắt buộc)
+function pnlRow(label: string, amount: number, sign: '+' | '-', always = false): string {
+  if (!always && amount === 0) return '';
+  return `<div class="ledger-row pnl-row${sign === '-' ? ' neg' : ''}">
+    <span>${label}</span><span class="${sign === '+' ? 'val-pos' : 'val-neg'}">${sign}${vnd(amount)}</span>
+  </div>`;
+}
+
+// Khối thu gọn được (<details> không cần JS) để vừa màn 320px
+function pnlSection(title: string, total: number, sign: '+' | '-', rows: string, open = false): string {
+  return `<details class="pnl-section"${open ? ' open' : ''}>
+    <summary class="ledger-row pnl-subtotal"><span>${title}</span><span class="${sign === '+' ? 'val-pos' : 'val-neg'}">${sign}${vnd(total)}</span></summary>
+    ${rows}
+  </details>`;
+}
+
+// Báo cáo lãi lỗ cuối ngày. Class cho CSS (Gemini): .pnl, .pnl-form-badge, .pnl-section, .pnl-subtotal,
+// .pnl-row(.neg), .pnl-profit, .pnl-tax, .pnl-net, .pnl-note. Giữ .ledger-box / .ledger-row để có style sẵn.
+export function renderPnl(ledger: DayLedger): string {
+  const f = financialLedger(ledger);
+  const signed = (n: number) => `${n >= 0 ? '+' : '-'}${vnd(Math.abs(n))}`;
+  return `
+    <div class="ledger-box pnl">
+      <div class="pnl-form-badge" data-form="${f.tax.form}">${BUSINESS_FORM_LABEL[f.tax.form]}</div>
+      ${pnlSection('Doanh thu', f.revenue.counter + f.revenue.delivery + f.revenue.tips, '+',
+        pnlRow('Bán tại quầy', f.revenue.counter, '+', true)
+        + pnlRow('Bán qua app giao hàng', f.revenue.delivery, '+')
+        + pnlRow('Tip &amp; thưởng tay nghề', f.revenue.tips, '+')
+        + (f.waste.burnt > 0 ? `<div class="pnl-note">Đã mất ${vnd(f.waste.burnt)} vì giao món cháy (khách trả nửa giá).</div>` : ''), true)}
+      ${pnlSection('Giá vốn hàng bán', f.cogs.total, '-',
+        pnlRow('Nguyên liệu đã dùng', f.cogs.ingredients, '-', true)
+        + pnlRow('Tương cà, tương ớt', f.cogs.condiments, '-')
+        + pnlRow('Bao bì: hộp kraft, giấy thấm, ly, túi', f.cogs.packaging, '-')
+        + pnlRow('Thay dầu chiên', f.cogs.oil, '-'))}
+      ${pnlSection('Chi phí vận hành', f.opex.total, '-',
+        pnlRow('Lương nhân viên', f.opex.wages, '-')
+        + pnlRow('Tiền mặt bằng', f.opex.rent, '-')
+        + pnlRow('Điện nước', f.opex.utilities, '-', true)
+        + pnlRow('Gas chảo chiên', f.opex.gas, '-')
+        + pnlRow('Hoa hồng app giao hàng', f.opex.commission, '-')
+        + pnlRow('Bảo trì, khấu hao thiết bị', f.opex.maintenance, '-'))}
+      ${f.waste.expired + f.fines > 0 ? pnlSection('Hao hụt &amp; phạt', f.waste.expired + f.fines, '-',
+        pnlRow('Hàng hết hạn bỏ đi', f.waste.expired, '-')
+        + pnlRow('Phạt kiểm tra vệ sinh', f.fines, '-')) : ''}
+      <div class="ledger-row pnl-profit">
+        <span>Lãi trước thuế</span>
+        <span class="${f.preTaxProfit >= 0 ? 'val-pos' : 'val-neg'}">${signed(f.preTaxProfit)}</span>
+      </div>
+      ${pnlSection('Thuế', f.tax.total, '-',
+        pnlRow(f.tax.form === 'household' ? 'Thuế GTGT (3% doanh thu)' : 'Thuế GTGT (8% phần giá trị tăng thêm)', f.tax.vat, '-', true)
+        + pnlRow('Thuế TNCN (1,5% doanh thu)', f.tax.pit, '-')
+        + pnlRow('Thuế TNDN (17% lãi)', f.tax.cit, '-'))}
+      <div class="ledger-row total pnl-net">
+        <span>LỢI NHUẬN RÒNG</span>
+        <span class="${f.netProfit >= 0 ? 'val-pos' : 'val-neg'}">${signed(f.netProfit)}</span>
+      </div>
+      <div class="pnl-note">Tiền bán đã vào quỹ lúc giao món, nguyên liệu trả lúc nhập kho. Đóng cửa chỉ trừ lương, mặt bằng, điện nước, bao bì, gas, bảo trì, hoa hồng và thuế.</div>
+    </div>`;
+}
 
 export function renderSummaryModal(
   state: GameState,
@@ -7,7 +70,6 @@ export function renderSummaryModal(
   review: CustomerReview,
   advisorTip: string
 ): string {
-  const isProfit = ledger.netProfit >= 0;
   // Gà Wrapped mỗi 7 ngày: cùng số liệu với thẻ chia sẻ (core/wrapped.ts). Trước đây cộng hôm nay 2 lần.
   const wrapped = isWrappedDay(ledger.day) ? weeklyWrapped(state, ledger.day) : null;
 
@@ -43,63 +105,8 @@ export function renderSummaryModal(
         </div>
       ` : ''}
 
-      <!-- Financial Ledger -->
-      <div class="ledger-box">
-        <div class="ledger-row">
-          <span>Doanh thu bán hàng</span>
-          <span class="val-pos">+${ledger.grossRevenue.toLocaleString('vi-VN')}đ</span>
-        </div>
-        ${ledger.tips > 0 ? `
-          <div class="ledger-row">
-            <span>Tiền tip của khách</span>
-            <span class="val-pos">+${ledger.tips.toLocaleString('vi-VN')}đ</span>
-          </div>
-        ` : ''}
-        <div class="ledger-row">
-          <span>Nguyên liệu đã dùng <small>(đã trả lúc nhập)</small></span>
-          <span class="val-neg">-${ledger.ingredientCost.toLocaleString('vi-VN')}đ</span>
-        </div>
-        ${ledger.wasteCost > 0 ? `
-          <div class="ledger-row">
-            <span>Hàng hết hạn bỏ đi</span>
-            <span class="val-neg">-${ledger.wasteCost.toLocaleString('vi-VN')}đ</span>
-          </div>
-        ` : ''}
-        ${ledger.wages > 0 ? `
-          <div class="ledger-row">
-            <span>Lương nhân viên</span>
-            <span class="val-neg">-${ledger.wages.toLocaleString('vi-VN')}đ</span>
-          </div>
-        ` : ''}
-        ${ledger.rent > 0 ? `
-          <div class="ledger-row">
-            <span>Tiền mặt bằng</span>
-            <span class="val-neg">-${ledger.rent.toLocaleString('vi-VN')}đ</span>
-          </div>
-        ` : ''}
-        <div class="ledger-row">
-          <span>Điện nước</span>
-          <span class="val-neg">-${ledger.utilities.toLocaleString('vi-VN')}đ</span>
-        </div>
-        ${(ledger.fines ?? 0) > 0 ? `
-          <div class="ledger-row">
-            <span>Phạt kiểm tra vệ sinh</span>
-            <span class="val-neg">-${(ledger.fines ?? 0).toLocaleString('vi-VN')}đ</span>
-          </div>
-        ` : ''}
-        ${ledger.appCommissions > 0 ? `
-          <div class="ledger-row">
-            <span>Hoa hồng app giao hàng</span>
-            <span class="val-neg">-${ledger.appCommissions.toLocaleString('vi-VN')}đ</span>
-          </div>
-        ` : ''}
-        <div class="ledger-row total">
-          <span>LỢI NHUẬN RÒNG</span>
-          <span class="${isProfit ? 'val-pos' : 'val-neg'}">
-            ${isProfit ? '+' : ''}${ledger.netProfit.toLocaleString('vi-VN')}đ
-          </span>
-        </div>
-      </div>
+      <!-- Báo cáo lãi lỗ (P&L) — số liệu ở core/accounting.ts -->
+      ${renderPnl(ledger)}
 
       <!-- 5 Criteria Ratings -->
       <div class="stars-summary-box">

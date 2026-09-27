@@ -33,6 +33,15 @@ export interface SellingSession {
   midIncidentTriggered?: boolean;
   soldCounts?: Record<string, number>; // số món đã giao theo loại → món bán chạy
   bestStreak?: number;                 // chuỗi Perfect dài nhất trong ca
+  // Sổ P&L (core/accounting.ts). Tùy chọn: ca bán dở lưu từ bản cũ không có.
+  revenueDelivery?: number;            // phần doanh thu từ đơn app (trong grossRevenue)
+  counterOrders?: number;
+  deliveryOrders?: number;
+  cups?: number;                       // số ly nước đã giao (ly nắp + ống hút)
+  squirts?: number;                    // số phần tương đã xịt trên món giao đi
+  burntWaste?: number;                 // tiền mất vì món cháy (khách trả nửa giá)
+  friedMainOrders?: number;            // đơn có món chính chiên ngập dầu
+  cleanserOrders?: number;             // … và có món giải ngấy (củ cải, bắp cải) → sao Hương vị
 }
 
 // Hiệu ứng "đã tay": core ghi lại chuyện vừa xảy ra, giao diện rút ra (drainFx) để vẽ đúng một lần.

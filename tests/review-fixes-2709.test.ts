@@ -1,3 +1,4 @@
+import { FRY_RECIPES } from '../src/core/staff';
 import { describe, it, expect, beforeAll } from 'vitest';
 import { DAILY_INCIDENTS } from '../src/content/dailyIncidents';
 import { resolveIncidentChoice, MAX_RESOLVED_HISTORY } from '../src/core/dailyIncidentsEngine';
@@ -98,8 +99,8 @@ describe('quầy tương: chỉ tip khi khách dặn đúng loại', () => {
     let asked = 0, lines = 0;
     for (let i = 0; i < 300; i++) {
       for (const it of OrdersEngine.generateOrder(s).items) {
-        if (it.condiment) { asked++; expect(['crispy_chicken', 'shake_fries']).toContain(it.menuItemId); }
-        if (it.menuItemId !== 'soda' && it.menuItemId !== 'seven_up') lines++;
+        if (it.condiment) { asked++; expect(FRY_RECIPES[it.menuItemId]).toBeDefined(); }
+        if (FRY_RECIPES[it.menuItemId]) lines++; // chỉ món chiên mới được dặn tương
       }
     }
     expect(asked / lines).toBeGreaterThan(CONDIMENT_REQUEST_CHANCE - 0.1);

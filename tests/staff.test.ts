@@ -182,8 +182,12 @@ describe('thu ngân / shipper / quản lý / Idol TikTok', () => {
   it('shipper nhà giảm hoa hồng app trong sổ cuối ngày', () => {
     const rate = staffEffects([member('delivery')]).commissionRate;
     expect(rate).toBeLessThan(BASE_APP_COMMISSION);
-    const ledger = EconomyEngine.finalizeDayLedger(1, 1000000, 0, 0, 0, 0, 3, 10, 0, 0, 'x', 0, rate);
-    expect(ledger.appCommissions).toBeLessThan(80000);
+    const ledger = EconomyEngine.finalizeDayLedger({
+      day: 1, chapter: 3, revenueCounter: 500000, revenueDelivery: 1000000, tips: 0, ingredientCost: 0, wasteCost: 0, wages: 0,
+      servedCount: 10, lostCount: 0, burntCount: 0, topSellerId: 'x', commissionRate: rate
+    });
+    expect(ledger.appCommissions).toBe(Math.round(1000000 * rate)); // hoa hồng chỉ tính trên đơn app
+    expect(ledger.appCommissions).toBeLessThan(1000000 * BASE_APP_COMMISSION);
   });
 
   it('quản lý tăng hiệu suất cả đội', () => {

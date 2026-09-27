@@ -106,3 +106,17 @@ export const DRINK_RECIPES: Record<DrinkId, DrinkRecipe> = {
 export const isDrinkId = (v: string): v is DrinkId => v in DRINK_RECIPES;
 export const isAssemblyId = (v: string): v is AssemblyId => v in ASSEMBLY_RECIPES;
 export const isTimerStationId = (v: string): v is TimerStationId => v in TIMER_RECIPES;
+
+// ---------------------------------------------------------------------------
+// Khay múc (quầy inox GN 1/6): món kèm giải ngấy, không nấu, chạm là múc vào khay
+// ---------------------------------------------------------------------------
+
+export type ScoopId = 'danmuji' | 'coleslaw';
+export interface ScoopRecipe { menuItemId: ScoopId; name: string; icon: string; stock: string; chapter: number }
+
+export const SCOOP_RECIPES: Record<ScoopId, ScoopRecipe> = {
+  danmuji: { menuItemId: 'danmuji', name: 'Củ Cải Vàng Muối Chua Ngọt', icon: '🥒', stock: 'danmuji', chapter: 1 },
+  coleslaw: { menuItemId: 'coleslaw', name: 'Bắp Cải Trộn Sốt Mè Rang', icon: '🥗', stock: 'coleslaw', chapter: 2 }
+};
+
+export const isScoopId = (v: string): v is ScoopId => v in SCOOP_RECIPES;

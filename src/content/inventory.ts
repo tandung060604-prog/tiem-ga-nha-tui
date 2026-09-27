@@ -69,6 +69,34 @@ export const INITIAL_INVENTORY: { [id: string]: Omit<InventoryItem, 'batches'> }
     unlockCost: 0
   },
 
+  // MÓN KÈM GIẢI NGẤY + MÁ ĐÙI (quầy khay inox, core/prepStation.ts)
+  danmuji: {
+    id: 'danmuji',
+    name: 'Củ cải vàng muối chua ngọt',
+    unit: 'phần',
+    cost: 2500,
+    amount: 6,
+    shelfLifeDays: 5,
+    currentLifeDays: 5,
+    icon: '🥒',
+    unlocked: true,
+    unlockDay: 1,
+    unlockCost: 0
+  },
+  chicken_thigh: {
+    id: 'chicken_thigh',
+    name: 'Má đùi gà tươi ướp cay',
+    unit: 'miếng',
+    cost: 16000,
+    amount: 0,
+    shelfLifeDays: 2,
+    currentLifeDays: 2,
+    icon: '🍗',
+    unlocked: true,
+    unlockDay: 2,
+    unlockCost: 0
+  },
+
   // 5 NGUYÊN LIỆU NÂNG CAO (PHÂN TẦNG MỞ KHÓA THEO NGÀY & PHÍ HỢP ĐỒNG)
   spicy_sauce: {
     id: 'spicy_sauce',
@@ -134,5 +162,31 @@ export const INITIAL_INVENTORY: { [id: string]: Omit<InventoryItem, 'batches'> }
     unlocked: false,
     unlockDay: 14,
     unlockCost: 250000
+  },
+  cheese_stick_raw: {
+    id: 'cheese_stick_raw',
+    name: 'Phô mai que tẩm bột (sống)',
+    unit: 'que',
+    cost: 7000,
+    amount: 0,
+    shelfLifeDays: 3,
+    currentLifeDays: 3,
+    icon: '🧀',
+    unlocked: false,
+    unlockDay: 3,
+    unlockCost: 40000
+  },
+  coleslaw: {
+    id: 'coleslaw',
+    name: 'Bắp cải trộn sốt mè rang',
+    unit: 'phần',
+    cost: 3000,
+    amount: 0,
+    shelfLifeDays: 2,
+    currentLifeDays: 2,
+    icon: '🥗',
+    unlocked: false,
+    unlockDay: 8,
+    unlockCost: 60000
   }
 };

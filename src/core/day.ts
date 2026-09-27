@@ -1,13 +1,15 @@
 import { Condiment, CustomerOrder, CustomerReview, DayLedger, GameEvent, GameState, QualityRating, TrayItem } from '../types/game';
 import { RANDOM_EVENTS } from '../content/events';
 import { BUNNY_LETTERS, BunnyLetter, MysteryBunnyEngine } from '../content/mysteryBunny';
-import { OrdersEngine } from './orders';
+import { OrdersEngine, basketRoleOf } from './orders';
+import { maintenanceCost } from './accounting';
 import { EconomyEngine } from './economy';
 import { ReviewsEngine } from './reviewsEngine';
 import { ageOneDay, consumeStock, addStock } from './inventory';
 import { CookingEngine, Sauce } from './cooking';
 import {
-  TIMER_RECIPES, TimerStationId, collectTimer, DRINK_RECIPES, DrinkId, ASSEMBLY_RECIPES, AssemblyId, assemble, assemblyBaseIndex
+  TIMER_RECIPES, TimerStationId, collectTimer, DRINK_RECIPES, DrinkId, ASSEMBLY_RECIPES, AssemblyId, assemble, assemblyBaseIndex,
+  SCOOP_RECIPES, ScoopId
 } from './stations';
 import { upgradeEffects } from './upgrades';
 import { staffEffects, endShiftForStaff, FRY_RECIPES } from './staff';
@@ -179,6 +181,16 @@ export function makeDrink(draft: GameState, session: SellingSession, cook: Cooki
   return 'ok';
 }
 
+// Khay múc: củ cải muối / bắp cải trộn vào khay (không nấu nên luôn đạt 'good')
+export function scoopSide(draft: GameState, session: SellingSession, cook: CookingEngine, id: ScoopId): StationResult {
+  const r = SCOOP_RECIPES[id];
+  if (!stationOpen(draft, r.chapter, [r.stock])) return 'locked';
+  if (cook.isTrayFull()) return 'tray-full';
+  if (!useIngredients(draft, session, [r.stock])) return 'no-stock';
+  cook.addToTray({ id: `tray_${id}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`, menuItemId: r.menuItemId, name: r.name, icon: r.icon, quality: 'good' });
+  return 'ok';
+}
+
 export function assembleAtCounter(draft: GameState, session: SellingSession, cook: CookingEngine, id: AssemblyId): StationResult {
   const r = ASSEMBLY_RECIPES[id];
   if (!stationOpen(draft, r.chapter, r.stock)) return 'locked';
@@ -228,6 +240,7 @@ export function serveFirstOrder(
       wantsSauce.condimentServed = (wantsSauce.condimentServed ?? 0) + 1;
       order.perfectBonus = (order.perfectBonus ?? 0) + CONDIMENT_TIP;
     }
+    if (item.condiment) session.squirts = (session.squirts ?? 0) + 1;
     removeAt(i);
     matched = true;
   }
@@ -242,8 +255,44 @@ export function serveFirstOrder(
   const tip = (order.patienceCurrent / order.patienceMax > 0.6 ? FAST_SERVICE_TIP : 0) + (order.perfectBonus ?? 0);
   session.grossRevenue += paid;
   session.tips += tip;
+  recordOrderBooks(session, order, paid);
   pushFx(session, { kind: 'cash', paid, tip });
   return { kind: 'complete', order, paid, tip, burnt: (order.burntPenalty ?? 0) > 0 };
+}
+
+// Sổ P&L của một đơn đã giao: kênh bán, bao bì, ly nước, tiền mất vì món cháy, món giải ngấy
+function recordOrderBooks(session: SellingSession, order: CustomerOrder, paid: number) {
+  if (order.isDelivery) {
+    session.revenueDelivery = (session.revenueDelivery ?? 0) + paid;
+    session.deliveryOrders = (session.deliveryOrders ?? 0) + 1;
+  } else {
+    session.counterOrders = (session.counterOrders ?? 0) + 1;
+  }
+  session.cups = (session.cups ?? 0) + order.items.filter(it => basketRoleOf(it.menuItemId) === 'drink').reduce((n, it) => n + it.count, 0);
+  session.burntWaste = (session.burntWaste ?? 0) + (order.burntPenalty ?? 0);
+  if (order.items.some(it => FRY_RECIPES[it.menuItemId] && basketRoleOf(it.menuItemId) === 'main')) {
+    session.friedMainOrders = (session.friedMainOrders ?? 0) + 1;
+    if (order.items.some(it => CLEANSER_IDS.has(it.menuItemId))) session.cleanserOrders = (session.cleanserOrders ?? 0) + 1;
+  }
+}
+// Món giải ngấy: ăn gà rán kèm củ cải muối / bắp cải trộn thì khách thấy ngon miệng hơn.
+// Mỗi ngày sao Hương vị +0,05 × tỉ lệ đơn gà rán có món giải ngấy (cộng mỗi đơn thì sao lạm phát quá nhanh).
+export const CLEANSER_IDS: ReadonlySet<string> = new Set(['danmuji', 'coleslaw']);
+export const CLEANSER_TASTE_PER_DAY = 0.05;
+export function cleanserTasteBonus(session: Pick<SellingSession, 'friedMainOrders' | 'cleanserOrders'>): number {
+  const fried = session.friedMainOrders ?? 0;
+  return fried > 0 ? CLEANSER_TASTE_PER_DAY * Math.min(1, (session.cleanserOrders ?? 0) / fried) : 0;
+}
+
+// Thay dầu chiên (150k): trả tiền ngay, ghi vào giá vốn của ngày để hiện trong P&L
+export const OIL_CHANGE_COST = 150000;
+export function changeOil(draft: GameState): boolean {
+  if (draft.money < OIL_CHANGE_COST) return false;
+  draft.money -= OIL_CHANGE_COST;
+  draft.todayOilCost = (draft.todayOilCost ?? 0) + OIL_CHANGE_COST;
+  draft.oilCondition = 'clean';
+  draft.oilBatchesCooked = 0;
+  return true;
 }
 
 // Tiền bán hàng vào ví ngay lúc giao; ghi vào doanh thu trọn đời (dùng cho kiểm tra sổ sách)
@@ -297,12 +346,21 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   // Món bán chạy nhất trong ca (trước đây topSellerId không bao giờ được cập nhật → luôn là Gà Giòn)
   const sold = Object.entries(session.soldCounts ?? {}).sort((a, b) => b[1] - a[1])[0];
   if (sold) session.topSellerId = sold[0];
-  const ledger = EconomyEngine.finalizeDayLedger(
-    draft.day, session.grossRevenue, session.tips, session.ingredientCost, expiredValue,
-    EconomyEngine.calculateTotalWages(draft), draft.currentChapter,
-    session.servedCount, session.lostCount, session.burntCount, session.topSellerId, fine, team.commissionRate,
-    karma.overheadPct
-  );
+  const ledger = EconomyEngine.finalizeDayLedger({
+    day: draft.day, chapter: draft.currentChapter,
+    revenueCounter: session.grossRevenue - (session.revenueDelivery ?? 0), revenueDelivery: session.revenueDelivery ?? 0,
+    tips: session.tips, ingredientCost: session.ingredientCost, wasteCost: expiredValue,
+    wages: EconomyEngine.calculateTotalWages(draft),
+    servedCount: session.servedCount, lostCount: session.lostCount, burntCount: session.burntCount, topSellerId: session.topSellerId,
+    fines: fine, commissionRate: team.commissionRate, overheadPct: karma.overheadPct,
+    counts: { counterOrders: session.counterOrders ?? 0, deliveryOrders: session.deliveryOrders ?? 0, cups: session.cups ?? 0, squirts: session.squirts ?? 0 },
+    oilCost: draft.todayOilCost ?? 0,
+    friedBatches: session.totalFriedCount,
+    maintenance: maintenanceCost(draft.currentChapter, draft.upgrades),
+    burntWaste: session.burntWaste ?? 0
+  });
+  draft.todayOilCost = 0;
+
 
   const perfectRatio = session.totalFriedCount > 0 ? session.perfectCount / session.totalFriedCount : 0.8;
   const avgWait = session.servedCount > 0 ? session.totalWaitSec / session.servedCount : 0;
@@ -311,6 +369,11 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   );
   if (karma.tasteDriftPerDay !== 0) { // Nghệ Nhân (karma): tiếng lành / tiếng dữ về độ ngon
     newRatings.taste = Math.max(1, Math.min(5, newRatings.taste + karma.tasteDriftPerDay));
+    newRatings.overall = ReviewsEngine.calculateOverallStars(newRatings);
+  }
+  const cleanser = cleanserTasteBonus(session);
+  if (cleanser > 0) { // gà rán kèm củ cải / bắp cải: khách thấy đỡ ngấy, khen ngon
+    newRatings.taste = Math.min(5, newRatings.taste + cleanser);
     newRatings.overall = ReviewsEngine.calculateOverallStars(newRatings);
   }
   if (team.hygienePerDay > 0) { // phục vụ lau dọn mỗi ngày

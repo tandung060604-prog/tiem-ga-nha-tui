@@ -3,6 +3,8 @@ import { karmaEffects } from './karmaEffects';
 import { averagePriceRatio, customerMultiplierFromPrice } from './pricing';
 import { GameState, DayLedger } from '../types/game';
 import { upgradeEffects } from './upgrades';
+import { BASE_APP_COMMISSION } from './staff';
+import { CONDIMENT_COST, GAS_PER_BATCH, ServiceCounts, businessForm, computeTaxes, packagingCost } from './accounting';
 import { GAME_HOUR_MS, OFF_PEAK_HOURS, RUSH_HOURS, isWeekend, WEEKEND_CUSTOMER_MULTIPLIER } from './clock';
 
 export class EconomyEngine {
@@ -10,7 +12,7 @@ export class EconomyEngine {
   public static calculateDailyCustomerCount(state: GameState, weatherMultiplier: number = 1.0): number {
     // Khách nền theo từng chương
     const baseCustomersPerChapter: { [key: number]: number } = {
-      1: 12, // mô phỏng (npm run sim): 16 → người chơi trung bình qua Chương 1 ở ngày 9, GDD muốn ~15
+      1: 10, // mô phỏng (npm run sim): 12 → qua Chương 1 ngày 16 khi giỏ hàng có món kèm + nước (27/09); 10 → ~ngày 20
       2: 40, // mô phỏng: 28 khách thì phụ bếp không có việc, Chương 2 không qua nổi trong 35 ngày
       3: 65,
       4: 75,
@@ -64,7 +66,7 @@ export class EconomyEngine {
       case 3:
         return { rent: 350000, utilities: 110000 }; // Mặt tiền phố (mô phỏng: 500k+160k → Chương 3 lỗ)
       case 4:
-        return { rent: 1500000, utilities: 350000 }; // Tiệm hot trend
+        return { rent: 1100000, utilities: 350000 }; // Tiệm hot trend (mô phỏng: 1,5tr + thuế công ty → Chương 4 chậm 4 ngày)
       case 5:
         return { rent: 2400000, utilities: 600000 }; // Chuỗi 5 chi nhánh (mô phỏng: 5,45tr/ngày → Chương 5 lỗ)
       default:
@@ -82,37 +84,42 @@ export class EconomyEngine {
     return total;
   }
 
-  // Khoản trừ ví lúc đóng cửa. Doanh thu + tip đã vào ví khi giao món, nguyên liệu đã trả khi
-  // nhập kho, hàng hết hạn là hàng đã trả tiền: cả ba chỉ để hiển thị trong netProfit.
+  // Khoản trừ ví lúc đóng cửa: những gì CHƯA được trả trong ngày. Doanh thu + tip đã vào ví khi giao món,
+  // nguyên liệu trả lúc nhập kho, dầu trả lúc thay, hàng hết hạn là hàng đã trả tiền: chỉ hiện trong P&L.
   public static closingCharges(ledger: DayLedger): number {
-    return ledger.wages + ledger.rent + ledger.utilities + ledger.appCommissions + (ledger.fines ?? 0);
+    return ledger.wages + ledger.rent + ledger.utilities + ledger.appCommissions + (ledger.fines ?? 0)
+      + (ledger.cogsPackaging ?? 0) + (ledger.cogsCondiments ?? 0) + (ledger.gasCost ?? 0) + (ledger.maintenance ?? 0)
+      + (ledger.taxVat ?? 0) + (ledger.taxPit ?? 0) + (ledger.taxCit ?? 0);
   }
 
-  // Tạo báo cáo tài chính cuối ngày (Ledger). netProfit là lãi kinh tế của ngày để hiển thị;
-  // `ingredientCost` = giá vốn nguyên liệu đã dùng, `wasteCost` = giá trị hàng hết hạn bỏ đi.
-  public static finalizeDayLedger(
-    day: number,
-    grossRevenue: number,
-    tips: number,
-    ingredientCost: number,
-    wasteCost: number,
-    wages: number,
-    chapter: number,
-    servedCount: number,
-    lostCount: number,
-    burntCount: number,
-    topSellerId: string,
-    fines = 0,
-    commissionRate = 0.08, // shipper nhà giảm hoa hồng app (core/staff.ts)
-    overheadPct = 0        // Tham Vọng (karma): mặt bằng, điện nước đội lên
-  ): DayLedger {
+  // Báo cáo tài chính cuối ngày (P&L, core/accounting.ts). netProfit = lãi SAU thuế, chỉ để hiển thị.
+  public static finalizeDayLedger(input: DayLedgerInput): DayLedger {
+    const {
+      day, chapter, tips, ingredientCost, wasteCost, wages, fines = 0,
+      commissionRate = BASE_APP_COMMISSION, // shipper nhà giảm hoa hồng app (core/staff.ts)
+      overheadPct = 0                       // Tham Vọng (karma): mặt bằng, điện nước đội lên
+    } = input;
+    const revenueCounter = input.revenueCounter;
+    const revenueDelivery = input.revenueDelivery ?? 0;
+    const grossRevenue = revenueCounter + revenueDelivery;
     const base = this.getOverheadCosts(chapter);
-    const overhead = { rent: Math.round(base.rent * (1 + overheadPct / 100)), utilities: Math.round(base.utilities * (1 + overheadPct / 100)) };
-    const appCommissions = chapter >= 3 ? Math.round(grossRevenue * commissionRate) : 0; // hoa hồng app nếu có
+    const rent = Math.round(base.rent * (1 + overheadPct / 100));
+    const utilities = Math.round(base.utilities * (1 + overheadPct / 100));
+    const appCommissions = Math.round(revenueDelivery * commissionRate); // hoa hồng sàn chỉ tính đơn app
 
-    const totalIncome = grossRevenue + tips;
-    const totalExpenses = ingredientCost + wasteCost + wages + overhead.rent + overhead.utilities + appCommissions + fines;
-    const netProfit = totalIncome - totalExpenses;
+    const counts = input.counts ?? { counterOrders: 0, deliveryOrders: 0, cups: 0, squirts: 0 };
+    const cogsPackaging = packagingCost(counts);
+    const cogsCondiments = counts.squirts * CONDIMENT_COST;
+    const oilCost = input.oilCost ?? 0;
+    const gasCost = (input.friedBatches ?? 0) * GAS_PER_BATCH;
+    const maintenance = input.maintenance ?? 0;
+    const cogs = ingredientCost + cogsPackaging + cogsCondiments + oilCost;
+
+    const preTaxProfit = grossRevenue + tips - cogs - wasteCost
+      - (wages + rent + utilities + gasCost + appCommissions + maintenance) - fines;
+    const form = businessForm(chapter);
+    const tax = computeTaxes(form, grossRevenue, cogs, preTaxProfit);
+    const netProfit = preTaxProfit - tax.vat - tax.pit - tax.cit;
 
     return {
       day,
@@ -121,15 +128,51 @@ export class EconomyEngine {
       ingredientCost,
       wasteCost,
       wages,
-      rent: overhead.rent,
-      utilities: overhead.utilities,
+      rent,
+      utilities,
       appCommissions,
       fines,
       netProfit,
-      customersServed: servedCount,
-      customersLost: lostCount,
-      burntCount,
-      topSellerId
+      customersServed: input.servedCount,
+      customersLost: input.lostCount,
+      burntCount: input.burntCount,
+      topSellerId: input.topSellerId,
+      businessForm: form,
+      revenueCounter,
+      revenueDelivery,
+      cogsCondiments,
+      cogsPackaging,
+      oilCost,
+      gasCost,
+      maintenance,
+      burntWaste: input.burntWaste ?? 0,
+      preTaxProfit,
+      taxVat: tax.vat,
+      taxPit: tax.pit,
+      taxCit: tax.cit
     };
   }
+}
+
+export interface DayLedgerInput {
+  day: number;
+  chapter: number;
+  revenueCounter: number;   // doanh thu tại quầy (thực thu, sau khi trừ nửa giá món cháy)
+  revenueDelivery?: number; // doanh thu đơn app
+  tips: number;
+  ingredientCost: number;
+  wasteCost: number;        // hàng hết hạn bỏ đi
+  wages: number;
+  servedCount: number;
+  lostCount: number;
+  burntCount: number;
+  topSellerId: string;
+  fines?: number;
+  commissionRate?: number;
+  overheadPct?: number;
+  counts?: ServiceCounts;   // số đơn theo kênh, số ly, số lần xịt tương → bao bì + tương
+  oilCost?: number;
+  friedBatches?: number;
+  maintenance?: number;
+  burntWaste?: number;
 }

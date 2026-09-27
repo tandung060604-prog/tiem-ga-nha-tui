@@ -1,12 +1,14 @@
 import { QualityRating, OilCondition, TrayItem } from '../types/game';
 import { audio } from './audio';
 import { DRINK_RECIPES, DrinkId } from './stations';
+import { FRY_LOOK, fryingItemId } from './staff';
 
 export type Sauce = 'spicy' | 'honey';
-// Gà viên (Chương 3): mẻ nhỏ chín nhanh gấp 1,5 → vùng Perfect ngắn hơn, đòi tay canh nhanh hơn
-export type FryType = 'chicken' | 'fries' | 'popcorn';
+// Gà viên (Chương 3): mẻ nhỏ chín nhanh gấp 1,5 → vùng Perfect ngắn hơn, đòi tay canh nhanh hơn.
+// Má đùi: miếng dày chín lâu (0,8) → chiếm chảo lâu hơn. Phô mai que: chín nhanh (1,3), lơ là là chảy phô mai.
+export type FryType = 'chicken' | 'fries' | 'popcorn' | 'thigh' | 'cheese';
 const BASE_TRAY_SIZE = 4;
-const FRY_SPEED: Record<FryType, number> = { chicken: 1, fries: 1, popcorn: 1.5 };
+const FRY_SPEED: Record<FryType, number> = { chicken: 1, fries: 1, popcorn: 1.5, thigh: 0.8, cheese: 1.3 };
 
 export interface CookingState {
   isFrying: boolean;
@@ -162,31 +164,10 @@ export class CookingEngine {
       audio.playPop();
     }
 
-    let menuItemId = 'crispy_chicken';
-    let name = 'Gà Giòn Nhà Tui';
-    let icon = '🍗';
-
-    if (this.cookState.fryingType === 'fries') {
-      menuItemId = 'shake_fries';
-      name = 'Khoai Lắc Phô Mai';
-      icon = '🍟';
-    } else if (this.cookState.fryingType === 'popcorn') {
-      menuItemId = 'popcorn_chicken';
-      name = 'Gà Viên Popcorn';
-      icon = '🍿';
-    }
-
-    // Sốt chỉ phủ lên gà, không phủ lên khoai
+    // Sốt chỉ phủ lên gà miếng, không phủ lên khoai / gà viên / má đùi / phô mai
     const sauce = this.cookState.fryingType === 'chicken' ? this.activeSeasoning : null;
-    if (sauce === 'spicy') {
-      menuItemId = 'spicy_chicken';
-      name = 'Gà Sốt Cay Xé Lưỡi';
-      icon = '🌶️';
-    } else if (sauce === 'honey') {
-      menuItemId = 'honey_garlic_chicken';
-      name = 'Gà Mật Ong Bơ Tỏi';
-      icon = '🍯';
-    }
+    const menuItemId = fryingItemId(this.cookState.fryingType, sauce);
+    const { name, icon } = FRY_LOOK[menuItemId] ?? { name: menuItemId, icon: '🍗' };
 
     const item: TrayItem = {
       id: 'tray_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),

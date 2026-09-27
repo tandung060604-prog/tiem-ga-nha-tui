@@ -17,10 +17,24 @@ export type BaseMenuItemId =
   | 'spicy_chicken' | 'honey_garlic_chicken' | 'pasta_beef' | 'combo_duo'
   | 'biscuit_honey' | 'chicken_burger' | 'popcorn_chicken' | 'peach_tea'
   | 'chicken_rice' | 'korean_tokbokki_chicken' | 'sundae_icecream'
-  | 'family_bucket';
+  | 'family_bucket'
+  | 'spicy_thigh' | 'cheese_stick' | 'danmuji' | 'coleslaw';
 
 // Trạm trong bếp làm ra món. Món chưa có trạm thì khách chưa được gọi.
-export type Station = 'fryer' | 'drink' | 'noodle' | 'oven' | 'assembly' | 'combo';
+// 'scoop': múc thẳng từ khay inox (củ cải muối, bắp cải trộn), không nấu.
+export type Station = 'fryer' | 'drink' | 'noodle' | 'oven' | 'assembly' | 'combo' | 'scoop';
+
+// Vai trò trong giỏ hàng (core/orders.ts): mọi khách phải gọi ít nhất 1 món chính.
+export type BasketRole = 'main' | 'side' | 'drink' | 'dessert';
+
+// Luật giỏ hàng. Xác suất [đầu game, cuối game], tăng dần theo chương.
+export interface BasketRule {
+  sideChance: readonly [number, number];
+  drinkChance: readonly [number, number];
+  dessertChance: number;
+  walkupDrinkChance: number; // người đi đường chỉ mua nước (đơn duy nhất không có món chính)
+  walkupSurcharge: number;   // phụ thu nước mang đi gấp (VNĐ)
+}
 
 export interface MenuItem {
   id: string;
@@ -31,6 +45,8 @@ export interface MenuItem {
   icon: string;
   category: 'chicken' | 'sides' | 'drinks' | 'combo';
   station?: Station;
+  basketRole?: BasketRole; // món combo không có (combo đã gồm món chính)
+  unlockDay?: number;      // ngày tối thiểu khách mới được gọi (ngoài điều kiện chương)
   components?: { menuItemId: BaseMenuItemId; count: number }[]; // combo: khách nhận từng món, trả giá combo
   steps: string[];
   ingredients: { [key: string]: number };
@@ -130,6 +146,7 @@ export interface CustomerOrder {
   avatar: string;
   isDelivery: boolean;
   isMysteryGuest?: boolean;
+  isWalkupDrink?: boolean; // người đi đường chỉ mua nước mang đi (đã gồm phụ thu)
   mysteryQuestId?: string;
   isBunny?: boolean;
   bunnyLetterId?: string;
@@ -175,6 +192,51 @@ export interface DayLedger {
   bestStreak?: number;
   friedCount?: number;
   perfectCount?: number;
+  // Báo cáo P&L (core/accounting.ts). Save cũ không có → UI coi như 0.
+  businessForm?: BusinessForm;
+  revenueCounter?: number;   // bán tại quầy
+  revenueDelivery?: number;  // bán qua app giao hàng
+  cogsCondiments?: number;   // tương cà, tương ớt
+  cogsPackaging?: number;    // hộp kraft, giấy thấm dầu, ly nắp, ống hút, túi
+  oilCost?: number;          // thay dầu chiên trong ngày
+  gasCost?: number;          // gas chảo chiên (theo số mẻ)
+  maintenance?: number;      // bảo trì, khấu hao thiết bị
+  burntWaste?: number;       // phần tiền mất vì giao món cháy (khách trả nửa giá)
+  preTaxProfit?: number;
+  taxVat?: number;
+  taxPit?: number;
+  taxCit?: number;
+}
+
+// Hình thức kinh doanh: Chương 1–3 hộ kinh doanh, Chương 4–5 công ty TNHH (core/accounting.ts)
+export type BusinessForm = 'household' | 'company';
+
+// Báo cáo lãi lỗ cuối ngày, nhóm theo khoản mục để UI đọc (dựng từ DayLedger bằng financialLedger()).
+export interface FinancialLedger {
+  revenue: { counter: number; delivery: number; tips: number; gross: number };
+  cogs: { ingredients: number; condiments: number; packaging: number; oil: number; total: number };
+  opex: { wages: number; rent: number; utilities: number; gas: number; commission: number; maintenance: number; total: number };
+  waste: { expired: number; burnt: number; total: number };
+  fines: number;
+  preTaxProfit: number;
+  tax: { form: BusinessForm; vat: number; pit: number; cit: number; total: number };
+  netProfit: number;
+}
+
+// Một khay inox GN trên quầy sơ chế (core/prepStation.ts). Khay luôn được dựng đủ, kể cả khi còn khóa.
+export interface PrepSlotState {
+  id: string;
+  row: 'top' | 'bottom';       // trên: khay nông GN 1/6 (món kèm, sốt) · dưới: khay sâu GN 1/3 (đồ sống thả chảo)
+  pan: '1-3' | '1-6';
+  action: string;              // id nút (không có 'btn-'), vd. 'fry-chicken', 'scoop-danmuji', 'season-spicy'
+  ingredientId: string;
+  menuItemId?: string;
+  label: string;
+  icon: string;                // emoji dự phòng khi chưa có ảnh
+  asset: string | null;
+  stock: number;
+  status: 'ready' | 'empty' | 'locked';
+  lock?: { kind: 'chapter' | 'day' | 'contract'; label: string; hint: string };
 }
 
 export interface GameEvent {
@@ -314,4 +376,5 @@ export interface GameState {
   integrity?: { tampered: boolean; reasons: string[] };
   pausedShift?: import('../core/sellingSim').ShiftSnapshot | null; // ca bán dở (thoát giữa ca)
   tutorialDone?: boolean;      // Bác Ba đã dẫn ca đầu (core/tutorial.ts)
+  todayOilCost?: number;       // tiền thay dầu trong ngày (đã trừ ví) → ghi vào sổ lúc đóng cửa
 }

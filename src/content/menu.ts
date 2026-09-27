@@ -4,12 +4,13 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   // CHƯƠNG 1
   {
     id: 'crispy_chicken',
-    name: 'Gà Giòn Nhà Tui',
+    name: 'Gà Rán Giòn Truyền Thống',
     basePrice: 35000,
     currentPrice: 35000,
     chapter: 1,
     icon: '🍗',
     category: 'chicken',
+    basketRole: 'main',
     station: 'fryer',
     steps: ['Tẩm bột', 'Chiên vàng giòn'],
     ingredients: { chicken_meat: 1, flour: 1 }
@@ -22,6 +23,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
     chapter: 1,
     icon: '🍟',
     category: 'sides',
+    basketRole: 'side',
     station: 'fryer',
     steps: ['Chiên khoai', 'Lắc bột phô mai'],
     ingredients: { potato_cheese: 1 }
@@ -34,6 +36,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
     chapter: 1,
     icon: '🥤',
     category: 'drinks',
+    basketRole: 'drink',
     station: 'drink',
     steps: ['Bơm Coca đầy cốc'],
     ingredients: { soft_drink: 1 }
@@ -46,9 +49,52 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
     chapter: 1,
     icon: '🥤',
     category: 'drinks',
+    basketRole: 'drink',
     station: 'drink',
     steps: ['Bơm 7Up đầy cốc'],
     ingredients: { soft_drink: 1 }
+  },
+
+  {
+    id: 'danmuji',
+    name: 'Củ Cải Vàng Muối Chua Ngọt',
+    basePrice: 10000,
+    currentPrice: 10000,
+    chapter: 1,
+    icon: '🥒',
+    category: 'sides',
+    basketRole: 'side',
+    station: 'scoop',
+    steps: ['Múc củ cải từ khay inox'],
+    ingredients: { danmuji: 1 }
+  },
+  {
+    id: 'spicy_thigh',
+    name: 'Má Đùi Gà Rán Giòn Cay',
+    basePrice: 39000,
+    currentPrice: 39000,
+    chapter: 1,
+    unlockDay: 2,
+    icon: '🍗',
+    category: 'chicken',
+    basketRole: 'main',
+    station: 'fryer',
+    steps: ['Tẩm bột cay', 'Chiên lâu lửa vừa cho chín tới xương'],
+    ingredients: { chicken_thigh: 1, flour: 1 }
+  },
+  {
+    id: 'cheese_stick',
+    name: 'Phô Mai Que Kéo Sợi',
+    basePrice: 20000,
+    currentPrice: 20000,
+    chapter: 1,
+    unlockDay: 3,
+    icon: '🧀',
+    category: 'sides',
+    basketRole: 'side',
+    station: 'fryer',
+    steps: ['Chiên nhanh tay kẻo chảy phô mai'],
+    ingredients: { cheese_stick_raw: 1 }
   },
 
   // CHƯƠNG 2
@@ -60,30 +106,33 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
     chapter: 2,
     icon: '🥤',
     category: 'drinks',
+    basketRole: 'drink',
     station: 'drink',
     steps: ['Bơm Fanta Cam đầy cốc'],
     ingredients: { soft_drink: 1 }
   },
   {
     id: 'spicy_chicken',
-    name: 'Gà Sốt Cay Xé Lưỡi',
+    name: 'Cánh Gà Sốt Cay Yangnyeom',
     basePrice: 42000,
     currentPrice: 42000,
     chapter: 2,
     icon: '🌶️',
     category: 'chicken',
+    basketRole: 'main',
     station: 'fryer',
     steps: ['Chiên giòn', 'Quét sốt cay'],
     ingredients: { chicken_meat: 1, flour: 1, spicy_sauce: 1 }
   },
   {
     id: 'honey_garlic_chicken',
-    name: 'Gà Mật Ong Bơ Tỏi',
+    name: 'Gà Sốt Bơ Tỏi Đậu Nành',
     basePrice: 45000,
     currentPrice: 45000,
     chapter: 2,
     icon: '🍯',
     category: 'chicken',
+    basketRole: 'main',
     station: 'fryer',
     steps: ['Chiên giòn', 'Rưới sốt bơ tỏi'],
     ingredients: { chicken_meat: 1, flour: 1, garlic_honey: 1 }
@@ -96,6 +145,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
     chapter: 2,
     icon: '🍝',
     category: 'sides',
+    basketRole: 'main',
     station: 'noodle',
     steps: ['Trụng mì', 'Rưới sốt bò'],
     ingredients: { pasta_beef: 1 }
@@ -114,6 +164,20 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
     ingredients: { chicken_meat: 2, flour: 2, potato_cheese: 1, soft_drink: 2 }
   },
 
+  {
+    id: 'coleslaw',
+    name: 'Bắp Cải Trộn Sốt Mè Rang',
+    basePrice: 12000,
+    currentPrice: 12000,
+    chapter: 2,
+    icon: '🥗',
+    category: 'sides',
+    basketRole: 'side',
+    station: 'scoop',
+    steps: ['Múc bắp cải trộn từ khay inox'],
+    ingredients: { coleslaw: 1 }
+  },
+
   // CHƯƠNG 3
   {
     id: 'biscuit_honey',
@@ -123,6 +187,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
     chapter: 3,
     icon: '🥐',
     category: 'sides',
+    basketRole: 'side',
     station: 'oven',
     steps: ['Nướng bánh', 'Quét bơ mật'],
     ingredients: { garlic_honey: 1 }
@@ -135,6 +200,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
     chapter: 3,
     icon: '🍔',
     category: 'chicken',
+    basketRole: 'main',
     station: 'assembly',
     steps: ['Chiên gà', 'Ghép lớp burger'],
     ingredients: { chicken_meat: 1, flour: 1, burger_bun: 1 }
@@ -147,6 +213,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
     chapter: 3,
     icon: '🍿',
     category: 'chicken',
+    basketRole: 'main',
     station: 'fryer',
     steps: ['Chiên mẻ nhỏ'],
     ingredients: { chicken_meat: 1, flour: 1 }
@@ -159,6 +226,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
     chapter: 3,
     icon: '🍑',
     category: 'drinks',
+    basketRole: 'drink',
     station: 'drink',
     steps: ['Pha trà đào', 'Thêm đào miếng'],
     ingredients: { dessert_pack: 1 }
@@ -173,6 +241,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
     chapter: 4,
     icon: '🍛',
     category: 'chicken',
+    basketRole: 'main',
     station: 'assembly',
     steps: ['Xới cơm dẻo', 'Gà giòn', 'Rưới nước sốt'],
     ingredients: { chicken_meat: 1, flour: 1, spicy_sauce: 1 }
@@ -185,6 +254,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
     chapter: 4,
     icon: '🍲',
     category: 'chicken',
+    basketRole: 'main',
     station: 'assembly',
     steps: ['Chiên gà 2 lần', 'Nấu tokbokki', 'Phủ phô mai'],
     ingredients: { chicken_meat: 1, flour: 1, spicy_sauce: 1, potato_cheese: 1 }
@@ -197,6 +267,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
     chapter: 4,
     icon: '🍨',
     category: 'drinks',
+    basketRole: 'dessert',
     station: 'drink',
     steps: ['Rót kem', 'Rưới sốt sôcôla'],
     ingredients: { dessert_pack: 1 }

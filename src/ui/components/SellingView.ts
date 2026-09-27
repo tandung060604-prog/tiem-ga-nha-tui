@@ -7,6 +7,7 @@ import { foodImage, ASSETS } from '../../content/assets';
 import { TIMER_RECIPES, TimerStationId, timerPhase, DRINK_RECIPES, DrinkId, ASSEMBLY_RECIPES, AssemblyId, assemblyBaseIndex } from '../../core/stations';
 import { stationOpen, perfectTip } from '../../core/day';
 import { escapeHtml } from '../escapeHtml';
+import { renderPrepStation, prepStationKey } from './PrepStation';
 
 export type { SellingSession };
 
@@ -97,7 +98,8 @@ export function sellingStructureKey(state: GameState, session: SellingSession): 
     session.isFastForward, isRushHour(session.gameHour),
     session.perfectStreak >= 2,
     stationStripKey(state, session),
-    staffStripKey(state, session)
+    staffStripKey(state, session),
+    prepStationKey(state)
   ]);
 }
 
@@ -492,8 +494,6 @@ export function renderSellingView(state: GameState, session: SellingSession): st
   const tray = cookingEngine.getTray();
   const oilCondition = state.oilCondition;
 
-  const chickenStock = state.inventory.chicken_meat?.amount ?? 0;
-  const friesStock = state.inventory.potato_cheese?.amount ?? 0;
   const drinkStock = state.inventory.soft_drink?.amount ?? 0;
 
   const potProgressPercent = Math.min(100, Math.round(cookState.progress));
@@ -658,36 +658,12 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             <!-- Kệ Topping & Nguyên Liệu Tươi (Food Shelf / Topping Rack như Mì Cay Bà Tám) -->
             <div class="prep-baskets-section">
               <div class="prep-baskets-header">
-                <span class="prep-baskets-title">🧺 Kệ Topping & Nguyên Liệu</span>
+                <span class="prep-baskets-title">🧺 Quầy Khay Inox Sơ Chế</span>
                 <button id="btn-change-oil" class="oil-change-btn">Thay dầu (150k)</button>
               </div>
-              <div class="food-shelf-grid">
-                <!-- Slot 1: Gà Tươi Tẩm Bột -->
-                <button id="btn-fry-chicken" class="shelf-tile primary ${cookState.isFrying && cookState.fryingType === 'chicken' ? 'is-active-frying' : ''} ${cookState.isFrying ? 'disabled' : ''}" ${cookState.isFrying ? 'disabled' : ''} title="Thả gà tươi tẩm bột vào chảo chiên">
-                  <div class="shelf-badge ${chickenStock <= 0 ? 'empty' : ''}">${chickenStock}</div>
-                  <img src="${ASSETS.kitchen.prepChicken}" alt="Gà Tươi" class="shelf-img" />
-                  <span class="shelf-label">Gà Tươi</span>
-                  <span class="shelf-sub">Chảo 180°</span>
-                </button>
-
-                <!-- Slot 2: Khoai Tây Cắt Sợi -->
-                <button id="btn-fry-fries" class="shelf-tile ${cookState.isFrying && cookState.fryingType === 'fries' ? 'is-active-frying' : ''} ${cookState.isFrying ? 'disabled' : ''}" ${cookState.isFrying ? 'disabled' : ''} title="Thả khoai tây cắt sợi vào chảo chiên">
-                  <div class="shelf-badge ${friesStock <= 0 ? 'empty' : ''}">${friesStock}</div>
-                  <img src="${ASSETS.kitchen.prepFries}" alt="Khoai Tươi" class="shelf-img" />
-                  <span class="shelf-label">Khoai Tươi</span>
-                  <span class="shelf-sub">Lắc Phô Mai</span>
-                </button>
-
-                ${stationOpen(state, 3, ['chicken_meat', 'flour']) ? `
-                  <!-- Slot 3: Gà Viên Popcorn -->
-                  <button id="btn-fry-popcorn" class="shelf-tile ${cookState.isFrying && cookState.fryingType === 'popcorn' ? 'is-active-frying' : ''} ${cookState.isFrying ? 'disabled' : ''}" ${cookState.isFrying ? 'disabled' : ''} title="Chiên gà viên popcorn giòn tan">
-                    <div class="shelf-badge">Chảo</div>
-                    <img src="${ASSETS.food.popcornChicken}" alt="Gà Viên" class="shelf-img" />
-                    <span class="shelf-label">Gà Popcorn</span>
-                    <span class="shelf-sub">Giòn Cay</span>
-                  </button>
-                ` : ''}
-
+              ${renderPrepStation(state)}
+              <!-- Hai chai tương xịt lên món trong khay -->
+              <div class="food-shelf-grid prep-bottles">
                 <!-- Slot 4: Chai Tương Cà -->
                 <button id="btn-squeeze-ketchup" class="shelf-tile condiment ketchup" title="Xịt Tương Cà đỏ tươi thơm ngọt lên món (+Tip & Hương vị)">
                   <div class="shelf-badge sauce">🍅 +Tip</div>
@@ -770,18 +746,6 @@ export function renderSellingView(state: GameState, session: SellingSession): st
                 </button>
               </div>
             </div>
-
-            <!-- Seasoning Addons (món sốt mở từ chương 2) -->
-            ${state.currentChapter < 2 ? '' : `<div class="addon-station">
-              <button id="btn-season-spicy" class="addon-btn ${cookingEngine.getActiveSeasoning() === 'spicy' ? 'active' : ''}">
-                <img src="${ASSETS.kitchen.prepSpicyPot}" class="addon-pot-img" alt="Hũ Sốt Cay" />
-                <span>🌶️ Sốt Cay</span>
-              </button>
-              <button id="btn-season-honey" class="addon-btn ${cookingEngine.getActiveSeasoning() === 'honey' ? 'active' : ''}">
-                <img src="${ASSETS.kitchen.prepHoneyPot}" class="addon-pot-img" alt="Hũ Bơ Tỏi" />
-                <span>🍯 Bơ Tỏi</span>
-              </button>
-            </div>`}
 
             ${renderStaffStrip(state, session)}
             ${renderStationStrip(state, session)}

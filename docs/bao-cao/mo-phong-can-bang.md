@@ -63,3 +63,34 @@ Mô phỏng: mua theo lượng đã dùng, tự nhấc giỏ khi có Dây chuy�
 | Khung thiết kế | 15 | 50 | 100 | 150 | 210 |
 
 Không nâng cấp, không nhân viên: không qua được Chương 3 — quán mặt phố cần đội ngũ và đầu tư (đúng thiết kế).
+
+## 27/09: P&L + thuế, giỏ hàng thực tế, thực đơn K-chicken
+
+Thay đổi:
+- Mọi đơn đều có món chính. Món kèm 40→60% theo chương, nước 65→85%. Người đi đường chỉ mua nước: 3%, có phụ thu 5k.
+- Chi phí mới: thuế (hộ kinh doanh 4,5% doanh thu; công ty VAT 8/108 + TNDN 17%), bao bì, tương, gas, bảo trì.
+- Hoa hồng app 22%, chỉ tính trên đơn app.
+- Tiền thay dầu được ghi vào sổ.
+
+Chỉnh sau khi chạy mô phỏng:
+- Khách nền Chương 1: 12 → 10.
+- Mặt bằng Chương 4: 1,5tr → 1,1tr.
+- Bảo trì nền Chương 4/5: 50k/100k.
+
+`npm run sim -- --days 210 --seeds 12`, trung vị ngày qua Chương 1 / 2 / 3 / 4:
+
+| Người chơi · chính sách | HEAD `ac2d6da` | Sau thay đổi |
+|---|---|---|
+| **Trung bình · nâng cấp · nhân viên** | **20 / 53 / 86 / 148** | **20 / 54 / 85 / 148** |
+| Giỏi · nâng cấp · nhân viên | 20 / 41 / 65 / 105 | 14 / 37 / 58 / 98 |
+| Vụng · nâng cấp · nhân viên | 34 / 71 / 106 / 176 | 45 / 84 / 118 / 195 |
+| Trung bình · nâng cấp · không NV | 20 / 68 / 99 / 165 | 20 / 78 / 108 / 176 |
+| Vụng · nâng cấp · không NV | 34 / 102 / 137 / 176 | 45 / 145 / — / — |
+
+Nhận xét:
+- Mục tiêu đạt: người chơi trung bình giữ nguyên nhịp. Chương 1 lãi 0,41tr/ngày.
+- **Chênh lệch kỹ năng rộng hơn.** Giỏi nhanh hơn 6 ngày, Vụng chậm hơn 11 ngày ở Chương 1 (lãi 15 ngày đầu 0,41 → 0,21tr/ngày).
+  - Lý do: mỗi đơn nhiều món hơn nên cần nhiều thao tác hơn. Thêm vào đó khách nền Chương 1 giảm, trong khi người vụng vốn đã ít sao, ít khách.
+  - Báo cáo cũ từng ghi "kỹ năng ít ảnh hưởng" là vấn đề, nên thay đổi này có mặt tốt. Nhưng Vụng tự làm một mình (không nhân viên) không còn qua được Chương 3 trong 210 ngày.
+  - Nếu muốn nương tay: tăng khách nền Chương 1 lên 11 (trung bình qua Chương 1 sớm hơn khoảng 2 ngày), hoặc giảm tỉ lệ món kèm Chương 1 xuống 30%.
+- Mô phỏng chưa đo được tác dụng của món giải ngấy (bot không chủ động mời) và của khay khóa (bot không bấm UI).

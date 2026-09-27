@@ -2,7 +2,7 @@ import { TrayItem } from '../types/game';
 import type { CookingState } from './cooking';
 import { CookingEngine } from './cooking';
 import { missingItems } from './staff';
-import { isDrinkId } from './stations';
+import { isDrinkId, isScoopId } from './stations';
 import type { SellingSession } from './sellingSim';
 
 // Bác Ba dẫn ca bán đầu tiên. Không có kịch bản cứng: mỗi bước được TÍNH từ trạng thái thật của ca
@@ -10,7 +10,7 @@ import type { SellingSession } from './sellingSim';
 // Trong lúc hướng dẫn, đồng hồ/khách đứng yên (tickSelling bỏ qua khi session.tutorial = true), chảo vẫn chạy.
 
 export type TutorialStep =
-  | 'intro' | 'fry-chicken' | 'fry-fries' | 'drink' | 'wait' | 'lift' | 'discard-raw' | 'serve' | 'done';
+  | 'intro' | 'fry-chicken' | 'fry-fries' | 'drink' | 'scoop' | 'wait' | 'lift' | 'discard-raw' | 'serve' | 'done';
 
 export interface TutorialHint {
   step: TutorialStep;
@@ -27,6 +27,7 @@ export const TUTORIAL_TEXT: Record<TutorialStep, Omit<TutorialHint, 'step'>> = {
   'fry-chicken': { text: 'Khách gọi gà. Bấm "+ Gà Rán" để thả một miếng vào chảo nè.', target: '#btn-fry-chicken' },
   'fry-fries': { text: 'Khách gọi khoai. Bấm "+ Khoai" để thả khoai vô chảo.', target: '#btn-fry-fries' },
   'drink': { text: 'Nước ngọt thì khỏi chiên: chạm vòi máy nước bác chỉ sáng, máy tự rót đúng loại khách còn thiếu vô khay liền.', target: '#btn-add-drink' },
+  'scoop': { text: 'Củ cải muối thì khỏi chiên: chạm khay củ cải vàng trên quầy inox để múc một phần vô khay. Ăn gà kèm củ cải cho đỡ ngấy, khách khen ngon lắm!', target: '#btn-scoop-danmuji' },
   'wait': { text: 'Canh thanh đo nha. Còn ở vùng SỐNG thì chưa được nhấc — đợi kim chạy tới vùng VÀNG GIÒN.', target: '.cook-gauge-container' },
   'lift': { text: 'VÀNG GIÒN rồi! Chạm vô chảo để nhấc ngay, để lâu là cháy đó con!', target: '#btn-fry-pot' },
   'discard-raw': { text: 'Miếng này còn sống, khách không ăn đâu. Chạm vô món trong khay để bỏ, rồi chiên mẻ khác.', target: '.tray-item' },
@@ -60,6 +61,7 @@ export function tutorialStep(
   if (missing.length === 0) return 'serve';
   const next = missing[0];
   if (next && isDrinkId(next)) return 'drink'; // Coca, 7Up, Fanta… đều rót ở máy nước
+  if (next && isScoopId(next)) return 'scoop';
   if (next === 'shake_fries') return 'fry-fries';
   return 'fry-chicken';
 }
