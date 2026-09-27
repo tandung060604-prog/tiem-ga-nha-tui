@@ -116,24 +116,24 @@ export function renderSummaryModal(
         </div>
         <div class="criteria-grid">
           <div class="criteria-item">
-            <span>🍗 Hương Vị:</span>
-            <span>${state.ratings.taste.toFixed(1)}</span>
+            <div class="criteria-label-row"><span>🍗 Hương Vị</span><b>${state.ratings.taste.toFixed(1)}</b></div>
+            <div class="criteria-bar-track"><div class="criteria-bar-fill taste" style="width: ${Math.min(100, Math.round((state.ratings.taste / 5) * 100))}%;"></div></div>
           </div>
           <div class="criteria-item">
-            <span>⚡ Tốc Độ:</span>
-            <span>${state.ratings.speed.toFixed(1)}</span>
+            <div class="criteria-label-row"><span>⚡ Tốc Độ</span><b>${state.ratings.speed.toFixed(1)}</b></div>
+            <div class="criteria-bar-track"><div class="criteria-bar-fill speed" style="width: ${Math.min(100, Math.round((state.ratings.speed / 5) * 100))}%;"></div></div>
           </div>
           <div class="criteria-item">
-            <span>✨ Vệ Sinh:</span>
-            <span>${state.ratings.hygiene.toFixed(1)}</span>
+            <div class="criteria-label-row"><span>✨ Vệ Sinh</span><b>${state.ratings.hygiene.toFixed(1)}</b></div>
+            <div class="criteria-bar-track"><div class="criteria-bar-fill hygiene" style="width: ${Math.min(100, Math.round((state.ratings.hygiene / 5) * 100))}%;"></div></div>
           </div>
           <div class="criteria-item">
-            <span>🪑 Không Gian:</span>
-            <span>${state.ratings.space.toFixed(1)}</span>
+            <div class="criteria-label-row"><span>🪑 Không Gian</span><b>${state.ratings.space.toFixed(1)}</b></div>
+            <div class="criteria-bar-track"><div class="criteria-bar-fill space" style="width: ${Math.min(100, Math.round((state.ratings.space / 5) * 100))}%;"></div></div>
           </div>
-          <div class="criteria-item" style="grid-column: 1 / -1;">
-            <span>💰 Giá Cả:</span>
-            <span>${state.ratings.pricing.toFixed(1)}</span>
+          <div class="criteria-item criteria-item-full">
+            <div class="criteria-label-row"><span>💰 Giá Cả Hợp Lý</span><b>${state.ratings.pricing.toFixed(1)}</b></div>
+            <div class="criteria-bar-track"><div class="criteria-bar-fill pricing" style="width: ${Math.min(100, Math.round((state.ratings.pricing / 5) * 100))}%;"></div></div>
           </div>
         </div>
       </div>

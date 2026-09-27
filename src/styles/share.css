@@ -277,25 +277,67 @@ details.pnl-section .pnl-note {
 .criteria-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px 12px;
+  gap: 6px 12px;
   font-size: 0.75rem;
 }
 
 .criteria-item {
   display: flex;
-  justify-content: space-between;
-  border-bottom: 1px dashed #f0e4d0;
+  flex-direction: column;
+  gap: 3px;
   padding: 2px 0;
 }
 
-.criteria-item span:first-child {
-  color: var(--soft);
+.criteria-item-full {
+  grid-column: 1 / -1;
+}
+
+.criteria-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.74rem;
+}
+
+.criteria-label-row span {
+  color: var(--soft, #64748b);
   font-weight: 600;
 }
 
-.criteria-item span:last-child {
+.criteria-label-row b {
+  color: var(--ink, #1e293b);
   font-weight: 800;
-  color: var(--ink);
+}
+
+.criteria-bar-track {
+  width: 100%;
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.criteria-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.criteria-bar-fill.taste {
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+.criteria-bar-fill.speed {
+  background: linear-gradient(90deg, #38bdf8, #0284c7);
+}
+.criteria-bar-fill.hygiene {
+  background: linear-gradient(90deg, #4ade80, #16a34a);
+}
+.criteria-bar-fill.space {
+  background: linear-gradient(90deg, #c084fc, #9333ea);
+}
+.criteria-bar-fill.pricing {
+  background: linear-gradient(90deg, #fb7185, #e11d48);
 }
 
 /* GenZ Review Card of the Day */

@@ -34,20 +34,86 @@ export function getCustomerMood(order: CustomerOrder): CustomerMood {
 
 export function getMoodThought(mood: CustomerMood, order?: CustomerOrder): string {
   if (order?.isBunny) {
-    if (mood === 'leaving') return 'Em đói bụng rồi tiệm ơi... 🥺';
-    if (mood === 'impatient') return 'Chờ xíu xíu nữa thôi nè! 🐰';
-    return 'Gà chiên thơm lừng luôn á! 💖';
+    if (mood === 'leaving') return 'Em đói lả người rồi tiệm ơi... 🥺';
+    if (mood === 'impatient') return 'Chờ thêm xíu nữa thui nè! 🐰';
+    if (mood === 'waiting') return 'Mùi gà chiên thơm nức mũi luôn á! 🤤';
+    return 'Gà giòn rụm đỉnh nóc kịch trần! 💖';
   }
+
+  const p = order?.personality;
+  if (p === 'foodie') {
+    switch (mood) {
+      case 'leaving': return 'Chờ mòn mỏi chưa có, trừ sạch sao nha! 💢';
+      case 'impatient': return 'Canh lửa chuẩn nha, chiên non lửa là tui biết đó! ⏱️';
+      case 'waiting': return 'Nghe tiếng dầu réo là biết tay nghề cứng rồi! 🍗';
+      case 'happy': return 'Da gà ráo dầu, giòn rụm đúng chuẩn! ⭐';
+    }
+  }
+
+  if (p === 'impatient') {
+    switch (mood) {
+      case 'leaving': return 'Trễ giờ chấm công rồi! Bỏ đi đây! 😤';
+      case 'impatient': return 'Sắp trễ giờ họp rồi, nóng ruột quá trời! ⏳';
+      case 'waiting': return 'Gói lẹ giùm em nha chủ tiệm ơi! 🏃';
+      case 'happy': return 'Nhanh như chớp, kịp giờ làm rồi! ⚡';
+    }
+  }
+
+  if (p === 'driver') {
+    switch (mood) {
+      case 'leaving': return 'Trễ giờ đơn app phạt tiền, huỷ đơn thôi! ❌';
+      case 'impatient': return 'Khách réo nổ máy điện thoại luôn rồi anh ơi! ⏳';
+      case 'waiting': return 'App báo đơn gấp, tiệm làm liền giùm em nha! 📦';
+      case 'happy': return 'Cảm ơn tiệm, em phóng đi giao cho kịp đây! 🛵';
+    }
+  }
+
+  if (p === 'student') {
+    switch (mood) {
+      case 'leaving': return 'Đói lả người rồi, qua quán bánh mì ăn cho lẹ! 🏃';
+      case 'impatient': return 'Bụng réo ầm ầm rồi đại ca ơi... 🥺';
+      case 'waiting': return 'Ăn xong cái đùi này về giải tích phân mới vô! 📖';
+      case 'happy': return 'Gà sốt cay ở đây dính vãi chưởng! 🍟';
+    }
+  }
+
+  if (p === 'easygoing') {
+    switch (mood) {
+      case 'leaving': return 'Có việc bận rồi, hẹn tiệm mai ghé lại nhen! 🚶';
+      case 'impatient': return 'Nay đông khách dữ ta ơi, ráng đợi thêm chút! ⏳';
+      case 'waiting': return 'Tiệm cứ chiên từ từ, em đứng đợi được nhen! 😊';
+      case 'happy': return 'Gà nóng hổi thơm ngon, ưng cái bụng ghê! 🍵';
+    }
+  }
+
+  if (p === 'generous') {
+    switch (mood) {
+      case 'leaving': return 'Thôi chịu hết nổi rồi, hẹn tiệm dịp khác vậy! 🚪';
+      case 'impatient': return 'Cũng hơi lâu xíu rồi đó nha tiệm! 🕒';
+      case 'waiting': return 'Cứ làm kỹ càng nha em, anh không vội đâu! ✨';
+      case 'happy': return 'Quá ngon! Bữa nay tip đậm cho chủ quán! 💵';
+    }
+  }
+
+  if (p === 'frugal') {
+    switch (mood) {
+      case 'leaving': return 'Giá rẻ mà đợi lâu vầy thì thôi xin kiếu! 🏃';
+      case 'impatient': return 'Lâu quá chừng, xin thêm gói tương nha! 🍅';
+      case 'waiting': return 'Đợi combo rẻ mà ngon bõ công ghê! 🍗';
+      case 'happy': return 'Combo giá hời mà gà chất lượng thiệt! 🪙';
+    }
+  }
+
   switch (mood) {
     case 'leaving':
-      return 'Lâu quá! Bỏ về đây! 💢';
+      return 'Lâu quá mức! Bỏ về đây! 💢';
     case 'impatient':
-      return 'Chờ sốt ruột ghê... 🥺';
+      return 'Chờ sốt ruột ghê, nhanh giùm em nha! 🥺';
     case 'waiting':
-      return 'Mùi gà thơm nức mũi! 🤤';
+      return 'Mùi gà thơm nức mũi, thèm chảy nước miếng! 🤤';
     case 'happy':
     default:
-      return 'Tiệm này đỉnh chóp! ✨';
+      return 'Tiệm này đỉnh chóp hẻm 1102! ✨';
   }
 }
 
@@ -76,7 +142,10 @@ export function renderFx(events: readonly FxEvent[]): void {
     const left = 20 + Math.random() * 35;
     if (fx.kind === 'cash') {
       spawn('money-float', `+${fx.paid.toLocaleString('vi-VN')}đ 💵`, left, 'calc(env(safe-area-inset-top) + 72px)');
-      if (fx.tip > 0) spawn('money-float tip-float', `+${fx.tip.toLocaleString('vi-VN')}đ tip ✨`, left + 4, 'calc(env(safe-area-inset-top) + 102px)');
+      if (fx.tip > 0) {
+        spawn('money-float tip-float', `+${fx.tip.toLocaleString('vi-VN')}đ tip ✨`, left + 4, 'calc(env(safe-area-inset-top) + 102px)');
+        spawn('money-float heart-float', '💖 Cảm ơn tiệm!', left - 2, 'calc(env(safe-area-inset-top) + 132px)');
+      }
     } else if (fx.kind === 'lost') {
       spawn('money-float lost-float', '😤 Khách bỏ về', left, 'calc(env(safe-area-inset-top) + 140px)');
     }
@@ -247,6 +316,18 @@ export interface CustomerVisualModel {
 }
 
 function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
+  // Ưu tiên sử dụng model sprite từ bộ 36 nhân vật Hẻm 1102
+  if (order.avatar && (order.avatar.includes('/assets/') || order.avatar.endsWith('.png'))) {
+    return {
+      stand: order.avatar,
+      walk: order.avatar,
+      angry: order.avatar,
+      leave: order.avatar,
+      name: order.customerName,
+      badge: order.archetypeBadge || 'Cư Dân Hẻm',
+      badgeClass: order.isDelivery ? 'delivery-badge' : 'genz-badge'
+    };
+  }
   if (order.isBunny) {
     return {
       stand: ASSETS.thocam.front,

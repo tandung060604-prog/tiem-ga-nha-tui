@@ -1672,6 +1672,38 @@
   animation: floatLostAway 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+/* Hiệu ứng thả tim khi khách vui nhận đủ món */
+.money-float.heart-float {
+  color: #db2777;
+  border-color: #f472b6;
+  font-size: 0.88rem;
+  background: rgba(253, 242, 248, 0.96);
+  box-shadow: 0 4px 12px rgba(219, 39, 119, 0.28);
+  animation: floatHeartUp 1.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes floatHeartUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.6) rotate(-6deg);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(-8px) scale(1.18) rotate(4deg);
+  }
+  40% {
+    transform: translateY(-18px) scale(1) rotate(-3deg);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(-46px) scale(1) rotate(2deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-70px) scale(0.85) rotate(0deg);
+  }
+}
+
 @keyframes floatLostAway {
   0% {
     opacity: 0;

@@ -1,7 +1,9 @@
 import { pick, random } from '../core/rng';
 import { CustomerPersonality } from '../types/game';
-// Hệ thống sinh nhân vật ngẫu nhiên (100 - 200 nhân vật) theo Archetype, Tên & Tính cách riêng biệt
+import { CHARACTERS_36 } from './characters36';
+import { mentionsStoryCharacter } from './storyCharacters';
 
+// Hệ thống 36 nhân vật Hẻm 1102 (33 nhân vật người thực khách/cư dân hẻm + 3 động vật đặc biệt)
 export type CustomerArchetype = 'student' | 'delivery' | 'office' | 'genz' | 'demanding' | 'family';
 
 export interface ModularCharacter {
@@ -58,130 +60,56 @@ export const PERSONALITY_MAP: Record<CustomerPersonality, { label: string; desc:
   }
 };
 
-const ARCHETYPE_CONFIG: Record<CustomerArchetype, {
-  titles: string[];
-  names: string[];
-  avatars: string[];
-  patienceMultiplier: number;
-  tipChance: number;
-  hairStyles: string[];
-  outfits: string[];
-  accessories: string[];
-}> = {
-  student: {
-    titles: ['Học sinh THPT', 'Sinh viên đại học', 'Học sinh ôn thi', 'Bàn cuối lớp 12A1'],
-    names: ['Tường Vy', 'Gia Hân', 'Anh Kiệt', 'Bảo Châu', 'Khôi Nguyên', 'Phương Nhi', 'Thanh Trúc', 'Huy Hoàng', 'Ánh Tuyết', 'Hữu Phước'],
-    avatars: ['🎒', '👦', '👧', '👨‍🎓', '👩‍🎓'],
-    patienceMultiplier: 1.15,
-    tipChance: 0.2,
-    hairStyles: ['Tóc mái ngố', 'Tóc buộc đuôi ngựa', 'Tóc undercut học sinh', 'Tóc ngắn ngang vai'],
-    outfits: ['Đồng phục áo trắng váy xanh', 'Áo sơ mi trắng quần tây', 'Áo khoác thể dục trường'],
-    accessories: ['Kính cận gọng tròn', 'Balo học sinh', 'Bình nước giữ nhiệt', 'Hộp bút']
-  },
-  delivery: {
-    titles: ['Tài xế công nghệ', 'Shipper siêu tốc', 'Ninja giao hàng', 'Bác tài 5 sao'],
-    names: ['Phong Rồ-Ga', 'Bác Bảy Siêu Tốc', 'Cường Ninja', 'Khoa Giao Hàng', 'Thành Đạt Shipper', 'Hải Bánh Mì', 'Văn Lâm Vận Chuyển'],
-    avatars: ['🛵', '🧑‍✈️', '📦', '🦺'],
-    patienceMultiplier: 0.75, // Shipper hay vội
-    tipChance: 0.1,
-    hairStyles: ['Mũ bảo hiểm nửa đầu', 'Mũ lưỡi trai', 'Tóc cắt cua'],
-    outfits: ['Áo khoác shipper xanh dương', 'Áo khoác gió cam phản quang', 'Găng tay chống nắng'],
-    accessories: ['Điện thoại định vị GPS', 'Tai nghe bluetooth 1 bên', 'Túi giữ nhiệt giao đồ ăn']
-  },
-  office: {
-    titles: ['Nhân viên công sở', 'Kế toán viên', 'Trưởng nhóm kinh doanh', 'HR tuyển dụng'],
-    names: ['Chị Hạnh Kế Toán', 'Anh Khải Trưởng Phòng', 'Thảo Linh HR', 'Hoàng Tử Deadline', 'Huyền Trang Marketing', 'Quốc Bảo Lập Trình', 'Thu Hà Designer'],
-    avatars: ['💼', '👔', '👩‍💼', '👨‍💼', '💻'],
-    patienceMultiplier: 0.9,
-    tipChance: 0.45,
-    hairStyles: ['Tóc xoăn lọn sóng', 'Tóc búi công sở', 'Tóc vuốt sáp lịch lãm', 'Tóc bob hiện đại'],
-    outfits: ['Áo sơ mi trắng quần âu', 'Váy công sở thanh lịch', 'Áo vest blazer'],
-    accessories: ['Thẻ đeo cổ nhân viên', 'Cặp đựng laptop', 'Đồng hồ đeo tay', 'Ly cà phê sáng']
-  },
-  genz: {
-    titles: ['Tiktoker triệu view', 'Game thủ cày rank', 'Dân chơi hệ Threads', 'Hot girl review'],
-    names: ['Ngọc Hân Review', 'Zét-Bi Đói Bụng', 'Mèo Béo Mukbang', 'Gia Bảo Cày Rank', 'Bé Sóc Chill', 'Khánh Vy Vui Vẻ', 'Minh Châu Trend'],
-    avatars: ['📱', '🎧', '📸', '🕶️', '✨'],
-    patienceMultiplier: 1.0,
-    tipChance: 0.35,
-    hairStyles: ['Tóc nhuộm xám khói', 'Tóc layer Hàn Quốc', 'Tóc highlight màu pastel', 'Tóc mullet cá tính'],
-    outfits: ['Áo hoodie oversized', 'Áo thun phong cách streetwear', 'Áo bomber jacket'],
-    accessories: ['Tai nghe chụp tai gaming', 'Kính râm gọng vuông', 'Điện thoại quay phim', 'Túi chéo tote']
-  },
-  demanding: {
-    titles: ['Thực khách sành ăn', 'Tổ trưởng gương mẫu', 'Chuyên gia soi dầu', 'Khách VIP khó tính'],
-    names: ['Cô Hằng Khó Tính', 'Bác Sáu Tổ Phó', 'Cô Tư Soi Mỡ', 'Bác Hạc Ẩm Thực', 'Bà Bảy Chợ Cũ', 'Bác Năm Kiểm Tra'],
-    avatars: ['💅', '👴', '👵', '🧐', '🔍'],
-    patienceMultiplier: 0.7, // Rất khó tính
-    tipChance: 0.6, // Nếu làm vừa lòng thì tip cực khủng
-    hairStyles: ['Tóc búi cao quý phái', 'Tóc hoa râm cổ điển', 'Tóc uốn xù retro'],
-    outfits: ['Đồ bộ lụa hoa văn', 'Áo sơ mi cộc tay cài cúc', 'Áo khoác len trang nhã'],
-    accessories: ['Kính lão trễ mũi', 'Túi xách da cổ điển', 'Quạt nan phe phẩy', 'Khăn tay thêu']
-  },
-  family: {
-    titles: ['Gia đình ấm cúng', 'Mẹ bỉm sữa', 'Bố đảm đang', 'Hai mẹ con dễ thương'],
-    names: ['Bé Mít & Mẹ', 'Bác Tư & Cháu', 'Gia Đình Anh Phát', 'Mẹ Con Su Su', 'Nhà Bác Sáu'],
-    avatars: ['👨‍👩‍👧', '🧒', '👶', '🧸'],
-    patienceMultiplier: 1.1,
-    tipChance: 0.3,
-    hairStyles: ['Tóc cột nơ', 'Tóc ngắn trẻ em', 'Tóc dài buộc gọn'],
-    outfits: ['Áo thun gia đình ton-sur-ton', 'Váy hoa nhí mẹ và bé', 'Yếm bò đáng yêu'],
-    accessories: ['Gấu bông cầm tay', 'Bình sữa em bé', 'Xe đẩy trẻ em', 'Bong bóng hình gà']
-  }
-};
+// 33 nhân vật thực khách và cư dân Hẻm 1102 (loại trừ động vật và nhân vật cốt truyện Hẻm 1102)
+const HUMAN_CHARACTERS = CHARACTERS_36.filter(c => c.category !== 'animal' && !mentionsStoryCharacter(c.name));
 
 export class CharacterGenerator {
-  // Sinh ngẫu nhiên 1 trong 100 - 200 vị khách với đầy đủ thông tin đồng bộ
   public static generateCharacter(): ModularCharacter {
-    const archetypes: CustomerArchetype[] = ['student', 'delivery', 'office', 'genz', 'demanding', 'family'];
-    const chosenArchetype = pick(archetypes);
-    const config = ARCHETYPE_CONFIG[chosenArchetype];
+    const char = pick(HUMAN_CHARACTERS);
 
-    const name = pick(config.names);
-    const title = pick(config.titles);
-    const avatar = pick(config.avatars);
-    const hairStyle = pick(config.hairStyles);
-    const outfit = pick(config.outfits);
-    const accessory = pick(config.accessories);
-
-    let personality: CustomerPersonality;
-    switch (chosenArchetype) {
-      case 'student':
-        personality = random() < 0.75 ? 'student' : 'easygoing';
-        break;
-      case 'delivery':
-        personality = random() < 0.7 ? 'driver' : 'impatient';
-        break;
-      case 'office':
-        personality = pick(['generous', 'impatient', 'frugal'] as const);
-        break;
-      case 'genz':
-        personality = pick(['generous', 'impatient', 'easygoing'] as const);
-        break;
-      case 'demanding':
-        personality = random() < 0.65 ? 'foodie' : 'frugal';
-        break;
-      case 'family':
-      default:
-        personality = random() < 0.6 ? 'easygoing' : 'generous';
-        break;
+    // Xác định archetype dựa trên vai trò & nghề nghiệp
+    let archetype: CustomerArchetype = 'office';
+    if (char.id.includes('student') || char.id.includes('kid')) {
+      archetype = 'student';
+    } else if (char.id.includes('shipper') || char.id.includes('courier') || char.id.includes('buyer_tam') || char.id.includes('trucker')) {
+      archetype = 'delivery';
+    } else if (char.id.includes('trendy') || char.id.includes('couple') || char.id.includes('jogger')) {
+      archetype = 'genz';
+    } else if (char.id.includes('grumpy') || char.id.includes('tough') || char.id.includes('police') || char.id.includes('traffic')) {
+      archetype = 'demanding';
+    } else if (char.id.includes('granny') || char.id.includes('wholesale') || char.id.includes('vendor') || char.id.includes('scrap') || char.id.includes('bread') || char.id.includes('grocer')) {
+      archetype = 'family';
     }
+
+    // Xác định personality phù hợp tính cách nhân vật
+    let personality: CustomerPersonality;
+    if (char.tipTendency === 'generous') {
+      personality = random() < 0.65 ? 'generous' : 'foodie';
+    } else if (char.tipTendency === 'low') {
+      personality = char.patienceMultiplier < 0.9 ? 'impatient' : 'frugal';
+    } else {
+      if (archetype === 'student') personality = 'student';
+      else if (archetype === 'delivery') personality = 'driver';
+      else personality = random() < 0.5 ? 'easygoing' : 'generous';
+    }
+
     const pInfo = PERSONALITY_MAP[personality];
+    const tipChance = char.tipTendency === 'generous' ? 0.65 : char.tipTendency === 'low' ? 0.12 : 0.35;
 
     return {
-      id: 'cust_' + Math.floor(random() * 10000000).toString(36),
-      name,
-      title,
-      archetype: chosenArchetype,
+      id: char.id,
+      name: char.name,
+      title: char.roleTitle,
+      archetype,
       personality,
       personalityLabel: pInfo.label,
       personalityDesc: pInfo.desc,
-      avatar,
-      patienceMultiplier: config.patienceMultiplier * (1 / pInfo.patienceRate),
-      tipChance: config.tipChance,
-      hairStyle,
-      outfit,
-      accessory
+      avatar: `/assets/characters/${char.id}.png`,
+      patienceMultiplier: char.patienceMultiplier * (1 / pInfo.patienceRate),
+      tipChance,
+      hairStyle: 'Chuẩn phong cách Sài Gòn',
+      outfit: 'Trang phục đời thường hẻm 1102',
+      accessory: char.roleTitle
     };
   }
 }
