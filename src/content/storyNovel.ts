@@ -32,7 +32,7 @@ export const STORY_ACTS: NonEmpty<StoryEpisode> = [
     chapterRequirement: 1,
     title: 'Hồi 1: Hơi Ấm Khói Dầu Đầu Ngõ',
     subtitle: 'Ngày đầu lập nghiệp bên chiếc xe đẩy cũ và người dẫn đường thầm lặng',
-    characters: ['Chủ Tiệm Gà', 'Bác Ba Tổ Trưởng', 'Nhóm Học Sinh Bàn Cuối'],
+    characters: ['Chủ Tiệm Gà', 'Bác Ba Tổ Trưởng', 'Bà Ba Nước Mía', 'Minh Trí Học Sinh', 'Bà Bảy Vé Số', 'Chó Vàng Canh Tiệm'],
     excerpt: 'Tiếng xèo xèo đầu tiên vang lên giữa chiều mưa lất phất, khi túi tiền chỉ còn lại vài trăm ngàn...',
     fullStory: `
 Buổi chiều tháng Chín ở Sài Gòn, mây xám giăng kín bầu trời con hẻm 1102. Tiếng còi xe ngoài đại lộ vọng vào như tiếng thở dài của một đô thị không bao giờ ngủ. 
@@ -79,7 +79,7 @@ Vừa lúc đó, tiếng cười đùa ríu rít xua tan màn mưa ảm đạm. 
     chapterRequirement: 2,
     title: 'Hồi 2: Tiếng Cười Trong Con Hẻm Sâu',
     subtitle: 'Mối tình đầu bên đĩa gà sốt bơ tỏi và chiếc rào chắn gia đình',
-    characters: ['Bé Na & Dũng', 'Anh Long Trưởng Phòng', 'Chủ Tiệm Gà'],
+    characters: ['Chủ Tiệm Gà', 'Bé Na & Dũng Họa Sĩ', 'Anh Long Trưởng Phòng', 'Anh Dũng Thợ Điện', 'Cô Linh Phụ Bếp', 'Khang Bếp Chiên', 'Mèo Mướp Bắt Chuột'],
     excerpt: 'Hai chiếc ghế gỗ nhỏ nơi góc quán đã chứng kiến lời hẹn ước tuổi mười tám...',
     fullStory: `
 Gom đủ tiền lời sau chuỗi ngày vỉa hè miệt mài, Tiệm Gà Nhà Tui dọn vào căn nhà số 14 sâu trong hẻm. Bốn bộ bàn ghế gỗ mộc mạc được kê thẳng thớm dưới tán cây hoa giấy rực hồng.
@@ -122,7 +122,7 @@ Nhưng cuộc sống chưa bao giờ đơn giản như một lời hứa hẹn. 
     chapterRequirement: 3,
     title: 'Hồi 3: Ánh Đèn Mặt Tiền & Đứa Trẻ Không Đơn Độc',
     subtitle: 'Nỗi lòng người mẹ đơn thân và cuốc xe nghĩa tình của chàng shipper',
-    characters: ['Chị Mai Văn Phòng', 'Bé Bắp', 'Anh Tuấn Shipper Ruột'],
+    characters: ['Chủ Tiệm Gà', 'Cô Lan Lao Công', 'Bé Bơ (Bé Bắp)', 'Anh Tuấn Shipper Ruột', 'Bác Tài Long Đông Lạnh', 'Cô Thắm Bán Rau Củ'],
     excerpt: 'Mỗi suất gà gửi đi lúc 9 giờ tối mang theo cả tấm lòng của những phận đời tha hương...',
     fullStory: `
 Bước sang chương thứ 3, Tiệm Gà Nhà Tui chính thức khai trương chi nhánh mặt tiền đường lớn với 12 bàn ăn, đèn neon sáng trưng và chiếc máy in đơn app nổ "ting ting" liên tục. Nhưng dù tiệm có hiện đại đến đâu, tình người trong con hẻm cũ vẫn nguyên vẹn.
@@ -163,7 +163,7 @@ Thấy hoàn cảnh éo le của hai mẹ con, Anh Tuấn Shipper – người c
     chapterRequirement: 4,
     title: 'Hồi 4: Cơn Sóng Ngầm MegaChicken & Lửa Thử Vàng',
     subtitle: 'Cuộc chiến giữa chuỗi tập đoàn tỷ đô và sự công tâm của người tiêu dùng',
-    characters: ['Chị Lan Karen', 'Quỳnh Anh Tiktoker', 'Food Reviewer Bí Ẩn', 'Đức Huy Game Thủ'],
+    characters: ['Chủ Tiệm Gà', 'Chị Lan Karen', 'Khánh Vy TikToker', 'Chú Hai Soi Vệ Sinh', 'Chú Nam Công An', 'Bác Hải Trật Tự', 'Bác Béo Hoàn Lương'],
     excerpt: 'Khi truyền thông bẩn bủa vây, sự thật chính là ngọn lửa vàng không sợ thử thách...',
     fullStory: `
 Khi Tiệm Gà Nhà Tui trở thành hiện tượng ẩm thực quận, sóng gió thực sự bắt đầu ập tới. Tập đoàn đồ ăn nhanh đa quốc gia "MegaChicken" mở một chi nhánh hoành tráng ba tầng ngay đối diện, chi hàng trăm triệu đồng chạy quảng cáo và tung ra chương trình gà rán giảm giá 50%.
@@ -202,7 +202,7 @@ Chưa dừng lại ở đó, đối thủ thuê một đội ngũ truyền thôn
     chapterRequirement: 5,
     title: 'Hồi 5: Khải Hoàn "Gà Vàng Quốc Dân"',
     subtitle: 'Năm chi nhánh rực rỡ và chiếc thìa vàng truyền thống trao tay',
-    characters: ['Tất cả 12 Nhân Vật Chính'],
+    characters: ['Toàn Thể 36 Nhân Vật Hẻm 1102', 'Bác Ba', 'Mimi Thỏ Cam'],
     excerpt: 'Hành trình từ chiếc xe đẩy 850 ngàn đồng đến chiếc cúp danh dự ẩm thực đất nước...',
     fullStory: `
 Đại sảnh Trung tâm Hội nghị Quốc gia rực rỡ ánh đèn. Đêm trao giải thưởng ẩm thực thường niên "Gà Vàng Quốc Dân" diễn ra trong sự hồi hộp của hàng ngàn chuyên gia và thực khách.

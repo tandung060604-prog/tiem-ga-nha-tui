@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sơ Đồ Tuyến Nhân Vật & Cốt Truyện Hẻm 1102 · Tiệm Gà Nhà Tui</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #1a0f0a;
+      --panel-bg: rgba(36, 20, 13, 0.94);
+      --card-bg: #2d1810;
+      --card-hover: #3d2116;
+      --primary: #f59e0b;
+      --primary-glow: rgba(245, 158, 11, 0.4);
+      --accent-red: #ef4444;
+      --accent-green: #22c55e;
+      --accent-blue: #38bdf8;
+      --accent-purple: #c084fc;
+      --accent-pink: #ec4899;
+      --text-main: #fff7ed;
+      --text-muted: #d6bfa8;
+      --border-wood: #5a3219;
+      --border-gold: #d97706;
+      --font-display: 'Baloo 2', cursive, sans-serif;
+      --font-body: 'Nunito', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-dark) radial-gradient(circle at 50% 0%, #3e1b0d 0%, #170b06 70%, #0d0603 100%);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-bottom: 50px;
+    }
+
+    /* HEADER BANNER */
+    .header-banner {
+      background: linear-gradient(180deg, rgba(20, 8, 4, 0.98) 0%, rgba(45, 20, 11, 0.95) 100%);
+      border-bottom: 3px solid var(--border-gold);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      padding: 24px 20px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .header-title {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--primary);
+      text-shadow: 0 2px 8px rgba(245, 158, 11, 0.5), 0 4px 14px rgba(0,0,0,0.8);
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .header-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+      font-weight: 600;
+    }
+
+    .badge-jev {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 3px 12px;
+      border-radius: 999px;
+      margin-top: 10px;
+    }
+
+    /* NAV CONTROLS & TABS */
+    .controls-container {
+      max-width: 1400px;
+      margin: 20px auto 0;
+      padding: 0 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .view-switch {
+      display: flex;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1.5px solid var(--border-wood);
+      border-radius: 12px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #3b1704;
+      box-shadow: 0 2px 8px var(--primary-glow);
+    }
+
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .filter-chip {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .filter-chip.active, .filter-chip:hover {
+      background: rgba(245, 158, 11, 0.25);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .search-box {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1.5px solid var(--border-wood);
+      border-radius: 10px;
+      padding: 8px 16px;
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      min-width: 240px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+    .search-box:focus {
+      border-color: var(--primary);
+    }
+
+    /* MAIN CONTAINER LAYOUT */
+    .main-layout {
+      max-width: 1440px;
+      margin: 20px auto 0;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* STORY TIMELINE SWIMLANE VIEW */
+    .timeline-view {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .act-card {
+      background: var(--panel-bg);
+      border: 2px solid var(--border-wood);
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .act-card:hover {
+      border-color: var(--border-gold);
+    }
+
+    .act-header {
+      padding: 16px 20px;
+      background: linear-gradient(90deg, rgba(60, 28, 14, 0.9) 0%, rgba(30, 14, 7, 0.7) 100%);
+      border-bottom: 1.5px solid var(--border-wood);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .act-badge {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 8px;
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    .act-title-box h3 {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .act-title-box p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .act-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .dilemma-highlight {
+      background: rgba(239, 68, 68, 0.12);
+      border-left: 4px solid var(--accent-red);
+      padding: 10px 14px;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #fca5a5;
+    }
+
+    .cast-avatars-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    /* CHARACTER CHIP MINI */
+    .char-mini-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border-wood);
+      border-radius: 12px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      min-width: 180px;
+    }
+
+    .char-mini-card:hover, .char-mini-card.selected {
+      background: var(--card-hover);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+    }
+
+    .char-avatar-img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #4a2810;
+      border: 1.5px solid var(--primary);
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .char-mini-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .char-mini-name {
+      font-family: var(--font-display);
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .char-mini-role {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .char-karma-tag {
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 4px;
+      width: fit-content;
+      margin-top: 3px;
+    }
+    .karma-community { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
+    .karma-craftsmanship { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+    .karma-ambition { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #0284c7; }
+
+    /* NETWORK MATRIX GRID VIEW */
+    .network-grid-view {
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .character-card-full {
+      background: var(--panel-bg);
+      border: 2px solid var(--border-wood);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+      overflow: hidden;
+    }
+
+    .character-card-full:hover, .character-card-full.selected {
+      border-color: var(--primary);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 24px rgba(245, 158, 11, 0.3);
+    }
+
+    .char-full-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #5a3014 30%, #2a1408 100%);
+      border: 2px solid var(--primary);
+      margin-bottom: 12px;
+      object-fit: contain;
+    }
+
+    .char-full-name {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .char-full-role {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .char-cluster-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffd166;
+      border: 1px solid rgba(255, 209, 102, 0.3);
+      margin-bottom: 8px;
+    }
+
+    .char-relations-count {
+      font-size: 0.72rem;
+      color: #94a3b8;
+    }
+
+    /* RIGHT SIDE INSPECTOR PANEL */
+    .inspector-panel {
+      background: var(--panel-bg);
+      border: 2px solid var(--border-gold);
+      border-radius: 20px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      position: sticky;
+      top: 100px;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .inspector-header {
+      text-align: center;
+      padding-bottom: 14px;
+      border-bottom: 1px dashed var(--border-wood);
+      position: relative;
+    }
+
+    .inspector-avatar-box {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 10px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffd166 20%, #4a2810 100%);
+      border: 3px solid #fff;
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .inspector-avatar-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .inspector-name {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--primary);
+    }
+
+    .inspector-role {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .inspector-section {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-wood);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .inspector-section-title {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .relation-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+      font-size: 0.8rem;
+    }
+    .relation-item:last-child { border-bottom: none; }
+
+    .relation-type-tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .rel-family { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid #ec4899; }
+    .rel-supply { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
+    .rel-conflict { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+    .rel-protect { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+    .rel-friend { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #0284c7; }
+
+    .inspector-quote {
+      font-style: italic;
+      color: #fef08a;
+      font-size: 0.84rem;
+      line-height: 1.4;
+      border-left: 3px solid var(--primary);
+      padding-left: 10px;
+      margin-top: 4px;
+    }
+
+    /* 4 ENDINGS FOOTER SECTION */
+    .endings-summary-section {
+      max-width: 1400px;
+      margin: 40px auto 0;
+      padding: 0 20px;
+    }
+
+    .endings-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 14px;
+    }
+
+    .ending-box {
+      background: var(--panel-bg);
+      border: 2px solid var(--border-wood);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .ending-box.happy { border-color: #22c55e; }
+    .ending-box.open { border-color: #38bdf8; }
+    .ending-box.bad { border-color: #ef4444; }
+    .ending-box.secret { border-color: #f59e0b; }
+
+    .ending-box h4 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+    .ending-box.happy h4 { color: #4ade80; }
+    .ending-box.open h4 { color: #38bdf8; }
+    .ending-box.bad h4 { color: #f87171; }
+    .ending-box.secret h4 { color: #fbbf24; }
+
+    .ending-box p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .ending-req {
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(0,0,0,0.4);
+      width: fit-content;
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER BANNER -->
+  <header class="header-banner">
+    <div class="header-title">
+      <span>🍗</span> SƠ ĐỒ MẠNG LƯỚI 36 NHÂN VẬT & 5 HỒI CỐT TRUYỆN <span>📜</span>
+    </div>
+    <p class="header-subtitle">Vũ trụ đời thường Hẻm 1102 · Dây mơ rễ má & Tác động trực tiếp tới 4 Đại Kết Cục</p>
+    <div class="badge-jev">
+      <span>✨</span> Đồ Hình Kiến Trúc Xác Thực Bởi TypeSafe AI Jev (jev-1.13.0) · Topology: Micro-Community Web
+    </div>
+  </header>
+
+  <!-- CONTROLS & TABS -->
+  <div class="controls-container">
+    <div class="view-switch">
+      <button id="btn-tab-timeline" class="tab-btn active" onclick="switchView('timeline')">
+        <span>📖</span> Tuyến 5 Hồi Truyện
+      </button>
+      <button id="btn-tab-network" class="tab-btn" onclick="switchView('network')">
+        <span>🕸️</span> Ma Trận 36 Nhân Vật
+      </button>
+    </div>
+
+    <div class="filter-group">
+      <span class="filter-chip active" onclick="filterCluster('all')">Tất Cả (36)</span>
+      <span class="filter-chip" onclick="filterCluster('hearth')">🏠 Trụ Cột Bếp (6)</span>
+      <span class="filter-chip" onclick="filterCluster('supply')">🚛 Chuỗi Cung Ứng (6)</span>
+      <span class="filter-chip" onclick="filterCluster('logistics')">🛵 Giao Hàng & Bốc Vác (3)</span>
+      <span class="filter-chip" onclick="filterCluster('order')">👮 Hội Đồng Hẻm (4)</span>
+      <span class="filter-chip" onclick="filterCluster('urban')">⚡ Kỹ Thuật & Vệ Sinh (5)</span>
+      <span class="filter-chip" onclick="filterCluster('customers')">⭐ Thực Khách & GenZ (9)</span>
+      <span class="filter-chip" onclick="filterCluster('animals')">🐾 Động Vật Hẻm (3)</span>
+    </div>
+
+    <input type="text" id="search-input" class="search-box" placeholder="🔍 Tìm tên nhân vật, vai trò..." oninput="handleSearch(this.value)">
+  </div>
+
+  <!-- MAIN DUAL-PANE LAYOUT -->
+  <div class="main-layout">
+    
+    <!-- LEFT PANE: TIMELINE OR NETWORK -->
+    <div class="left-pane">
+      
+      <!-- 1. TIMELINE SWIMLANES VIEW -->
+      <div id="timeline-container" class="timeline-view">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- 2. NETWORK GRID VIEW -->
+      <div id="network-container" class="network-grid-view">
+        <!-- Rendered by JS -->
+      </div>
+
+    </div>
+
+    <!-- RIGHT PANE: DETAIL INSPECTOR -->
+    <div class="right-pane">
+      <div id="inspector-card" class="inspector-panel">
+        <div class="inspector-header">
+          <div class="inspector-avatar-box">
+            <img id="insp-avatar" src="/assets/characters/char_01_owner.png" alt="Avatar">
+          </div>
+          <h2 id="insp-name" class="inspector-name">Chủ Tiệm Gà</h2>
+          <p id="insp-role" class="inspector-role">Khởi nghiệp từ xe đẩy 850k</p>
+          <div id="insp-cluster" class="char-cluster-badge" style="margin-top: 8px;">🏠 Trụ Cột Quán</div>
+        </div>
+
+        <div class="inspector-section">
+          <div class="inspector-section-title"><span>💖</span> MỐI QUAN HỆ TRONG HẺM 1102</div>
+          <div id="insp-relations-list">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <div class="inspector-section">
+          <div class="inspector-section-title"><span>🎬</span> VAI TRÒ TRONG CỐT TRUYỆN CHÍNH</div>
+          <p id="insp-story-role" style="font-size: 0.84rem; line-height: 1.4; color: var(--text-main);">
+            Nhân vật trung tâm, đứng trước mọi ngã rẽ lựa chọn số phận cho quán gà và xóm giềng Hẻm 1102.
+          </p>
+        </div>
+
+        <div class="inspector-section">
+          <div class="inspector-section-title"><span>⚖️</span> TÁC ĐỘNG CHỈ SỐ NGẦM KARMA</div>
+          <div id="insp-karma-desc" style="font-size: 0.82rem; color: #ffd166;">
+            Cân bằng giữa Tình Nghĩa (Community), Tay Nghề (Craftsmanship), và Khát Vọng (Ambition).
+          </div>
+        </div>
+
+        <div class="inspector-section">
+          <div class="inspector-section-title"><span>💬</span> CÂU THOẠI ĐẶC TRƯNG</div>
+          <p id="insp-quote" class="inspector-quote">
+            "Dầu chưa đủ sôi mà thả vào thì ngấy, dầu quá nhiệt thì đắng ngắt. Nghề bếp cũng như cuộc đời, biết đợi đúng lúc thì mới ra được độ giòn vàng."
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 4 ENDINGS OVERVIEW -->
+  <section class="endings-summary-section">
+    <h3 style="font-family: var(--font-display); font-size: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 8px;">
+      <span>🏆</span> 4 ĐẠI KẾT CỤC DO MẠNG LƯỚI NHÂN VẬT ĐỊNH ĐOẠT
+    </h3>
+    <div class="endings-card-grid">
+      <div class="ending-box happy">
+        <h4>❤️ KẾT THÚC 1: TIỆM GÀ TRI KỶ (HAPPY ENDING)</h4>
+        <p>Bác Ba, Cô Lan, Anh Tuấn Shipper và bà con Hẻm 1102 cùng nâng ly chúc mừng. Tiệm gà trở thành mái ấm tình nghĩa bất diệt giữa lòng đô thị phồn hoa.</p>
+        <span class="ending-req">Yêu cầu: Community ≥ 65 & Craftsmanship ≥ 55</span>
+      </div>
+
+      <div class="ending-box open">
+        <h4>💼 KẾT THÚC 2: TẬP ĐOÀN ĐẠI CHÚNG (OPEN ENDING)</h4>
+        <p>Cùng Khánh Vy TikToker và Anh Long Trưởng Phòng đưa thương hiệu lên sàn chứng khoán, 50 chi nhánh toàn quốc. Doanh thu tiền tỷ nhưng vơi bớt hơi ấm hẻm nghèo.</p>
+        <span class="ending-req">Yêu cầu: Ambition ≥ 70 & Doanh thu ≥ 300 triệu</span>
+      </div>
+
+      <div class="ending-box bad">
+        <h4>💔 KẾT THÚC 3: MẤT CHẤT & BỊ QUAY LƯNG (BAD ENDING)</h4>
+        <p>Nghe lời MegaChicken dùng phụ gia và nguyên liệu kém chất lượng. Bác Hai phát hiện, Chị Lan livestream bóc phốt, xóm giềng tẩy chay tiệm gà sập tiệm.</p>
+        <span class="ending-req">Yêu cầu: Dính bẫy MegaChicken / Nợ phá sản</span>
+      </div>
+
+      <div class="ending-box secret">
+        <h4>👑 KẾT THÚC 4: THÌA VÀNG CHỢ LỚN (SECRET ENDING)</h4>
+        <p>Đạt chuẩn mực tối thượng của nghệ nhân ẩm thực. Bác Ba trao lại cuốn bí kíp chiên gà Chợ Lớn 1990 truyền thừa 3 đời, trở thành Di sản Ẩm thực Quốc gia.</p>
+        <span class="ending-req">Yêu cầu: 5 Sao Toàn Diện & Đủ 36 Nhân Vật</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- DATA & LOGIC SCRIPTS -->
+  <script>
+    // 36 CHARACTERS DATABASE WITH DETAILED RELATIONSHIP NETWORK
+    const CHARACTERS = [
+      // 1. Trụ cột quán (hearth)
+      {
+        id: 'char_01_owner',
+        name: 'Chủ Tiệm Gà (Bạn)',
+        roleTitle: 'Chủ Quán · Trái Tim Hẻm 1102',
+        cluster: 'hearth',
+        clusterName: '🏠 Trụ Cột Quán',
+        avatar: '/assets/characters/char_01_owner.png',
+        karma: 'community',
+        karmaLabel: '❤️ Nghĩa Tình',
+        quote: 'Gà chiên nóng hổi cho người đói lòng, tiền bạc chỉ là chuyện về sau!',
+        storyRole: 'Nhân vật chính, người đưa ra các quyết định then chốt ở cả 5 Hồi truyện.',
+        relations: [
+          { target: 'char_06_granny_ba', type: 'rel-family', label: 'Học trò Bác Ba & Bà Ba' },
+          { target: 'char_03_helper_linh', type: 'rel-family', label: 'Chị họ phụ bếp' },
+          { target: 'char_19_shipper_tuan', type: 'rel-friend', label: 'Bạn nối khố' },
+          { target: 'pet_01_dog_vang', type: 'rel-protect', label: 'Cưu mang Chó Vàng' }
+        ]
+      },
+      {
+        id: 'char_02_lottery_lady',
+        name: 'Bà Bảy Bán Vé Số',
+        roleTitle: 'Bà Cụ Neo Đơn Đầu Hẻm',
+        cluster: 'customers',
+        clusterName: '⭐ Thực Khách & Xóm Giềng',
+        avatar: '/assets/characters/char_02_lottery_lady.png',
+        karma: 'community',
+        karmaLabel: '❤️ Nghĩa Tình',
+        quote: 'Mua giùm bà tờ vé số chiều trúng độc đắc mở thêm chảo gà nghe con!',
+        storyRole: 'Xuất hiện ở Hồi 1 & Hồi 3, người gắn kết tình cảm người nghèo lao động.',
+        relations: [
+          { target: 'char_01_owner', type: 'rel-friend', label: 'Nhận canh gà ấm bụng' },
+          { target: 'char_10_winner_hung', type: 'rel-supply', label: 'Bán vé số trúng độc đắc 2 tỷ' }
+        ]
+      },
+      {
+        id: 'char_03_helper_linh',
+        name: 'Cô Linh Phụ Bếp',
+        roleTitle: 'Quản Lý Quầy Topping & Khay GN',
+        cluster: 'hearth',
+        clusterName: '🏠 Trụ Cột Quán',
+        avatar: '/assets/characters/char_03_helper_linh.png',
+        karma: 'craftsmanship',
+        karmaLabel: '🔥 Tay Nghề',
+        quote: 'Củ cải muối phải đủ 24 tiếng mới giòn sần sật, không được đốt cháy giai đoạn!',
+        storyRole: 'Mở khóa ở Hồi 2 khi quán dọn vào nhà số 14, giữ vững chất lượng sốt bơ tỏi.',
+        relations: [
+          { target: 'char_01_owner', type: 'rel-family', label: 'Chị họ Chủ Quán' },
+          { target: 'char_04_fryer_khang', type: 'rel-family', label: 'Chị gái của Khang' },
+          { target: 'char_13_vendor_tham', type: 'rel-supply', label: 'Nhập rau củ sạch của Cô Thắm' }
+        ]
+      },
+      {
+        id: 'char_04_fryer_khang',
+        name: 'Khang Đứng Bếp Chiên',
+        roleTitle: 'Cậu Sinh Viên Cơ Khí Làm Thêm',
+        cluster: 'hearth',
+        clusterName: '🏠 Trụ Cột Quán',
+        avatar: '/assets/characters/char_04_fryer_khang.png',
+        karma: 'ambition',
+        karmaLabel: '💼 Khát Vọng',
+        quote: 'Em vừa thiết kế xong cần gạt lò xo cho vỉ chiên, đỡ mỏi tay gấp đôi anh ơi!',
+        storyRole: 'Sáng chế cần gạt tự động nâng chảo (Auto-lift) ở Hồi 3.',
+        relations: [
+          { target: 'char_03_helper_linh', type: 'rel-family', label: 'Em trai của Linh' },
+          { target: 'char_22_electrician_dung', type: 'rel-friend', label: 'Học nghề điện từ Anh Dũng' }
+        ]
+      },
+      {
+        id: 'char_05_kid_bo',
+        name: 'Bé Bơ Con Nít Hẻm (Bé Bắp)',
+        roleTitle: 'Học Sinh Lớp 2 Tan Trường Chờ Mẹ',
+        cluster: 'customers',
+        clusterName: '⭐ Thực Khách & Xóm Giềng',
+        avatar: '/assets/characters/char_05_kid_bo.png',
+        karma: 'community',
+        karmaLabel: '❤️ Nghĩa Tình',
+        quote: 'Chú ơi, chừng nào mẹ Lan quét rác xong ghé đón con vậy chú?',
+        storyRole: 'Tâm điểm của Hồi 3, được quán dành riêng bàn số 1 làm góc học tập.',
+        relations: [
+          { target: 'char_17_sweeper_lan', type: 'rel-family', label: 'Con gái Cô Lan Lao Công' },
+          { target: 'char_19_shipper_tuan', type: 'rel-protect', label: 'Được Tuấn Shipper đưa đón tan học' },
+          { target: 'pet_01_dog_vang', type: 'rel-friend', label: 'Bạn thân của Chó Vàng' }
+        ]
+      },
+      {
+        id: 'char_06_granny_ba',
+        name: 'Bà Ba Nước Mía (Bác Ba)',
+        roleTitle: 'Người Lưu Giữ Hương Vị Chợ Lớn 1990',
+        cluster: 'hearth',
+        clusterName: '🏠 Trụ Cột Quán',
+        avatar: '/assets/characters/char_06_granny_ba.png',
+        karma: 'craftsmanship',
+        karmaLabel: '🔥 Tay Nghề',
+        quote: 'Tiệm gà này là linh hồn của con hẻm, đừng bao giờ để đồng tiền làm khét tiếng tăm!',
+        storyRole: 'Người hướng dẫn tinh thần từ Hồi 1 đến Hồi 5, trao thìa vàng truyền thống.',
+        relations: [
+          { target: 'char_01_owner', type: 'rel-protect', label: 'Truyền thụ bí quyết chiên gà' },
+          { target: 'char_27_warden_hai', type: 'rel-friend', label: 'Bạn đồng niên tổ dân phố' },
+          { target: 'pet_02_cat_muop', type: 'rel-family', label: 'Chủ nuôi Mèo Mướp' }
+        ]
+      },
+
+      // 2. Chuỗi cung ứng (supply)
+      {
+        id: 'char_07_trendy_vy',
+        name: 'Khánh Vy GenZ Sành Điệu',
+        roleTitle: 'Food Reviewer Triệu View TikTok',
+        cluster: 'customers',
+        clusterName: '⭐ Thực Khách & GenZ',
+        avatar: '/assets/characters/char_07_trendy_vy.png',
+        karma: 'ambition',
+        karmaLabel: '💼 Khát Vọng',
+        quote: '10 điểm không có nhưng! Giòn rụm từ miếng đầu tiên tới miếng cuối cùng!',
+        storyRole: 'Nhân vật chủ lực ở Hồi 4, livestream bếp sạch đập tan tin đồn bẩn của MegaChicken.',
+        relations: [
+          { target: 'char_33_couple_genz', type: 'rel-friend', label: 'Bạn thân nhóm sáng tạo nội dung' },
+          { target: 'char_08_grumpy_hai', type: 'rel-conflict', label: 'Bị Chú Hai nghi ngờ làm màu' }
+        ]
+      },
+      {
+        id: 'char_08_grumpy_hai',
+        name: 'Chú Hai Khó Tính (Karen Hẻm)',
+        roleTitle: 'Thanh Tra Vệ Sinh Hưu Trí',
+        cluster: 'customers',
+        clusterName: '⭐ Thực Khách & Xóm Giềng',
+        avatar: '/assets/characters/char_08_grumpy_hai.png',
+        karma: 'craftsmanship',
+        karmaLabel: '🔥 Tay Nghề',
+        quote: 'Dầu đen một chút là tôi báo trạm y tế phường liền đó nha!',
+        storyRole: 'Người tạo thử thách kiểm định dầu chiên ở Hồi 4, sau đó trở thành người bảo chứng.',
+        relations: [
+          { target: 'char_11_wholesale_nam', type: 'rel-conflict', label: 'Soi xét nhãn mác dầu ăn' },
+          { target: 'char_25_police_nam', type: 'rel-friend', label: 'Bạn cờ tướng chiều chủ nhật' }
+        ]
+      },
+      {
+        id: 'char_09_buyer_tam',
+        name: 'Chị Tâm Bán Mối Gà Tươi',
+        roleTitle: 'Chủ Trại Gà Sạch Củ Chi',
+        cluster: 'supply',
+        clusterName: '🚛 Chuỗi Cung Ứng',
+        avatar: '/assets/characters/char_09_buyer_tam.png',
+        karma: 'craftsmanship',
+        karmaLabel: '🔥 Tay Nghề',
+        quote: 'Gà vườn đồi Củ Chi, thịt chắc da giòn, giao tới tiệm trước 5 giờ sáng!',
+        storyRole: 'Đảm bảo nguồn thịt gà chuẩn VietGAP, từ chối bán thịt đông lạnh trôi nổi.',
+        relations: [
+          { target: 'char_21_trucker_long', type: 'rel-family', label: 'Em gái Bác Tài Long' },
+          { target: 'char_01_owner', type: 'rel-supply', label: 'Đối tác chiến lược cung ứng thịt' }
+        ]
+      },
+      {
+        id: 'char_10_winner_hung',
+        name: 'Anh Hùng Trúng Số',
+        roleTitle: 'Đại Gia Mới Nổi Hẻm 1102',
+        cluster: 'customers',
+        clusterName: '⭐ Thực Khách & Xóm Giềng',
+        avatar: '/assets/characters/char_10_winner_hung.png',
+        karma: 'ambition',
+        karmaLabel: '💼 Khát Vọng',
+        quote: 'Hôm nay trúng số độc đắc! Cả hẻm cứ ăn gà thoải mái, tôi bao hết!',
+        storyRole: 'Kích hoạt sự kiện đêm tiệc bùng nổ doanh số ở Hồi 2.',
+        relations: [
+          { target: 'char_02_lottery_lady', type: 'rel-friend', label: 'Ân nhân mua vé số đổi đời' },
+          { target: 'char_28_tough_beo', type: 'rel-friend', label: 'Bạn nhậu mừng tiệc lớn' }
+        ]
+      },
+      {
+        id: 'char_11_wholesale_nam',
+        name: 'Chú Nam Đại Lý Dầu Ăn',
+        roleTitle: 'Đầu Mối Dầu Thực Vật Tinh Luyện',
+        cluster: 'supply',
+        clusterName: '🚛 Chuỗi Cung Ứng',
+        avatar: '/assets/characters/char_11_wholesale_nam.png',
+        karma: 'craftsmanship',
+        karmaLabel: '🔥 Tay Nghề',
+        quote: 'Dầu đậu nành nguyên chất chịu nhiệt 200°C, chiên không bao giờ khét khói!',
+        storyRole: 'Cung cấp hóa đơn kiểm định vệ sinh ở Hồi 4 để dập tắt truyền thông bẩn.',
+        relations: [
+          { target: 'char_01_owner', type: 'rel-supply', label: 'Cung cấp can dầu vàng óng' },
+          { target: 'char_18_garbage_hung', type: 'rel-friend', label: 'Liên kết đội thu gom tái chế' }
+        ]
+      },
+      {
+        id: 'char_12_courier_ut',
+        name: 'Bé Út Giao Thư Bưu Điện',
+        roleTitle: 'Người Đưa Tin Hẻm 1102',
+        cluster: 'logistics',
+        clusterName: '🛵 Vận Chuyển & Giao Hàng',
+        avatar: '/assets/characters/char_12_courier_ut.png',
+        karma: 'community',
+        karmaLabel: '❤️ Nghĩa Tình',
+        quote: 'Có thư khen ngợi của khách hàng gửi tiệm gà nè anh ơi!',
+        storyRole: 'Mang thư chứng nhận OCOP 4 sao và giấy phép kinh doanh ở Hồi 3.',
+        relations: [
+          { target: 'char_19_shipper_tuan', type: 'rel-family', label: 'Em gái Anh Tuấn Shipper' },
+          { target: 'char_30_student_bus', type: 'rel-friend', label: 'Bạn học chung trường cấp 3' }
+        ]
+      },
+
+      // 3. Tiểu thương hẻm & Kỹ thuật
+      {
+        id: 'char_13_vendor_tham',
+        name: 'Cô Thắm Bán Rau Củ',
+        roleTitle: 'Vựa Rau Củ Đầu Ngõ',
+        cluster: 'supply',
+        clusterName: '🚛 Chuỗi Cung Ứng',
+        avatar: '/assets/characters/char_13_vendor_tham.png',
+        karma: 'craftsmanship',
+        karmaLabel: '🔥 Tay Nghề',
+        quote: 'Củ cải trắng ngon ngọt, bắp cải tươi mơn mởn, ăn kèm gà là hết sảy!',
+        storyRole: 'Giúp quán sáng tạo 2 món giải ngấy (Danmuji & Coleslaw) tăng điểm Sao Hương Vị.',
+        relations: [
+          { target: 'char_03_helper_linh', type: 'rel-supply', label: 'Giao hàng mỗi sáng sớm' },
+          { target: 'char_31_gossip_tam', type: 'rel-friend', label: 'Hàng xóm kế sạp rau' }
+        ]
+      },
+      {
+        id: 'char_14_scrap_nam',
+        name: 'Chú Năm Ve Chai',
+        roleTitle: 'Chuyên Gia Tái Chế Hẻm 1102',
+        cluster: 'urban',
+        clusterName: '⚡ Kỹ Thuật & Môi Trường',
+        avatar: '/assets/characters/char_14_scrap_nam.png',
+        karma: 'community',
+        karmaLabel: '❤️ Nghĩa Tình',
+        quote: 'Thùng giấy với lon nước ngọt cứ để đó, tui thu gom gọn gàng trả tiền liền!',
+        storyRole: 'Giảm 10% chi phí rác thải và bao bì cho quán suốt 5 Chương.',
+        relations: [
+          { target: 'char_17_sweeper_lan', type: 'rel-friend', label: 'Hỗ trợ dọn dẹp vệ sinh hẻm' },
+          { target: 'char_01_owner', type: 'rel-supply', label: 'Thu mua lon Coca & vỏ thùng' }
+        ]
+      },
+      {
+        id: 'char_15_bread_bay',
+        name: 'Chú Bảy Lò Bánh Mì',
+        roleTitle: 'Lò Than Bánh Mì Đầu Hẻm',
+        cluster: 'supply',
+        clusterName: '🚛 Chuỗi Cung Ứng',
+        avatar: '/assets/characters/char_15_bread_bay.png',
+        karma: 'craftsmanship',
+        karmaLabel: '🔥 Tay Nghề',
+        quote: 'Bánh mì nóng giòn kết hợp gà bơ tỏi của tiệm là thành bữa sáng quốc dân!',
+        storyRole: 'Tạo combo Bánh Mì Gà Giòn độc quyền ở Hồi 2.',
+        relations: [
+          { target: 'char_22_electrician_dung', type: 'rel-family', label: 'Bố vợ của Anh Dũng Điện' },
+          { target: 'char_01_owner', type: 'rel-supply', label: 'Cung cấp vụn bánh mì panko' }
+        ]
+      },
+      {
+        id: 'char_16_icecream_tu',
+        name: 'Chú Tư Xe Kem Chuối',
+        roleTitle: 'Kem Chuối Tuổi Thơ Hẻm 1102',
+        cluster: 'customers',
+        clusterName: '⭐ Thực Khách & Xóm Giềng',
+        avatar: '/assets/characters/char_16_icecream_tu.png',
+        karma: 'community',
+        karmaLabel: '❤️ Nghĩa Tình',
+        quote: 'Ăn gà cay xè lưỡi rồi tráng miệng cây kem chuối nước cốt dừa là chuẩn bài!',
+        storyRole: 'Liên minh ẩm thực hè phố tạo sức hút cho khách học sinh.',
+        relations: [
+          { target: 'char_05_kid_bo', type: 'rel-friend', label: 'Tặng kem chuối cho Bé Bơ' },
+          { target: 'char_30_student_bus', type: 'rel-friend', label: 'Mối ruột học sinh' }
+        ]
+      },
+      {
+        id: 'char_17_sweeper_lan',
+        name: 'Cô Lan Lao Công',
+        roleTitle: 'Mẹ Đơn Thân Quét Rác Ca Đêm',
+        cluster: 'urban',
+        clusterName: '⚡ Kỹ Thuật & Môi Trường',
+        avatar: '/assets/characters/char_17_sweeper_lan.png',
+        karma: 'community',
+        karmaLabel: '❤️ Nghĩa Tình',
+        quote: 'Cảm ơn tiệm đã luôn giữ ấm phần cơm cho hai mẹ con cô...',
+        storyRole: 'Tâm điểm xúc động ở Hồi 3, đại diện cho những phận đời lam lũ được tiệm che chở.',
+        relations: [
+          { target: 'char_05_kid_bo', type: 'rel-family', label: 'Mẹ của Bé Bơ' },
+          { target: 'char_19_shipper_tuan', type: 'rel-protect', label: 'Nhận sự giúp đỡ từ Tuấn Shipper' },
+          { target: 'char_18_garbage_hung', type: 'rel-friend', label: 'Đồng nghiệp ca đêm' }
+        ]
+      },
+      {
+        id: 'char_18_garbage_hung',
+        name: 'Anh Hùng Xe Rác',
+        roleTitle: 'Thu Gom & Xử Lý Dầu Thải Sinh Học',
+        cluster: 'urban',
+        clusterName: '⚡ Kỹ Thuật & Môi Trường',
+        avatar: '/assets/characters/char_18_garbage_hung.png',
+        karma: 'craftsmanship',
+        karmaLabel: '🔥 Tay Nghề',
+        quote: 'Dầu ăn qua sử dụng được tái chế thành xà phòng sinh học, không hại nguồn nước!',
+        storyRole: 'Giúp quán đạt danh hiệu Vệ Sinh 5 Sao ở Hồi 4, phản bác cáo buộc MegaChicken.',
+        relations: [
+          { target: 'char_17_sweeper_lan', type: 'rel-friend', label: 'Phối hợp dọn dẹp hẻm sạch đẹp' },
+          { target: 'char_11_wholesale_nam', type: 'rel-supply', label: 'Thu gom can dầu rỗng' }
+        ]
+      },
+
+      // 4. Vận chuyển & Kỹ thuật
+      {
+        id: 'char_19_shipper_tuan',
+        name: 'Anh Tuấn Shipper Ruột',
+        roleTitle: 'Đội Trưởng Đội Giao Hàng Đêm',
+        cluster: 'logistics',
+        clusterName: '🛵 Vận Chuyển & Giao Hàng',
+        avatar: '/assets/characters/char_19_shipper_tuan.png',
+        karma: 'ambition',
+        karmaLabel: '💼 Khát Vọng',
+        quote: 'Đơn xa mấy hẻm sâu cỡ nào cứ để em, gà tới tay khách vẫn nóng hôi hổi!',
+        storyRole: 'Nhân vật trụ cột ở Hồi 3, phát triển mạng lưới đơn app văn phòng tăng ca.',
+        relations: [
+          { target: 'char_01_owner', type: 'rel-friend', label: 'Bạn tri kỷ từ thời đi học' },
+          { target: 'char_12_courier_ut', type: 'rel-family', label: 'Anh trai của Bé Út' },
+          { target: 'char_17_sweeper_lan', type: 'rel-protect', label: 'Đưa đón Bé Bơ giúp Cô Lan' }
+        ]
+      },
+      {
+        id: 'char_20_mover_cuong',
+        name: 'Anh Cường Bốc Vác',
+        roleTitle: 'Chuyên Gia Lắp Đặt Bếp Công Nghiệp',
+        cluster: 'logistics',
+        clusterName: '🛵 Vận Chuyển & Giao Hàng',
+        avatar: '/assets/characters/char_20_mover_cuong.png',
+        karma: 'ambition',
+        karmaLabel: '💼 Khát Vọng',
+        quote: 'Bếp chiên ngập dầu nặng 80 ký vô hẻm hẹp cỡ nào tụi tui cũng khiêng lọt!',
+        storyRole: 'Giúp chuyển quán vào nhà mới ở Hồi 2 và mở rộng bếp trung tâm ở Hồi 5.',
+        relations: [
+          { target: 'char_21_trucker_long', type: 'rel-friend', label: 'Bạn nhậu chung xe tải' },
+          { target: 'char_23_builder_bay', type: 'rel-friend', label: 'Hợp tác thi công quầy inox' }
+        ]
+      },
+      {
+        id: 'char_21_trucker_long',
+        name: 'Bác Tài Long (Xe Đông Lạnh)',
+        roleTitle: 'Tài Xế Vận Chuyển Liên Tỉnh',
+        cluster: 'supply',
+        clusterName: '🚛 Chuỗi Cung Ứng',
+        avatar: '/assets/characters/char_21_trucker_long.png',
+        karma: 'craftsmanship',
+        karmaLabel: '🔥 Tay Nghề',
+        quote: 'Thịt tươi chạy suốt đêm giữ nhiệt 2°C, không một thớ thịt nào bị ươn!',
+        storyRole: 'Cảnh báo sớm đợt khan hiếm hàng và dịch bệnh gia cầm ở Hồi 3.',
+        relations: [
+          { target: 'char_09_buyer_tam', type: 'rel-family', label: 'Anh ruột của Chị Tâm Gà' },
+          { target: 'char_20_mover_cuong', type: 'rel-friend', label: 'Cặp đôi xe tải & bốc vác' }
+        ]
+      },
+      {
+        id: 'char_22_electrician_dung',
+        name: 'Anh Dũng Thợ Điện',
+        roleTitle: 'Kỹ Thuật Viên Điện Lực Hẻm 1102',
+        cluster: 'urban',
+        clusterName: '⚡ Kỹ Thuật & Môi Trường',
+        avatar: '/assets/characters/char_22_electrician_dung.png',
+        karma: 'craftsmanship',
+        karmaLabel: '🔥 Tay Nghề',
+        quote: '3 bếp chiên cùng bật là sập cầu dao, để anh kéo thêm đường dây 3 pha riêng!',
+        storyRole: 'Cứu nguy vụ chập điện cháy bảng hiệu ở Hồi 2, bảo đảm an toàn cháy nổ.',
+        relations: [
+          { target: 'char_15_bread_bay', type: 'rel-family', label: 'Con rể Chú Bảy Bánh Mì' },
+          { target: 'char_04_fryer_khang', type: 'rel-friend', label: 'Chỉ dạy mạch điện cho Khang' },
+          { target: 'pest_01_rat_cong', type: 'rel-conflict', label: 'Khắc phục dây điện bị chuột cắn' }
+        ]
+      },
+      {
+        id: 'char_23_builder_bay',
+        name: 'Chú Bảy Thợ Hồ',
+        roleTitle: 'Nghệ Nhân Lát Gạch Bếp Chống Trượt',
+        cluster: 'urban',
+        clusterName: '⚡ Kỹ Thuật & Môi Trường',
+        avatar: '/assets/characters/char_23_builder_bay.png',
+        karma: 'craftsmanship',
+        karmaLabel: '🔥 Tay Nghề',
+        quote: 'Sàn bếp chiên phải có độ dốc thoát nước và gạch nhám, đi đứng không bao giờ trượt!',
+        storyRole: 'Xây dựng quầy khay inox GN và sàn bếp tiêu chuẩn ở Hồi 2.',
+        relations: [
+          { target: 'char_20_mover_cuong', type: 'rel-friend', label: 'Đội thợ công trình hẻm' },
+          { target: 'char_27_warden_hai', type: 'rel-friend', label: 'Đăng ký sửa chữa hợp pháp' }
+        ]
+      },
+      {
+        id: 'char_24_grocer_sau',
+        name: 'Cô Sáu Tạp Hóa',
+        roleTitle: 'Tạp Hóa Tổng Hợp Hẻm 1102',
+        cluster: 'supply',
+        clusterName: '🚛 Chuỗi Cung Ứng',
+        avatar: '/assets/characters/char_24_grocer_sau.png',
+        karma: 'ambition',
+        karmaLabel: '💼 Khát Vọng',
+        quote: 'Hết tương cà tương ớt hay nước ngọt chạy qua cô chia lại giá gốc liền!',
+        storyRole: 'Kho dự phòng khẩn cấp khi tiệm hết nguyên liệu giữa ca bán đông khách.',
+        relations: [
+          { target: 'char_03_helper_linh', type: 'rel-supply', label: 'Tiếp ứng tương cà, tương ớt' },
+          { target: 'char_29_atm_nga', type: 'rel-friend', label: 'Chị em hội buôn bán hẻm' }
+        ]
+      },
+
+      // 5. Chính quyền & An ninh
+      {
+        id: 'char_25_police_nam',
+        name: 'Chú Nam Công An Phường',
+        roleTitle: 'Cảnh Sát Khu Vực Phụ Trách Hẻm 1102',
+        cluster: 'order',
+        clusterName: '👮 Hội Đồng Hẻm & Trật Tự',
+        avatar: '/assets/characters/char_25_police_nam.png',
+        karma: 'community',
+        karmaLabel: '❤️ Nghĩa Tình',
+        quote: 'Kinh doanh văn minh, có camera an ninh và không lấn chiếm đường cứu hỏa nghe!',
+        storyRole: 'Bảo vệ tiệm khi đối thủ MegaChicken cho giang hồ đến quấy rối ở Hồi 4.',
+        relations: [
+          { target: 'char_26_traffic_hoang', type: 'rel-family', label: 'Cha ruột của Hoàng CSGT' },
+          { target: 'char_27_warden_hai', type: 'rel-friend', label: 'Đồng chí bảo vệ trật tự' },
+          { target: 'char_28_tough_beo', type: 'rel-protect', label: 'Cảm hóa Bác Béo hoàn lương' }
+        ]
+      },
+      {
+        id: 'char_26_traffic_hoang',
+        name: 'Anh Hoàng Cảnh Sát Giao Thông',
+        roleTitle: 'Đội CSGT Điều Tiết Tuyến Đại Lộ',
+        cluster: 'order',
+        clusterName: '👮 Hội Đồng Hẻm & Trật Tự',
+        avatar: '/assets/characters/char_26_traffic_hoang.png',
+        karma: 'ambition',
+        karmaLabel: '💼 Khát Vọng',
+        quote: 'Xe giao hàng đậu gọn gàng, tránh giờ cao điểm học sinh tan trường nha em!',
+        storyRole: 'Hướng dẫn quy chuẩn phân luồng shipper để không bị phạt vi phạm.',
+        relations: [
+          { target: 'char_25_police_nam', type: 'rel-family', label: 'Con trai Chú Nam' },
+          { target: 'char_19_shipper_tuan', type: 'rel-friend', label: 'Khách quen mê má đùi cay' }
+        ]
+      },
+      {
+        id: 'char_27_warden_hai',
+        name: 'Bác Hải Trưởng Ban Trật Tự',
+        roleTitle: 'Trưởng Ban An Ninh Đô Thị Hẻm',
+        cluster: 'order',
+        clusterName: '👮 Hội Đồng Hẻm & Trật Tự',
+        avatar: '/assets/characters/char_27_warden_hai.png',
+        karma: 'community',
+        karmaLabel: '❤️ Nghĩa Tình',
+        quote: 'Tiệm gà giữ được vệ sinh hẻm sạch sẽ, bác biểu dương trước cuộc họp tổ dân phố!',
+        storyRole: 'Đứng ra bảo lãnh danh dự cho quán trước đoàn kiểm tra liên ngành ở Hồi 4.',
+        relations: [
+          { target: 'char_06_granny_ba', type: 'rel-friend', label: 'Bạn già gắn bó nửa thế kỷ' },
+          { target: 'char_25_police_nam', type: 'rel-friend', label: 'Cánh tay phải của công an phường' }
+        ]
+      },
+      {
+        id: 'char_28_tough_beo',
+        name: 'Bác Béo Hoàn Lương',
+        roleTitle: 'Chủ Lò Sửa Xe Máy Hẻm 1102',
+        cluster: 'order',
+        clusterName: '👮 Hội Đồng Hẻm & Trật Tự',
+        avatar: '/assets/characters/char_28_tough_beo.png',
+        karma: 'community',
+        karmaLabel: '❤️ Nghĩa Tình',
+        quote: 'Đứa nào dám phá tiệm gà của thằng em trong hẻm này thì bước qua xác tao!',
+        storyRole: 'Dẹp tan đám thanh niên gây rối do đối thủ thuê đến ở Hồi 4.',
+        relations: [
+          { target: 'char_25_police_nam', type: 'rel-protect', label: 'Được Chú Nam giúp làm lại cuộc đời' },
+          { target: 'char_19_shipper_tuan', type: 'rel-friend', label: 'Sửa xe máy giá rẻ cho đội shipper' }
+        ]
+      },
+      {
+        id: 'char_29_atm_nga',
+        name: 'Chị Nga Cây Xăng ATM',
+        roleTitle: 'Thu Ngân Cây Xăng Đầu Ngã Tư',
+        cluster: 'customers',
+        clusterName: '⭐ Thực Khách & Xóm Giềng',
+        avatar: '/assets/characters/char_29_atm_nga.png',
+        karma: 'ambition',
+        karmaLabel: '💼 Khát Vọng',
+        quote: 'Cần đổi 5 triệu tiền lẻ 2k, 5k, 10k thối cho khách thì cứ qua chị đổi miễn phí!',
+        storyRole: 'Giải quyết bài toán tiền lẻ thối cho khách vào giờ cao điểm bán hàng.',
+        relations: [
+          { target: 'char_24_grocer_sau', type: 'rel-friend', label: 'Bạn thân tổ phụ nữ' },
+          { target: 'char_01_owner', type: 'rel-supply', label: 'Ngân hàng tiền lẻ của tiệm' }
+        ]
+      },
+      {
+        id: 'char_30_student_bus',
+        name: 'Minh Trí Học Sinh Xe Buýt',
+        roleTitle: 'Đại Diện Hội Học Sinh THPT',
+        cluster: 'customers',
+        clusterName: '⭐ Thực Khách & GenZ',
+        avatar: '/assets/characters/char_30_student_bus.png',
+        karma: 'community',
+        karmaLabel: '❤️ Nghĩa Tình',
+        quote: 'Hôm nào thi xong tụi em cũng ghé tiệm ăn mừng, gà ở đây là ký ức học trò!',
+        storyRole: 'Khách hàng đầu tiên ở Hồi 1, người lập hội "Fan cứng Tiệm Gà Nhà Tui" trên mạng.',
+        relations: [
+          { target: 'char_01_owner', type: 'rel-friend', label: 'Khách ruột từ ngày đầu vỉa hè' },
+          { target: 'char_07_trendy_vy', type: 'rel-friend', label: 'Quản trị viên nhóm Review học sinh' }
+        ]
+      },
+
+      // 6. Đời sống & Động vật
+      {
+        id: 'char_31_gossip_tam',
+        name: 'Bà Tám Hóng Chuyện Đầu Ngõ',
+        roleTitle: 'Đài Phát Thanh Hẻm 1102',
+        cluster: 'customers',
+        clusterName: '⭐ Thực Khách & Xóm Giềng',
+        avatar: '/assets/characters/char_31_gossip_tam.png',
+        karma: 'ambition',
+        karmaLabel: '💼 Khát Vọng',
+        quote: 'Tui vừa nghe ngóng được đối thủ tính giảm giá 50%, tiệm mình chuẩn bị ứng phó nha!',
+        storyRole: 'Cung cấp tin tình báo đối thủ và lan truyền danh tiếng món mới khắp quận.',
+        relations: [
+          { target: 'char_13_vendor_tham', type: 'rel-friend', label: 'Tám chuyện mỗi sáng sớm' },
+          { target: 'char_08_grumpy_hai', type: 'rel-conflict', label: 'Khẩu chiến chuyện tổ dân phố' }
+        ]
+      },
+      {
+        id: 'char_32_jogger_tuan',
+        name: 'Anh Tuấn Chạy Bộ Buổi Sáng',
+        roleTitle: 'Huấn Luyện Viên Thể Hình Hẻm 1102',
+        cluster: 'customers',
+        clusterName: '⭐ Thực Khách & GenZ',
+        avatar: '/assets/characters/char_32_jogger_tuan.png',
+        karma: 'craftsmanship',
+        karmaLabel: '🔥 Tay Nghề',
+        quote: 'Ăn ức gà chiên ráo dầu kết hợp salad củ cải là chuẩn macro tập gym luôn!',
+        storyRole: 'Tư vấn mở rộng thực đơn Eat Clean lành mạnh ở Hồi 3.',
+        relations: [
+          { target: 'char_07_trendy_vy', type: 'rel-friend', label: 'Nhóm bạn tập thể thao' },
+          { target: 'char_01_owner', type: 'rel-friend', label: 'Gợi ý món gà thanh đạm' }
+        ]
+      },
+      {
+        id: 'char_33_couple_genz',
+        name: 'Cặp Đôi GenZ Hẹn Hò',
+        roleTitle: 'Đôi Bạn Trẻ Đam Mê Check-in',
+        cluster: 'customers',
+        clusterName: '⭐ Thực Khách & GenZ',
+        avatar: '/assets/characters/char_33_couple_genz.png',
+        karma: 'community',
+        karmaLabel: '❤️ Nghĩa Tình',
+        quote: 'Góc quán dưới giàn hoa giấy chụp hình lên ảnh màu phim đẹp xỉu!',
+        storyRole: 'Biến góc quán thành điểm hẹn hò lãng mạn ở Hồi 2.',
+        relations: [
+          { target: 'char_07_trendy_vy', type: 'rel-friend', label: 'Nhóm bạn rủ nhau đi ăn' },
+          { target: 'char_01_owner', type: 'rel-friend', label: 'Khách hàng thân thiết bàn số 2' }
+        ]
+      },
+      {
+        id: 'pet_01_dog_vang',
+        name: 'Chó Cỏ Vàng (Mascot Canh Tiệm)',
+        roleTitle: 'Vệ Sĩ Bốn Chân Hẻm 1102',
+        cluster: 'animals',
+        clusterName: '🐾 Tuyến Động Vật',
+        avatar: '/assets/characters/pet_01_dog_vang.png',
+        karma: 'community',
+        karmaLabel: '❤️ Nghĩa Tình',
+        quote: 'Gâu gâu! (Vẫy đuôi mừng khách quen, gầm gừ kẻ trộm vặt!)',
+        storyRole: 'Sự kiện nhận nuôi ở Chương 1, phát hiện trộm cắp và giảm 10% rủi ro mất đồ.',
+        relations: [
+          { target: 'char_01_owner', type: 'rel-family', label: 'Chủ nhân cưu mang' },
+          { target: 'char_05_kid_bo', type: 'rel-friend', label: 'Bảo vệ Bé Bơ tan học' },
+          { target: 'pet_02_cat_muop', type: 'rel-friend', label: 'Bộ đôi thú cưng quán gà' }
+        ]
+      },
+      {
+        id: 'pet_02_cat_muop',
+        name: 'Mèo Mướp Bắt Chuột',
+        roleTitle: 'Chiến Thần Diệt Chuột Kho Bao Bì',
+        cluster: 'animals',
+        clusterName: '🐾 Tuyến Động Vật',
+        avatar: '/assets/characters/pet_02_cat_muop.png',
+        karma: 'craftsmanship',
+        karmaLabel: '🔥 Tay Nghề',
+        quote: 'Meo meo! (Nằm sưởi nắng trên nắp thùng carton, canh gác đêm!)',
+        storyRole: 'Bảo vệ kho bao bì không bị chuột cắn thủng hộp giấy ở Chương 2.',
+        relations: [
+          { target: 'char_06_granny_ba', type: 'rel-family', label: 'Mèo cưng của Bà Ba' },
+          { target: 'pest_01_rat_cong', type: 'rel-conflict', label: 'Kẻ thù không đội trời chung' },
+          { target: 'pet_01_dog_vang', type: 'rel-friend', label: 'Bạn đồng hành giữ tiệm' }
+        ]
+      },
+      {
+        id: 'pest_01_rat_cong',
+        name: 'Chuột Cống Đầu Bếp (Sự Cố)',
+        roleTitle: 'Kẻ Phá Hoại Đêm Hẻm 1102',
+        cluster: 'animals',
+        clusterName: '🐾 Tuyến Động Vật',
+        avatar: '/assets/characters/pest_01_rat_cong.png',
+        karma: 'craftsmanship',
+        karmaLabel: '🔥 Tay Nghề',
+        quote: 'Chít chít! (Rình mò kho bột và cắn trộm dây điện bếp chiên!)',
+        storyRole: 'Kích hoạt chuỗi sự cố kiểm tra an toàn vệ sinh và bẫy rào ở Chương 2-3.',
+        relations: [
+          { target: 'pet_02_cat_muop', type: 'rel-conflict', label: 'Bị Mèo Mướp truy đuổi' },
+          { target: 'char_22_electrician_dung', type: 'rel-conflict', label: 'Cắn đứt dây điện của Anh Dũng' }
+        ]
+      }
+    ];
+
+    // 5 ACTS STORYLINE LINKED DIRECTLY TO CHARACTERS
+    const STORY_ACTS_DATA = [
+      {
+        act: 1,
+        title: 'Hồi 1: Hơi Ấm Khói Dầu Đầu Ngõ',
+        subtitle: 'Chương 1 · Chiếc Xe Đẩy 850k & Lửa Nghề Chợ Lớn',
+        dilemma: 'Chia sẻ gà ấm cho lũ trẻ nghèo đói bụng hay siết chặt từng đồng vốn mỏng để sống sót?',
+        conflict: 'Bà Ba & Bác Ba (Tay Nghề) ⚡ Minh Trí & Học Sinh Bàn Cuối (Khách Nghèo)',
+        keyChars: ['char_01_owner', 'char_06_granny_ba', 'char_30_student_bus', 'char_02_lottery_lady', 'pet_01_dog_vang'],
+        impactKarma: 'Quyết định tạo dựng tình nghĩa xóm giềng (Community +15) hoặc tích lũy vốn liếng ban đầu (Ambition +15).'
+      },
+      {
+        act: 2,
+        title: 'Hồi 2: Tiếng Cười Trong Con Hẻm Sâu',
+        subtitle: 'Chương 2 · Căn Nhà Số 14 & Mối Tình Giàn Hoa Giấy',
+        dilemma: 'Cứu vãn tình thân và hỗ trợ chàng họa sĩ nghèo hay tối ưu hóa doanh thu thương mại?',
+        conflict: 'Bác Béo Hoàn Lương & Anh Dũng Điện ⚡ Cặp Đôi GenZ Hẹn Hò & Mèo Mướp Giữ Kho',
+        keyChars: ['char_01_owner', 'char_03_helper_linh', 'char_04_fryer_khang', 'char_22_electrician_dung', 'char_33_couple_genz', 'pet_02_cat_muop'],
+        impactKarma: 'Định hình bản sắc nghệ nhân bếp chiên (Craftsmanship +15) hoặc bứt phá hợp đồng thương mại (Ambition +15).'
+      },
+      {
+        act: 3,
+        title: 'Hồi 3: Ánh Đèn Mặt Tiền & Đứa Trẻ Không Đơn Độc',
+        subtitle: 'Chương 3 · Bùng Nổ Đơn App & Góc Bàn Số 1 Cho Bé Bơ',
+        dilemma: 'Mở rộng đội xe giao hàng đêm ép doanh số tối đa hay cưu mang đứa trẻ chờ mẹ tăng ca?',
+        conflict: 'Chị Mai & Cô Lan Lao Công ⚡ Anh Tuấn Shipper & Bác Tài Long Thịt Sạch',
+        keyChars: ['char_01_owner', 'char_17_sweeper_lan', 'char_05_kid_bo', 'char_19_shipper_tuan', 'char_09_buyer_tam', 'char_21_trucker_long'],
+        impactKarma: 'Mở ra Mái Ấm Che Chở (Community +20) hoặc Đột Phá Doanh Thu Đêm (Ambition +20).'
+      },
+      {
+        act: 4,
+        title: 'Hồi 4: Cơn Sóng Ngầm MegaChicken & Lửa Thử Vàng',
+        subtitle: 'Chương 4 · Chiến Tranh Truyền Thông Bẩn & Minh Bạch Lòng Tin',
+        dilemma: 'Minh bạch 100% bếp sạch và cùng xóm giềng phản đòn hay nhận tiền mua chuộc của tập đoàn?',
+        conflict: 'MegaChicken & Thanh Tra Đối Thủ ⚡ Chú Hai Soi Vệ Sinh & Khánh Vy TikToker',
+        keyChars: ['char_01_owner', 'char_07_trendy_vy', 'char_08_grumpy_hai', 'char_25_police_nam', 'char_27_warden_hai', 'char_28_tough_beo'],
+        impactKarma: 'Quyết định bước ngoặt: Bảo vệ lòng tin người tiêu dùng hay thỏa hiệp thương mại hóa (Bad Ending Branch).'
+      },
+      {
+        act: 5,
+        title: 'Hồi 5: Khải Hoàn "Gà Vàng Quốc Dân"',
+        subtitle: 'Chương 5 · Đêm Trao Giải Thưởng Quốc Gia & Chiếc Vá Gỗ Gia Truyền',
+        dilemma: 'Giữ vững tiệm gà như một di sản tri kỷ ấm áp hay niêm yết sàn chứng khoán thành chuỗi tỷ đô?',
+        conflict: 'Bác Ba & Di Sản Hẻm 1102 ⚡ Các Quỹ Đầu Tư Tài Chính Quốc Tế (IPO)',
+        keyChars: ['char_01_owner', 'char_06_granny_ba', 'char_19_shipper_tuan', 'char_07_trendy_vy', 'char_27_warden_hai', 'char_10_winner_hung'],
+        impactKarma: 'Kích hoạt 1 trong 4 Đại Kết Cục vĩnh viễn lưu vào bảng vàng lịch sử trò chơi.'
+      }
+    ];
+
+    let currentSelectedChar = CHARACTERS[0];
+    let currentFilter = 'all';
+
+    // RENDER TIMELINE SWIMLANES
+    function renderTimeline() {
+      const container = document.getElementById('timeline-container');
+      container.innerHTML = STORY_ACTS_DATA.map(act => {
+        const castHtml = act.keyChars.map(charId => {
+          const char = CHARACTERS.find(c => c.id === charId);
+          if (!char) return '';
+          const isSelected = char.id === currentSelectedChar.id ? 'selected' : '';
+          return `
+            <div class="char-mini-card ${isSelected}" onclick="selectCharacter('${char.id}')">
+              <img src="${char.avatar}" class="char-avatar-img" alt="${char.name}" onerror="this.src='/assets/characters/char_01_owner.png'">
+              <div class="char-mini-info">
+                <span class="char-mini-name">${char.name}</span>
+                <span class="char-mini-role">${char.roleTitle}</span>
+                <span class="char-karma-tag karma-${char.karma}">${char.karmaLabel}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="act-card">
+            <div class="act-header" onclick="selectCharacter('${act.keyChars[0]}')">
+              <div class="act-title-box">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                  <span class="act-badge">HỒI ${act.act}</span>
+                  <h3>${act.title}</h3>
+                </div>
+                <p>${act.subtitle}</p>
+              </div>
+              <span style="font-size: 1.5rem; color: var(--primary);">➔</span>
+            </div>
+
+            <div class="act-body">
+              <div class="dilemma-highlight">
+                <b>⚡ MÂU THUẪN THEN CHỐT:</b> ${act.dilemma}
+              </div>
+
+              <div style="font-size: 0.84rem; color: var(--text-muted);">
+                <b>Xung đột đối kháng:</b> ${act.conflict}
+              </div>
+
+              <div>
+                <div style="font-size: 0.8rem; font-weight: 800; color: var(--primary); margin-bottom: 6px;">
+                  👥 CÁC NHÂN VẬT THAM GIA ĐỊNH HÌNH HỒI NÀY (${act.keyChars.length} nhân vật):
+                </div>
+                <div class="cast-avatars-row">
+                  ${castHtml}
+                </div>
+              </div>
+
+              <div style="font-size: 0.78rem; color: #ffd166; background: rgba(0,0,0,0.25); padding: 8px 12px; border-radius: 8px;">
+                <b>Ảnh hưởng Karma:</b> ${act.impactKarma}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // RENDER NETWORK GRID
+    function renderNetwork() {
+      const container = document.getElementById('network-container');
+      const filtered = CHARACTERS.filter(char => {
+        const matchesFilter = currentFilter === 'all' || char.cluster === currentFilter;
+        return matchesFilter;
+      });
+
+      container.innerHTML = filtered.map(char => {
+        const isSelected = char.id === currentSelectedChar.id ? 'selected' : '';
+        return `
+          <div class="character-card-full ${isSelected}" onclick="selectCharacter('${char.id}')">
+            <img src="${char.avatar}" class="char-full-img" alt="${char.name}" onerror="this.src='/assets/characters/char_01_owner.png'">
+            <div class="char-full-name">${char.name}</div>
+            <div class="char-full-role">${char.roleTitle}</div>
+            <div class="char-cluster-badge">${char.clusterName}</div>
+            <span class="char-karma-tag karma-${char.karma}">${char.karmaLabel}</span>
+            <div class="char-relations-count" style="margin-top: 8px;">🔗 ${char.relations.length} mối liên kết</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // UPDATE INSPECTOR PANEL
+    function updateInspector(char) {
+      document.getElementById('insp-avatar').src = char.avatar;
+      document.getElementById('insp-avatar').onerror = function() { this.src = '/assets/characters/char_01_owner.png'; };
+      document.getElementById('insp-name').textContent = char.name;
+      document.getElementById('insp-role').textContent = char.roleTitle;
+      document.getElementById('insp-cluster').textContent = char.clusterName;
+      document.getElementById('insp-story-role').textContent = char.storyRole;
+      document.getElementById('insp-quote').textContent = `"${char.quote}"`;
+
+      const karmaBox = document.getElementById('insp-karma-desc');
+      if (char.karma === 'community') {
+        karmaBox.innerHTML = '❤️ <b>Thiên Hướng Nghĩa Tình (Community):</b> Ưu tiên cứu trợ xóm giềng, mở rộng mái ấm tình thương, hướng về Happy Ending 1.';
+      } else if (char.karma === 'craftsmanship') {
+        karmaBox.innerHTML = '🔥 <b>Thiên Hướng Nghệ Nhân (Craftsmanship):</b> Tôn vinh tay nghề sạch, chuẩn vị truyền thống 1990, hướng về Secret Ending 4.';
+      } else {
+        karmaBox.innerHTML = '💼 <b>Thiên Hướng Khát Vọng (Ambition):</b> Mở rộng quy mô, đột phá doanh thu và phát triển chuỗi thương mại, hướng về Open Ending 2.';
+      }
+
+      const relationsList = document.getElementById('insp-relations-list');
+      relationsList.innerHTML = char.relations.map(rel => {
+        const target = CHARACTERS.find(c => c.id === rel.target);
+        const targetName = target ? target.name : rel.target;
+        return `
+          <div class="relation-item">
+            <span style="font-weight: 700; color: #fff;">${targetName}</span>
+            <span class="relation-type-tag ${rel.type}">${rel.label}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // SELECT CHARACTER HANDLER
+    function selectCharacter(charId) {
+      const char = CHARACTERS.find(c => c.id === charId);
+      if (!char) return;
+      currentSelectedChar = char;
+      updateInspector(char);
+      renderTimeline();
+      renderNetwork();
+    }
+
+    // SWITCH VIEW TABS
+    function switchView(viewName) {
+      document.getElementById('btn-tab-timeline').classList.toggle('active', viewName === 'timeline');
+      document.getElementById('btn-tab-network').classList.toggle('active', viewName === 'network');
+      document.getElementById('timeline-container').style.display = viewName === 'timeline' ? 'flex' : 'none';
+      document.getElementById('network-container').style.display = viewName === 'network' ? 'grid' : 'none';
+    }
+
+    // FILTER CLUSTERS
+    function filterCluster(cluster) {
+      currentFilter = cluster;
+      document.querySelectorAll('.filter-chip').forEach(el => {
+        el.classList.toggle('active', el.textContent.includes(cluster) || (cluster === 'all' && el.textContent.includes('Tất Cả')));
+      });
+      renderNetwork();
+      switchView('network');
+    }
+
+    // SEARCH INPUT
+    function handleSearch(query) {
+      const q = query.toLowerCase().trim();
+      if (!q) {
+        renderNetwork();
+        return;
+      }
+      const matched = CHARACTERS.filter(c => c.name.toLowerCase().includes(q) || c.roleTitle.toLowerCase().includes(q));
+      if (matched.length > 0) {
+        selectCharacter(matched[0].id);
+      }
+    }
+
+    // INIT
+    window.addEventListener('DOMContentLoaded', () => {
+      renderTimeline();
+      renderNetwork();
+      updateInspector(currentSelectedChar);
+    });
+  </script>
+</body>
+</html>
