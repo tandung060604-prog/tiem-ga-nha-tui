@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Showcase 15s • Tiệm Gà Nhà Tui</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #18120c;
+      --card-bg: #241a12;
+      --accent: #f59e0b;
+      --accent-glow: rgba(245, 158, 11, 0.4);
+      --text: #fef3c7;
+      --text-muted: #d97706;
+      --border: #3d2c1d;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle at top, #2d1e12 0%, var(--bg) 100%);
+      color: var(--text);
+      font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+    }
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1.5px solid var(--accent);
+      padding: 6px 16px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fbbf24;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+    h1 {
+      font-family: 'Baloo 2', sans-serif;
+      font-size: 2.4rem;
+      font-weight: 800;
+      text-align: center;
+      background: linear-gradient(135deg, #fff 0%, #fde68a 50%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      font-size: 1rem;
+      color: #d1d5db;
+      text-align: center;
+      max-width: 580px;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 412px;
+      aspect-ratio: 412 / 860;
+      border-radius: 36px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 4px #3d2a1c, 0 0 40px var(--accent-glow);
+      background: #000;
+      margin-bottom: 24px;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .controls-deck {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn-action {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #fff;
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+    }
+    .btn-secondary {
+      background: #2b1f14;
+      border: 1px solid var(--border);
+      color: #fde68a;
+      box-shadow: none;
+    }
+    .timeline-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      width: 100%;
+      max-width: 900px;
+    }
+    .moment-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: transform 0.2s ease;
+    }
+    .moment-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent);
+    }
+    .moment-time {
+      font-size: 12px;
+      font-weight: 800;
+      color: #fbbf24;
+      background: rgba(245, 158, 11, 0.15);
+      padding: 3px 8px;
+      border-radius: 8px;
+      align-self: flex-start;
+    }
+    .moment-title {
+      font-family: 'Baloo 2', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .moment-desc {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-badge">🎬 Official Gameplay Showcase</div>
+  <h1>TIỆM GÀ NHÀ TUI</h1>
+  <p class="subtitle">Video Showcase 15s ghi hình thực tế gameplay: Từ không khí Hẻm 1102, bảng quản lý thực đơn &amp; kho hàng, tới ca chiên gà vàng giòn và phục vụ khách hàng GenZ.</p>
+
+  <div class="video-wrapper">
+    <video id="showcase-video" src="./tiem_ga_showcase_15s.webm" controls autoplay loop playsinline muted></video>
+  </div>
+
+  <div class="controls-deck">
+    <a href="./tiem_ga_showcase_15s.webm" download="tiem_ga_showcase_15s.webm" class="btn-action">
+      ⬇️ Tải Video WebM (2.57 MB)
+    </a>
+    <a href="./" class="btn-action btn-secondary">
+      🎮 Vào Game Trải Nghiệm Ngay
+    </a>
+  </div>
+
+  <div class="timeline-grid">
+    <div class="moment-card">
+      <span class="moment-time">00:00 - 00:03</span>
+      <h3 class="moment-title">🍗 Title Screen &amp; Hẻm 1102</h3>
+      <p class="moment-desc">Bìa tranh hoài niệm tiệm gà hẻm Sài Gòn, logo huy hiệu K-Chicken và tương tác chạm Bé Miu canh vía &amp; Bác Ba tổ trưởng.</p>
+    </div>
+    <div class="moment-card">
+      <span class="moment-time">00:03 - 00:06</span>
+      <h3 class="moment-title">📋 Bảng Quản Lý Hub</h3>
+      <p class="moment-desc">Khám phá Thực đơn K-Chicken đa dạng, Kho nguyên liệu tươi sống quản lý theo lô FIFO (nút hoàn vốn -5) và Đánh giá GenZ viral.</p>
+    </div>
+    <div class="moment-card">
+      <span class="moment-time">00:06 - 00:13</span>
+      <h3 class="moment-title">🔥 Ca Chiên Gà Cao Điểm</h3>
+      <p class="moment-desc">Thả gà vào chảo, canh kim đo nhiệt độ vào vùng Vàng Giòn (PERFECT), rót Coca có đá sủi bọt, xịt tương sốt và KENG! lên món.</p>
+    </div>
+    <div class="moment-card">
+      <span class="moment-time">00:13 - 00:15</span>
+      <h3 class="moment-title">⚡ Tăng Tốc ⏩ x2 &amp; Tiền Bay</h3>
+      <p class="moment-desc">Bật chế độ tăng tốc, ngọn lửa chuỗi Perfect Streak bùng nổ, hiệu ứng tiền bay và thực khách nườm nượp ghé tiệm.</p>
+    </div>
+  </div>
+</body>
+</html>

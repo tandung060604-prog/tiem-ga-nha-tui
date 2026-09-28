@@ -1,5 +1,5 @@
 import { chromium } from 'playwright-core';
-import { mkdirSync, existsSync, copyFileSync, renameSync, readdirSync } from 'node:fs';
+import { mkdirSync, existsSync, copyFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 
@@ -12,7 +12,7 @@ if (!existsSync(ARTIFACT_DIR)) {
   mkdirSync(ARTIFACT_DIR, { recursive: true });
 }
 
-console.log('🎬 Bắt đầu khởi động Chrome để quay video showcase 15s...');
+console.log('🎬 Bắt đầu khởi động Chrome để quay video showcase 15s chuẩn xác...');
 const browser = await chromium.launch({
   channel: 'chrome',
   headless: true
@@ -34,58 +34,64 @@ const page = await context.newPage();
 // Inject Touch Ripple & Showcase Subtitle HUD
 await page.addInitScript(() => {
   window.addEventListener('DOMContentLoaded', () => {
-    // 1. Touch Ripple FX
+    // 1. Touch Ripple & Showcase Styles
     const style = document.createElement('style');
     style.textContent = `
       .showcase-hud {
         position: fixed;
-        top: 10px;
+        top: 12px;
         left: 50%;
         transform: translateX(-50%);
-        z-index: 99999;
-        background: rgba(30, 20, 15, 0.88);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        z-index: 999999;
+        background: linear-gradient(135deg, rgba(28, 18, 12, 0.92), rgba(45, 26, 16, 0.95));
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
         color: #fff;
-        padding: 6px 14px;
-        border-radius: 24px;
-        font-family: 'Baloo 2', system-ui, sans-serif;
-        font-size: 13px;
+        padding: 7px 16px;
+        border-radius: 30px;
+        font-family: 'Baloo 2', 'Be Vietnam Pro', system-ui, sans-serif;
+        font-size: 13.5px;
         font-weight: 700;
-        letter-spacing: 0.2px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 0 1.5px rgba(251, 191, 36, 0.7);
+        letter-spacing: 0.3px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 0 2px rgba(245, 158, 11, 0.85);
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
         pointer-events: none;
-        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         text-align: center;
-        max-width: 90vw;
+        max-width: 92vw;
         white-space: nowrap;
       }
       .showcase-hud .hud-icon {
-        font-size: 16px;
-        animation: hudPulse 1.5s ease infinite alternate;
+        font-size: 18px;
+        display: inline-block;
+        animation: hudPulse 1.2s ease infinite alternate;
+      }
+      .showcase-hud .hud-text {
+        background: linear-gradient(90deg, #fff, #fef08a);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
       @keyframes hudPulse {
         0% { transform: scale(1); }
-        100% { transform: scale(1.2); }
+        100% { transform: scale(1.25) rotate(5deg); }
       }
       .touch-ripple {
         position: fixed;
-        width: 36px;
-        height: 36px;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(251, 191, 36, 0.85) 0%, rgba(245, 158, 11, 0.35) 60%, transparent 100%);
-        box-shadow: 0 0 16px rgba(245, 158, 11, 0.8);
+        background: radial-gradient(circle, rgba(251, 191, 36, 0.9) 0%, rgba(245, 158, 11, 0.45) 50%, transparent 100%);
+        box-shadow: 0 0 20px rgba(245, 158, 11, 0.9), inset 0 0 10px rgba(255, 255, 255, 0.8);
         pointer-events: none;
         transform: translate(-50%, -50%) scale(0.2);
-        animation: rippleAnim 0.45s ease-out forwards;
-        z-index: 100000;
+        animation: rippleAnim 0.5s ease-out forwards;
+        z-index: 1000000;
       }
       @keyframes rippleAnim {
         0% { transform: translate(-50%, -50%) scale(0.2); opacity: 1; }
-        100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+        100% { transform: translate(-50%, -50%) scale(1.8); opacity: 0; }
       }
     `;
     document.head.appendChild(style);
@@ -93,16 +99,16 @@ await page.addInitScript(() => {
     const hud = document.createElement('div');
     hud.id = 'showcase-hud';
     hud.className = 'showcase-hud';
-    hud.innerHTML = '<span class="hud-icon">🍗</span><span class="hud-text">TIỆM GÀ NHÀ TUI • Quán Gà Rán Hẻm 1102</span>';
+    hud.innerHTML = '<span class="hud-icon">🍗</span><span class="hud-text">TIỆM GÀ NHÀ TUI • Quán Gà Rán Giòn Rụm Hẻm 1102</span>';
     document.body.appendChild(hud);
 
     window.updateShowcaseHud = (icon, text) => {
       hud.style.opacity = '0';
-      hud.style.transform = 'translateX(-50%) translateY(-6px)';
+      hud.style.transform = 'translateX(-50%) translateY(-8px) scale(0.95)';
       setTimeout(() => {
         hud.innerHTML = `<span class="hud-icon">${icon}</span><span class="hud-text">${text}</span>`;
         hud.style.opacity = '1';
-        hud.style.transform = 'translateX(-50%) translateY(0)';
+        hud.style.transform = 'translateX(-50%) translateY(0) scale(1)';
       }, 150);
     };
 
@@ -112,150 +118,163 @@ await page.addInitScript(() => {
       rip.style.left = e.clientX + 'px';
       rip.style.top = e.clientY + 'px';
       document.body.appendChild(rip);
-      setTimeout(() => rip.remove(), 450);
+      setTimeout(() => rip.remove(), 500);
     }, { passive: true });
   });
 });
 
-console.log('🌐 Đang điều hướng tới:', TARGET_URL);
-await page.goto(TARGET_URL, { waitUntil: 'networkidle' });
-await page.waitForTimeout(1000);
+console.log('🌐 Đang tải trang chủ game...');
+await page.goto(TARGET_URL);
+await page.waitForTimeout(600);
 
-// Helper click with visible cursor movement and tap
-async function humanClick(selector, delayAfter = 800) {
+// Helper click with smooth touch animation
+async function smoothTap(selector, delayAfter = 600) {
   try {
-    const el = await page.$(selector);
-    if (!el) {
-      console.log(`⚠️ Không tìm thấy selector: ${selector}`);
-      return false;
-    }
-    const box = await el.boundingBox();
-    if (!box) {
-      await el.click();
+    const loc = page.locator(selector).first();
+    if (await loc.isVisible().catch(() => false)) {
+      const box = await loc.boundingBox();
+      if (box) {
+        const x = box.x + box.width / 2;
+        const y = box.y + box.height / 2;
+        await page.mouse.move(x, y, { steps: 4 });
+        await page.mouse.down();
+        await page.waitForTimeout(60);
+        await page.mouse.up();
+        await page.waitForTimeout(delayAfter);
+        return true;
+      }
+      await loc.click();
       await page.waitForTimeout(delayAfter);
       return true;
     }
-    const x = box.x + box.width / 2;
-    const y = box.y + box.height / 2;
-    await page.mouse.move(x, y, { steps: 5 });
-    await page.mouse.down();
-    await page.waitForTimeout(80);
-    await page.mouse.up();
-    await page.waitForTimeout(delayAfter);
-    return true;
   } catch (err) {
-    console.log(`⚠️ Lỗi khi click ${selector}:`, err.message);
-    return false;
+    console.log(`⚠️ Tap ${selector}:`, err.message);
   }
+  return false;
 }
 
-// SCENE 1: MÀN HÌNH CHÀO MỪNG (TITLE SCREEN)
-console.log('📍 SCENE 1: Title Screen & Khởi Nghiệp Hẻm 1102');
-await page.evaluate(() => window.updateShowcaseHud?.('🍗', 'TIỆM GÀ NHÀ TUI • Khởi nghiệp gà rán giòn rụm'));
-await page.waitForTimeout(1000);
+// ==========================================
+// SCENE 1: TITLE SCREEN & KHỞI NGHIỆP HẺM 1102 (0s - 3.2s)
+// ==========================================
+console.log('📍 SCENE 1: Title Screen & Không Khí Hẻm Sài Gòn');
+await page.evaluate(() => window.updateShowcaseHud?.('🍗', 'TIỆM GÀ NHÀ TUI • Quán Gà Rán Giòn Rụm Hẻm 1102'));
+await page.waitForTimeout(900);
 
-// Chạm bé mèo canh vía
-await humanClick('#zone-cat', 1200);
+// Chạm Bé Miu canh vía
+console.log('🐱 Vuốt ve Bé Miu...');
+await smoothTap('#zone-cat', 1000);
 
-// Chạm Bác Ba tổ trưởng mách nước
-await humanClick('#zone-bacba', 1200);
+// Chạm Bác Ba tổ trưởng
+console.log('👴 Chào Bác Ba...');
+await smoothTap('#zone-bacba', 800);
 
-// Nhấn nút Hero "VÀO TIỆM BÁN GÀ" / "TIẾP TỤC MỞ BÁN"
-await humanClick('#btn-title-play', 800);
+// Bấm VÀO TIỆM BÁN GÀ
+console.log('▶️ Bấm Vào Tiệm Bán Gà...');
+await smoothTap('#btn-title-play', 600);
 
-// Nếu có hộp thoại đặt tên tiệm
-const nameInput = await page.$('.shop-name-dialog');
-if (nameInput) {
-  console.log('📝 Đặt tên tiệm gà...');
-  // Chọn chip gợi ý đầu tiên
-  await humanClick('.shop-name-chip:first-of-type', 500);
-  await humanClick('#btn-confirm-shop-name', 800);
+// Xác nhận đặt tên tiệm nếu xuất hiện
+const nameConfirm = page.locator('#btn-confirm-shop-name');
+if (await nameConfirm.isVisible().catch(() => false)) {
+  console.log('🏷️ Xác nhận tên tiệm gà...');
+  await smoothTap('#btn-confirm-shop-name', 400);
 }
 
-// Nếu có modal chào mừng
-const welcomeCta = await page.$('.welcome-dialog button, #modal-content button');
-if (welcomeCta) {
-  await humanClick('.welcome-dialog button, #modal-content button', 600);
+// Đóng modal chào mừng nếu xuất hiện
+const welcomeStart = page.locator('#btn-welcome-start');
+if (await welcomeStart.isVisible().catch(() => false)) {
+  console.log('🎉 Bắt đầu ngày 1...');
+  await smoothTap('#btn-welcome-start', 500);
 }
 
-await page.waitForTimeout(500);
+// ==========================================
+// SCENE 2: BẢNG KẾ HOẠCH & TÍNH NĂNG QUẢN LÝ (3.2s - 6.5s)
+// ==========================================
+console.log('📍 SCENE 2: Quản Lý Tiệm - Thực Đơn, Kho Hàng, Đánh Giá');
+await page.evaluate(() => window.updateShowcaseHud?.('📋', 'QUẢN LÝ TIỆM • Thực Đơn Giòn Tan & Kho Nguyên Liệu FIFO'));
+await page.waitForTimeout(400);
 
-// SCENE 2: TÍNH NĂNG QUẢN LÝ TIỆM (CHALKBOARD HUB)
-console.log('📍 SCENE 2: Khám phá Quản lý Thực đơn, Kho hàng FIFO, Đánh giá');
-await page.evaluate(() => window.updateShowcaseHud?.('📋', 'QUẢN LÝ TIỆM • Thực đơn giòn rụm & Kho nguyên liệu FIFO'));
+// Xem Tab Thực Đơn
+console.log('🍗 Xem Tab Thực Đơn...');
+await smoothTap('button[data-tab="menu"]', 1100);
 
-// Chuyển tab Thực đơn
-await humanClick('[data-tab="menu"]', 1200);
+// Xem Tab Kho Hàng
+console.log('📦 Xem Tab Kho Hàng...');
+await page.evaluate(() => window.updateShowcaseHud?.('📦', 'KHO HÀNG FIFO • Tồn Kho Tươi Mới & Mở Khóa Theo Ngày'));
+await smoothTap('button[data-tab="inventory"]', 1100);
 
-// Chuyển tab Kho hàng
-await humanClick('[data-tab="inventory"]', 1200);
+// Xem Tab Đánh Giá Thực Khách GenZ
+console.log('💬 Xem Tab Đánh Giá GenZ...');
+await page.evaluate(() => window.updateShowcaseHud?.('⭐', 'REVIEW GENZ VIRAL • Đánh Giá Thực Khách & Uy Tín Hẻm'));
+await smoothTap('button[data-tab="reviews"]', 1200);
 
-// Chuyển tab Đánh giá GenZ
-await page.evaluate(() => window.updateShowcaseHud?.('💬', 'REVIEW GENZ • Đánh giá thực khách & Tích luỹ danh tiếng'));
-await humanClick('[data-tab="reviews"]', 1400);
+// ==========================================
+// SCENE 3: GAMEPLAY CHIÊN GÀ & PHỤC VỤ (6.5s - 13.0s)
+// ==========================================
+console.log('📍 SCENE 3: Ca Bán Cao Điểm - Chiên Gà & Phục Vụ Realtime');
+await page.evaluate(() => window.updateShowcaseHud?.('🔥', 'VÀO CA BÁN HÀNG • Chiên Gà Canh Nhiệt & Lên Món'));
+await smoothTap('#btn-start-selling', 700);
 
-// Quay lại tab kho/bảng điều khiển
-await humanClick('[data-tab="inventory"]', 600);
-
-// SCENE 3: GAMEPLAY BÁN GÀ CA CAO ĐIỂM (RUSH HOUR COOKING)
-console.log('📍 SCENE 3: Gameplay Bán Gà & Chiên Nấu Realtime');
-await page.evaluate(() => window.updateShowcaseHud?.('🔥', 'VÀO CA BÁN HÀNG • Chiên gà canh nhiệt & Phục vụ khách'));
-
-// Bấm MỞ BÁN NGAY
-await humanClick('#btn-start-day', 1000);
-
-// Xử lý Tutorial Bác Ba nếu xuất hiện
-const tutBtn = await page.$('#btn-tutorial-primary, .tutorial-actions button');
-if (tutBtn) {
-  console.log('🎓 Nhấn xác nhận hướng dẫn Bác Ba...');
-  await humanClick('#btn-tutorial-primary, .tutorial-actions button', 600);
+// Bỏ qua hướng dẫn nếu có
+const tutNext = page.locator('#btn-tutorial-next');
+if (await tutNext.isVisible().catch(() => false)) {
+  await tutNext.click().catch(() => {});
+  await page.waitForTimeout(300);
 }
 
-// Thả gà vào chảo chiên
-console.log('🍗 Thả gà vào chảo...');
-await humanClick('#btn-fry-chicken', 300);
+// Thả mẻ gà đầu tiên vào chảo chiên
+console.log('🍗 Thả gà vào chảo chiên...');
+await smoothTap('#btn-fry-chicken', 300);
 
-// Canh thanh đo nhiệt độ: chờ kim chạy tới vùng Vàng Giòn (khoảng 1.8 giây)
-await page.evaluate(() => window.updateShowcaseHud?.('✨', 'CANH LỬA CHUẨN XÁC • Vớt gà ngay vùng Vàng Giòn!'));
-await page.waitForTimeout(1600);
+// Canh thanh đo nhiệt độ: chờ kim chạy tới vùng VÀNG GIÒN (khoảng 1.7s)
+console.log('⏱️ Canh kim đo nhiệt tới vùng VÀNG GIÒN (PERFECT)...');
+await page.evaluate(() => window.updateShowcaseHud?.('✨', 'CANH LỬA VÀNG GIÒN • Vớt Đúng Lúc PERFECT!'));
+await page.waitForTimeout(1650);
 
-// Nhấc chảo lấy gà giòn
-await humanClick('#btn-fry-pot', 500);
+// Nhấc chảo vớt gà giòn rụm vào khay giữ nhiệt
+console.log('🥘 Vớt gà giòn rụm lên khay giữ nhiệt!');
+await smoothTap('#btn-fry-pot', 500);
 
-// Rót nước ngọt có ga mát lạnh
-console.log('🥤 Rót nước ngọt...');
-await humanClick('#btn-pour-coca, #btn-add-drink', 500);
+// Rót nước ngọt mát lạnh
+console.log('🥤 Rót Coca sủi bọt có đá...');
+await smoothTap('#btn-add-drink', 500);
 
-// Xịt tương hoặc phục vụ
-await page.evaluate(() => window.updateShowcaseHud?.('🛎️', 'KENG! LÊN MÓN • Khách nhận gà, Tiền bay & Chuỗi Perfect'));
-await humanClick('#btn-serve-order', 1000);
+// Xịt thêm tương cà / tương ớt tặng tip
+console.log('🍅 Xịt tương sốt...');
+await smoothTap('#btn-squeeze-ketchup', 500);
 
-// Thả tiếp mẻ gà thứ 2 + khoai lắc
-await humanClick('#btn-fry-chicken', 300);
-await humanClick('#btn-fry-fries', 1200);
-await humanClick('#btn-fry-pot', 500);
+// Bấm KENG! LÊN MÓN phục vụ khách
+console.log('🛎️ Phục vụ khách hàng đầu tiên!');
+await page.evaluate(() => window.updateShowcaseHud?.('🛎️', 'KENG! LÊN MÓN • Tiền Bay (+35k), Tip & Chuỗi Perfect 🔥'));
+await smoothTap('#btn-serve-order', 1000);
 
-// Rót thêm nước hoặc phục vụ
-await humanClick('#btn-pour-7up, #btn-add-drink', 400);
-await humanClick('#btn-serve-order', 800);
+// Thả tiếp mẻ 2: gà + khoai
+console.log('🍟 Thả thêm mẻ gà và khoai...');
+await smoothTap('#btn-fry-chicken', 300);
+await page.waitForTimeout(1650);
+await smoothTap('#btn-fry-pot', 400);
+await smoothTap('#btn-pour-7up', 400);
+await smoothTap('#btn-serve-order', 800);
 
-// Bật tăng tốc ⏩ x2 để ca bán sôi động
-await page.evaluate(() => window.updateShowcaseHud?.('⚡', 'TĂNG TỐC BÁN HÀNG • Đơn hàng dồn dập, Tiền vô ào ào'));
-await humanClick('#btn-toggle-fast', 2000);
+// Bật tăng tốc ⏩ x2 cho ca bán bùng nổ
+console.log('⚡ Bật tăng tốc ⏩ x2 ca bán...');
+await page.evaluate(() => window.updateShowcaseHud?.('⚡', 'TĂNG TỐC BÁN HÀNG • Khách Vào Tấp Nập, Tiền Đếm Mỏi Tay'));
+await smoothTap('#btn-toggle-fast', 2000);
 
-// SCENE 4: KẾT THÚC SHOWCASE HOÀN HẢO
-console.log('📍 SCENE 4: Tổng kết & Khép lại Showcase');
-await page.evaluate(() => window.updateShowcaseHud?.('🎉', 'TIỆM GÀ NHÀ TUI • Trải nghiệm ngay trên trình duyệt di động!'));
-await page.waitForTimeout(1500);
+// ==========================================
+// SCENE 4: GRAND FINALE (13.0s - 15.5s)
+// ==========================================
+console.log('📍 SCENE 4: Kết thúc Showcase Ấn Tượng');
+await page.evaluate(() => window.updateShowcaseHud?.('🎉', 'TIỆM GÀ NHÀ TUI • Chơi Ngay Trên Web Di Động!'));
+await page.waitForTimeout(2000);
 
-console.log('🏁 Hoàn tất kịch bản showcase. Đang xuất video...');
+console.log('🏁 Hoàn thành xuất sắc 15s showcase! Đang xuất video...');
 const video = page.video();
 await context.close();
 await browser.close();
 
 if (video) {
   const videoPath = await video.path();
-  console.log('🎥 Video gốc được lưu tại:', videoPath);
+  console.log('🎥 Video recording hoàn tất tại:', videoPath);
 
   const destPathArtifact = path.join(ARTIFACT_DIR, 'tiem_ga_showcase_15s.webm');
   const destPathPublic = path.join('public', 'tiem_ga_showcase_15s.webm');
@@ -264,10 +283,10 @@ if (video) {
   copyFileSync(videoPath, destPathArtifact);
   copyFileSync(videoPath, destPathPublic);
   copyFileSync(videoPath, destPathRoot);
-  console.log('✅ Đã copy video tới:');
+  console.log('✅ Đã sao chép video WebM tới:');
   console.log('   - Artifact:', destPathArtifact);
   console.log('   - Public:', destPathPublic);
   console.log('   - Root:', destPathRoot);
 }
 
-console.log('🎉 Xong toàn bộ pipeline showcase!');
+console.log('🎉 Toàn bộ Showcase 15s đã hoàn thành 100%!');
