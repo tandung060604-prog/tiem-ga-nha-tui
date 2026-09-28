@@ -1,5 +1,15 @@
 /* Dashboard Bảng Tin Cập Nhật Phiên Bản v2.1.0 - Tiệm Gà Nhà Tui */
 
+.modal-card.is-dashboard,
+.modal-card:has(.update-dashboard-card) {
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  max-width: 520px !important;
+  width: 100% !important;
+}
+
 .update-dashboard-card {
   display: flex;
   flex-direction: column;

@@ -972,7 +972,7 @@ body.selling-mode .awning::after {
   align-items: center;
   justify-content: center;
   padding: 18px;
-  z-index: 50;
+  z-index: 2000;
   overflow-y: auto;
   animation: fadeIn 0.2s ease-out;
 }
@@ -1010,7 +1010,7 @@ body.selling-mode .awning::after {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s ease, transform 0.25s ease;
-  z-index: 60;
+  z-index: 2500;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   white-space: nowrap;
 }

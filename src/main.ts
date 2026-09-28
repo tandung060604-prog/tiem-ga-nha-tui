@@ -234,10 +234,14 @@ class AppController {
     audio.playPop();
     const html = renderUpdateDashboardModal();
     this.openModal(html);
+    const modalContent = document.getElementById('modal-content');
+    if (modalContent) modalContent.classList.add('is-dashboard');
+
     const closeTop = document.getElementById('btn-close-dashboard-top');
     const closeCta = document.getElementById('btn-close-dashboard-cta');
     const closeHandler = () => {
       audio.playPop();
+      if (modalContent) modalContent.classList.remove('is-dashboard');
       this.closeModal();
     };
     if (closeTop) closeTop.onclick = closeHandler;
@@ -388,6 +392,8 @@ class AppController {
   public closeModal() {
     stopNarration();
     const overlay = document.getElementById('modal-container');
+    const modalContent = document.getElementById('modal-content');
+    if (modalContent) modalContent.classList.remove('is-dashboard');
     if (overlay) {
       overlay.setAttribute('hidden', '');
     }
