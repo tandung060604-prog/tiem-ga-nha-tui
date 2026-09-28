@@ -1987,4 +1987,880 @@
   }
 }
 
+/* ==========================================================================
+   MINIGAME NƯỚC SỐT BÍ TRUYỀN HẺM 1102 (SECRET SAUCE CRAFTING)
+   ========================================================================== */
+
+.sauce-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 14, 10, 0.78);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 12px;
+  box-sizing: border-box;
+  animation: sauceFadeIn 0.22s ease-out forwards;
+}
+
+.sauce-modal-overlay.fade-out {
+  animation: sauceFadeOut 0.2s ease-in forwards;
+}
+
+@keyframes sauceFadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes sauceFadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.96); }
+}
+
+.sauce-modal-box {
+  background: #fffdf9;
+  border: 3px solid #d97706;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 390px;
+  max-height: 92vh;
+  overflow-y: auto;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(217, 119, 6, 0.2);
+  padding: 18px 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.sauce-badge-kicker {
+  display: inline-block;
+  background: #fef3c7;
+  color: #b45309;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid #fde68a;
+  margin-bottom: 6px;
+}
+
+.sauce-title {
+  margin: 2px 0 6px 0;
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #78350f;
+  line-height: 1.25;
+}
+
+.sauce-hint {
+  margin: 0 0 12px 0;
+  font-size: 0.82rem;
+  color: #6b7280;
+  line-height: 1.35;
+}
+
+/* Thanh đếm ngược thời gian ghi nhớ */
+.sauce-timer-container {
+  width: 100%;
+  height: 8px;
+  background: #f3f4f6;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 14px;
+  border: 1px solid #e5e7eb;
+}
+
+.sauce-timer-bar-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #f59e0b, #ef4444);
+  border-radius: 999px;
+  transition: width 0.08s linear;
+}
+
+/* Cuộn giấy bí kíp cổ truyền */
+.sauce-scroll-paper {
+  width: 100%;
+  background: #fefce8;
+  border: 2px dashed #f59e0b;
+  border-radius: 16px;
+  padding: 14px 10px;
+  box-sizing: border-box;
+  margin-bottom: 16px;
+  box-shadow: inset 0 2px 8px rgba(245, 158, 11, 0.12);
+}
+
+.sauce-scroll-inner {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  width: 100%;
+}
+
+.sauce-step-card {
+  background: #ffffff;
+  border: 2px solid #fbbf24;
+  border-radius: 12px;
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 3px 6px rgba(217, 119, 6, 0.15);
+  transform: translateY(0);
+  transition: transform 0.15s ease;
+}
+
+.sauce-step-card .step-num {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #b45309;
+  background: #fef3c7;
+  padding: 1px 5px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+}
+
+.sauce-step-card .step-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  margin: 2px 0;
+}
+
+.sauce-step-card .step-name {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #1f2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 68px;
+}
+
+.sauce-step-card .step-tag {
+  font-size: 0.6rem;
+  color: #d97706;
+  font-weight: 700;
+}
+
+/* Giai đoạn Nấu / Chế biến */
+.sauce-pot-visual {
+  width: 100%;
+  background: #fffbeb;
+  border: 2px solid #fde68a;
+  border-radius: 16px;
+  padding: 12px;
+  box-sizing: border-box;
+  margin-bottom: 14px;
+}
+
+.sauce-pot-illustration {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.sauce-pot-steam {
+  font-size: 1.4rem;
+  animation: sauceSteamRise 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes sauceSteamRise {
+  from { transform: translateY(0) scale(0.9); opacity: 0.7; }
+  to { transform: translateY(-4px) scale(1.1); opacity: 1; }
+}
+
+.sauce-pot-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.sauce-pot-status {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #92400e;
+  margin-top: 4px;
+}
+
+.sauce-pot-slots {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  width: 100%;
+}
+
+.sauce-pot-slot {
+  height: 52px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  font-weight: 800;
+}
+
+.sauce-pot-slot.empty {
+  background: #f3f4f6;
+  border: 2px dashed #d1d5db;
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+.sauce-pot-slot.empty.current {
+  border-color: #f59e0b;
+  background: #fef3c7;
+  animation: slotPulse 1s infinite alternate;
+}
+
+@keyframes slotPulse {
+  from { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+  to { transform: scale(1.02); box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2); }
+}
+
+.sauce-pot-slot.filled {
+  background: #ecfdf5;
+  border: 2px solid #10b981;
+  color: #065f46;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2);
+}
+
+.sauce-pot-slot.filled .slot-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.sauce-pot-slot.filled .slot-name {
+  font-size: 0.65rem;
+  font-weight: 800;
+  margin-top: 1px;
+}
+
+/* Khay hũ gia vị (Golden Thumb Zone) */
+.sauce-controls-tray {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.sauce-controls-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #78350f;
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+.sauce-spices-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+  width: 100%;
+}
+
+.btn-spice-touch {
+  min-height: 56px;
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 6px 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  touch-action: manipulation;
+  box-shadow: 0 3px 0 #d1d5db, 0 3px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.12s ease;
+}
+
+.btn-spice-touch:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #d1d5db;
+  background: #fef3c7;
+  border-color: #f59e0b;
+}
+
+.btn-spice-icon {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.btn-spice-text {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.sauce-cancel-tray {
+  margin-top: 4px;
+}
+
+/* Màn hình thành công rực rỡ */
+.sauce-celebration-badge {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 0.78rem;
+  letter-spacing: 0.5px;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 3px 10px rgba(217, 119, 6, 0.35);
+}
+
+.sauce-success-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.sauce-golden-pot {
+  font-size: 3.5rem;
+  line-height: 1;
+  filter: drop-shadow(0 6px 12px rgba(245, 158, 11, 0.45));
+  animation: potGoldenPulse 1.5s infinite alternate;
+}
+
+@keyframes potGoldenPulse {
+  from { transform: scale(1); filter: drop-shadow(0 4px 8px rgba(245, 158, 11, 0.35)); }
+  to { transform: scale(1.08); filter: drop-shadow(0 8px 16px rgba(245, 158, 11, 0.6)); }
+}
+
+.sauce-sparkles-left, .sauce-sparkles-right {
+  font-size: 1.6rem;
+  animation: sparkleTwinkle 1s infinite alternate;
+}
+
+@keyframes sparkleTwinkle {
+  from { opacity: 0.4; transform: rotate(-10deg) scale(0.85); }
+  to { opacity: 1; transform: rotate(10deg) scale(1.15); }
+}
+
+.sauce-success-title {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #b45309;
+  margin: 4px 0 8px 0;
+  line-height: 1.25;
+}
+
+.sauce-success-desc {
+  font-size: 0.85rem;
+  color: #4b5563;
+  margin: 0 0 16px 0;
+  line-height: 1.4;
+}
+
+.sauce-buff-reward-box {
+  width: 100%;
+  background: #fefce8;
+  border: 2px solid #fde047;
+  border-radius: 14px;
+  padding: 12px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.buff-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.buff-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.buff-text {
+  font-size: 0.82rem;
+  color: #374151;
+  line-height: 1.35;
+}
+
+.buff-text b {
+  color: #92400e;
+}
+
+/* Thất bại thân thiện */
+.sauce-fail-icon {
+  font-size: 3rem;
+  margin-bottom: 8px;
+}
+
+.sauce-fail-title {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #4b5563;
+  margin: 2px 0 8px 0;
+}
+
+.sauce-fail-quote {
+  background: #f9fafb;
+  border-left: 3px solid var(--primary);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.82rem;
+  color: #4b5563;
+  line-height: 1.45;
+  text-align: left;
+  margin-bottom: 18px;
+  font-style: italic;
+}
+
+.btn-sauce-action {
+  width: 100%;
+  min-height: 48px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  border-radius: 12px;
+}
+
+/* HUD Badge & Chalkboard Button */
+.sauce-buff-hud-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+  border: 1.5px solid #f59e0b;
+  padding: 3px 8px;
+  border-radius: 14px;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.25);
+  animation: sauceBadgeGlow 1.5s infinite alternate;
+}
+
+@keyframes sauceBadgeGlow {
+  from { transform: scale(1); box-shadow: 0 0 4px rgba(245, 158, 11, 0.3); }
+  to { transform: scale(1.04); box-shadow: 0 0 10px rgba(245, 158, 11, 0.6); }
+}
+
+.btn-sauce-card {
+  background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 100%) !important;
+  color: #92400e !important;
+  border: 1.5px solid #f59e0b !important;
+  box-shadow: 0 2px 4px rgba(217, 119, 6, 0.15) !important;
+  font-weight: 800 !important;
+  border-radius: 8px;
+}
+
+.btn-sauce-card.is-active {
+  background: linear-gradient(180deg, #fef3c7 0%, #fde68a 100%) !important;
+  border-color: #d97706 !important;
+  box-shadow: 0 0 8px rgba(217, 119, 6, 0.35) !important;
+}
+
+@media (max-width: 360px) {
+  .sauce-modal-box {
+    padding: 14px 10px;
+  }
+  .btn-spice-touch {
+    min-height: 50px;
+    padding: 4px 1px;
+  }
+  .btn-spice-icon {
+    font-size: 1.15rem;
+  }
+  .btn-spice-text {
+    font-size: 0.62rem;
+  }
+  .sauce-step-card .step-icon {
+    font-size: 1.25rem;
+  }
+  .sauce-step-card .step-name {
+    font-size: 0.65rem;
+    max-width: 58px;
+  }
+}
+
+/* ==========================================================================
+   MINIGAME LỌC CẶN DẦU & VỚT BỘT CHÁY CUỐI NGÀY (OIL FILTER MINIGAME)
+   ========================================================================== */
+
+.oil-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 12, 9, 0.82);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 12px;
+  box-sizing: border-box;
+  animation: oilModalFadeIn 0.22s ease-out forwards;
+}
+
+.oil-modal-overlay.fade-out {
+  animation: oilModalFadeOut 0.2s ease-in forwards;
+}
+
+@keyframes oilModalFadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes oilModalFadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.96); }
+}
+
+.oil-modal-box {
+  background: #fffdfa;
+  border: 3px solid #b45309;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 390px;
+  max-height: 94vh;
+  overflow-y: auto;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.45);
+  padding: 16px 14px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.oil-badge-kicker {
+  display: inline-block;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid #fde68a;
+  margin-bottom: 5px;
+}
+
+.oil-title {
+  margin: 2px 0 4px 0;
+  font-size: 1.22rem;
+  font-weight: 900;
+  color: #78350f;
+  line-height: 1.25;
+}
+
+.oil-hint {
+  margin: 0 0 10px 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+  line-height: 1.35;
+}
+
+.oil-stats-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.oil-status-chip {
+  font-size: 0.76rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+  flex: 1;
+  text-align: left;
+}
+
+.oil-status-chip.pan-dirty {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+.oil-status-chip.pan-medium {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.oil-status-chip.pan-clean {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.oil-timer-pill {
+  background: #111827;
+  color: #fbbf24;
+  font-size: 0.88rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+
+.oil-progress-container {
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.oil-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #10b981);
+  border-radius: 999px;
+  transition: width 0.15s ease-out;
+}
+
+.oil-progress-label {
+  font-size: 0.75rem;
+  color: #78350f;
+  margin-bottom: 12px;
+  width: 100%;
+  text-align: right;
+}
+
+/* Sân khấu Chảo Gang Tròn Tương Tác */
+.oil-pan-stage {
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, #2d261e 0%, #15110d 100%);
+  border: 8px solid #4a3e35;
+  border-radius: 50%;
+  box-shadow: inset 0 8px 24px rgba(0, 0, 0, 0.7), 0 10px 24px rgba(0, 0, 0, 0.4);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 14px;
+  touch-action: none;
+  user-select: none;
+}
+
+.oil-pan-stage.pan-dirty .pan-oil-surface {
+  background: radial-gradient(circle, #382717 0%, #1a120b 100%);
+}
+
+.oil-pan-stage.pan-medium .pan-oil-surface {
+  background: radial-gradient(circle, #92400e 0%, #451a03 100%);
+}
+
+.oil-pan-stage.pan-clean .pan-oil-surface {
+  background: radial-gradient(circle, #fbbf24 0%, #b45309 100%);
+}
+
+.pan-oil-surface {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  position: relative;
+  transition: background 0.4s ease;
+}
+
+.pan-reflection {
+  position: absolute;
+  top: 10%;
+  left: 15%;
+  width: 70%;
+  height: 35%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+}
+
+/* Đốm cặn bột chiên cháy */
+.oil-crumb-item {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  touch-action: manipulation;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6));
+  animation: crumbFloat 2s ease-in-out infinite alternate;
+  transition: transform 0.12s ease, opacity 0.15s ease;
+}
+
+.oil-crumb-item:hover, .oil-crumb-item:active {
+  transform: translate(-50%, -50%) scale(1.18);
+}
+
+.oil-crumb-item.is-collected {
+  animation: crumbPopDisappear 0.25s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes crumbPopDisappear {
+  0% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  50% { transform: translate(-50%, -50%) scale(1.4); opacity: 0.8; filter: brightness(1.6); }
+  100% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+}
+
+@keyframes crumbFloat {
+  from { margin-top: -2px; }
+  to { margin-top: 2px; }
+}
+
+.crumb-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.oil-crumb-item.burnt_chunk .crumb-icon {
+  font-size: 1.9rem;
+}
+
+/* Màn hình thành công */
+.oil-celebration-badge {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 0.78rem;
+  letter-spacing: 0.5px;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+  box-shadow: 0 3px 10px rgba(16, 185, 129, 0.35);
+}
+
+.oil-pan-sparkle-icon {
+  font-size: 3.5rem;
+  line-height: 1;
+  margin-bottom: 6px;
+  animation: panSparklePulse 1.4s infinite alternate;
+}
+
+@keyframes panSparklePulse {
+  from { transform: scale(0.96); filter: drop-shadow(0 4px 10px rgba(245, 158, 11, 0.4)); }
+  to { transform: scale(1.06); filter: drop-shadow(0 8px 18px rgba(16, 185, 129, 0.6)); }
+}
+
+.oil-success-title {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #065f46;
+  margin: 4px 0 6px 0;
+}
+
+.oil-success-desc {
+  font-size: 0.85rem;
+  color: #374151;
+  margin: 0 0 14px 0;
+  line-height: 1.4;
+}
+
+.oil-reward-summary-card {
+  width: 100%;
+  background: #f0fdf4;
+  border: 2px solid #86efac;
+  border-radius: 14px;
+  padding: 12px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.reward-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.reward-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.reward-text {
+  font-size: 0.82rem;
+  color: #374151;
+  line-height: 1.35;
+}
+
+.reward-text b {
+  color: #065f46;
+}
+
+/* Thất bại thân thiện */
+.oil-fail-icon {
+  font-size: 3rem;
+  margin-bottom: 6px;
+}
+
+.oil-fail-title {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #4b5563;
+  margin: 2px 0 6px 0;
+}
+
+.oil-fail-desc {
+  font-size: 0.82rem;
+  color: #6b7280;
+  margin: 0 0 12px 0;
+}
+
+.oil-fail-quote {
+  background: #f9fafb;
+  border-left: 3px solid #f59e0b;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.82rem;
+  color: #4b5563;
+  line-height: 1.45;
+  text-align: left;
+  margin-bottom: 16px;
+  font-style: italic;
+}
+
+.btn-oil-action {
+  width: 100%;
+  min-height: 48px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  border-radius: 12px;
+}
+
+.btn-filter-oil-card {
+  background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%) !important;
+  color: #065f46 !important;
+  border: 1.5px solid #10b981 !important;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2) !important;
+  font-weight: 800 !important;
+  border-radius: 8px;
+}
+
+@media (max-width: 360px) {
+  .oil-pan-stage {
+    width: 240px;
+    height: 240px;
+  }
+  .crumb-icon {
+    font-size: 1.35rem;
+  }
+}
+
 

@@ -714,6 +714,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <span>Khách: <b>${session.servedCount}/${session.expectedCustomers || 10}</b></span>
         </div>
         ${rush ? '<span class="rush-badge">🔥 CA CAO ĐIỂM!</span>' : `<span class="session-ambience">${timePeriodLabel}</span>`}
+        ${state.secretSauceDay?.buffActive ? '<span class="sauce-buff-hud-badge" title="Sốt Bí Truyền đang kích hoạt: +3k tip mỗi đơn!">🍲✨ Sốt Vàng</span>' : ''}
         <div class="hud-actions">
           <button id="btn-toggle-fast" class="btn-sm btn-toggle-fast">
             ${session.isFastForward ? '⏩ Tua x2' : '▶️ 1x'}

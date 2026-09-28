@@ -345,6 +345,135 @@ class AudioManager {
       osc.stop(t + 0.45);
     });
   }
+
+  // Âm thanh thả gia vị vào nồi sốt (tiếng bụp ngọt ngào + giọt nước sôi sủi)
+  public playSpiceDrop(stepIndex: number = 0) {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const baseFreq = 440 + stepIndex * 80; // Cao dần theo mỗi bước đúng
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(baseFreq * 1.5, now);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq, now + 0.08);
+
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+
+    osc.connect(gain).connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.12);
+  }
+
+  // Âm thanh hoàn thành Nồi Sốt Bí Truyền Hoàng Kim (hợp âm khải hoàn rực rỡ)
+  public playSecretSauceSuccess() {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    // Hợp âm F Major sáng rực rỡ: F4, A4, C5, F5
+    const notes = [349.23, 440.00, 523.25, 698.46];
+    notes.forEach((freq, idx) => {
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const startTime = now + idx * 0.08;
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      gain.gain.setValueAtTime(0.2, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.6);
+
+      osc.connect(gain).connect(this.ctx.destination);
+      osc.start(startTime);
+      osc.stop(startTime + 0.6);
+    });
+  }
+
+  // Âm thanh khi chọn sai gia vị (nốt trầm tiếc nuối nhẹ nhàng)
+  public playSecretSauceFail() {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(260, now);
+    osc.frequency.exponentialRampToValueAtTime(140, now + 0.25);
+
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+
+    osc.connect(gain).connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.25);
+  }
+
+  // Âm thanh vớt cặn bột chiên (tiếng vợt lưới kim loại cạo sột soạt + giọt dầu sôi xèo)
+  public playCrumbCollect(index: number = 0) {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const filter = this.ctx.createBiquadFilter();
+
+    // Tần số kim loại vợt lưới cao dần
+    const baseFreq = 750 + (index % 8) * 60;
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(baseFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.4, now + 0.05);
+
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(baseFreq, now);
+    filter.Q.setValueAtTime(3.5, now);
+
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+    osc.connect(filter).connect(gain).connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.08);
+  }
+
+  // Âm thanh lọc dầu hoàn thành (tiếng suối trong lành / giọt ngọc bích vang lên)
+  public playOilFilterSuccess() {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    // Rải hợp âm G Major thanh khiết: G4, B4, D5, G5
+    const notes = [392.00, 493.88, 587.33, 783.99];
+    notes.forEach((freq, idx) => {
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const startTime = now + idx * 0.07;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, startTime);
+      osc.frequency.exponentialRampToValueAtTime(freq * 1.02, startTime + 0.5);
+
+      gain.gain.setValueAtTime(0.22, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.5);
+
+      osc.connect(gain).connect(this.ctx.destination);
+      osc.start(startTime);
+      osc.stop(startTime + 0.5);
+    });
+  }
 }
 
 export const audio = new AudioManager();

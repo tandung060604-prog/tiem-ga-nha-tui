@@ -55,6 +55,9 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
           </div>
         </div>
         <div class="board-btns">
+          <button id="btn-secret-sauce" class="btn-sm btn-sauce-card ${state.secretSauceDay?.buffActive ? 'is-active' : ''}" title="Pha nồi sốt bí truyền nhận Buff Vàng (+3k tip & +0.25★ Hương vị)">
+            🍲 ${state.secretSauceDay?.buffActive ? '✨ Sốt Thần Thánh' : 'Nấu Sốt Bí Truyền'}
+          </button>
           <button id="btn-open-bunny-notes" class="btn-sm btn-bunny-card">
             🐰 Thỏ Cam
           </button>

@@ -90,6 +90,23 @@ export function renderSummaryModal(
         </div>
       </div>
 
+      ${state.secretSauceDay?.buffActive ? `
+        <!-- Nồi Sốt Bí Truyền Hoàng Kim -->
+        <div style="background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 1.5px solid #f59e0b; border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 1.2rem;">🍲</span>
+            <div>
+              <span style="font-weight: 800; color: #b45309;">Sốt Bí Truyền Hoàng Kim</span>
+              <div style="font-size: 0.74rem; color: #78350f;">+0.25★ Hương Vị bảo hộ chất lượng món ăn</div>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <span style="font-size: 0.72rem; color: #92400e; display: block;">Tiền tip sốt:</span>
+            <b style="color: #16a34a; font-size: 0.95rem;">+${(state.secretSauceDay.tipsEarnedToday || 0).toLocaleString('vi-VN')}đ</b>
+          </div>
+        </div>
+      ` : ''}
+
       ${wrapped ? `
         <!-- Gà Wrapped Cuối Tuần (Viral Threads Feature từ GDD) -->
         <div style="background: linear-gradient(135deg, #ff7675, #d63031); color: #fff; border-radius: var(--radius-md); padding: 14px; box-shadow: 0 4px 14px rgba(214, 48, 49, 0.35); text-align: left; margin-bottom: 8px;">
@@ -198,6 +215,49 @@ export function renderSummaryModal(
           </button>
         `}
       </div>
+
+      <!-- Minigame Lọc Cặn Dầu & Vớt Bột Cháy Cuối Ngày -->
+      ${!state.todayOilFiltered ? `
+        <div class="oil-filter-card-summary" style="background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border: 1.5px solid #fb923c; border-radius: var(--radius-md); padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(251, 146, 60, 0.15);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 1.3rem;">🧹</span>
+              <div>
+                <span style="font-weight: 800; font-size: 0.9rem; color: #9a3412;">Lọc Cặn Dầu &amp; Vớt Bột Cháy</span>
+                <div style="font-size: 0.74rem; color: #7c2d12;">
+                  Tình trạng dầu: <b style="color: ${state.oilCondition === 'dirty' ? '#dc2626' : state.oilCondition === 'medium' ? '#d97706' : '#16a34a'};">
+                    ${state.oilCondition === 'dirty' ? 'Đen Khét ⚠️' : state.oilCondition === 'medium' ? 'Nâu Cánh Gián' : 'Vàng Óng Ả'}
+                  </b>
+                </div>
+              </div>
+            </div>
+            <span style="font-size: 0.7rem; background: #ea580c; color: #fff; padding: 2px 8px; border-radius: 12px; font-weight: 800; letter-spacing: 0.3px;">TIẾT KIỆM 150K</span>
+          </div>
+          <p style="margin: 0 0 10px 0; font-size: 0.76rem; color: #431407; line-height: 1.4;">
+            ${state.oilCondition === 'dirty' 
+              ? '🔥 <b>Báo động!</b> Chảo dầu đen khét dễ làm gà cháy khét và bị trừ sao Vệ Sinh ngày mai. Hãy vớt sạch cặn cháy để phục hồi dầu về màu nâu!' 
+              : state.oilCondition === 'medium' 
+              ? '✨ Dầu đã ngả màu nâu hổ phách. Vớt sạch cặn bột cháy trong 15s để dầu trong trẻo, vàng óng trở lại!' 
+              : '🌟 Dầu vẫn sáng màu. Vớt nhanh các vụn bột còn sót để đáy chảo sáng bóng, sẵn sàng cho ngày mới!'}
+          </p>
+          <button id="btn-open-oil-filter" class="btn-sm" style="width: 100%; font-weight: 800; padding: 9px 14px; background: linear-gradient(135deg, #f97316, #ea580c); border: none; color: #fff; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; box-shadow: 0 3px 8px rgba(234, 88, 12, 0.35); transition: transform 0.1s ease;">
+            <span>🍳</span> BẮT ĐẦU VỚT CẶN DẦU (15 Giây)
+          </button>
+        </div>
+      ` : `
+        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1.5px solid #86efac; border-radius: var(--radius-md); padding: 10px 12px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem; box-shadow: 0 1px 4px rgba(16, 185, 129, 0.1);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.3rem;">✨</span>
+            <div>
+              <div style="font-weight: 800; color: #166534;">Đã Lọc Cặn Dầu Hôm Nay!</div>
+              <div style="font-size: 0.74rem; color: #15803d;">
+                Tình trạng chảo: <b>${state.oilCondition === 'dirty' ? 'Đen Khét' : state.oilCondition === 'medium' ? 'Nâu Cánh Gián' : 'Vàng Óng Ả 🌟'}</b>
+              </div>
+            </div>
+          </div>
+          <span style="font-size: 0.72rem; color: #16a34a; font-weight: 800; background: #fff; border: 1px solid #86efac; padding: 3px 8px; border-radius: 8px;">ĐÃ VỆ SINH</span>
+        </div>
+      `}
 
       <!-- Advisor Tip Box -->
       <div class="advisor-box">

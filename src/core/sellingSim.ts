@@ -53,6 +53,7 @@ export interface SellingSession {
   spawnedCount?: number;               // số khách đã ghé quán trong ca
   disruptionTimerSec?: number;         // đếm ngược thời gian gián đoạn quán khi bị giang hồ quậy phá
   disruptionNotice?: string;           // thông báo tình trạng gián đoạn quán
+  secretSauceTip?: number;             // tiền tip nhận được từ hiệu ứng Sốt Bí Truyền
 }
 
 // Hiệu ứng "đã tay": core ghi lại chuyện vừa xảy ra, giao diện rút ra (drainFx) để vẽ đúng một lần.

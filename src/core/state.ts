@@ -116,6 +116,8 @@ export function createInitialState(): GameState {
     dirtyOilViolations: 0,
     dirtyOilFryingCount: 0,
     totalReviewsCount: 0,
+    secretSauceDay: null,
+    todayOilFiltered: false,
     lifetimeStats: {
       totalFried: 0,
       totalBurnt: 0,

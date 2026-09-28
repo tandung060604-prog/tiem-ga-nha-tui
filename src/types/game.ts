@@ -484,4 +484,47 @@ export interface GameState {
   lastRentPaidWeek?: number;     // Tuần gần nhất đã trả tiền mặt bằng (tính theo day / 7)
   incidentCooldowns?: Record<string, number>; // incidentId -> last day seen (chống lặp lại sự kiện trong 6 ngày)
   expiredWasteNotification?: { items: string[]; totalValue: number; day: number } | null; // Thông báo hủy hàng hết hạn qua đêm
+  secretSauceDay?: SecretSauceDayState | null; // Trạng thái Nồi Sốt Bí Truyền của ngày hôm nay
+  todayOilFiltered?: boolean; // Đã chơi minigame lọc cặn dầu cuối ngày hôm nay chưa
+}
+
+export interface OilCrumb {
+  id: string;
+  x: number;
+  y: number;
+  size: number;
+  type: 'small' | 'medium' | 'burnt_chunk';
+  collected: boolean;
+}
+
+export interface OilFilterResult {
+  success: boolean;
+  isPartial: boolean;
+  collectedCount: number;
+  totalCrumbs: number;
+  initialCondition: OilCondition;
+  newCondition: OilCondition;
+  savedMoney: number;
+  hygieneBonus: number;
+  bonusReward: number;
+}
+
+export type SpiceId = 'garlic' | 'honey' | 'chili' | 'soy' | 'sesame';
+
+export interface SauceSpice {
+  id: SpiceId;
+  name: string;
+  shortName: string;
+  icon: string;
+  color: string;
+  tag: string;
+}
+
+export interface SecretSauceDayState {
+  day: number;
+  recipe: SpiceId[];
+  completed: boolean;
+  success: boolean;
+  buffActive: boolean;
+  tipsEarnedToday?: number;
 }

@@ -1,0 +1,44 @@
+{
+  "timestamp": "2026-09-28T14:17:57.090Z",
+  "answers": {
+    "nextBestFeature": {
+      "type": "choice",
+      "choice": "oil_clean_minigame",
+      "confidence": 0.25,
+      "probabilities": {
+        "oil_clean_minigame": 0.5,
+        "stepper_hold_ux": 0.21,
+        "volume_sliders": 0.29
+      }
+    },
+    "oilMinigameThemeFit": {
+      "type": "score",
+      "score": 3.71,
+      "confidence": 0.76,
+      "legend": {
+        "0": "Không ăn khớp",
+        "1": "Bình thường",
+        "2": "Khá hay",
+        "3": "Rất ăn khớp với đời thực của quán gà rán (vớt bột chiên, gạn dầu)",
+        "4": "Hoàn hảo, tạo vòng lặp trọn vẹn: Sáng nấu sốt, Ngày chiên gà, Tối lọc dầu tiết kiệm tiền"
+      },
+      "probabilities": {
+        "0": 0,
+        "1": 0,
+        "2": 0.01,
+        "3": 0.24,
+        "4": 0.75
+      }
+    },
+    "stepperComboStrategy": {
+      "type": "choice",
+      "choice": "focus_oil_first",
+      "confidence": 0.84,
+      "probabilities": {
+        "bundle_stepper": 0.08,
+        "focus_oil_first": 0.92
+      }
+    }
+  },
+  "latencyMs": 2453
+}

@@ -1,0 +1,55 @@
+{
+  "timestamp": "2026-09-28T13:53:16.868Z",
+  "answers": {
+    "topPriorityFeature": {
+      "type": "choice",
+      "choice": "secret_sauce_minigame",
+      "confidence": 0.94,
+      "probabilities": {
+        "stepper_longpress_ux": 0,
+        "secret_sauce_minigame": 0.96,
+        "delivery_bike_minigame": 0.03,
+        "oil_clean_minigame": 0.01
+      }
+    },
+    "sauceMinigameSuitability": {
+      "type": "score",
+      "score": 2.91,
+      "confidence": 0.61,
+      "legend": {
+        "0": "Hoàn toàn không phù hợp",
+        "1": "Hơi khiên cưỡng",
+        "2": "Khá phù hợp nhưng tẻ nhạt",
+        "3": "Rất phù hợp, nâng tầm khâu Chuẩn Bị & Trạm Sốt của quán gà",
+        "4": "Hoàn hảo tuyệt đối (Signature Feature), biến khâu làm sốt thành linh hồn của tiệm gà Sài Gòn"
+      },
+      "probabilities": {
+        "0": 0.02,
+        "1": 0.09,
+        "2": 0.04,
+        "3": 0.66,
+        "4": 0.19
+      }
+    },
+    "rolloutStrategy": {
+      "type": "choice",
+      "choice": "one_feature_depth_first",
+      "confidence": 1,
+      "probabilities": {
+        "only_small_ux_fixes": 0,
+        "bundle_multiple_features": 0,
+        "one_feature_depth_first": 1
+      }
+    },
+    "gameFeelAndPolishKeys": {
+      "type": "choice",
+      "choice": "sensory_tactile_and_clear_feedback",
+      "confidence": 1,
+      "probabilities": {
+        "complex_drag_and_drop": 0,
+        "sensory_tactile_and_clear_feedback": 1
+      }
+    }
+  },
+  "latencyMs": 510
+}

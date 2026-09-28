@@ -54,6 +54,8 @@ import { ASSETS } from './content/assets';
 import { pickDailyIncident, resolveIncidentChoice } from './core/dailyIncidentsEngine';
 import { DAILY_INCIDENTS } from './content/dailyIncidents';
 import { renderIncidentPrompt, renderIncidentConfirmPrompt, renderIncidentReaction, renderIncidentAlbumModal } from './ui/components/DailyIncidentModal';
+import { openSecretSauceModal } from './ui/components/SecretSauceModal';
+import { openOilFilterModal } from './ui/components/OilFilterModal';
 import type { DailyIncident } from './types/game';
 
 type TabId = 'inventory' | 'upgrades' | 'staff' | 'reviews' | 'menu';
@@ -812,6 +814,24 @@ class AppController {
     });
 
     // Chalkboard Buttons
+    const secretSauceBtn = document.getElementById('btn-secret-sauce');
+    if (secretSauceBtn) {
+      secretSauceBtn.onclick = () => {
+        audio.playPop();
+        openSecretSauceModal(stateManager.getState(), {
+          onSuccess: () => {
+            stateManager.flush();
+            this.showToast('🍲✨ SỐT THẦN THÁNH ĐÃ SẴN SÀNG! +3.000đ Tip mỗi đơn gà sốt!');
+            this.render();
+          },
+          onClose: () => {
+            stateManager.flush();
+            this.render();
+          }
+        });
+      };
+    }
+
     const readStoryBtn = document.getElementById('btn-read-story');
     if (readStoryBtn) {
       readStoryBtn.onclick = () => {
@@ -1587,13 +1607,15 @@ class AppController {
     const session = this.sellingSession;
     if (!session) return;
     const menu = stateManager.getState().menu;
+    const curState = stateManager.getState();
     const result = serveFirstOrder(
       session,
       cookingEngine.getTray(),
       id => menu.find(m => m.id === id)?.currentPrice ?? 0,
       idx => cookingEngine.removeFromTray(idx),
-      stateManager.getState().upgrades,
-      targetOrderId
+      curState.upgrades,
+      targetOrderId,
+      curState.secretSauceDay?.buffActive
     );
 
     switch (result.kind) {
@@ -1665,7 +1687,6 @@ class AppController {
 
     const { order, paid, tip, feedbackNotes } = result;
     let letter: BunnyLetter | undefined;
-    const curState = stateManager.getState();
     const patienceRatio = order.patienceCurrent / Math.max(1, order.patienceMax);
     const hasBurnt = (order.burntPenalty ?? 0) > 0;
     const hasDirtyOil = curState.oilCondition === 'dirty';
@@ -1898,6 +1919,31 @@ class AppController {
       };
     }
 
+    // Nút Lọc Cặn Dầu & Vớt Bột Cháy Cuối Ngày
+    const oilFilterBtn = document.getElementById('btn-open-oil-filter');
+    if (oilFilterBtn) {
+      oilFilterBtn.onclick = () => {
+        audio.playPop();
+        openOilFilterModal(stateManager.getState(), {
+          onSuccess: (result) => {
+            stateManager.flush();
+            Haptics.serveSuccess();
+            if (result.success && !result.isPartial) {
+              this.showToast(`🎉 Đã vớt sạch cặn chảo! Dầu phục hồi thành công, tiết kiệm ${result.savedMoney.toLocaleString('vi-VN')}đ! ✨`);
+            } else if (result.isPartial) {
+              this.showToast(`🧹 Đã vớt ${result.collectedCount}/${result.totalCrumbs} cặn! Được giảm 50% tiền thay dầu.`);
+            } else {
+              this.showToast('⚠️ Vẫn còn cặn bột trong chảo! Cần thay dầu để đạt điểm vệ sinh.');
+            }
+          },
+          onClose: () => {
+            this.openModal(renderSummaryModal(stateManager.getState(), ledger, review, advisorTip));
+            this.bindSummaryEvents(ledger, review, advisorTip, rentDue);
+          }
+        });
+      };
+    }
+
     // Nút Bắt đầu Ngày mới
     const nextDayBtn = document.getElementById('btn-start-next-day');
     if (nextDayBtn) {
@@ -2008,6 +2054,8 @@ class AppController {
       draft.day += 1;
       draft.phase = 'prep';
       draft.todayIncidentsCount = 0;
+      draft.secretSauceDay = null;
+      draft.todayOilFiltered = false;
     });
     this.pickDailyEvent();
     this.setPhase('prep');

@@ -254,7 +254,7 @@ export type ServeResult =
   | { kind: 'incomplete-finish'; order: CustomerOrder; paid: number; tip: number; missingItemIds: string[]; feedbackNotes?: string[] };
 
 // Tính toán tiền Tip linh hoạt dựa trên tính cách khách hàng, tốc độ phục vụ và độ ngon của món
-export function calculateCustomerTip(order: CustomerOrder): { tip: number; feedbackNotes: string[] } {
+export function calculateCustomerTip(order: CustomerOrder, secretSauceBuff?: boolean): { tip: number; feedbackNotes: string[] } {
   const notes: string[] = [];
   const ratio = order.patienceMax > 0 ? order.patienceCurrent / order.patienceMax : 0.5;
   const isFast = ratio > 0.6;
@@ -262,14 +262,21 @@ export function calculateCustomerTip(order: CustomerOrder): { tip: number; feedb
   const hasBurnt = (order.burntPenalty ?? 0) > 0;
   const perfectBonus = order.perfectBonus ?? 0;
 
+  let sauceBonus = 0;
+  if (secretSauceBuff && order.personality !== 'frugal') {
+    sauceBonus = 3000;
+    notes.push('🍲 Sốt Bí Truyền vàng óng tuyệt hảo! (+3k tip)');
+  }
+
   // Bé Thỏ Cam tri kỷ
   if (order.isBunny) {
-    return { tip: BUNNY_VISIT_TIP, feedbackNotes: ['Tri kỷ tặng quà 💖'] };
+    const bunnyTip = BUNNY_VISIT_TIP + sauceBonus;
+    return { tip: bunnyTip, feedbackNotes: ['Tri kỷ tặng quà 💖', ...(sauceBonus > 0 ? ['🍲 Thỏ Cam khen nức nở sốt bí truyền! (+3k)'] : [])] };
   }
 
   // Nếu khách không có tính cách đặc thù (đơn test hoặc khách thường mặc định)
   if (!order.personality) {
-    const tip = (isFast ? FAST_SERVICE_TIP : 0) + perfectBonus;
+    const tip = (isFast ? FAST_SERVICE_TIP : 0) + perfectBonus + sauceBonus;
     if (isFast) notes.push(`Giao nhanh đúng giờ (+${(FAST_SERVICE_TIP / 1000).toLocaleString('vi-VN')}k)`);
     if (perfectBonus > 0) notes.push('Thưởng món vàng giòn/chuẩn vị');
     return { tip, feedbackNotes: notes };
@@ -380,7 +387,7 @@ export function calculateCustomerTip(order: CustomerOrder): { tip: number; feedb
     notes.push('Trừ bớt tip vì có món cháy');
   }
 
-  return { tip: Math.max(0, baseTip), feedbackNotes: notes };
+  return { tip: Math.max(0, baseTip + sauceBonus), feedbackNotes: notes };
 }
 
 
@@ -394,7 +401,8 @@ export function serveFirstOrder(
   prices: (menuItemId: string) => number,
   removeAt: (trayIdx: number) => void,
   upgrades?: { [id: string]: UpgradeBranch },
-  targetOrderId?: string
+  targetOrderId?: string,
+  secretSauceBuff?: boolean
 ): ServeResult {
   if (session.orders.length === 0) return { kind: 'no-order' };
 
@@ -518,7 +526,10 @@ export function serveFirstOrder(
     }
 
     const paid = Math.max(0, order.totalPrice - (order.burntPenalty ?? 0));
-    const { tip, feedbackNotes } = calculateCustomerTip(order);
+    const { tip, feedbackNotes } = calculateCustomerTip(order, secretSauceBuff);
+    if (secretSauceBuff && order.personality !== 'frugal') {
+      session.secretSauceTip = (session.secretSauceTip ?? 0) + 3000;
+    }
     session.grossRevenue += paid;
     session.tips += tip;
     recordOrderBooks(session, order, paid);
@@ -784,6 +795,12 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   if (cleanser > 0) { // gà rán kèm củ cải / bắp cải: khách thấy đỡ ngấy, khen ngon
     newRatings.taste = Math.min(5, newRatings.taste + cleanser);
     newRatings.overall = ReviewsEngine.calculateOverallStars(newRatings);
+  }
+  // Sốt Bí Truyền Hoàng Kim: tăng chất lượng món ăn & ghi nhận tiền tip thu được
+  if (draft.secretSauceDay?.buffActive) {
+    newRatings.taste = Math.min(5, newRatings.taste + 0.25);
+    newRatings.overall = ReviewsEngine.calculateOverallStars(newRatings);
+    draft.secretSauceDay.tipsEarnedToday = session.secretSauceTip ?? 0;
   }
   if (team.hygienePerDay > 0) { // phục vụ lau dọn mỗi ngày
     newRatings.hygiene = Math.min(5, newRatings.hygiene + team.hygienePerDay);

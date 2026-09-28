@@ -339,19 +339,17 @@ body.selling-mode .awning::after {
 
 .board-footer {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   margin-top: 8px;
   gap: 8px;
-  flex-wrap: wrap;
 }
 
 .board-event-note-wrapper {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex: 1;
-  min-width: 140px;
+  width: 100%;
 }
 
 .board-drumstick-sticker {
@@ -376,17 +374,27 @@ body.selling-mode .awning::after {
   margin: 0;
   text-align: left;
   line-height: 1.35;
+  flex: 1;
 }
 
 .board-btns {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.board-btns .btn-sm {
+  font-size: 0.72rem !important;
+  padding: 5px 8px !important;
+  border-radius: var(--radius-sm) !important;
+  white-space: nowrap;
 }
 
 .btn-bunny-card {
-  font-size: 0.74rem !important;
-  padding: 5px 10px !important;
+  font-size: 0.72rem !important;
+  padding: 5px 8px !important;
   white-space: nowrap;
   background: linear-gradient(135deg, #fff7eb 0%, #ffe9cc 100%) !important;
   border: 1.5px solid #ff9800 !important;
@@ -397,8 +405,8 @@ body.selling-mode .awning::after {
 }
 
 .btn-story-card {
-  font-size: 0.74rem !important;
-  padding: 5px 10px !important;
+  font-size: 0.72rem !important;
+  padding: 5px 8px !important;
   white-space: nowrap;
   border-radius: var(--radius-sm) !important;
 }
