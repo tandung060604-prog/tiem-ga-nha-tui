@@ -79,6 +79,17 @@ export function renderSummaryModal(
       <h2 class="summary-title">🎉 Tổng Kết Ngày ${ledger.day}</h2>
       <div class="summary-subtitle">Ca bán hoàn thành xuất sắc! Dưới đây là sổ sách hôm nay:</div>
 
+      <!-- Thống kê khách ăn thực tế vs phục vụ -->
+      <div style="background: #fff8f0; border: 1.5px solid #fed7aa; border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem;">
+        <div>
+          <span>👥 <b>Khách ăn thực tế:</b> <span style="color: #ea580c; font-weight: 800;">${ledger.customersServed} khách</span></span>
+          ${ledger.customersLost > 0 ? `<span style="color: #dc2626; margin-left: 6px; font-weight: 600;">(Bỏ về: ${ledger.customersLost})</span>` : '<span style="color: #16a34a; margin-left: 6px; font-weight: 600;">(Đủ 100%)</span>'}
+        </div>
+        <div style="color: #9a3412; font-weight: 700;">
+          Phục vụ: ${Math.round((ledger.customersServed / Math.max(1, ledger.customersServed + ledger.customersLost)) * 100)}%
+        </div>
+      </div>
+
       ${wrapped ? `
         <!-- Gà Wrapped Cuối Tuần (Viral Threads Feature từ GDD) -->
         <div style="background: linear-gradient(135deg, #ff7675, #d63031); color: #fff; border-radius: var(--radius-md); padding: 14px; box-shadow: 0 4px 14px rgba(214, 48, 49, 0.35); text-align: left; margin-bottom: 8px;">

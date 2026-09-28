@@ -7,7 +7,7 @@ import { ASSETS } from '../content/assets';
 
 const MUSIC_PREF_KEY = 'tiem_ga_music_on';
 
-export type Mode = 'title' | 'prep' | 'selling';
+export type Mode = 'title' | 'prep' | 'selling' | 'dramatic_incident';
 
 // Vòng hợp âm C – Am – F – G dự phòng (Web Audio synth khi offline/fallback)
 const CHORDS: readonly (readonly number[])[] = [
@@ -23,6 +23,15 @@ const MELODY: readonly (number | 0)[] = [
   698.46, 0, 659.25, 587.33, 523.25, 0, 440.0, 523.25,
   587.33, 0, 659.25, 0, 587.33, 523.25, 0, 0
 ];
+
+// Vòng hợp âm kịch tính Dm – Bb – Gm – A cho các phân cảnh gay cấn, đòi nợ, giang hồ
+const DRAMATIC_CHORDS: readonly (readonly number[])[] = [
+  [146.83, 174.61, 220.0],  // Dm
+  [116.54, 146.83, 174.61], // Bb
+  [98.0, 116.54, 146.83],   // Gm
+  [110.0, 138.59, 164.81]   // A
+];
+const DRAMATIC_BASS = [73.42, 58.27, 49.0, 55.0];
 
 class MusicBox {
   private master: GainNode | null = null;
@@ -85,6 +94,15 @@ class MusicBox {
   start(mode: Mode = this.mode) {
     this.mode = mode;
     if (!this.enabled || audio.getMuted()) return;
+
+    if (mode === 'dramatic_incident') {
+      // Tạm hạ âm lượng bài nhạc MP3 xuống mức rất nhỏ và khởi động synth kịch tính
+      if (this.activeAudio) {
+        this.activeAudio.volume = 0.04;
+      }
+      this.startSynth();
+      return;
+    }
 
     const { title, selling } = this.getAudioElements();
     const targetAudio = (mode === 'selling') ? selling : title;
@@ -172,6 +190,26 @@ class MusicBox {
 
   private schedule(ctx: AudioContext) {
     if (!this.master) return;
+
+    if (this.mode === 'dramatic_incident') {
+      const bpm = 68;
+      const eighth = 60 / bpm / 2;
+      while (this.nextTime < ctx.currentTime + 0.2) {
+        const bar = Math.floor(this.step / 8) % DRAMATIC_CHORDS.length;
+        const beat = this.step % 8;
+        const t = this.nextTime;
+        if (beat === 0) {
+          for (const f of DRAMATIC_CHORDS[bar] ?? []) this.tone(ctx, f, t, eighth * 6, 'sawtooth', 0.038, 0.2);
+        }
+        if (beat === 0 || beat === 3 || beat === 6) {
+          this.tone(ctx, DRAMATIC_BASS[bar] ?? 73.42, t, eighth * 2, 'sine', 0.16, 0.03);
+        }
+        this.nextTime += eighth;
+        this.step++;
+      }
+      return;
+    }
+
     const bpm = this.mode === 'selling' ? 112 : 84;
     const eighth = 60 / bpm / 2;
     while (this.nextTime < ctx.currentTime + 0.2) {

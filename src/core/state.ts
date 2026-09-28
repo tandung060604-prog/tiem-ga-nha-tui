@@ -113,6 +113,9 @@ export function createInitialState(): GameState {
     pausedShift: null,
     tutorialDone: false,
     todayOilCost: 0,
+    dirtyOilViolations: 0,
+    dirtyOilFryingCount: 0,
+    totalReviewsCount: 0,
     lifetimeStats: {
       totalFried: 0,
       totalBurnt: 0,

@@ -8,10 +8,14 @@ export function renderMenuTab(state: GameState): string {
   const currentChapter = state.currentChapter;
 
   const menuRows = state.menu.map((item, idx) => {
-    const isUnlocked = item.chapter <= currentChapter;
+    const dayLocked = (item.unlockDay ?? 1) > state.day;
+    const isUnlocked = item.chapter <= currentChapter && !dayLocked;
     const ratio = priceRatio(item);
     const band = priceBand(ratio);
     const limits = priceLimits(item);
+    const lockTag = item.chapter > currentChapter
+      ? `Chương ${item.chapter}`
+      : (dayLocked ? `Ngày ${item.unlockDay}` : '');
 
     return `
       <div class="item-row" style="opacity: ${isUnlocked ? '1' : '0.5'};">
@@ -20,7 +24,7 @@ export function renderMenuTab(state: GameState): string {
         <div class="item-meta">
           <div class="item-name">
             ${item.name}
-            ${!isUnlocked ? `<span class="shelf-tag" style="background:#ddd;color:#666;">Chương ${item.chapter}</span>` : ''}
+            ${!isUnlocked ? `<span class="shelf-tag" style="background:#ddd;color:#666;">${lockTag}</span>` : ''}
           </div>
           <div class="item-sub">
             Giá bán: <b style="color: var(--red); font-size: 0.95rem;">${item.currentPrice.toLocaleString('vi-VN')}đ</b>
@@ -38,7 +42,7 @@ export function renderMenuTab(state: GameState): string {
             <button class="btn-sm btn-price-mod" data-index="${idx}" data-delta="${PRICE_STEP}" ${item.currentPrice >= limits.max ? 'disabled' : ''}>+2k</button>
           </div>
         ` : `
-          <span style="font-size: 0.75rem; color: var(--soft); font-weight: 700;">🔒 Khóa</span>
+          <span style="font-size: 0.75rem; color: var(--soft); font-weight: 700;">🔒 ${lockTag || 'Khóa'}</span>
         `}
       </div>
     `;

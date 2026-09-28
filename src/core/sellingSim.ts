@@ -49,6 +49,10 @@ export interface SellingSession {
   wrongOrderCount?: number;            // số đơn giao sai món
   missedItemsCount?: number;           // số đơn giao thiếu món
   apologiesCount?: number;             // số đơn hủy do hết hàng và xin lỗi khách
+  expectedCustomers?: number;          // số khách dự kiến hôm nay
+  spawnedCount?: number;               // số khách đã ghé quán trong ca
+  disruptionTimerSec?: number;         // đếm ngược thời gian gián đoạn quán khi bị giang hồ quậy phá
+  disruptionNotice?: string;           // thông báo tình trạng gián đoạn quán
 }
 
 // Hiệu ứng "đã tay": core ghi lại chuyện vừa xảy ra, giao diện rút ra (drainFx) để vẽ đúng một lần.
@@ -95,7 +99,9 @@ export function createSellingSession(): SellingSession {
     expensiveCount: 0,
     fairPriceCount: 0,
     wrongOrderCount: 0,
-    missedItemsCount: 0
+    missedItemsCount: 0,
+    expectedCustomers: 10,
+    spawnedCount: 0
   };
 }
 
@@ -136,6 +142,9 @@ export function tickSelling(session: SellingSession, gameDt: number, ctx: TickCo
   session.gameHour += gameDt / GAME_HOUR_MS;
   tickTimers(session.timers, gameDt);
 
+  session.expectedCustomers = ctx.expectedCustomers;
+  session.spawnedCount ??= session.orders.length;
+
   const stillWaiting: CustomerOrder[] = [];
   for (let i = 0; i < session.orders.length; i++) {
     const order = session.orders[i];
@@ -156,16 +165,43 @@ export function tickSelling(session: SellingSession, gameDt: number, ctx: TickCo
   }
   session.orders = stillWaiting;
 
-  session.spawnTimerMs += gameDt;
-  const interval = EconomyEngine.spawnIntervalMs(ctx.expectedCustomers, isRushHour(session.gameHour));
+  // Xử lý gián đoạn quán khi bị giang hồ quậy phá đuổi khách
+  const isDisrupted = (session.disruptionTimerSec ?? 0) > 0;
+  if (isDisrupted) {
+    session.disruptionTimerSec = Math.max(0, (session.disruptionTimerSec ?? 0) - (gameDt / 1000));
+    if (session.disruptionTimerSec === 0) {
+      session.disruptionNotice = undefined;
+    }
+  }
 
-  if (session.spawnTimerMs >= interval && session.orders.length < MAX_QUEUE) {
+  // Spawning logic: Điều tiết nhịp độ sao cho toàn bộ expectedCustomers đều đến quán
+  if (!isDisrupted) {
+    session.spawnTimerMs += gameDt;
+  }
+
+  const remainingToSpawn = Math.max(0, ctx.expectedCustomers - (session.spawnedCount ?? 0));
+  const hoursLeft = Math.max(0.1, CLOSE_HOUR - session.gameHour);
+  const rushFactor = isRushHour(session.gameHour) ? 0.8 : 1.0;
+  const baseInterval = remainingToSpawn > 0 
+    ? ((hoursLeft * GAME_HOUR_MS) / (remainingToSpawn + 0.3)) * rushFactor
+    : EconomyEngine.spawnIntervalMs(ctx.expectedCustomers, isRushHour(session.gameHour));
+  const dynamicInterval = Math.max(1200, Math.min(25000, baseInterval));
+
+  if (
+    !isDisrupted &&
+    remainingToSpawn > 0 &&
+    session.gameHour < CLOSE_HOUR &&
+    session.spawnTimerMs >= dynamicInterval &&
+    session.orders.length < MAX_QUEUE
+  ) {
     session.spawnTimerMs = 0;
+    session.spawnedCount = (session.spawnedCount ?? 0) + 1;
     const order = ctx.spawnCustomer();
     session.orders.push(order);
     events.push({ type: 'customerArrived', order });
   }
 
   if (session.gameHour >= CLOSE_HOUR) events.push({ type: 'dayOver' });
+
   return events;
 }

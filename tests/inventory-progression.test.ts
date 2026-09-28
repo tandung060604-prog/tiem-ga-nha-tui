@@ -76,6 +76,7 @@ describe('Phân tầng mở khóa nguyên liệu (Progression Pacing)', () => {
   it('khách không gọi món có nguyên liệu bị khóa', () => {
     const state = createInitialState();
     state.currentChapter = 2; // Cho phép món chương 2
+    state.day = 5;
     state.inventory.spicy_sauce.unlocked = false;
 
     // Sinh 100 order: không được có 'spicy_chicken'

@@ -80,10 +80,15 @@ export class OrdersEngine {
       baseTotal += item.basePrice;
     };
 
+    // Sinh nhân vật thông qua CharacterGenerator (100 - 200 nhân vật phân bổ đều)
+    const char = CharacterGenerator.generateCharacter();
+    const isVip = !!char.isVip;
+
     const drinks = byRole('drink');
-    // Giá đắt → combo đó ít được chọn (core/pricing.ts)
-    const combo = combos.length > 0 && random() < 0.18 ? weightedPick(combos, m => demandWeight(priceRatio(m))) : undefined;
-    if (!isDelivery && state.day >= WALKUP_FROM_DAY && drinks.length > 0 && random() < BASKET_RULE.walkupDrinkChance) {
+    // Giá đắt → combo đó ít được chọn (core/pricing.ts), Khách Sộp ưu tiên combo to
+    const comboChance = isVip ? 0.35 : 0.18;
+    const combo = combos.length > 0 && random() < comboChance ? weightedPick(combos, m => demandWeight(priceRatio(m))) : undefined;
+    if (!isDelivery && state.day >= WALKUP_FROM_DAY && drinks.length > 0 && random() < BASKET_RULE.walkupDrinkChance && !isVip) {
       // Người đi đường khát nước, xin mua ly mang đi gấp (phụ thu)
       isWalkupDrink = true;
       pickFrom(drinks);
@@ -113,9 +118,7 @@ export class OrdersEngine {
     }
     const extraItems = selectedItems.reduce((n, it) => n + it.count, 0) - 1;
 
-    // Sinh nhân vật thông qua CharacterGenerator (100 - 200 nhân vật phân bổ đều)
-    const char = CharacterGenerator.generateCharacter();
-    const customerName = isDelivery ? `[App] ${char.name}` : isWalkupDrink ? `Người đi đường (${char.name})` : `${char.name}`;
+    const customerName = isDelivery ? `[App] ${isVip ? '👑 ' : ''}${char.name}` : isWalkupDrink ? `Người đi đường (${char.name})` : (isVip ? `👑 ${char.name} 💵` : `${char.name}`);
     const avatar = isDelivery ? '🛵' : char.avatar;
 
     // Thời gian kiên nhẫn: 28 - 42 giây (ảnh hưởng bởi archetype và nâng cấp không gian)
@@ -136,6 +139,7 @@ export class OrdersEngine {
       customerName,
       avatar,
       isDelivery,
+      isVip,
       archetypeBadge: char.title,
       personality: char.personality,
       personalityLabel: char.personalityLabel,

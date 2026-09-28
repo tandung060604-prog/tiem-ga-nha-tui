@@ -193,13 +193,14 @@ export interface CustomerReview {
 
 // Tính cách khách hàng ảnh hưởng trực tiếp đến thời gian kiên nhẫn, thái độ và tiền tips
 export type CustomerPersonality =
-  | 'generous'   // 💎 Hào Phóng: Tip đậm (+10k-15k) khi làm nhanh và món ngon
-  | 'frugal'     // 🦀 Keo Kiệt: Không bao giờ tip (0đ), đếm từng đồng lẻ
-  | 'impatient'  // ⚡ Vội Vã: Tụt kiên nhẫn nhanh (1.4x), làm nhanh tip +5k, chậm cắt sạch tip
-  | 'easygoing'  // 🌸 Dễ Tính: Kiên nhẫn tụt chậm (0.7x), vui vẻ xí xóa, tip 2k-3k
-  | 'foodie'     // 👑 Sành Ăn: Cực chuộng Perfect (+8k-12k tip), gà cháy phạt gấp đôi
-  | 'student'    // 🎓 Học Sinh: Tiền túi có hạn, tip 1k-2k tiền lẻ hoặc không tip
-  | 'driver';    // 🛵 Tài Xế / Shipper: Cần đơn gấp chạy chuyến, không tip
+  | 'generous'     // 💎 Hào Phóng: Tip đậm (+10k-15k) khi làm nhanh và món ngon
+  | 'frugal'       // 🦀 Keo Kiệt: Không bao giờ tip (0đ), đếm từng đồng lẻ
+  | 'impatient'    // ⚡ Vội Vã: Tụt kiên nhẫn nhanh (1.4x), làm nhanh tip +5k, chậm cắt sạch tip
+  | 'easygoing'    // 🌸 Dễ Tính: Kiên nhẫn tụt chậm (0.7x), vui vẻ xí xóa, tip 2k-3k
+  | 'foodie'       // 👑 Sành Ăn: Cực chuộng Perfect (+8k-12k tip), gà cháy phạt gấp đôi
+  | 'student'      // 🎓 Học Sinh: Tiền túi có hạn, tip 1k-2k tiền lẻ hoặc không tip
+  | 'driver'       // 🛵 Tài Xế / Shipper: Cần đơn gấp chạy chuyến, không tip
+  | 'vip_generous';// 👑✨ Khách Sộp: Đại gia/CEO/Tiktoker, tip khủng +35k-150k+, viền hào quang vàng lấp lánh!
 
 export interface CustomerOrder {
   id: string;
@@ -208,6 +209,7 @@ export interface CustomerOrder {
   isDelivery: boolean;
   isMysteryGuest?: boolean;
   isWalkupDrink?: boolean; // người đi đường chỉ mua nước mang đi (đã gồm phụ thu)
+  isVip?: boolean;         // Khách Sộp hào phóng
   mysteryQuestId?: string;
   isBunny?: boolean;
   bunnyLetterId?: string;
@@ -335,7 +337,7 @@ export interface KarmaState {
   ambition: number;      // Tham Vọng Quy Mô (0-100)
 }
 
-export type StoryEndingId = 'happy' | 'open' | 'bad_bankruptcy' | 'bad_corporate' | 'secret';
+export type StoryEndingId = 'happy' | 'open' | 'bad_bankruptcy' | 'bad_corporate' | 'bad_police' | 'secret';
 
 export interface StoryEnding {
   id: StoryEndingId;
@@ -363,6 +365,8 @@ export interface IncidentChoice {
   };
   moneyDelta?: number; // Thay đổi tiền mặt (âm = mất tiền, dương = thưởng)
   reputationDelta?: number; // Thay đổi sao đánh giá
+  scareCustomers?: boolean; // Khi người chơi chọn sai: làm toàn bộ khách đang đợi hoảng sợ bỏ chạy
+  disruptionSeconds?: number; // Thời gian gián đoạn quán (đóng băng khách đến)
   reactionTitle: string;
   reactionNarrative: string; // Diễn biến câu chuyện khi thành công / giải quyết (ẩn điểm số)
   reactionFailureNarrative?: string; // Diễn biến khi gặp rủi ro thất bại (quán phải tự chịu)
@@ -473,6 +477,11 @@ export interface GameState {
   adoptedPets?: ('pet_01_dog_vang' | 'pet_02_cat_muop')[]; // Thú cưng đã nhận nuôi (Chó Cỏ, Mèo Mướp)
   pestIncidentsCount?: number; // Số lần xuất hiện chuột cống bếp
   dirtyOilPenaltyDays?: number;  // Số ngày còn bị phạt vì đóng cửa lúc dầu đen (giảm sao Vệ sinh + Hương vị)
+  dirtyOilViolations?: number;   // Số lần bị công an / kiểm tra ATTP phát hiện xài dầu đen (1: cảnh cáo, 2: phạt 200k, 3: bắt đi tù)
+  dirtyOilFryingCount?: number;  // Đếm số mẻ chiên liên tiếp trong dầu đen sì
+  totalReviewsCount?: number;    // Tổng số lượt đánh giá đã nhận
   gangsterThreatDays?: number;   // Số ngày giang hồ gây khó (giảm 30% khách) do chưa trả tiền mặt bằng
   lastRentPaidWeek?: number;     // Tuần gần nhất đã trả tiền mặt bằng (tính theo day / 7)
+  incidentCooldowns?: Record<string, number>; // incidentId -> last day seen (chống lặp lại sự kiện trong 6 ngày)
+  expiredWasteNotification?: { items: string[]; totalValue: number; day: number } | null; // Thông báo hủy hàng hết hạn qua đêm
 }

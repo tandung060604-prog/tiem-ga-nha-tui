@@ -61,6 +61,7 @@ describe('order chỉ gồm món có nguyên liệu đã mở khóa', () => {
     seedRandom(3);
     const s = createInitialState();
     s.currentChapter = 2;
+    s.day = 5;
     for (let i = 0; i < 300; i++) {
       for (const it of OrdersEngine.generateOrder(s).items) {
         expect(['spicy_chicken', 'honey_garlic_chicken']).not.toContain(it.menuItemId);

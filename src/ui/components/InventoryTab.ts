@@ -47,7 +47,8 @@ export function renderInventoryTab(state: GameState): string {
     }
 
     const isLow = item.amount <= 5;
-    const isUrgentShelf = item.currentLifeDays <= 1;
+    const isOutOfStock = item.amount <= 0;
+    const isUrgentShelf = !isOutOfStock && item.currentLifeDays <= 1;
     const unitCost = Math.round(item.cost * (1 - discount / 100));
     const totalCost5 = unitCost * 5;
     const totalCost10 = unitCost * 10;
@@ -59,7 +60,11 @@ export function renderInventoryTab(state: GameState): string {
         <div class="item-meta">
           <div class="item-name">
             ${item.name}
-            ${isUrgentShelf ? '<span class="shelf-tag" style="background:#ffd2d2;color:#b71c1c;">HSD: ' + item.currentLifeDays + ' ngày!</span>' : '<span class="shelf-tag">HSD: ' + item.currentLifeDays + ' ngày</span>'}
+            ${isOutOfStock 
+              ? '<span class="shelf-tag" style="background:#f1f5f9;color:#64748b;font-weight:600;">Hết hàng</span>'
+              : isUrgentShelf 
+              ? '<span class="shelf-tag" style="background:#ffd2d2;color:#b71c1c;font-weight:700;">⚠️ HSD: ' + item.currentLifeDays + ' ngày!</span>' 
+              : '<span class="shelf-tag">HSD: ' + item.currentLifeDays + ' ngày</span>'}
           </div>
           <div class="item-sub ${isLow ? 'low-stock' : ''}">
             Tồn kho: <b>${item.amount} ${item.unit}</b> · Giá sỉ: <b>${unitCost.toLocaleString('vi-VN')}đ</b> ${discount > 0 ? `<small style="color:var(--mint-dark,#10b981);font-weight:700;">(-${discount}%)</small>` : ''}

@@ -21,6 +21,7 @@ export interface ModularCharacter {
   hairStyle: string;
   outfit: string;
   accessory: string;
+  isVip?: boolean;
 }
 
 export const PERSONALITY_MAP: Record<CustomerPersonality, { label: string; desc: string; patienceRate: number }> = {
@@ -48,6 +49,11 @@ export const PERSONALITY_MAP: Record<CustomerPersonality, { label: string; desc:
     label: '👑 Sành Ăn',
     desc: 'Món Perfect tip to (+8k-12k), gà cháy phạt tiền gấp đôi',
     patienceRate: 0.95
+  },
+  vip_generous: {
+    label: '👑✨ KHÁCH SỘP 💵',
+    desc: 'Đại gia hào phóng! Đơn to, phục vụ nhanh + vàng giòn tip khủng (+25k–60k+)',
+    patienceRate: 0.85
   },
   student: {
     label: '🎓 Học Sinh',
@@ -82,9 +88,15 @@ export class CharacterGenerator {
       archetype = 'family';
     }
 
+    // Cơ chế Khách Sộp (VIP Big Spender): ~15% tỷ lệ khách thường, ~35% cho khách sang/thương lái
+    const isVipEligible = char.tipTendency === 'generous' || char.id.includes('buyer') || char.id.includes('wholesale') || char.id.includes('trendy');
+    const isVip = isVipEligible ? random() < 0.30 : random() < 0.12;
+
     // Xác định personality phù hợp tính cách nhân vật
     let personality: CustomerPersonality;
-    if (char.tipTendency === 'generous') {
+    if (isVip) {
+      personality = 'vip_generous';
+    } else if (char.tipTendency === 'generous') {
       personality = random() < 0.65 ? 'generous' : 'foodie';
     } else if (char.tipTendency === 'low') {
       personality = char.patienceMultiplier < 0.9 ? 'impatient' : 'frugal';
@@ -95,12 +107,13 @@ export class CharacterGenerator {
     }
 
     const pInfo = PERSONALITY_MAP[personality];
-    const tipChance = char.tipTendency === 'generous' ? 0.65 : char.tipTendency === 'low' ? 0.12 : 0.35;
+    const tipChance = isVip ? 0.95 : char.tipTendency === 'generous' ? 0.65 : char.tipTendency === 'low' ? 0.12 : 0.35;
+    const title = isVip ? `👑 ${char.roleTitle} (Khách Sộp)` : char.roleTitle;
 
     return {
       id: char.id,
       name: char.name,
-      title: char.roleTitle,
+      title,
       archetype,
       personality,
       personalityLabel: pInfo.label,
@@ -109,8 +122,9 @@ export class CharacterGenerator {
       patienceMultiplier: char.patienceMultiplier * (1 / pInfo.patienceRate),
       tipChance,
       hairStyle: 'Chuẩn phong cách Sài Gòn',
-      outfit: 'Trang phục đời thường hẻm 1102',
-      accessory: char.roleTitle
+      outfit: isVip ? 'Trang phục bảnh bao sang trọng' : 'Trang phục đời thường hẻm 1102',
+      accessory: title,
+      isVip
     };
   }
 }

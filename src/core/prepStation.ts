@@ -58,19 +58,22 @@ export function prepLock(state: PrepView, def: PrepPanDef): PrepSlotState['lock'
 export function prepStationSlots(state: PrepView): PrepSlotState[] {
   return PREP_LAYOUT.map(def => {
     const lock = prepLock(state, def);
-    const stock = Math.min(...def.stock.map(id => state.inventory[id]?.amount ?? 0));
+    // Tồn kho hiển thị trực tiếp theo NGUYÊN LIỆU CHÍNH (Đùi gà riêng, Má đùi riêng)
+    // Giúp số lượng khi mua và tồn kho quầy bếp luôn bằng nhau, không bị trừ chéo má đùi khi bán đùi gà
+    const primaryId = def.stock[0] ?? '';
+    const primaryStock = state.inventory[primaryId]?.amount ?? 0;
     return {
       id: def.id,
       row: def.row,
       pan: def.row === 'top' ? '1-6' : '1-3',
       action: def.action,
-      ingredientId: def.stock[0] ?? '',
+      ingredientId: primaryId,
       menuItemId: def.menuItemId,
       label: def.label,
       icon: def.icon,
       asset: def.asset,
-      stock: lock ? 0 : stock,
-      status: lock ? 'locked' : stock > 0 ? 'ready' : 'empty',
+      stock: lock ? 0 : primaryStock,
+      status: lock ? 'locked' : primaryStock > 0 ? 'ready' : 'empty',
       ...(lock ? { lock } : {})
     };
   });

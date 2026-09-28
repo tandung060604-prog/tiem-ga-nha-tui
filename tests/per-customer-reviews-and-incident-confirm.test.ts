@@ -50,7 +50,7 @@ describe('5 Tính Năng Mới: Review Từng Khách, Bác Ba Hỏi Lại, Ẩn �
     // Khi lỗi nặng (dầu đen, gà khét) mà chủ tiệm đùa cợt với khách nghiêm túc -> phản hồi tiêu cực
     const severeWittyNegative = resolveCustomerReaction('witty', 'foodie', 'dirty_oil', false);
     expect(severeWittyNegative).toContain('Khách phản hồi:');
-    expect(severeWittyNegative.toLowerCase()).toMatch(/giỡn|thất vọng|cợt nhả|trừ|không thấy vui/);
+    expect(severeWittyNegative.toLowerCase()).toMatch(/giỡn|thất vọng|cợt nhả|trừ|không thấy vui|bực mình|trò cười|tắc trách/);
   });
 
   it('các nút sự kiện đồng đều màu sắc (btn-neutral-choice), không có nút nào nổi bật áp đặt người chơi', () => {

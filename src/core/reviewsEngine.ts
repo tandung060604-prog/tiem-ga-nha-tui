@@ -31,6 +31,155 @@ export class ReviewsEngine {
     return Math.round(score * 10) / 10;
   }
 
+  // Áp dụng review trực tiếp vào GameState theo thời gian thực (Real-time Review System)
+  public static applyRealtimeReview(draft: GameState, review: CustomerReview): void {
+    draft.recentReviews.unshift(review);
+    if (draft.recentReviews.length > 200) draft.recentReviews.pop();
+    draft.totalReviewsCount = (draft.totalReviewsCount ?? 0) + 1;
+
+    // Điều chỉnh các tiêu chí sao theo thang đo 1-5 sao và chủ đề thực tế
+    const stars = review.stars;
+    const weakest = review.weakestCriteria || 'taste';
+    const topic = review.topic || '';
+
+    // Độ dịch chuyển điểm sao cơ bản:
+    // 5★: +0.08, 4★: +0.03, 3★: 0, 2★: -0.10, 1★: -0.25
+    let delta = 0;
+    if (stars === 5) delta = 0.08;
+    else if (stars === 4) delta = 0.03;
+    else if (stars === 3) delta = 0.0;
+    else if (stars === 2) delta = -0.10;
+    else if (stars === 1) delta = -0.25;
+
+    // Ảnh hưởng sâu theo chủ đề
+    if (topic === 'dirty_oil' || topic === 'police_inspection') {
+      draft.ratings.hygiene = Math.max(1.0, Math.min(5.0, draft.ratings.hygiene + (stars <= 2 ? -0.4 : 0.05)));
+      draft.ratings.taste = Math.max(1.0, Math.min(5.0, draft.ratings.taste + (stars <= 2 ? -0.2 : 0.03)));
+    } else if (topic === 'wrong_order') {
+      draft.ratings.taste = Math.max(1.0, Math.min(5.0, draft.ratings.taste - 0.25));
+      draft.ratings.speed = Math.max(1.0, Math.min(5.0, draft.ratings.speed - 0.15));
+    } else if (topic === 'burnt_food') {
+      draft.ratings.taste = Math.max(1.0, Math.min(5.0, draft.ratings.taste - 0.3));
+    } else if (topic === 'missed_order' || topic === 'slow_speed') {
+      draft.ratings.speed = Math.max(1.0, Math.min(5.0, draft.ratings.speed - 0.25));
+    } else if (topic === 'fast_speed') {
+      draft.ratings.speed = Math.max(1.0, Math.min(5.0, draft.ratings.speed + 0.1));
+    } else if (topic === 'perfect_food') {
+      draft.ratings.taste = Math.max(1.0, Math.min(5.0, draft.ratings.taste + 0.1));
+    } else if (topic === 'cheap_price') {
+      draft.ratings.pricing = Math.max(1.0, Math.min(5.0, draft.ratings.pricing + 0.08));
+    } else if (topic === 'expensive') {
+      draft.ratings.pricing = Math.max(1.0, Math.min(5.0, draft.ratings.pricing - 0.2));
+    } else {
+      // Các trường hợp khác áp vào tiêu chí tương ứng
+      draft.ratings[weakest] = Math.max(1.0, Math.min(5.0, draft.ratings[weakest] + delta));
+    }
+
+    draft.ratings.overall = this.calculateOverallStars(draft.ratings);
+  }
+
+  // Tạo bài đánh giá / biên bản chính thức của Công an & Thanh tra ATTP khi phát hiện dầu đen
+  public static createPoliceInspectionReview(
+    strike: 1 | 2 | 3,
+    day: number
+  ): CustomerReview {
+    const reviewId = 'rev_police_' + Date.now();
+    if (strike === 1) {
+      return {
+        id: reviewId,
+        authorName: 'Đồng Chí Nam (Công An Khu Vực)',
+        avatar: '👮',
+        day,
+        stars: 2,
+        comment: '⚠️ BIÊN BẢN CẢNH CÁO (LẦN 1): Kiểm tra đột xuất phát hiện tiệm sử dụng chảo dầu chiên đen thui, bốc mùi khét lẹt gây hại cho sức khỏe bà con. Nhắc nhở nghiêm khắc, yêu cầu thay dầu sạch ngay lập tức!',
+        weakestCriteria: 'hygiene',
+        orderSummary: 'Kiểm tra vệ sinh chảo dầu',
+        tags: ['#KiemTraVeSinh', '#CanhCaoLan1', '#DauDen'],
+        topic: 'police_inspection',
+        personaGroup: 'resident',
+        sentiment: 'disappointed',
+        advisorHint: 'Bác Ba nhắc nhở nè: Công an phường đã tới tận nơi cảnh cáo rồi đó! Vào bếp bấm "Thay dầu mới (150k)" liền đi kẻo bị phạt tiền nặng nghen con!',
+        replyOptions: [
+          {
+            id: 'opt_police_1_sincere',
+            strategy: 'sincere',
+            label: 'Chấp hành nghiêm chỉnh',
+            text: 'Dạ con xin lỗi đồng chí Nam và bà con cô bác! Con xin rút kinh nghiệm sâu sắc và đã cho thay ngay chảo dầu mới tinh ạ!',
+            isRecommended: true,
+            customerReaction: 'Đồng chí Nam gật đầu: "Biết lắng nghe và khắc phục liền là tốt. Chú sẽ còn quay lại kiểm tra đột xuất đó nghen!"',
+            starBonus: 0.2,
+            karmaReward: { community: 2, craftsmanship: 2 }
+          },
+          {
+            id: 'opt_police_1_firm',
+            strategy: 'firm',
+            label: 'Giải trình phân trần',
+            text: 'Do hôm nay khách đông quá nên tiệm chưa kịp xả dầu cũ, tiệm sẽ thay dầu mới ngay!',
+            isRecommended: false,
+            customerReaction: 'Đồng chí Nam nghiêm giọng: "Đông khách càng phải giữ vệ sinh cho người dân. Lần sau còn tái phạm là phạt tiền đó!"',
+            starBonus: 0.1,
+            karmaReward: { craftsmanship: 1 }
+          }
+        ]
+      };
+    } else if (strike === 2) {
+      return {
+        id: reviewId,
+        authorName: 'Đoàn Thanh Tra Vệ Sinh ATTP',
+        avatar: '📋',
+        day,
+        stars: 1,
+        comment: '🚨 BIÊN BẢN XỬ PHẠT HÀNH CHÍNH (LẦN 2): Tái phạm chiên gà bằng dầu đen biến chất, nguy cơ gây ngộ độc và ung thư. Phạt tiền 200.000đ! Cảnh báo: Nếu phát hiện lần 3 sẽ đình chỉ vĩnh viễn và khởi tố hình sự!',
+        weakestCriteria: 'hygiene',
+        orderSummary: 'Xử phạt vi phạm vệ sinh ATTP',
+        tags: ['#XuPhat200k', '#DauDenDocHai', '#TaiPham'],
+        topic: 'police_inspection',
+        personaGroup: 'resident',
+        sentiment: 'furious',
+        advisorHint: 'Trời ơi Bác Ba đã dặn rồi mà con không nghe! Bị phạt 200k rồi đó. Lần sau nữa là công an bắt đi tù đóng cửa tiệm luôn đó con ơi!',
+        replyOptions: [
+          {
+            id: 'opt_police_2_sincere',
+            strategy: 'sincere',
+            label: 'Nộp phạt và cam kết tuyệt đối',
+            text: 'Tiệm xin nghiêm túc chấp hành nộp phạt 200.000đ và cam kết hủy toàn bộ dầu đen cũ, bảo đảm 100% an toàn cho thực khách!',
+            isRecommended: true,
+            customerReaction: 'Đoàn kiểm tra lập biên bản thu tiền phạt: "Tạm tha đình chỉ lần này. Nếu để dân phản ánh thêm lần thứ 3 thì chuẩn bị hầu tòa!"',
+            starBonus: 0.2,
+            karmaReward: { community: 2, craftsmanship: 3 }
+          },
+          {
+            id: 'opt_police_2_firm',
+            strategy: 'firm',
+            label: 'Thắc mắc mức phạt',
+            text: 'Tiệm xin đóng phạt, nhưng mức phạt 200.000đ với quán vỉa hè là quá nặng!',
+            isRecommended: false,
+            customerReaction: 'Cán bộ thanh tra đập bàn: "Đầu độc sức khỏe cộng đồng bằng dầu khét mà còn kêu nặng? Muốn niêm phong quán luôn không?"',
+            starBonus: 0.0,
+            karmaReward: { community: -2 }
+          }
+        ]
+      };
+    } else {
+      return {
+        id: reviewId,
+        authorName: 'Công An Quận - Cơ Quan CSĐT',
+        avatar: '🚔',
+        day,
+        stars: 1,
+        comment: '⚖️ THI HÀNH LỆNH BẮT TẠM GIAM: Bắt quả tang chủ tiệm cố tình dùng dầu đen biến chất lần thứ 3. Quán bị tịch thu giấy phép, niêm phong vĩnh viễn, chuyển hồ sơ truy tố hình sự!',
+        weakestCriteria: 'hygiene',
+        orderSummary: 'Khởi tố hình sự & Niêm phong quán',
+        tags: ['#KhoiToHinhSu', '#DiTu', '#NiemPhongTiem'],
+        topic: 'police_inspection',
+        personaGroup: 'resident',
+        sentiment: 'furious',
+        advisorHint: 'Hết cứu nổi rồi... Dầu đen xào mãi không chịu thay, giờ công an còng tay đi tù rồi con ơi...'
+      };
+    }
+  }
+
+
   // Tạo tóm tắt đơn hàng thực tế của khách review hôm nay
   private static formatOrderSummary(topSellerId?: string): string {
     switch (topSellerId) {
@@ -169,11 +318,11 @@ export class ReviewsEngine {
       topic = 'missed_order';
       weakest = 'speed';
       reviewStars = Math.min(3, Math.max(2, Math.round(r.speed)));
-    } else if (expensive > fair && expensive >= 3) {
+    } else if (expensive >= 2 || (averagePriceRatio(currentState) >= 1.25 && expensive > 0)) {
       // Ưu tiên 6: Giá cả đắt đỏ
       topic = 'expensive';
       weakest = 'pricing';
-      reviewStars = Math.min(3, Math.max(2, Math.round(r.pricing)));
+      reviewStars = Math.min(3, Math.max(1, Math.round(r.pricing)));
     } else if (spaceLevel <= 1 && currentState.day >= 4) {
       // Ưu tiên 7: Không gian vỉa hè chật chội
       topic = 'bad_space';
@@ -230,6 +379,7 @@ export class ReviewsEngine {
       tags: chosenTemplate.tags ?? ['#TiemGaNhaTui', '#Hem1102'],
       weakestCriteria: weakest,
       orderSummary,
+      topic,
       personaGroup: author.group,
       sentiment: TOPIC_SENTIMENTS[topic] || (reviewStars >= 4 ? 'delighted' : 'disappointed'),
       advisorHint: TOPIC_ADVISOR_HINTS[topic] || this.generateAdvisorTip(weakest, r[weakest]),

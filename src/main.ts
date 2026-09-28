@@ -39,10 +39,11 @@ import { syncTutorialLayer } from './ui/components/TutorialLayer';
 import { weeklyWrapped } from './core/wrapped';
 import { drawWrapped, shareWrapped, shareImage } from './ui/components/WrappedCard';
 
-import { squeezeCondiment, recordHelperFry, StationResult, scoopSide, changeOil, OIL_CHANGE_COST, startTimerStation, pullTimerStation, assembleAtCounter, makeDrink, creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, SAUCE_STOCK, serveFirstOrder, cancelAndApologizeOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP, payWeeklyRent, applyGangsterThreat } from './core/day';
+import { squeezeCondiment, recordHelperFry, StationResult, scoopSide, changeOil, OIL_CHANGE_COST, startTimerStation, pullTimerStation, assembleAtCounter, makeDrink, creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, checkPoliceOilInspection, PoliceInspectionResult, SAUCE_STOCK, serveFirstOrder, cancelAndApologizeOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP, payWeeklyRent, applyGangsterThreat } from './core/day';
 import { upgradeEffects } from './core/upgrades';
 import { renderSummaryModal } from './ui/components/SummaryModal';
 import { renderSettingsModal } from './ui/components/SettingsModal';
+import { renderUpdateDashboardModal } from './ui/components/UpdateDashboardModal';
 import { renderStoryModal, bindStoryEvents, revealedStory } from './ui/components/StoryModal';
 import { renderBunnyLetterModal, renderBunnyAlbumModal, bindBunnyModalEvents } from './ui/components/BunnyModal';
 import { renderEndingModal, bindEndingEvents } from './ui/components/EndingModal';
@@ -209,6 +210,14 @@ class AppController {
       }
     };
 
+    const changelogBtn = document.getElementById('btn-title-changelog');
+    if (changelogBtn) {
+      changelogBtn.onclick = (e) => {
+        e.stopPropagation();
+        this.openUpdateDashboardModal();
+      };
+    }
+
     const screenEl = document.getElementById('title-screen');
     const onFirstUserTap = () => {
       music.unlock();
@@ -218,6 +227,21 @@ class AppController {
       screenEl?.removeEventListener('pointerdown', onFirstUserTap);
     };
     screenEl?.addEventListener('pointerdown', onFirstUserTap, { passive: true });
+  }
+
+  // Mở Bảng tin / Dashboard Cập nhật phiên bản v2.1.0
+  public openUpdateDashboardModal() {
+    audio.playPop();
+    const html = renderUpdateDashboardModal();
+    this.openModal(html);
+    const closeTop = document.getElementById('btn-close-dashboard-top');
+    const closeCta = document.getElementById('btn-close-dashboard-cta');
+    const closeHandler = () => {
+      audio.playPop();
+      this.closeModal();
+    };
+    if (closeTop) closeTop.onclick = closeHandler;
+    if (closeCta) closeCta.onclick = closeHandler;
   }
 
   // Đặt tên quán khi mở tiệm mới (đổi lại được trong Cài đặt)
@@ -396,6 +420,25 @@ class AppController {
       this.sellingSession.isPaused = true;
       this.incidentPausedSelling = true;
     }
+
+    // Âm thanh và nhạc phân cảnh sự kiện (Yêu cầu 8)
+    const isDrama = incident.isSecurityRisk ||
+      incident.categoryTag?.includes('BẢO KÊ') ||
+      incident.categoryTag?.includes('SIẾT NỢ') ||
+      incident.categoryTag?.includes('NGUY HIỂM') ||
+      incident.categoryTag?.includes('ĐỐI THỦ');
+    const isRomance = incident.categoryTag?.includes('TÌNH') || incident.categoryTag?.includes('HẸN HÒ');
+    const isComedy = incident.categoryTag?.includes('TREND') || incident.categoryTag?.includes('HÀI') || incident.categoryTag?.includes('MÈO');
+
+    if (isDrama) {
+      audio.playDramaticSting();
+      music.setMode('dramatic_incident');
+    } else if (isRomance) {
+      audio.playRomanceChime();
+    } else if (isComedy) {
+      audio.playComedyBoing();
+    }
+
     babble(incident.dialogue, 'guest');
     const promptHtml = renderIncidentPrompt(incident, state);
     this.openModal(promptHtml);
@@ -433,10 +476,27 @@ class AppController {
 
             if (!result) return;
 
-            if (result.succeeded) {
+            // Xử lý giang hồ đập phá đuổi khách hoảng sợ chạy sạch (Yêu cầu 11)
+            if (result.scareCustomers && this.sellingSession) {
+              const lostOrdersCount = this.sellingSession.orders.length;
+              this.sellingSession.orders = [];
+              this.sellingSession.disruptionTimerSec = result.disruptionSeconds || 18;
+              this.sellingSession.disruptionNotice = '⚠️ Quán đang gián đoạn sau khi bị giang hồ quậy phá! Khách chạy tán loạn, đang dọn bàn ghế...';
+              audio.playChaosScare();
+              Haptics.warning();
+              if (lostOrdersCount > 0) {
+                this.showToast(`💥 Giang hồ đập bàn phá quán! ${lostOrdersCount} khách đang đợi hoảng sợ bỏ chạy hết sạch! ⚠️`);
+              }
+            } else if (result.succeeded) {
               audio.playCash();
             } else {
               audio.playPop();
+            }
+
+            if (result.moneyDelta > 0) {
+              this.showToast(`💵 Sự kiện: Nhận +${result.moneyDelta.toLocaleString('vi-VN')}đ tiền mặt!`);
+            } else if (result.moneyDelta < 0) {
+              this.showToast(`💸 Sự kiện: Chi -${Math.abs(result.moneyDelta).toLocaleString('vi-VN')}đ tiền mặt!`);
             }
 
             const reactionHtml = renderIncidentReaction(
@@ -452,6 +512,8 @@ class AppController {
               continueBtn.onclick = () => {
                 audio.playPop();
                 this.closeModal();
+                // Khôi phục lại nhạc nền ca bán / chuẩn bị
+                music.setMode(wasSelling ? 'selling' : 'prep');
                 if (wasSelling && this.sellingSession) {
                   this.sellingSession.isPaused = false;
                   this.lastTimestamp = performance.now();
@@ -633,7 +695,8 @@ class AppController {
       bindHeaderEvents(
         state,
         () => this.render(),
-        () => this.openSettings()
+        () => this.openSettings(),
+        () => this.openUpdateDashboardModal()
       );
     }
 
@@ -679,7 +742,7 @@ class AppController {
         </button>
         <button class="tab-btn ${this.activeTab === 'reviews' ? 'active' : ''}" data-tab="reviews">
           <span class="tab-icon">⭐</span>
-          <span>Đánh giá</span>
+          <span>Đánh giá (${state.ratings.overall.toFixed(1)}★ · ${state.totalReviewsCount ?? state.recentReviews.length})</span>
         </button>
         <button class="tab-btn ${this.activeTab === 'menu' ? 'active' : ''}" data-tab="menu">
           <span class="tab-icon">📖</span>
@@ -920,6 +983,10 @@ class AppController {
     this.sellingSession.isPaused = false;
     this.tutorial = shift.session.tutorial ? { introSeen: true, servedAtStart: shift.session.servedCount } : null;
     this.expectedCustomers = shift.expectedCustomers;
+    this.sellingSession.expectedCustomers = shift.expectedCustomers;
+    if (this.sellingSession.spawnedCount === undefined) {
+      this.sellingSession.spawnedCount = this.sellingSession.orders.length + this.sellingSession.servedCount + this.sellingSession.lostCount;
+    }
     this.customerSource = createCustomerSource(state, this.currentEvent, shift.bunnyVisited);
     cookingEngine.setFryRampBonus(upgradeEffects(state.upgrades).fryRampPct);
     cookingEngine.setTraySize(traySizeFor(state));
@@ -952,6 +1019,8 @@ class AppController {
 
     // Số khách cả ngày: khách nền theo chương × sao × marketing × sự kiện (GDD)
     this.expectedCustomers = EconomyEngine.calculateDailyCustomerCount(state, this.currentEvent.effect.customerMultiplier ?? 1);
+    this.sellingSession.expectedCustomers = this.expectedCustomers;
+    this.sellingSession.spawnedCount = this.sellingSession.orders.length;
 
     this.lastTimestamp = performance.now();
 
@@ -1016,8 +1085,7 @@ class AppController {
             menuLookup: id => menu.find(m => m.id === id)?.name || id
           });
           stateManager.update(draft => {
-            draft.recentReviews.unshift(review);
-            if (draft.recentReviews.length > 200) draft.recentReviews.pop();
+            ReviewsEngine.applyRealtimeReview(draft, review);
           });
           break;
         }
@@ -1100,10 +1168,16 @@ class AppController {
     });
     for (const ev of events) {
       switch (ev.type) {
-        case 'helperDone':
-          stateManager.update(draft => recordHelperFry(draft, session, ev.item.quality));
+        case 'helperDone': {
+          let helperPoliceInsp: PoliceInspectionResult | null = null;
+          stateManager.update(draft => {
+            recordHelperFry(draft, session, ev.item.quality);
+            helperPoliceInsp = checkPoliceOilInspection(draft);
+          });
+          if (helperPoliceInsp) this.handlePoliceInspection(helperPoliceInsp);
           if (ev.item.quality === 'burnt') this.showToast(`😅 ${ev.cook} lỡ tay chiên cháy ${ev.item.name}!`);
           break;
+        }
         case 'autoServe':
           this.serveCurrentCustomer();
           break;
@@ -1128,7 +1202,14 @@ class AppController {
   }
 
   private onFryerLifted(result: ReturnType<typeof cookingEngine.liftFryer>) {
-    stateManager.update(draft => recordFryerLift(draft, this.sellingSession, result));
+    let policeInsp: PoliceInspectionResult | null = null;
+    stateManager.update(draft => {
+      recordFryerLift(draft, this.sellingSession, result);
+      policeInsp = checkPoliceOilInspection(draft);
+    });
+    if (policeInsp) {
+      this.handlePoliceInspection(policeInsp);
+    }
     if (!result.trayItem) this.showToast('Khay đầy, món vừa vớt bị bỏ!');
     if (result.quality === 'perfect') {
       Haptics.perfect();
@@ -1136,6 +1217,87 @@ class AppController {
       Haptics.warning();
     } else {
       Haptics.tap();
+    }
+  }
+
+  // Xử lý cơ chế công an kiểm tra an toàn thực phẩm khi chiên bằng dầu đen sì:
+  // Lần 1: Cảnh cáo + ghi biên bản đánh giá + trừ sao vệ sinh
+  // Lần 2: Phạt 200.000đ + ghi biên bản phạt + trừ nặng sao vệ sinh
+  // Lần 3: Game over ngay lập tức, chuyển vào bad ending vào tù
+  private handlePoliceInspection(insp: PoliceInspectionResult) {
+    if (insp.strike === 1) {
+      audio.playBurnt();
+      Haptics.warning();
+      this.showToast('🚨 CÔNG AN NHẮC NHỞ: Dầu chiên đen sì không đảm bảo ATVSTP! (Lần 1) ⚠️');
+      this.showPoliceNoticeModal(insp);
+    } else if (insp.strike === 2) {
+      audio.playBurnt();
+      Haptics.warning();
+      this.showToast('🚨 CÔNG AN XỬ PHẠT 200.000đ: Tái phạm chiên dầu đen khét lẹt lần 2! 💸');
+      this.showPoliceNoticeModal(insp);
+    } else if (insp.strike === 3) {
+      audio.playBurnt();
+      Haptics.warning();
+      this.stopSellingPhase();
+      this.openEndingModal('bad_police');
+    }
+  }
+
+  private showPoliceNoticeModal(insp: PoliceInspectionResult) {
+    const isStrike1 = insp.strike === 1;
+    const badgeText = isStrike1
+      ? '⚠️ BIÊN BẢN CẢNH CÁO VỆ SINH ATVSTP (LẦN 1/3)'
+      : '🚨 QUYẾT ĐỊNH XỬ PHẠT HÀNH CHÍNH (LẦN 2/3)';
+    const title = isStrike1
+      ? 'Phát Hiện Chảo Dầu Đen Khét Lẹt!'
+      : 'Xử Phạt 200.000đ Tái Phạm Dầu Đen!';
+    const quote = isStrike1
+      ? 'Chủ tiệm có biết chiên gà bằng dầu đen sì bốc khói khét lẹt này là vi phạm nghiêm trọng ATVSTP không? Dầu cháy đen sinh ra độc tố Acrylamide cực kỳ nguy hiểm cho sức khỏe thực khách! Lần đầu tôi lập biên bản nhắc nhở, yêu cầu bấm Thay Dầu (150k) ngay lập tức!'
+      : 'Bất chấp cảnh cáo lần trước, tiệm vẫn ngoan cố dùng dầu đen sì để chiên bán! Đội Quản lý & Công an chính thức lập biên bản xử phạt 200.000đ! Cảnh báo lần cuối: Nếu còn bị bắt lần thứ 3, tiệm sẽ bị niêm phong và khởi tố đi tù ngay lập tức!';
+    const actionBtn = isStrike1
+      ? '✍️ Ký Biên Bản & Cam Kết Thay Dầu Ngay'
+      : '💸 Chấp Hành Nộp Phạt 200.000đ & Tiếp Tục Bán';
+
+    const html = `
+      <div class="incident-dialog">
+        <div class="incident-avatar-wrap">
+          <div class="incident-chibi-circle" style="background: #e3f2fd; border-color: #1976d2;">
+            <div class="chibi-avatar-emoji">👮‍♂️</div>
+          </div>
+        </div>
+        <div class="incident-pill-badge pill-failure">
+          ${badgeText}
+        </div>
+        <h2 class="incident-main-title">${title}</h2>
+        <div class="incident-char-subtitle">
+          Đồng Chí Nam <span class="char-role-dot">●</span> Cảnh Sát Khu Vực & Đội Quản Lý Thị Trường
+        </div>
+        <div class="incident-body-box">
+          <div class="incident-quote-card" style="border-left: 4px solid #1976d2; background: rgba(25, 118, 210, 0.08);">
+            "${quote}"
+          </div>
+          <p class="incident-story-desc" style="margin-top: 10px; font-size: 0.82rem; color: #555;">
+            ${isStrike1 
+              ? '📋 Điểm sao Vệ Sinh của tiệm đã bị hạ và ghi vào nhật ký đánh giá. Hãy bấm "Thay dầu" để đảm bảo chất lượng!' 
+              : '💸 200.000đ tiền phạt đã bị khấu trừ từ quỹ tiệm. Nếu tái phạm lần 3, bạn sẽ bị bắt đi tù (Game Over lập tức)!'}
+          </p>
+        </div>
+        <div class="incident-choices-list" style="margin-top: 14px;">
+          <button id="btn-police-confirm" class="incident-choice-btn btn-neutral-choice" style="background: #1976d2; color: #fff; justify-content: center; text-align: center;">
+            <div class="choice-tier1" style="font-weight: 800;">${actionBtn}</div>
+          </button>
+        </div>
+      </div>
+    `;
+
+    this.openModal(html);
+    const btn = document.getElementById('btn-police-confirm');
+    if (btn) {
+      btn.onclick = () => {
+        audio.playPop();
+        this.closeModal();
+        this.render();
+      };
     }
   }
 
@@ -1467,8 +1629,7 @@ class AppController {
         });
         stateManager.update(draft => {
           creditSale(draft, result.paid, 0);
-          draft.recentReviews.unshift(review);
-          if (draft.recentReviews.length > 200) draft.recentReviews.pop();
+          ReviewsEngine.applyRealtimeReview(draft, review);
         });
         this.render();
         return;
@@ -1483,8 +1644,7 @@ class AppController {
           menuLookup: id => menu.find(m => m.id === id)?.name || id
         });
         stateManager.update(draft => {
-          draft.recentReviews.unshift(review);
-          if (draft.recentReviews.length > 200) draft.recentReviews.pop();
+          ReviewsEngine.applyRealtimeReview(draft, review);
         });
         this.render();
         return;
@@ -1503,21 +1663,29 @@ class AppController {
     const patienceRatio = order.patienceCurrent / Math.max(1, order.patienceMax);
     const hasBurnt = (order.burntPenalty ?? 0) > 0;
     const hasDirtyOil = curState.oilCondition === 'dirty';
+    const orderBasePrice = order.items.reduce((sum, it) => {
+      const def = menu.find(m => m.id === it.menuItemId);
+      return sum + (def?.basePrice ?? 30000) * it.count;
+    }, 0);
+    const orderPriceRatio = orderBasePrice > 0 ? order.totalPrice / orderBasePrice : 1.0;
+    const spaceLevel = curState.upgrades.space?.currentLevel || 1;
     const isPerfect = (order.perfectBonus ?? 0) > 0;
+
     const review = ReviewsEngine.generateCustomerReview(curState.day, order, {
       kind: 'complete',
       patienceRatio,
       hasBurnt,
       hasDirtyOil,
       isPerfect,
-      menuLookup: id => menu.find(m => m.id === id)?.name || id
+      menuLookup: id => menu.find(m => m.id === id)?.name || id,
+      priceRatio: orderPriceRatio,
+      spaceLevel
     });
 
     stateManager.update(draft => {
       creditSale(draft, paid, tip);
       if (order.isBunny) letter = applyBunnyReward(draft, order);
-      draft.recentReviews.unshift(review);
-      if (draft.recentReviews.length > 200) draft.recentReviews.pop();
+      ReviewsEngine.applyRealtimeReview(draft, review);
     });
 
     if (letter) {
@@ -1562,14 +1730,12 @@ class AppController {
       audio.playCash();
       stateManager.update(draft => {
         creditSale(draft, result.paid, 0);
-        draft.recentReviews.unshift(review);
-        if (draft.recentReviews.length > 200) draft.recentReviews.pop();
+        ReviewsEngine.applyRealtimeReview(draft, review);
       });
       this.showToast(`🙏 Quán xin lỗi do hết món. Khách thanh toán ${result.paid.toLocaleString('vi-VN')}đ phần đã nhận: "${result.apologyReply}"`);
     } else {
       stateManager.update(draft => {
-        draft.recentReviews.unshift(review);
-        if (draft.recentReviews.length > 200) draft.recentReviews.pop();
+        ReviewsEngine.applyRealtimeReview(draft, review);
       });
       this.showToast(`🙏 Quán xin lỗi do hết món. Khách thông cảm: "${result.apologyReply}"`);
     }
@@ -1615,28 +1781,27 @@ class AppController {
     const currentReview = stateManager.getState().recentReviews.find(r => r.id === review.id) || review;
     this.openModal(renderReviewReplyModal(currentReview));
 
+    const handleClose = () => {
+      audio.playPop();
+      this.closeModal();
+      if (onFinished) {
+        onFinished();
+      }
+    };
+
     const closeBtn = document.getElementById('btn-close-reply-modal');
     if (closeBtn) {
-      closeBtn.onclick = () => {
-        audio.playPop();
-        if (onFinished) {
-          onFinished();
-        } else {
-          this.closeModal();
-        }
-      };
+      closeBtn.onclick = handleClose;
     }
 
     const cancelBtn = document.getElementById('btn-cancel-reply-modal');
     if (cancelBtn) {
-      cancelBtn.onclick = () => {
-        audio.playPop();
-        if (onFinished) {
-          onFinished();
-        } else {
-          this.closeModal();
-        }
-      };
+      cancelBtn.onclick = handleClose;
+    }
+
+    const iconCloseBtn = document.getElementById('btn-modal-close-icon');
+    if (iconCloseBtn) {
+      iconCloseBtn.onclick = handleClose;
     }
 
     const chooseBtns = document.querySelectorAll('.btn-choose-reply');
@@ -1842,6 +2007,14 @@ class AppController {
     this.setPhase('prep');
     this.showToast(`Chào buổi sáng Ngày ${stateManager.getState().day}! Chuẩn bị hàng nào! ☀️`);
 
+    // Thông báo hàng hết hạn bị hủy nếu có
+    const expiredNotice = stateManager.getState().expiredWasteNotification;
+    if (expiredNotice && expiredNotice.items.length > 0) {
+      setTimeout(() => {
+        this.showToast(`🗑️ Đã hủy ${expiredNotice.items.join(', ')} do hết hạn sử dụng! (-${expiredNotice.totalValue.toLocaleString('vi-VN')}đ hao hụt)`);
+      }, 1200);
+    }
+
     // Kích hoạt Sự kiện 1 (Tình huống đầu ngày)
     setTimeout(() => {
       const morningIncident = pickDailyIncident(stateManager.getState(), 'morning');
@@ -1956,6 +2129,13 @@ class AppController {
       audioToggleBtn.onclick = () => {
         audio.toggleMute();
         this.openSettings(); // re-render settings
+      };
+    }
+
+    const changelogSettingsBtn = document.getElementById('btn-settings-changelog');
+    if (changelogSettingsBtn) {
+      changelogSettingsBtn.onclick = () => {
+        this.openUpdateDashboardModal();
       };
     }
 

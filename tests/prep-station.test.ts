@@ -21,14 +21,15 @@ describe('quầy khay inox GN', () => {
     }
   });
 
-  it('ngày 1: gà + khoai + củ cải mở; má đùi khóa "Ngày 2", gà viên khóa "Chương 3", phô mai que khóa "Ngày 3"', () => {
+  it('ngày 1: gà + khoai + củ cải mở; má đùi khóa "Ngày 2", gà viên khóa "Ngày 5", phô mai que khóa "Ngày 3", sốt Yangnyeom khóa "Ngày 3"', () => {
     const slot = (id: string) => prepStationSlots(createInitialState()).find(x => x.id === id)!;
     expect(slot('chicken').status).toBe('ready');
     expect(slot('danmuji').status).toBe('ready');
     expect(slot('thigh').lock).toMatchObject({ kind: 'day', label: 'Ngày 2' });
     expect(slot('cheese').lock).toMatchObject({ kind: 'day', label: 'Ngày 3' });
-    expect(slot('popcorn').lock).toMatchObject({ kind: 'chapter', label: 'Chương 3' });
-    expect(slot('yangnyeom').lock).toMatchObject({ kind: 'chapter', label: 'Chương 2' });
+    expect(slot('popcorn').lock).toMatchObject({ kind: 'day', label: 'Ngày 5' });
+    expect(slot('yangnyeom').lock).toMatchObject({ kind: 'day', label: 'Ngày 3' });
+    expect(slot('coleslaw').lock).toMatchObject({ kind: 'chapter', label: 'Chương 2' });
   });
 
   it('tới ngày nhưng chưa ký hợp đồng → khóa kèm phí; hết hàng → khay rỗng', () => {

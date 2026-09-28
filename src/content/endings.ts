@@ -46,6 +46,17 @@ export const STORY_ENDINGS: Record<StoryEndingId, StoryEnding> = {
     conditionDescription: '💼 Tham vọng quy mô ≥ 85 · ❤️ Tình thân hẻm < 40 (Chạy theo lợi nhuận mù quáng).',
     karma: { community: 20, craftsmanship: 30, ambition: 98 }
   },
+  bad_police: {
+    id: 'bad_police',
+    themeClass: 'ending-bad-police',
+    kicker: '🚔 BAD ENDING — VÀO TÙ VÌ DẦU ĐEN ĐỘC HẠI',
+    icon: '⛓️',
+    title: 'XE ĐẶC CHỦNG & NIÊM PHONG TIỆM',
+    tagline: 'Cố tình chiên xào dầu đen độc hại đầu độc thực khách, bạn đã phải trả giá sau song sắt trại giam.',
+    excerpt: 'Tiếng còi hú xe cảnh sát xé toang không gian Hẻm 1102. Đồng chí Nam cùng Đội Cảnh sát kinh tế và Thanh tra ATTP ập vào bắt quả tang chảo dầu đen đặc cặn cháy lần thứ 3. Lệnh bắt tạm giam được thi hành ngay tại chỗ. Bác Ba cúi đầu rơi nước mắt vì quá thất vọng, thực khách phẫn nộ đòi bồi thường. Quán gà bị tịch thu giấy phép, niêm phong vĩnh viễn, sự nghiệp ẩm thực chấm dứt trong vòng lao lý.',
+    conditionDescription: 'Cố tình chiên dầu đen sì bị công an phát hiện và lập biên bản lần thứ 3.',
+    karma: { community: 0, craftsmanship: 5, ambition: 30 }
+  },
   secret: {
     id: 'secret',
     themeClass: 'ending-secret',
@@ -82,6 +93,7 @@ export function finaleReady(state: GameState): boolean {
 // Kết thúc duy nhất có thể xảy ra giữa chừng là phá sản (âm quỹ nhiều ngày liền).
 // 4 kết thúc lớn chỉ mở ở đỉnh Chương 5 → người chơi đi hết cốt truyện, không bị cắt ngang ở ngày 25.
 export function evaluateEnding(state: GameState): StoryEndingId | null {
+  if ((state.dirtyOilViolations ?? 0) >= 3) return 'bad_police';
   if ((state.debtStreak ?? 0) >= BANKRUPTCY_DEBT_DAYS) return 'bad_bankruptcy';
   if (!finaleReady(state)) return null;
 

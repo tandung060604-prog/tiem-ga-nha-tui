@@ -4,17 +4,20 @@ import { GameState, InventoryItem } from '../types/game';
 // `amount` và `currentLifeDays` luôn được đồng bộ từ `batches` để UI cũ đọc được.
 
 function sync(item: InventoryItem) {
-  item.batches = item.batches.filter(b => b.amount > 0);
+  // Lô hết hạn (daysLeft <= 0) hoặc hết hàng (amount <= 0) phải bị loại bỏ thật sự khỏi kho
+  item.batches = item.batches.filter(b => b.amount > 0 && b.daysLeft > 0);
   // Đã bán bớt từ lô đang được đổi trả → phần hoàn được không vượt quá phần còn lại
   for (const b of item.batches) if (b.refundable) b.refundable = Math.min(b.refundable, b.amount);
   item.amount = item.batches.reduce((sum, b) => sum + b.amount, 0);
-  item.currentLifeDays = item.batches[0]?.daysLeft ?? item.shelfLifeDays;
+  item.currentLifeDays = item.batches.length > 0 ? (item.batches[0]?.daysLeft ?? 0) : 0;
 }
 
 // Save cũ (trước khi có lô) chỉ có amount + currentLifeDays: gom thành một lô.
 export function ensureBatches(item: InventoryItem) {
   if (!Array.isArray(item.batches)) {
-    item.batches = item.amount > 0 ? [{ amount: item.amount, daysLeft: item.currentLifeDays }] : [];
+    item.batches = (item.amount > 0 && item.currentLifeDays > 0)
+      ? [{ amount: item.amount, daysLeft: item.currentLifeDays }]
+      : [];
   }
   sync(item);
 }
@@ -138,3 +141,40 @@ export function ageOneDay(item: InventoryItem): number {
   sync(item);
   return expired;
 }
+
+export interface ExpiredStockReport {
+  totalWasteCost: number;
+  expiredItems: { id: string; name: string; amount: number; cost: number; unit: string }[];
+}
+
+// Quét dọn toàn diện và hủy triệt để mọi lô hàng đã quá hạn sử dụng (daysLeft <= 0)
+export function purgeAllExpiredStock(inventory: { [id: string]: InventoryItem }): ExpiredStockReport {
+  let totalWasteCost = 0;
+  const expiredItems: { id: string; name: string; amount: number; cost: number; unit: string }[] = [];
+
+  for (const item of Object.values(inventory)) {
+    ensureBatches(item);
+    let expiredAmount = 0;
+    for (const batch of item.batches) {
+      if (batch.daysLeft <= 0) {
+        expiredAmount += batch.amount;
+        batch.amount = 0;
+      }
+    }
+    sync(item);
+    if (expiredAmount > 0) {
+      const cost = expiredAmount * item.cost;
+      totalWasteCost += cost;
+      expiredItems.push({
+        id: item.id,
+        name: item.name,
+        amount: expiredAmount,
+        cost,
+        unit: item.unit
+      });
+    }
+  }
+
+  return { totalWasteCost, expiredItems };
+}
+

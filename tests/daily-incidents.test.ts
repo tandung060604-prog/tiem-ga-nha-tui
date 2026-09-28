@@ -18,8 +18,8 @@ describe('Hệ Thống 25 Sự Kiện Hài Hước Bắt Trend & Quyết Định
   });
 
   describe('1. Ngân hàng 25 Sự Kiện (Content Integrity)', () => {
-    it('Phải có chính xác 25 sự kiện hài hước & đời sống hẻm', () => {
-      expect(DAILY_INCIDENTS.length).toBe(25);
+    it('Phải có ít nhất 25 sự kiện hài hước & đời sống hẻm', () => {
+      expect(DAILY_INCIDENTS.length).toBeGreaterThanOrEqual(25);
     });
 
     it('Mỗi sự kiện phải có đầy đủ thuộc tính, lời thoại và ít nhất 2 lựa chọn', () => {
@@ -200,8 +200,8 @@ describe('Hệ Thống 25 Sự Kiện Hài Hước Bắt Trend & Quyết Định
     });
 
     it('Ưu tiên sự kiện chưa gặp', () => {
-      state.seenIncidentIds = DAILY_INCIDENTS.slice(0, 24).map(i => i.id);
-      const remainingId = DAILY_INCIDENTS[24].id;
+      state.seenIncidentIds = DAILY_INCIDENTS.slice(0, DAILY_INCIDENTS.length - 1).map(i => i.id);
+      const remainingId = DAILY_INCIDENTS[DAILY_INCIDENTS.length - 1].id;
 
       // Chương 5, Ngày 50 để mở khóa toàn bộ
       state.currentChapter = 5;

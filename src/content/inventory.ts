@@ -5,7 +5,7 @@ export const INITIAL_INVENTORY: { [id: string]: Omit<InventoryItem, 'batches'> }
   // 5 NGUYÊN LIỆU CỐT LÕI (NGÀY 1 - KHỞI NGHIỆP XE ĐẨY)
   chicken_meat: {
     id: 'chicken_meat',
-    name: 'Gà tươi tẩm ướp',
+    name: 'Đùi gà tươi tẩm ướp',
     unit: 'miếng',
     cost: 14000,
     amount: 8,

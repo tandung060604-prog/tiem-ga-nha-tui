@@ -129,6 +129,40 @@ export function recordFryerLift(
   if (session && result.quality !== 'perfect') session.perfectStreak = 0; // chỉ Perfect mới giữ chuỗi
 }
 
+export interface PoliceInspectionResult {
+  strike: 1 | 2 | 3;
+  review: CustomerReview;
+  fine: number;
+}
+
+// Kiểm tra công an phát hiện khi chiên bằng dầu đen sì:
+// Lần 1: Cảnh cáo
+// Lần 2: Phạt 200k
+// Lần 3: Bad ending bắt đi tù & Game over ngay lập tức
+export function checkPoliceOilInspection(draft: GameState): PoliceInspectionResult | null {
+  if (draft.oilCondition !== 'dirty') return null;
+
+  draft.dirtyOilFryingCount = (draft.dirtyOilFryingCount ?? 0) + 1;
+  if (draft.dirtyOilFryingCount >= 2) {
+    draft.dirtyOilFryingCount = 0;
+    draft.dirtyOilViolations = (draft.dirtyOilViolations ?? 0) + 1;
+    const strike = Math.min(3, draft.dirtyOilViolations) as 1 | 2 | 3;
+    const review = ReviewsEngine.createPoliceInspectionReview(strike, draft.day);
+    ReviewsEngine.applyRealtimeReview(draft, review);
+
+    let fine = 0;
+    if (strike === 2) {
+      fine = 200000;
+      draft.money = Math.max(0, draft.money - fine);
+    } else if (strike === 3) {
+      draft.activeEnding = 'bad_police';
+    }
+
+    return { strike, review, fine };
+  }
+  return null;
+}
+
 // Mẻ của phụ bếp: dầu xuống cấp, đếm chất lượng (chấm sao Vị), không đụng chuỗi Perfect của người chơi
 export function recordHelperFry(draft: GameState, session: SellingSession, quality: QualityRating): void {
   draft.oilBatchesCooked += 1;
@@ -259,7 +293,30 @@ export function calculateCustomerTip(order: CustomerOrder): { tip: number; feedb
 
   let baseTip = 0;
 
-  // 3. Hào Phóng: Rất chuộng tip to
+  // 3. Khách Sộp (VIP Big Spender): Đại gia hào phóng, tip khủng
+  if (personality === 'vip_generous' || order.isVip) {
+    if (isFast) {
+      baseTip = 45000;
+      notes.push('👑✨ KHÁCH SỘP: Tip cực đậm "Khỏi thối nha em!" (+45k)');
+    } else if (isMedium) {
+      baseTip = 25000;
+      notes.push('👑✨ KHÁCH SỘP: Hài lòng gửi tiền boa (+25k)');
+    } else {
+      baseTip = 10000;
+      notes.push('👑✨ KHÁCH SỘP: Tip khích lệ quán (+10k)');
+    }
+    if (perfectBonus > 0) {
+      baseTip += (perfectBonus * 2 + 15000);
+      notes.push('👑 Món chuẩn vị vàng giòn thưởng thêm (+15k+)');
+    }
+    if (hasBurnt) {
+      baseTip = Math.max(5000, Math.round(baseTip * 0.5));
+      notes.push('Khách sộp nhắc nhở vì món cháy (-50% tip)');
+    }
+    return { tip: Math.max(0, baseTip), feedbackNotes: notes };
+  }
+
+  // 4. Hào Phóng: Rất chuộng tip to
   if (personality === 'generous') {
     if (isFast) {
       baseTip = 10000;
@@ -566,6 +623,7 @@ export function cancelAndApologizeOrder(
     student: 'Dạ hông sao đâu ạ, bữa sau tan học con lại qua ăn gà rán giòn rụm tiếp!',
     driver: 'Ok tiệm nhé, để tui chạy cuốc khác, bữa sau có dịp ghé lại!',
     generous: 'Quán đông khách hết món là mừng rồi, không sao nha tiệm!',
+    vip_generous: 'Haha không sao em ơi! Quán bán đắt như tôm tươi là mừng rồi! Hôm khác anh lại ghé ủng hộ tiếp!',
     foodie: 'Tiếc ghê, món ngon nên mau hết hả tiệm? Bữa sau nhớ phần tui nghen!',
     frugal: 'Hơi tiếc công ghé, nhưng tiệm xin lỗi nhiệt tình quá, để bữa khác vậy!',
     impatient: 'Biết trước hết món thì đỡ đợi, nhưng cảm ơn quán đã báo sớm nha!'
@@ -609,6 +667,7 @@ export function changeOil(draft: GameState): boolean {
   draft.todayOilCost = (draft.todayOilCost ?? 0) + OIL_CHANGE_COST;
   draft.oilCondition = 'clean';
   draft.oilBatchesCooked = 0;
+  draft.dirtyOilFryingCount = 0;
   return true;
 }
 
@@ -654,7 +713,21 @@ export interface DayResult {
 export function closeDay(draft: GameState, session: SellingSession, event: GameEvent): DayResult {
   // Hàng hết hạn bỏ đi qua đêm (tiền đã trả lúc nhập; ghi vào sổ để người chơi thấy lỗ)
   let expiredValue = 0;
-  for (const inv of Object.values(draft.inventory)) expiredValue += ageOneDay(inv) * inv.cost;
+  const expiredNames: string[] = [];
+  for (const inv of Object.values(draft.inventory)) {
+    const expiredCount = ageOneDay(inv);
+    if (expiredCount > 0) {
+      expiredValue += expiredCount * inv.cost;
+      expiredNames.push(`${expiredCount} ${inv.unit} ${inv.name}`);
+    }
+  }
+
+  // Ghi nhận thông báo hàng hết hạn để gửi thông báo cho người chơi
+  draft.expiredWasteNotification = expiredNames.length > 0 ? {
+    items: expiredNames,
+    totalValue: expiredValue,
+    day: draft.day
+  } : null;
 
   const inspected = event.effect.inspection === true;
   const oil = draft.oilCondition;
@@ -734,6 +807,7 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
   draft.dayHistory.push(ledger);
   draft.recentReviews.unshift(generatedReview);
   if (draft.recentReviews.length > 200) draft.recentReviews.pop();
+  draft.totalReviewsCount = (draft.totalReviewsCount ?? 0) + 1;
   draft.lifetimeStats.totalFried += session.totalFriedCount;
   draft.lifetimeStats.totalBurnt += session.burntCount;
   draft.lifetimeStats.perfectFriedCount += session.perfectCount;

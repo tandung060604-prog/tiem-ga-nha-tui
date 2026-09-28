@@ -14,6 +14,8 @@ export interface IncidentResolutionResult {
   reactionNarrative: string;
   karmaDelta: { community?: number; craftsmanship?: number; ambition?: number };
   moneyDelta: number;
+  scareCustomers?: boolean;
+  disruptionSeconds?: number;
 }
 
 /**
@@ -23,9 +25,11 @@ export function hasSecurityStaff(state: GameState): boolean {
   return state.staff.some(m => m.role === 'security' && m.mood > 20);
 }
 
+export const INCIDENT_COOLDOWN_DAYS = 6; // Tuyệt đối không lặp lại sự kiện trong vòng 6 ngày
+
 /**
  * Chọn ngẫu nhiên 1 sự kiện phù hợp với ngày và thời điểm hiện tại.
- * Ưu tiên các sự kiện chưa gặp trong `seenIncidentIds`.
+ * Áp dụng cơ chế kép: Ưu tiên sự kiện chưa gặp (Exhaustion Pool) + Thời gian hồi Cooldown 6 ngày để triệt tiêu trùng lặp.
  */
 export function pickDailyIncident(
   state: GameState,
@@ -35,6 +39,7 @@ export function pickDailyIncident(
   const currentDay = state.day ?? 1;
   const currentStars = state.ratings?.overall ?? 4.0;
   const seen = new Set(state.seenIncidentIds ?? []);
+  const cooldowns = state.incidentCooldowns ?? {};
 
   // Lọc sự kiện đủ điều kiện theo chương, ngày tối thiểu, số sao và thời điểm
   const candidates = DAILY_INCIDENTS.filter(inc => {
@@ -47,11 +52,30 @@ export function pickDailyIncident(
 
   if (candidates.length === 0) return null;
 
-  // Ưu tiên sự kiện chưa gặp
+  // 1. Ưu tiên tuyệt đối sự kiện HOÀN TOÀN CHƯA GẶP LẦN NÀO trong suốt quá trình chơi
   const unseen = candidates.filter(inc => !seen.has(inc.id));
-  const pool = unseen.length > 0 ? unseen : candidates;
+  if (unseen.length > 0) {
+    return pick(unseen);
+  }
 
-  return pick(pool);
+  // 2. Khi đã gặp hết, chỉ chọn các sự kiện đã qua thời gian hồi Cooldown (tối thiểu 6 ngày)
+  const notOnCooldown = candidates.filter(inc => {
+    const lastDaySeen = cooldowns[inc.id] ?? -999;
+    return (currentDay - lastDaySeen) >= INCIDENT_COOLDOWN_DAYS;
+  });
+
+  if (notOnCooldown.length > 0) {
+    return pick(notOnCooldown);
+  }
+
+  // 3. Fallback phòng vệ: nếu tất cả đều dính cooldown (ít xảy ra), chọn sự kiện xảy ra lâu nhất trong quá khứ
+  const sortedByOldest = [...candidates].sort((a, b) => {
+    const lastA = cooldowns[a.id] ?? 0;
+    const lastB = cooldowns[b.id] ?? 0;
+    return lastA - lastB;
+  });
+
+  return sortedByOldest[0] ?? pick(candidates);
 }
 
 /**
@@ -118,19 +142,37 @@ export function resolveIncidentChoice(
       reactionNarrative = choice.reactionFailureNarrative;
     }
     reactionTitle = '⚠️ Rủi Ro Đã Xảy Ra!';
-    // Nếu thất bại mà có tiền thưởng dự kiến thì không nhận được
-    if (finalMoneyDelta > 0) {
+    if (choice.id === 'debt_trust') {
+      finalMoneyDelta = -65000;
+    } else if (finalMoneyDelta > 0) {
       finalMoneyDelta = 0;
     }
+  } else {
+    if (choice.id === 'gas_solo_chase') {
+      finalMoneyDelta = 0; // Đuổi trộm thành công, bảo vệ được bình gas không bị mất 300k
+    } else if (choice.id === 'debt_trust') {
+      finalMoneyDelta = 65000; // Khách giữ chữ tín quay lại trả đủ tiền nợ
+    }
+  }
+
+  // Tỷ lệ quy mô kinh tế sự kiện theo Chương để tiền thưởng/phạt luôn có giá trị tương xứng
+  const chapterRates = [1.0, 1.0, 1.6, 2.5, 3.5, 5.0];
+  const scale = chapterRates[draft.currentChapter ?? 1] ?? 1.0;
+  if (finalMoneyDelta !== 0) {
+    finalMoneyDelta = Math.round((finalMoneyDelta * scale) / 1000) * 1000;
   }
 
   // Áp dụng thay đổi Karma
   draft.karma = applyKarmaChange(draft.karma, choice.karmaDelta);
 
-  // Tiền: KHÔNG kẹp về 0 (trước đây kẹp → sự cố xóa nợ, phá luật phá sản 3 ngày âm quỹ).
+  // Tiền: Thay đổi tiền thật vào tài khoản ví người chơi (draft.money)
   // Tiền thưởng ghi vào totalBonus để kiểm tra sổ sách chống gian lận không gắn cờ nhầm người chơi thật thà.
   draft.money += finalMoneyDelta;
   if (finalMoneyDelta > 0) draft.lifetimeStats.totalBonus = (draft.lifetimeStats.totalBonus ?? 0) + finalMoneyDelta;
+
+  // Ghi nhận cooldown để không lặp lại sự kiện trong vòng 6 ngày
+  draft.incidentCooldowns ??= {};
+  draft.incidentCooldowns[incident.id] = draft.day;
 
   // Danh tiếng: cộng/trừ đều mọi tiêu chí sao, tối đa ±0,3 mỗi sự cố
   const rep = Math.max(-MAX_REPUTATION_DELTA, Math.min(MAX_REPUTATION_DELTA, succeeded ? choice.reputationDelta ?? 0 : 0));
@@ -164,6 +206,8 @@ export function resolveIncidentChoice(
     reactionTitle,
     reactionNarrative,
     karmaDelta: choice.karmaDelta,
-    moneyDelta: finalMoneyDelta
+    moneyDelta: finalMoneyDelta,
+    scareCustomers: choice.scareCustomers,
+    disruptionSeconds: choice.disruptionSeconds
   };
 }

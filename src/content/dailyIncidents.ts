@@ -102,10 +102,10 @@ export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
       {
         id: 'singer_play_for_guests',
         label: 'Nhờ chú đàn giao lưu 3 bài',
-        subDesc: 'Xe gà biến thành góc acoustic ấm cúng, khách thưởng tiền rôm rả',
+        subDesc: 'Xe gà biến thành góc acoustic ấm cúng, khách thưởng tiền rôm rả (+35k tiền boa)',
         kicker: '✨ BẦU KHÔNG KHÍ ẤM ÁP',
         karmaDelta: { community: 15, ambition: 10 },
-        moneyDelta: 0,
+        moneyDelta: 35000,
         reactionTitle: 'Mini Show Acoustic Tiệm Gà',
         reactionNarrative: 'Tiếng đàn mộc mạc biến xe đẩy gà thành một góc hòa nhạc thu nhỏ ấm cúng. Khách ủng hộ chú chiếc nón đầy tiền lẻ, ai cũng tấm tắc khen quán có gu!'
       },
@@ -198,10 +198,10 @@ export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
       {
         id: 'kid_exchange_feast',
         label: 'Đổi 4 vé số lấy Combo Gà + Khoai no nê',
-        subDesc: 'Mất 40k làm phúc, tối dò vé số trúng lộc trời ban 100k!',
+        subDesc: 'Đổi 4 vé số lấy gà ấm bụng, tối dò vé số trúng lộc trời ban 100k! (+60k lời)',
         kicker: '❤️ NẤU BẰNG TẤM LÒNG',
         karmaDelta: { community: 25, craftsmanship: 10, ambition: -5 },
-        moneyDelta: -40000,
+        moneyDelta: 60000,
         reactionTitle: 'Bữa Ăn Hạnh Phúc Nhất Đời!',
         reactionNarrative: 'Hai đứa trẻ cầm miếng gà giòn nóng hổi, cắn rôm rốp mà mắt cười tít lại hạnh phúc. Đêm đó bạn dò vé số: trúng giải tám 100.000đ! Đúng là lộc trời ban cho người có tâm!'
       },
@@ -446,6 +446,72 @@ export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
         moneyDelta: 0,
         reactionTitle: 'Cậu Bé Lặng Lẽ Rời Đi',
         reactionNarrative: 'Minh cúi chào rồi bước tiếp trên vỉa hè tìm việc. Công việc kinh doanh của bạn vẫn ổn định theo kế hoạch.'
+      }
+    ]
+  },
+
+  // 8B. Bà Bảy Đất & Đại Ca Beo Đòi Nợ & Bảo Kê (Ngày 8+, Giữa ca bán)
+  {
+    id: 'incident_landlord_racketeer_debt',
+    title: 'Bà Bảy Đất & Đại Ca Beo Đòi Nợ & Bảo Kê',
+    categoryTag: 'CHỦ NHÀ & BẢO KÊ SIẾT NỢ',
+    icon: '💥',
+    characterName: 'Bà Bảy Đất & Đại Ca Beo',
+    characterAvatar: '🦹‍♂️',
+    characterImg: charImg('char_28_tough_beo.png'),
+    emoteBubble: '⚡',
+    characterRole: 'Chủ Đất & Giang Hồ Xóm 1102',
+    context: 'Bà Bảy Đất (chủ cho thuê đất mặt bằng đầu hẻm) dắt theo Đại Ca Beo (giang hồ xăm trổ khét tiếng, em họ xa của bả) hùng hổ ập vào quán giữa lúc khách đang xếp hàng đông nghẹt, đập bàn đòi tiền cọc mặt bằng và tiền bảo kê!',
+    dialogue: 'Mày làm ăn khấm khá quá hén! Tiền thuê mặt bằng tháng này cộng thêm 300k tiền nước nôi cho thằng Beo bảo kê trật tự xe cộ đâu? Nôn ra mau, không thì quán này đừng hòng mở cửa ở Hẻm 1102!',
+    phaseTiming: 'shift',
+    isSecurityRisk: true,
+    minChapter: 1,
+    minDay: 8,
+    rarity: 'epic',
+    unlockHint: 'Mở khóa từ Ngày 8: Quán bắt đầu đông khách, chủ mặt bằng câu kết giang hồ xóm đến đòi nợ và tiền bảo kê.',
+    choices: [
+      {
+        id: 'landlord_bacba_mediate',
+        label: 'Nhờ Bác Ba và Tổ Dân Phố hòa giải theo luật lệ hẻm',
+        subDesc: 'Bác Ba cựu trưởng ban hòa giải: phân tích hợp đồng thấu tình đạt lý, giang hồ chùn bước',
+        kicker: '⚖️ UY TÍN BÁC BA & LÝ LẼ',
+        karmaDelta: { community: 20, craftsmanship: 10 },
+        moneyDelta: 0,
+        reactionTitle: 'Bác Ba Ra Tay, Giang Hồ Rút Lui!',
+        reactionNarrative: 'Bác Ba thong thả bước ra, cầm cuốn sổ họp tổ dân phố và bản hợp đồng thuê vỗ vai Đại Ca Beo: "Thằng Beo, mày mới qua quậy tiệm cháu tao hả? Còn chị Bảy, hợp đồng ghi rõ mùng 10 mới đóng tiền, bữa nay mùng 8 chị dắt côn đồ tới đòi là phạm luật đó nghen!". Nhận ra Bác Ba uy tín đầy mình, Đại Ca Beo gãi đầu xin lỗi rồi kéo bà Bảy rút lui. Khách trong quán vỗ tay khen ngợi!'
+      },
+      {
+        id: 'landlord_pay_ransom',
+        label: 'Bấm bụng đưa 300.000đ trả tiền cho êm chuyện',
+        subDesc: 'Bà Bảy và Đại Ca Beo cầm tiền cười khà khà bỏ đi, ca bán được tiếp tục bình yên',
+        kicker: '💸 BẤM BỤNG THỎA HIỆP',
+        moneyDelta: -300000,
+        karmaDelta: { ambition: -5, community: -5 },
+        reactionTitle: 'Êm Thấm Nhưng Tốn Kém!',
+        reactionNarrative: 'Cầm 300.000đ trên tay, Bà Bảy Đất nhét túi cười hề hề: "Biết điều vậy có phải tốt không!". Đại Ca Beo vỗ vai bạn bảo "Thôi anh em mình đi nhậu!". Cả hai rút đi, bạn thở phào nhẹ nhõm dù trong lòng xót tiền.'
+      },
+      {
+        id: 'landlord_provoke_riot',
+        label: 'Nổi nóng quát mắng, xua đuổi giang hồ và chủ nhà',
+        subDesc: '⚠️ CỰC KỲ NGUY HIỂM: Đại Ca Beo sẽ đập bàn phá quán, TOÀN BỘ KHÁCH ĐANG ĐỢI SẼ HOẢNG SỢ BỎ CHẠY HẾT!',
+        kicker: '💥 ĐỐI ĐẦU NÓNG NẢY',
+        scareCustomers: true,
+        disruptionSeconds: 18,
+        karmaDelta: { community: -15, ambition: -10 },
+        reputationDelta: -0.2,
+        reactionTitle: 'Khách Hoảng Sợ Bỏ Chạy Hết Sạch!',
+        reactionNarrative: 'Bị bạn quát mắng, Đại Ca Beo đỏ mặt tía tai lật tung bàn ghế inox, gạt đổ khay đĩa: "A thằng ranh con này muốn chống đối hả?". Cảnh tượng giang hồ hung hãn đập phá khiến TOÀN BỘ KHÁCH ĐANG XẾP HÀNG HOẢNG HỐT LA HÉT BỎ CHẠY TÁN LOẠN! Quán trở nên vắng hoe hỗn loạn, bạn phải mất thời gian dọn dẹp và trấn an bà con lối xóm mới có khách dám quay lại!'
+      },
+      {
+        id: 'landlord_sec_restrain',
+        label: 'Chú Tư Bảo Vệ bước ra khóa tay trấn áp kẻ quậy phá',
+        subDesc: '👮 Chú Tư cựu công an khu vực: khóa tay Đại Ca Beo lập tức, bảo đảm 100% bình yên',
+        kicker: '👮 BẢO VỆ CHUYÊN NGHIỆP',
+        requiresSecurity: true,
+        karmaDelta: { community: 25, ambition: 15 },
+        reputationDelta: 0.1,
+        reactionTitle: 'Đầu Gấu Bị Khóa Tay Sợ Tái Mặt!',
+        reactionNarrative: 'Vừa thấy Đại Ca Beo định giơ tay hung hăng, Chú Tư Bảo Vệ đã lướt tới vặn ngược cổ tay gã khóa chặt xuống bàn: "Mày đụng vô tiệm này một ngón tay nữa tao giải lên phường liền!". Đại Ca Beo đau điếng mặt xanh như tàu lá chuối, Bà Bảy sợ quá líu ríu xin lỗi rồi cả hai lủi mất tăm. Khách vỗ tay rần rần vì quán an ninh quá đỉnh!'
       }
     ]
   },

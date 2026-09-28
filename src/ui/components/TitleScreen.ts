@@ -82,6 +82,11 @@ export function renderTitleScreen(state: GameState, hasProgress: boolean, musicO
 
           <!-- Secondary Control Buttons -->
           <div class="title-controls-row">
+            <button id="btn-title-changelog" class="btn-control-pill" aria-label="Xem bản cập nhật">
+              <span class="control-icon">📜</span>
+              <span class="control-text">Bản Cập Nhật v2.1.0</span>
+            </button>
+
             <button id="btn-title-music" class="btn-control-pill" aria-label="Bật tắt nhạc nền">
               <span class="control-icon">${musicOn ? '🎵' : '🔇'}</span>
               <span class="control-text">${musicOn ? 'Nhạc nền: Bật' : 'Nhạc nền: Tắt'}</span>

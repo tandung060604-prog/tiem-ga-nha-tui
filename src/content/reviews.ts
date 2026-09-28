@@ -1145,7 +1145,7 @@ export const CUSTOMER_REACTION_POOLS = {
     "Khách phản hồi: 'Không thấy vui một chút nào! Đồ ăn dở tệ mà còn giở giọng bông đùa, 1 sao vĩnh viễn!'",
     "Khách phản hồi: 'Lấy sự tắc trách ra làm trò cười câu like, không hề thấy sự cầu thị nào ở đây cả!'",
     "Khách phản hồi: 'Tui đang tức sôi máu mà đọc rep kiểu này chỉ muốn report quán ngay và luôn!'",
-    "Khách phản hồi: 'Hết nói nổi! Đổi tên thành gánh hài đi chứ đừng bán đồ ăn nữa, làm ăn tắc trách!'",
+    "Khách phản hồi: 'Hết nói nổi! Quá thất vọng, đổi tên thành gánh hài đi chứ đừng bán đồ ăn nữa, làm ăn tắc trách!'",
     "Khách phản hồi: 'Giỡn nhây không đúng chỗ rồi em ơi. Buôn bán ẩm thực là tính mạng con người đó nghen!'"
   ],
 
@@ -1593,6 +1593,9 @@ export function generateIndividualCustomerReview(
     hasDirtyOil?: boolean;
     isPerfect?: boolean;
     menuLookup?: (id: string) => string;
+    priceRatio?: number;
+    priceBand?: 'cheap' | 'fair' | 'pricey' | 'expensive' | 'gouging';
+    spaceLevel?: number;
   }
 ): CustomerReview {
   const personality = order.personality || 'easygoing';
@@ -1620,6 +1623,10 @@ export function generateIndividualCustomerReview(
     weakest = 'speed';
   } else {
     // Hoàn tất món (complete)
+    const pRatio = outcome.priceRatio ?? 1.0;
+    const band = outcome.priceBand || (pRatio >= 1.4 ? 'gouging' : pRatio >= 1.25 ? 'expensive' : pRatio >= 1.1 ? 'pricey' : pRatio <= 0.9 ? 'cheap' : 'fair');
+    const spaceLvl = outcome.spaceLevel ?? 1;
+
     if (outcome.hasBurnt) {
       stars = personality === 'foodie' ? 1 : 2;
       topic = 'burnt_food';
@@ -1633,6 +1640,30 @@ export function generateIndividualCustomerReview(
       stars = personality === 'impatient' || personality === 'driver' ? 1 : personality === 'easygoing' ? 3 : 2;
       topic = 'slow_speed';
       weakest = 'speed';
+    } else if (band === 'gouging') {
+      // Giá cắt cổ (>= 140%): khách cực kỳ bức xúc phàn nàn giá đắt!
+      stars = personality === 'student' || personality === 'frugal' ? 1 : 2;
+      topic = 'expensive';
+      weakest = 'pricing';
+    } else if (band === 'expensive' && (personality === 'student' || personality === 'frugal' || personality === 'driver' || Math.random() < 0.7)) {
+      // Giá đắt (125-140%): đa số khách kêu ca chặt chém
+      stars = personality === 'student' || personality === 'frugal' ? 2 : Math.random() < 0.5 ? 2 : 3;
+      topic = 'expensive';
+      weakest = 'pricing';
+    } else if (band === 'pricey' && (personality === 'student' || personality === 'frugal') && Math.random() < 0.6) {
+      // Sinh viên / người tiết kiệm thấy hơi đắt
+      stars = 3;
+      topic = 'expensive';
+      weakest = 'pricing';
+    } else if (band === 'cheap') {
+      stars = 5;
+      topic = 'cheap_price';
+      weakest = 'pricing';
+    } else if (spaceLvl <= 1 && day >= 4 && Math.random() < 0.45) {
+      // Tiện nghi quán kém (ngồi vỉa hè nóng bức, muỗi chích, thiếu bàn ghế)
+      stars = Math.random() < 0.5 ? 2 : 3;
+      topic = 'bad_space';
+      weakest = 'space';
     } else if (outcome.patienceRatio >= 0.70) {
       // Phục vụ siêu nhanh
       stars = 5;
@@ -1642,13 +1673,13 @@ export function generateIndividualCustomerReview(
       stars = 5;
       topic = 'perfect_food';
       weakest = 'taste';
-    } else if (personality === 'student' || personality === 'frugal') {
-      stars = Math.random() < 0.6 ? 5 : 4;
-      topic = 'cheap_price';
-      weakest = 'pricing';
+    } else if (spaceLvl >= 3 && Math.random() < 0.5) {
+      stars = 5;
+      topic = 'great_space';
+      weakest = 'space';
     } else {
       stars = Math.random() < 0.7 ? 5 : 4;
-      topic = Math.random() < 0.4 ? 'great_space' : 'general_praise';
+      topic = 'general_praise';
       weakest = 'taste';
     }
   }

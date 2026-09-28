@@ -41,6 +41,15 @@ export function getMoodThought(mood: CustomerMood, order?: CustomerOrder): strin
   }
 
   const p = order?.personality;
+  if (p === 'vip_generous' || order?.isVip) {
+    switch (mood) {
+      case 'leaving': return 'Thời gian là vàng bạc! Anh xin kiếu lần này! 🚪';
+      case 'impatient': return 'Lâu quá anh sốt ruột nha, nhanh tay là có thưởng đậm! ⏱️';
+      case 'waiting': return 'Tiền nong không quan trọng, làm chuẩn giòn rụm anh bo hết nấc! 💵';
+      case 'happy': return 'Gà ngon xuất sắc! Khỏi thối tiền thừa nha em! 👑✨';
+    }
+  }
+
   if (p === 'foodie') {
     switch (mood) {
       case 'leaving': return 'Chờ mòn mỏi chưa có, trừ sạch sao nha! 💢';
@@ -185,6 +194,8 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
   }
   const clock = root.querySelector('.clock b');
   if (clock) clock.textContent = formatClock(session.gameHour);
+  const custCounter = root.querySelector('.hud-customers b');
+  if (custCounter) custCounter.textContent = `${session.servedCount}/${session.expectedCustomers || 10}`;
 
   for (const id of Object.keys(TIMER_RECIPES) as TimerStationId[]) {
     const el = root.querySelector<HTMLElement>(`.timer-progress[data-timer="${id}"]`);
@@ -533,10 +544,11 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       : `<span class="queue-pos-badge wait">${idx + 1}️⃣ Xếp hàng</span>`;
 
     return `
-      <div class="customer-card ${ord.isBunny ? 'bunny-card' : ''} ${isAngry ? 'angry' : ''} ${idx === 0 ? 'active' : ''}" 
+      <div class="customer-card ${ord.isBunny ? 'bunny-card' : ''} ${ord.isVip ? 'vip-card' : ''} ${isAngry ? 'angry' : ''} ${idx === 0 ? 'active' : ''}" 
            data-order-id="${ord.id}" 
            data-mood="${mood}" 
            data-is-bunny="${ord.isBunny ? 'true' : 'false'}" 
+           data-is-vip="${ord.isVip ? 'true' : 'false'}"
            data-letter-id="${ord.bunnyLetterId || ''}"
            data-stand-src="${visual.stand}"
            data-walk-src="${visual.walk}"
@@ -556,10 +568,11 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <div class="cust-info-col">
             <div class="cust-name-row">
               <span class="cust-name">${visual.name}</span>
-              <span class="mood-indicator">${isAngry ? '💢' : patienceColorClass === 'low' ? '🥺' : '✨'}</span>
+              <span class="mood-indicator">${isAngry ? '💢' : patienceColorClass === 'low' ? '🥺' : (ord.isVip ? '👑' : '✨')}</span>
             </div>
             <div class="cust-badges-row">
               ${queueBadge}
+              ${ord.isVip ? '<span class="cust-badge vip-gold-badge">👑 KHÁCH SỘP</span>' : ''}
               <span class="cust-badge ${visual.badgeClass}">${visual.badge}</span>
               ${ord.personalityLabel ? `<span class="cust-badge trait-badge" title="${escapeHtml(ord.personalityDesc || '')}">${escapeHtml(ord.personalityLabel)}</span>` : ''}
             </div>
@@ -696,6 +709,10 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         <div class="clock">
           <span>🕒 Giờ mở bán: <b>${formattedTime}</b></span>
         </div>
+        <div class="hud-customers" style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.78rem; font-weight: 700; background: rgba(255,255,255,0.85); padding: 3px 8px; border-radius: 12px; border: 1px solid var(--line); color: var(--ink);">
+          <span>👥</span>
+          <span>Khách: <b>${session.servedCount}/${session.expectedCustomers || 10}</b></span>
+        </div>
         ${rush ? '<span class="rush-badge">🔥 CA CAO ĐIỂM!</span>' : `<span class="session-ambience">${timePeriodLabel}</span>`}
         <div class="hud-actions">
           <button id="btn-toggle-fast" class="btn-sm btn-toggle-fast">
@@ -706,7 +723,21 @@ export function renderSellingView(state: GameState, session: SellingSession): st
 
       <!-- Customer Queue Lane (Khách vào/ra quán) -->
       <div class="customer-lane">
-        ${session.orders.length > 0 ? customerCardsHtml : '<div class="empty-queue">🍗 Mùi gà thơm phức bay khắp hẻm... Khách đang tấp nập tới! 🏃</div>'}
+        ${session.orders.length > 0 ? customerCardsHtml : (
+          (session.disruptionTimerSec ?? 0) > 0 ? `
+            <div class="empty-queue disruption-alert" style="background: #fff1f0; border: 1.5px solid #ff4d4f; color: #cf1322; padding: 12px 14px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(255,77,79,0.15);">
+              <div style="font-weight: 800; font-size: 0.92rem; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <span>💥</span> <span>QUÁN ĐANG HỖN LOẠN: KHÁCH CHẠY HẾT!</span>
+              </div>
+              <div style="font-size: 0.78rem; margin-top: 4px; color: #595959;">
+                Giang hồ vừa quậy phá! Đang dọn dẹp bàn ghế và trấn an bà con lối xóm...
+              </div>
+              <div style="margin-top: 6px; font-weight: 800; font-size: 0.85rem; color: #d4380d;">
+                ⏳ Chờ lứa khách mới sau: <b>${Math.ceil(session.disruptionTimerSec ?? 0)}s</b> 🧹
+              </div>
+            </div>
+          ` : '<div class="empty-queue">🍗 Mùi gà thơm phức bay khắp hẻm... Khách đang tấp nập tới! 🏃</div>'
+        )}
       </div>
 
       <!-- Wood Kitchen Counter (Quầy Bếp Gỗ Chiên Gà) -->

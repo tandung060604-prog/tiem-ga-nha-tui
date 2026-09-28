@@ -1,4 +1,4 @@
-import { GameState, MenuItem } from '../types/game';
+import { MenuItem } from '../types/game';
 
 // Luật giá: người chơi chỉnh giá trong khoảng 70%–150% giá gốc. Đắt quá thì khách ít chọn món đó, ít khách tới
 // quán, sao Giá cả tụt (kéo sao tổng → chặn lên chương, kết thúc Bí mật), và hẻm mang tiếng "chặt chém"
@@ -53,9 +53,13 @@ export function demandWeight(ratio: number): number {
   return Math.max(0.08, 1 - (ratio - 1) * 2.2);
 }
 
-// Giá trung bình của các món đang bán (đã mở chương) so với giá gốc
-export function averagePriceRatio(state: Pick<GameState, 'menu' | 'currentChapter'>): number {
-  const selling = state.menu.filter(m => m.chapter <= state.currentChapter && m.basePrice > 0);
+// Giá trung bình của các món đang bán (đã mở chương và đã tới ngày) so với giá gốc
+export function averagePriceRatio(state: { menu: MenuItem[]; currentChapter: number; day?: number }): number {
+  const selling = state.menu.filter(m =>
+    m.chapter <= state.currentChapter &&
+    (state.day !== undefined ? (m.unlockDay ?? 1) <= state.day : true) &&
+    m.basePrice > 0
+  );
   if (selling.length === 0) return 1;
   return selling.reduce((sum, m) => sum + priceRatio(m), 0) / selling.length;
 }

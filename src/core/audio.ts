@@ -216,6 +216,135 @@ class AudioManager {
       this.sizzleGain = null;
     }
   }
+
+  // Âm thanh kịch tính bất ngờ (Dramatic Sting / Suspense Chord) khi sự cố căng thẳng xuất hiện
+  public playDramaticSting() {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    // Hợp âm Dm trầm căng thẳng (D3, F3, A3, D4) với sóng sawtooth rùng rợn
+    const chord = [146.83, 174.61, 220.00, 293.66];
+    chord.forEach((freq, idx) => {
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const filter = this.ctx.createBiquadFilter();
+
+      osc.type = idx === 0 ? 'sawtooth' : 'triangle';
+      osc.frequency.setValueAtTime(freq, now);
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(600, now);
+      filter.frequency.exponentialRampToValueAtTime(180, now + 0.9);
+
+      gain.gain.setValueAtTime(0.22, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.9);
+    });
+
+    // Thêm tiếng sub-bass dội (low thud)
+    const subOsc = this.ctx.createOscillator();
+    const subGain = this.ctx.createGain();
+    subOsc.type = 'sine';
+    subOsc.frequency.setValueAtTime(75, now);
+    subOsc.frequency.exponentialRampToValueAtTime(35, now + 0.5);
+    subGain.gain.setValueAtTime(0.35, now);
+    subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+    subOsc.connect(subGain).connect(this.ctx.destination);
+    subOsc.start(now);
+    subOsc.stop(now + 0.5);
+  }
+
+  // Âm thanh hỗn loạn đám đông hoảng sợ bỏ chạy (bàn ghế đổ, xôn xao)
+  public playChaosScare() {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    // 1. Tiếng bàn ghế va đập (heavy crash noise)
+    const bufSize = Math.floor(this.ctx.sampleRate * 0.45);
+    const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.08));
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buf;
+    const nFilter = this.ctx.createBiquadFilter();
+    nFilter.type = 'lowpass';
+    nFilter.frequency.value = 450;
+    const nGain = this.ctx.createGain();
+    nGain.gain.setValueAtTime(0.35, now);
+    nGain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+    noise.connect(nFilter).connect(nGain).connect(this.ctx.destination);
+    noise.start(now);
+
+    // 2. Tiếng ré hoảng sợ (pitch sweep xuống nhanh)
+    [380, 520, 310].forEach((freq, i) => {
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const t = now + i * 0.06;
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, t);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.4, t + 0.35);
+      gain.gain.setValueAtTime(0.12, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+      osc.connect(gain).connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.35);
+    });
+  }
+
+  // Âm thanh hoạt hình dí dỏm cho sự kiện hài hước
+  public playComedyBoing() {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(220, now);
+    osc.frequency.exponentialRampToValueAtTime(780, now + 0.12);
+    osc.frequency.exponentialRampToValueAtTime(320, now + 0.3);
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+    osc.connect(gain).connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.3);
+  }
+
+  // Âm thanh ngọt ngào lãng mạn cho sự kiện tình cảm
+  public playRomanceChime() {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5 - E5 - G5 - C6
+    notes.forEach((f, idx) => {
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const t = now + idx * 0.07;
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(f, t);
+      gain.gain.setValueAtTime(0.18, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+      osc.connect(gain).connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.45);
+    });
+  }
 }
 
 export const audio = new AudioManager();

@@ -1809,6 +1809,21 @@ body.selling-mode .awning::after {
   pointer-events: none;
 }
 
+/* Bad Ending: Vào Tù Vì Dầu Đen Độc Hại */
+.ending-banner.ending-bad-police {
+  background: linear-gradient(135deg, #1e1b4b 0%, #172554 40%, #0f172a 100%);
+  color: #eff6ff;
+  border-bottom: 3px solid #ef4444;
+}
+
+.ending-banner.ending-bad-police::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 20%, rgba(239, 68, 68, 0.3) 0%, rgba(59, 130, 246, 0.2) 60%, transparent 80%);
+  pointer-events: none;
+}
+
 /* Secret Ending: Chiếc Vá Vàng 1975 */
 .ending-banner.ending-secret {
   background: linear-gradient(135deg, #eab308 0%, #ca8a04 40%, #a16207 100%);

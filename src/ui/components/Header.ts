@@ -17,10 +17,13 @@ export function renderHeader(state: GameState, _onOpenSettings?: () => void): st
     starsHtml += i <= starCount ? '★' : '☆';
   }
 
+  const reviewCount = state.totalReviewsCount ?? state.recentReviews.length;
+
   return `
     <div class="h-l">
       <button id="btn-audio-toggle" class="h-btn" aria-label="Âm thanh" title="Bật/Tắt âm thanh">${soundIcon}</button>
       <button id="btn-settings-toggle" class="h-btn" aria-label="Cài đặt" title="Cài đặt tiệm">⚙️</button>
+      <button id="btn-changelog-toggle" class="h-btn" aria-label="Bảng tin" title="Xem bản cập nhật v2.1.0">📜</button>
       <div class="h-day-box">
         <b>Ngày ${state.day}</b>
         <small>${phaseLabel}</small>
@@ -37,12 +40,17 @@ export function renderHeader(state: GameState, _onOpenSettings?: () => void): st
 
     <div class="h-r">
       <span class="stars">${starsHtml}</span>
-      <small>${state.ratings.overall.toFixed(1)} / 5.0 (Chương ${state.currentChapter})</small>
+      <small><b>${state.ratings.overall.toFixed(1)}★</b> · ${reviewCount} lượt</small>
     </div>
   `;
 }
 
-export function bindHeaderEvents(_state: GameState, onRefresh: () => void, onOpenSettings: () => void) {
+export function bindHeaderEvents(
+  _state: GameState, 
+  onRefresh: () => void, 
+  onOpenSettings: () => void,
+  onOpenChangelog?: () => void
+) {
   const audioBtn = document.getElementById('btn-audio-toggle');
   if (audioBtn) {
     audioBtn.onclick = () => {
@@ -56,6 +64,14 @@ export function bindHeaderEvents(_state: GameState, onRefresh: () => void, onOpe
     settingsBtn.onclick = () => {
       audio.playPop();
       onOpenSettings();
+    };
+  }
+
+  const changelogBtn = document.getElementById('btn-changelog-toggle');
+  if (changelogBtn && onOpenChangelog) {
+    changelogBtn.onclick = () => {
+      audio.playPop();
+      onOpenChangelog();
     };
   }
 }

@@ -31,7 +31,8 @@ export function renderReviewReplyModal(review: CustomerReview): string {
   return `
     <div class="review-reply-modal">
       <!-- Modal Header -->
-      <div class="reply-modal-header">
+      <div class="reply-modal-header" style="position: relative;">
+        <button id="btn-modal-close-icon" class="modal-close-btn" aria-label="Đóng" style="position: absolute; top: 0px; right: 0px; background: none; border: none; font-size: 1.3rem; color: var(--soft); cursor: pointer; padding: 4px 8px; z-index: 10;">✕</button>
         <div class="reply-modal-badge">PHẢN HỒI THỰC KHÁCH</div>
         <h2 class="reply-modal-title">💬 Trả Lời Đánh Giá Của Khách</h2>
         <div class="reply-modal-subtitle">Cách bạn hồi đáp quyết định danh tiếng và tình cảm của xóm giềng!</div>

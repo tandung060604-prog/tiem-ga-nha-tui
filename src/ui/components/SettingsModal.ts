@@ -84,6 +84,13 @@ export function renderSettingsModal(state: GameState): string {
         <textarea id="save-code-box" rows="3" placeholder="Dán mã sao lưu (TGNT1.…) vào đây rồi bấm Khôi phục" style="width: 100%; box-sizing: border-box; margin-top: 8px; font-size: 16px; border: 2px solid var(--line); border-radius: 10px; padding: 8px; font-family: monospace;"></textarea>
       </div>
 
+      <!-- Version Changelog Dashboard -->
+      <div style="border-top: 1px dashed var(--line); padding-top: 10px; text-align: center;">
+        <button id="btn-settings-changelog" class="btn-sm" style="width: 100%; padding: 8px; font-weight: 800; background: linear-gradient(135deg, #fef3c7, #fde68a); border-color: #f59e0b; color: #92400e;">
+          📜 Nhật Ký Cập Nhật Phiên Bản (v2.1.0)
+        </button>
+      </div>
+
       <!-- Story Ending Preview -->
       <div style="border-top: 1px dashed var(--line); padding-top: 10px; text-align: center;">
         <button id="btn-view-ending" class="btn-sm" style="width: 100%; padding: 8px; font-weight: 800; background: linear-gradient(135deg, #ffd166, #f4a261); border-color: #e76f51; color: #431407;">
