@@ -736,8 +736,7 @@ class AppController {
 
   // --- PREPARATION PHASE ---
   private renderPrepView(state: GameState): string {
-    const forecast = EconomyEngine.calculateDailyCustomerCount(state, this.currentEvent.effect.customerMultiplier ?? 1);
-    const chalkboardHtml = renderChalkboard(state, `${this.currentEvent.title} · dự kiến ~${forecast} khách`);
+    const chalkboardHtml = renderChalkboard(state, this.currentEvent.title);
 
     const tabsBarHtml = `
       <div class="tabs-bar">

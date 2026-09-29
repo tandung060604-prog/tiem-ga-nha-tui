@@ -5,8 +5,8 @@
   gap: 10px;
   overflow-x: auto;
   padding: 16px 12px 10px;
-  min-height: 145px;
-  max-height: 185px;
+  min-height: 165px;
+  max-height: 225px;
   background: var(--bg);
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
@@ -19,8 +19,9 @@
 }
 
 .customer-card {
-  flex: 0 0 175px;
-  max-height: 175px;
+  flex: 0 0 178px;
+  min-height: 165px;
+  max-height: 215px;
   box-sizing: border-box;
   background: var(--panel);
   border: 2px solid var(--line);
@@ -35,7 +36,7 @@
   transition: transform 0.15s ease, border-color 0.15s ease;
   cursor: pointer;
   touch-action: manipulation;
-  contain: layout paint;
+  contain: layout;
 }
 
 /* Stardew Floating Emote Bubble */
@@ -334,9 +335,9 @@
   flex-direction: column;
   position: relative;
   gap: 2px;
-  flex: 1;
-  min-height: 0;
-  max-height: 64px;
+  flex: 1 0 auto;
+  min-height: 32px;
+  max-height: 74px;
   overflow-y: auto;
   scrollbar-width: none;
 }
@@ -496,6 +497,8 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .patience-bar {
@@ -721,15 +724,18 @@
   }
 }
 
-/* Compact customer cards on mobile (under 360px & 320px) - max height 150px */
+/* Compact customer cards on mobile (under 360px & 320px) */
 @media (max-width: 360px) {
   .customer-lane {
     padding: 16px 8px 8px;
     gap: 8px;
+    min-height: 160px;
+    max-height: 220px;
   }
   .customer-card {
-    flex: 0 0 160px;
-    max-height: 150px;
+    flex: 0 0 165px;
+    min-height: 160px;
+    max-height: 210px;
     padding: 5px 6px;
     gap: 3px;
   }

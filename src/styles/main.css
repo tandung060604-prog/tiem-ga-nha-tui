@@ -85,6 +85,11 @@ body.selling-mode .app {
   text-align: center;
   min-width: 0;
   padding: 0 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
 }
 
 .h-m .store-badge {
@@ -99,9 +104,10 @@ body.selling-mode .app {
   font-size: 0.72rem;
   font-weight: 800;
   white-space: nowrap;
-  max-width: 140px;
+  max-width: 100%;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(244, 162, 97, 0.25);
+  box-sizing: border-box;
 }
 
 .store-logo-badge {
@@ -121,11 +127,12 @@ body.selling-mode .app {
 
 .h-m .money {
   display: block;
-  font-size: 1.18rem;
+  font-size: 1.05rem;
   font-weight: 900;
   color: #9e2a2b;
   letter-spacing: -0.5px;
   white-space: nowrap;
+  line-height: 1.1;
 }
 
 .h-r {
@@ -1020,10 +1027,24 @@ body.selling-mode .awning::after {
   transition: opacity 0.25s ease, transform 0.25s ease;
   z-index: 2500;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  white-space: nowrap;
+  white-space: normal;
+  max-width: calc(100vw - 32px);
+  text-align: center;
+  box-sizing: border-box;
 }
 
 .toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+body.selling-mode .toast {
+  top: auto;
+  bottom: calc(72px + var(--safe-bottom));
+  transform: translateX(-50%) translateY(20px);
+}
+
+body.selling-mode .toast.show {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }

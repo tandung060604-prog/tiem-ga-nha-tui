@@ -164,7 +164,25 @@ class OvernightMonkey {
   }
 
   async performChaosStep(page) {
-    // A. XỬ LÝ CÁC MODAL ĐANG MỞ (ƯU TIÊN SỐ 1 ĐỂ KHÔNG BỊ BLOCKED)
+    // A. XỬ LÝ CÁC MODAL & MÀN HÌNH ĐẶC BIỆT (ƯU TIÊN SỐ 1 ĐỂ KHÔNG BỊ BLOCKED)
+    // 0. Màn hình chính Title Screen (khi reload trang, hot reload hoặc mới vào lại)
+    const titlePlayBtn = page.locator('#btn-title-play');
+    if (await titlePlayBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`👉 Nhận diện màn hình chính Title Screen -> Bấm TIẾP TỤC / VÀO TIỆM...`);
+      await titlePlayBtn.first().click({ force: true });
+      await sleep(400);
+      return true;
+    }
+
+    // Modal Kết Thúc Trò Chơi (Ending Modal)
+    const endingCloseBtn = page.locator('#btn-close-ending, #btn-restart-game');
+    if (await endingCloseBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`🏆 Xử lý Ending Modal -> Tiếp tục hành trình...`);
+      await endingCloseBtn.first().click({ force: true });
+      await sleep(300);
+      return true;
+    }
+
     // 1. Modal Đặt tên quán (Shop Name Dialog)
     const confirmName = page.locator('#btn-confirm-shop-name');
     if (await confirmName.first().isVisible({ timeout: 50 }).catch(() => false)) {
@@ -409,8 +427,14 @@ class OvernightMonkey {
   }
 
   async emergencyRecover(page) {
-    // Đóng tất cả các modal đang bị kẹt
+    // Đóng tất cả các modal đang bị kẹt hoặc tự bấm tiếp tục
     await page.evaluate(() => {
+      const titleBtn = document.getElementById('btn-title-play');
+      if (titleBtn instanceof HTMLElement) { titleBtn.click(); return; }
+
+      const nextDayBtn = document.querySelector('#btn-start-next-day, #btn-summary-next-day');
+      if (nextDayBtn instanceof HTMLElement) { nextDayBtn.click(); return; }
+
       const closeButtons = document.querySelectorAll('.dash-close-x, #btn-modal-close-icon, [id*="btn-close"], .btn-close, .modal-close');
       for (const btn of closeButtons) {
         if (btn instanceof HTMLElement) btn.click();

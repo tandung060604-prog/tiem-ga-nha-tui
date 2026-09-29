@@ -193,7 +193,6 @@ interface CachedCustomerCard {
 
 interface SellingDomCache {
   clock: HTMLElement | null;
-  custCounter: HTMLElement | null;
   pointer: HTMLElement | null;
   hint: HTMLElement | null;
   fryPot: HTMLElement | null;
@@ -210,7 +209,6 @@ function getSellingDomCache(root: HTMLElement): SellingDomCache {
   if (!cache) {
     cache = {
       clock: root.querySelector('.clock b'),
-      custCounter: root.querySelector('.hud-customers b'),
       pointer: root.querySelector('.cook-gauge-pointer'),
       hint: root.querySelector('.pot-hint'),
       fryPot: root.querySelector('#btn-fry-pot'),
@@ -242,7 +240,6 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
   }
 
   if (cache.clock) cache.clock.textContent = formatClock(session.gameHour);
-  if (cache.custCounter) cache.custCounter.textContent = `${session.servedCount}/${session.expectedCustomers || 10}`;
 
   for (const id of Object.keys(TIMER_RECIPES) as TimerStationId[]) {
     let el = cache.timers.get(id);
@@ -678,7 +675,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
   const drinkStock = state.inventory.soft_drink?.amount ?? 0;
 
   const potProgressPercent = Math.min(100, Math.round(cookState.progress));
-  const oilLabel = oilCondition === 'clean' ? 'Vàng óng (Thơm lừng)' : oilCondition === 'medium' ? 'Nâu hổ phách' : 'Đen khét (Bốc khói!)';
+  const oilLabel = oilCondition === 'clean' ? 'Vàng óng' : oilCondition === 'medium' ? 'Nâu sẫm' : 'Đen khét';
 
   // Render food in pan: hiển thị đúng asset của từng loại món (gà giòn, má đùi cay, khoai lắc, gà viên, phô mai que)
   let panFoodHtml = '';
@@ -772,10 +769,6 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         <div class="clock">
           <span>🕒 Giờ mở bán: <b>${formattedTime}</b></span>
         </div>
-        <div class="hud-customers" style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.78rem; font-weight: 700; background: rgba(255,255,255,0.85); padding: 3px 8px; border-radius: 12px; border: 1px solid var(--line); color: var(--ink);">
-          <span>👥</span>
-          <span>Khách: <b>${session.servedCount}/${session.expectedCustomers || 10}</b></span>
-        </div>
         ${rush ? '<span class="rush-badge">🔥 CA CAO ĐIỂM!</span>' : `<span class="session-ambience">${timePeriodLabel}</span>`}
         ${state.secretSauceDay?.buffActive ? '<span class="sauce-buff-hud-badge" title="Sốt Bí Truyền đang kích hoạt: +3k tip mỗi đơn!">🍲✨ Sốt Vàng</span>' : ''}
         <div class="hud-actions">
@@ -810,7 +803,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <!-- Real Cast Iron Fryer Card (Bếp Chiên Ngập Dầu Chợ Lớn) -->
           <div class="fryer-card">
             <div class="fryer-header">
-              <span>🍳 Bếp Chiên 1990</span>
+              <span>🍳 Bếp Chiên</span>
               <div class="oil-status">
                 <span class="oil-dot ${oilCondition}"></span>
                 <span>${oilLabel}</span>
@@ -863,8 +856,8 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             <!-- Kệ Topping & Nguyên Liệu Tươi (Food Shelf / Topping Rack như Mì Cay Bà Tám) -->
             <div class="prep-baskets-section">
               <div class="prep-baskets-header">
-                <span class="prep-baskets-title">🧺 Quầy Khay Inox Sơ Chế</span>
-                <button id="btn-change-oil" class="oil-change-btn">Thay dầu (150k)</button>
+                <span class="prep-baskets-title">🧺 Khay Sơ Chế</span>
+                <button id="btn-change-oil" class="oil-change-btn">🛢️ Thay dầu 150k</button>
               </div>
               ${renderPrepStation(state)}
               <!-- Hai chai tương xịt lên món trong khay -->
@@ -891,8 +884,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <!-- Tray & Assemble Card (Quầy Giữ Nhiệt Giòn Tan) -->
           <div class="assemble-card">
             <div class="tray-title">
-              <span>🍱 Quầy Giữ Nhiệt (${tray.length}/${cookingEngine.getTraySize()})</span>
-              <span style="font-size: 0.68rem; color: var(--soft);">Bấm khay để vớt/vứt</span>
+              <span>🍱 Khay (${tray.length}/${cookingEngine.getTraySize()})</span>
             </div>
 
             <div class="tray-slots">
@@ -902,7 +894,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             <!-- Quầy Máy Rót Nước Đa Vị & Hiệu Ứng Đổ Đầy Cốc Nước -->
             <div class="fountain-station">
               <div class="fountain-header">
-                <span class="fountain-title">🥤 Máy Rót Nước Tự Động</span>
+                <span class="fountain-title">🥤 Máy Rót Nước</span>
                 <span class="fountain-stock">Kho: <b>${drinkStock}</b></span>
               </div>
 
@@ -935,19 +927,19 @@ export function renderSellingView(state: GameState, session: SellingSession): st
                 <button id="btn-add-drink" class="fountain-tap-btn tap-coca" data-action="pour-coca" title="Rót đầy một cốc Coca-Cola sủi bọt caramel mát lạnh">
                   <div class="tap-badge">🔴 Cola</div>
                   <img src="${ASSETS.food.soda}" alt="Coca-Cola" class="tap-cup-img" />
-                  <span class="tap-name">Coca-Cola</span>
+                  <span class="tap-name">Cola</span>
                 </button>
 
                 <button id="btn-pour-7up" class="fountain-tap-btn tap-7up" data-action="pour-7up" title="Rót đầy một cốc 7Up Chanh đá mát lạnh">
                   <div class="tap-badge">🟢 7Up</div>
                   <img src="${ASSETS.food.sevenUp}" alt="7Up Chanh" class="tap-cup-img" />
-                  <span class="tap-name">7Up Chanh</span>
+                  <span class="tap-name">7Up</span>
                 </button>
 
                 <button id="btn-pour-fanta" class="fountain-tap-btn tap-fanta" data-action="pour-fanta" title="Rót đầy một cốc Fanta Cam bùng nổ hương vị">
                   <div class="tap-badge">🟠 Fanta</div>
                   <img src="${ASSETS.food.fantaOrange}" alt="Fanta Cam" class="tap-cup-img" />
-                  <span class="tap-name">Fanta Cam</span>
+                  <span class="tap-name">Fanta</span>
                 </button>
               </div>
             </div>

@@ -73,7 +73,7 @@ export const PROCEDURAL_REVIEW_TEMPLATES: ReviewTemplate[] = [
     tags: ['#GiaoNhamMon', '#CauTha', '#SuytNhapVien']
   },
   {
-    criteria: 'taste',
+    criteria: 'speed',
     topic: 'wrong_order',
     minStars: 1,
     maxStars: 2,
