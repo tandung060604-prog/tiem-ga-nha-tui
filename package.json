@@ -13,7 +13,10 @@
     "ios:check": "node scripts/ios-check.mjs",
     "ui:check": "node scripts/ui-check.mjs",
     "jev:content": "tsx --env-file=.env scripts/jev-content.ts",
-    "jev:check": "node --env-file-if-exists=.env scripts/jev-check.ts"
+    "jev:check": "node --env-file-if-exists=.env scripts/jev-check.ts",
+    "test:overnight": "node scripts/run-overnight.mjs",
+    "test:core-stress": "tsx scripts/overnight-core-stress.ts",
+    "test:monkey": "node scripts/overnight-browser-monkey.mjs"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.30.1",

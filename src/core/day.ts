@@ -721,7 +721,9 @@ export interface DayResult {
 }
 
 // Gọi một lần lúc đóng cửa, trong stateManager.update: hàng hết hạn, sổ sách, sao, lịch sử, qua chương.
-export function closeDay(draft: GameState, session: SellingSession, event: GameEvent): DayResult {
+export function closeDay(draft: GameState, session: SellingSession, event?: GameEvent): DayResult {
+  const activeEvent = event ?? eventForDay(draft.day);
+
   // Hàng hết hạn bỏ đi qua đêm (tiền đã trả lúc nhập; ghi vào sổ để người chơi thấy lỗ)
   let expiredValue = 0;
   const expiredNames: string[] = [];
@@ -740,7 +742,7 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
     day: draft.day
   } : null;
 
-  const inspected = event.effect.inspection === true;
+  const inspected = activeEvent.effect.inspection === true;
   const oil = draft.oilCondition;
   const fine = inspected && oil === 'dirty' ? INSPECTION_FINE : 0;
   const team = staffEffects(draft.staff, 12, draft.upgrades);
