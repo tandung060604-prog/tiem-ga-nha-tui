@@ -68,6 +68,7 @@ class OvernightMonkey {
     });
 
     const page = await context.newPage();
+    page.setDefaultTimeout(2000);
 
     // 1. Lắng nghe lỗi JavaScript chưa bắt (Unhandled Exceptions)
     page.on('pageerror', async (err) => {
@@ -397,7 +398,7 @@ class OvernightMonkey {
       }
 
       log(`🍗 Bấm 'BẮT ĐẦU MỞ BÁN' Ngày ${this.daysCompleted + 1}...`);
-      await openBarBtn.first().click({ force: true });
+      await page.locator('#btn-start-selling').first().click({ force: true, timeout: 2000 }).catch(() => {});
       await sleep(400);
       return true;
     }
