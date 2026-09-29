@@ -10,3 +10,13 @@
   - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 66.0%)
   - **Số ngày chạy bù khuyến nghị:** Cấp 2.1100000000000003 (~undefined ngày)
 ---
+
+### 🐞 [02:02:49 30/9/2026] Locators conflict in Selling Phase: .fryer-card blocks frying/drinks
+- **Triệu chứng:** Selector .fryer-card matched container div and was clicked every tick, returning true and preventing fry/drink actions; fastBtn lacked active check
+- **Vị trí:** `scripts/overnight-browser-monkey.mjs` 
+- **Đánh giá Jev (461ms):**
+  - **Mức độ (Severity):** `p0_blocker` (Độ tin cậy: 66.0%)
+  - **Nguyên nhân gốc (Root Cause):** `ui_modal_stack` (Độ tin cậy: 36.0%)
+  - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 16.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---

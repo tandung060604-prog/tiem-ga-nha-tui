@@ -9,6 +9,7 @@
 
 import { chromium } from 'playwright-core';
 import { appendFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { spawn } from 'node:child_process';
 
 const LOG_FILE = 'logs/overnight-browser-monkey.log';
 const REPORT_MD = 'docs/bao-cao-test-xuyen-dem.md';
@@ -20,6 +21,19 @@ function log(msg) {
   const line = `[${new Date().toLocaleTimeString('vi-VN')}] ${msg}`;
   console.log(line);
   appendFileSync(LOG_FILE, line + '\n');
+}
+
+function triggerJevTriage(title, symptom, source) {
+  try {
+    const cleanTitle = title.replace(/["\r\n]/g, ' ');
+    const cleanSymptom = symptom.replace(/["\r\n]/g, ' ');
+    const p = spawn('npx', ['tsx', 'scripts/consult-jev-bug-triage.ts', `"${cleanTitle}"`, `"${cleanSymptom}"`, `"${source}"`], {
+      detached: true,
+      stdio: 'ignore',
+      shell: true,
+    });
+    p.unref();
+  } catch {}
 }
 
 // Đọc tham số dòng lệnh: node scripts/overnight-browser-monkey.mjs [--hours H] [--days D] [--headless false] [--url URL]
@@ -77,6 +91,7 @@ class OvernightMonkey {
       const shotPath = `logs/screenshots/pageerror-${Date.now()}.png`;
       await page.screenshot({ path: shotPath, fullPage: true }).catch(() => {});
       this.errors.push({ type: 'pageerror', message: errStr, screenshot: shotPath, day: this.daysCompleted });
+      triggerJevTriage(`Page Crash Ngày ${this.daysCompleted}`, errStr.slice(0, 150), 'src/main.ts');
     });
 
     // 2. Lắng nghe Console Error
@@ -114,6 +129,7 @@ class OvernightMonkey {
           const shotPath = `logs/screenshots/deadlock-day-${this.daysCompleted}-${Date.now()}.png`;
           await page.screenshot({ path: shotPath, fullPage: true }).catch(() => {});
           this.deadlocks.push({ day: this.daysCompleted, timestamp: new Date().toISOString(), screenshot: shotPath });
+          triggerJevTriage(`UI Deadlock Ngày ${this.daysCompleted}`, `Hệ thống đứng yên > 25s tại ngày ${this.daysCompleted}`, 'src/ui/SellingView.ts');
           await this.emergencyRecover(page);
           lastActionTimestamp = Date.now();
         }
@@ -335,49 +351,73 @@ class OvernightMonkey {
 
     // B. PHA BÁN HÀNG (SELLING SCREEN)
     const sellingScreen = page.locator('.selling-screen');
-    if (await sellingScreen.isVisible({ timeout: 80 }).catch(() => false)) {
-      // 1. Bật tua nhanh nếu chưa bật (để qua ngày nhanh khi stress test)
-      const fastBtn = page.locator('#btn-toggle-fast:not(.active)');
-      if (await fastBtn.isVisible({ timeout: 30 }).catch(() => false)) {
-        await fastBtn.click({ force: true }).catch(() => {});
+    if (await sellingScreen.isVisible({ timeout: 60 }).catch(() => false)) {
+      // 1. Bật tua nhanh nếu chưa bật (chỉ bấm khi đang ở chế độ 1x)
+      const fastBtn = page.locator('#btn-toggle-fast');
+      if (await fastBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
+        const text = await fastBtn.first().textContent().catch(() => '');
+        if (text.includes('1x')) {
+          await fastBtn.first().click({ force: true }).catch(() => {});
+          await sleep(50);
+        }
       }
 
-      // 2. Phục vụ món cho khách (Nút 'LÊN MÓN' .btn-serve-cust)
-      const serveBtn = page.locator('.btn-serve-cust, #btn-serve-order, .btn-serve-card');
-      if (await serveBtn.first().isVisible({ timeout: 40 }).catch(() => false)) {
+      // 2. Nhấc chảo rán NGAY khi vàng giòn (Perfect) hoặc sẵn sàng nhấc
+      const readyPot = page.locator('#btn-fry-pot.perfect-glow, #btn-fry-pot.ready-lift, .fry-pot.perfect-glow, .fry-pot.ready-lift');
+      if (await readyPot.first().isVisible({ timeout: 30 }).catch(() => false)) {
+        await readyPot.first().click({ force: true }).catch(() => {});
+        return true;
+      }
+
+      // 3. Phục vụ món cho khách (Nút 'LÊN MÓN' .btn-serve-cust hoặc #btn-serve-order)
+      const serveBtn = page.locator('.btn-serve-cust:not([disabled]), #btn-serve-order:not([disabled])');
+      if (await serveBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
         await serveBtn.first().click({ force: true }).catch(() => {});
         return true;
       }
 
-      // 3. Canh lửa & Nhấc chảo rán khi chín
-      const liftPot = page.locator('#btn-lift-fryer, .fry-pot.ready-lift, .fryer-card');
-      if (await liftPot.first().isVisible({ timeout: 40 }).catch(() => false)) {
-        await liftPot.first().click({ force: true }).catch(() => {});
-        return true;
-      }
-
-      // 4. Thả nguyên liệu vào chảo / Thao tác sơ chế
-      const fryAction = page.locator('#btn-fry-chicken, #btn-fry-thigh, #btn-fry-fries, #btn-fry-popcorn, #btn-fry-cheese');
-      if (await fryAction.first().isVisible({ timeout: 40 }).catch(() => false)) {
+      // 4. Thả nguyên liệu vào chảo rán từ khay sơ chế (Đùi, má đùi, khoai, gà viên, phô mai)
+      const fryAction = page.locator('#btn-fry-chicken:not([disabled]), #btn-fry-thigh:not([disabled]), #btn-fry-fries:not([disabled]), #btn-fry-popcorn:not([disabled]), #btn-fry-cheese:not([disabled])');
+      if (await fryAction.first().isVisible({ timeout: 30 }).catch(() => false)) {
         await fryAction.first().click({ force: true }).catch(() => {});
         return true;
       }
 
-      // 5. Rót nước ngọt / Xịt sốt
-      const drinkAction = page.locator('#btn-pour-soda, #btn-pour-seven_up, #btn-pour-fanta_orange, .station-btn');
-      if (await drinkAction.first().isVisible({ timeout: 40 }).catch(() => false)) {
+      // 5. Rót nước ngọt đa vị (Coca, 7Up, Fanta)
+      const drinkAction = page.locator('#btn-add-drink, #btn-pour-7up, #btn-pour-fanta');
+      if (await drinkAction.first().isVisible({ timeout: 30 }).catch(() => false)) {
         await drinkAction.first().click({ force: true }).catch(() => {});
         return true;
       }
 
-      // 6. Nếu hết đồ hoặc khách chờ lâu, hủy đơn / dọn bàn
-      const cancelBtn = page.locator('.btn-cancel-order, .btn-cancel-apologize');
-      if (await cancelBtn.first().isVisible({ timeout: 40 }).catch(() => false)) {
-        await cancelBtn.first().click({ force: true }).catch(() => {});
-        return true;
+      // 6. Xịt tương cà / tương ớt lên món trong khay
+      if (Math.random() < 0.3) {
+        const sauceBtn = page.locator('#btn-squeeze-ketchup, #btn-squeeze-chili');
+        if (await sauceBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
+          await sauceBtn.first().click({ force: true }).catch(() => {});
+          return true;
+        }
       }
 
-      return true; // Đang trong ca bán hàng hoạt động bình thường
+      // 7. Nhấp chảo rán định kỳ phòng khi không bắt được class
+      if (Math.random() < 0.25) {
+        const potEl = page.locator('#btn-fry-pot');
+        if (await potEl.first().isVisible({ timeout: 30 }).catch(() => false)) {
+          await potEl.first().click({ force: true }).catch(() => {});
+          return true;
+        }
+      }
+
+      // 8. Nếu khách chờ quá lâu hoặc thiếu món, hủy đơn để khách mới vào
+      if (Math.random() < 0.15) {
+        const cancelBtn = page.locator('.btn-cancel-order');
+        if (await cancelBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
+          await cancelBtn.first().click({ force: true }).catch(() => {});
+          return true;
+        }
+      }
+
+      return false; // Không có thao tác cụ thể nào được thực hiện
     }
 
     // C. PHA CHUẨN BỊ (PREPARATION SCREEN)
@@ -441,6 +481,12 @@ class OvernightMonkey {
       }
       const overlay = document.querySelector('.modal-overlay, #modal-overlay');
       if (overlay instanceof HTMLElement) overlay.click();
+
+      // Nếu đang kẹt trong màn bán hàng: hủy các đơn khách tồn đọng để kích hoạt lứa khách mới
+      const cancelBtns = document.querySelectorAll('.btn-cancel-order');
+      for (const cb of cancelBtns) {
+        if (cb instanceof HTMLElement) cb.click();
+      }
     }).catch(() => {});
   }
 
