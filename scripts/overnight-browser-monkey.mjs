@@ -372,16 +372,18 @@ class OvernightMonkey {
         await sleep(100);
       }
 
-      const buyChickenBtn = page.locator('.btn-buy[data-id="chicken_meat"]:not([disabled])');
-      if (await buyChickenBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
-        await buyChickenBtn.first().click({ force: true }).catch(() => {});
-        await sleep(100);
+      for (let i = 0; i < 3; i++) {
+        const buyChickenBtn = page.locator('.btn-buy[data-id="chicken_meat"]:not([disabled])');
+        if (await buyChickenBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+          await buyChickenBtn.first().click({ force: true }).catch(() => {});
+          await sleep(60);
+        }
       }
 
       const buyFlourBtn = page.locator('.btn-buy[data-id="flour"]:not([disabled])');
       if (await buyFlourBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
         await buyFlourBtn.first().click({ force: true }).catch(() => {});
-        await sleep(100);
+        await sleep(60);
       }
 
       // 2. Thỉnh thoảng nâng cấp quán

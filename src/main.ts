@@ -936,14 +936,20 @@ class AppController {
         // Kiểm tra nguyên liệu tối thiểu
         const chickenStock = state.inventory.chicken_meat?.amount || 0;
         if (chickenStock < 2) {
-          if (state.money < 14000) {
-            // Tương trợ khu phố từ Bác Ba Tổ Trưởng nếu người chơi bị kẹt (1 lần mỗi chương)
+          const effects = upgradeEffects(state.upgrades);
+          const discount = Math.min(60, (effects.discountWholesale || 0) + (state.todayMarketDiscount || 0));
+          const unitCost = Math.round((state.inventory.chicken_meat?.cost || 14000) * (1 - discount / 100));
+          const minChickenPackCost = unitCost * 5;
+
+          if (state.money < minChickenPackCost) {
+            // Tương trợ khu phố từ Bác Ba Tổ Trưởng nếu người chơi bị kẹt không đủ tiền mua gói gà tối thiểu
             let granted = false;
             stateManager.update(draft => { granted = requestBaBaAid(draft); });
             if (granted) {
               audio.playCash();
               babble('Con ơi cầm lấy mà xoay xở', 'bacba');
-              this.showToast('❤️ Bác Ba tiếp tế 15 miếng gà tươi & 150k vốn! Chương này bác chỉ giúp được một lần thôi đó con.');
+              const freshStock = stateManager.getState().inventory.chicken_meat?.amount || 0;
+              this.showToast(`❤️ Bác Ba tương trợ kịp thời (${freshStock >= 15 ? '15 miếng gà & 150k vốn' : '5 miếng gà cho mượn tạm'})! Mở bán được rồi con nhé!`);
             } else {
               this.showToast('Hết gà với hết vốn rồi… Bác Ba đã giúp một lần trong chương này rồi. Bán bớt đồ hoặc nhận thưởng Thỏ Cam đi con.');
             }

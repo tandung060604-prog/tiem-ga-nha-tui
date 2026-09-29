@@ -6,7 +6,8 @@ import { upgradeEffects } from '../../core/upgrades';
 export function renderInventoryTab(state: GameState): string {
   const items = Object.values(state.inventory);
   const effects = upgradeEffects(state.upgrades);
-  const discount = effects.discountWholesale || 0;
+  const marketDiscount = state.todayMarketDiscount || 0;
+  const discount = Math.min(60, (effects.discountWholesale || 0) + marketDiscount);
 
   const rowsHtml = items.map(item => {
     const isLocked = item.unlocked === false;
@@ -91,7 +92,6 @@ export function renderInventoryTab(state: GameState): string {
     `;
   }).join('');
 
-  const marketDiscount = state.todayMarketDiscount || 0;
   const marketBannerHtml = state.todayMarketBargained
     ? (marketDiscount > 0
         ? `<div style="background: rgba(16,185,129,0.12); border: 1.5px solid #10b981; border-radius: 6px; padding: 6px 10px; margin-bottom: 10px; font-size: 0.8rem; color: #065f46; display: flex; justify-content: space-between; align-items: center;">
@@ -116,52 +116,13 @@ export function renderInventoryTab(state: GameState): string {
     </div>
     ${marketBannerHtml}
     <div class="sec-desc">
-      Nhập đủ gà tươi, bột, dầu và gia vị trước giờ mở bán (10:00). Bấm <b>-5</b> để hoàn trả nếu lỡ tay mua nhầm! Nhấn giữ nút để nhập nhanh.
+      Nhập đủ gà tươi, bột, dầu và gia vị trước giờ mở bán (10:00). Bấm <b>-5</b> để hoàn trả nếu lỡ tay mua nhầm!
       ${effects.shelfLifeBonus > 0 ? `<br><b style="color:var(--mint-dark,#10b981);">❄️ Kho lạnh bảo quản: +${effects.shelfLifeBonus} ngày hạn dùng cho mọi lô nhập mới!</b>` : ''}
     </div>
     <div class="inventory-list">
       ${rowsHtml}
     </div>
   `;
-}
-
-function setupLongPress(btn: HTMLElement, action: () => void) {
-  let timer: ReturnType<typeof setTimeout> | null = null;
-  let interval: ReturnType<typeof setInterval> | null = null;
-  let speed = 180;
-  let pointerFired = false;
-
-  const start = (e: Event) => {
-    e.preventDefault();
-    pointerFired = true;
-    action();
-    speed = 180;
-    timer = setTimeout(() => {
-      interval = setInterval(() => {
-        action();
-        speed = Math.max(60, speed - 15);
-      }, speed);
-    }, 320);
-  };
-
-  const stop = () => {
-    if (timer) clearTimeout(timer);
-    if (interval) clearInterval(interval);
-    timer = null;
-    interval = null;
-    setTimeout(() => { pointerFired = false; }, 100);
-  };
-
-  btn.addEventListener('pointerdown', start);
-  btn.addEventListener('pointerup', stop);
-  btn.addEventListener('pointerleave', stop);
-  btn.addEventListener('pointercancel', stop);
-  btn.addEventListener('click', (e) => {
-    if (!pointerFired) {
-      e.preventDefault();
-      action();
-    }
-  });
 }
 
 export function bindInventoryEvents(
@@ -176,10 +137,11 @@ export function bindInventoryEvents(
     bargainBtn.addEventListener('click', onOpenMarketBargain);
   }
 
-  // 1. Nhập hàng (+5 / +10) có hỗ trợ nhấn giữ gia tốc
+  // 1. Nhập hàng (+5 / +10)
   const buyButtons = document.querySelectorAll<HTMLElement>('.btn-buy');
   buyButtons.forEach(btn => {
-    const doBuy = () => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
       const itemId = btn.getAttribute('data-id');
       const qty = parseInt(btn.getAttribute('data-qty') || '5', 10);
 
@@ -211,21 +173,26 @@ export function bindInventoryEvents(
 
       audio.playCash();
       showToast(`Đã nhập +${qty} ${item.name} (-${totalCost.toLocaleString('vi-VN')}đ)`);
-    };
-
-    setupLongPress(btn, doBuy);
+    });
   });
 
-  // 2. Hoàn vốn / Giảm nhập (-5) có hỗ trợ nhấn giữ gia tốc
+  // 2. Hoàn vốn / Giảm nhập (-5)
   const refundButtons = document.querySelectorAll<HTMLElement>('.btn-refund');
   refundButtons.forEach(btn => {
-    const doRefund = () => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
       const itemId = btn.getAttribute('data-id');
       const qty = parseInt(btn.getAttribute('data-qty') || '5', 10);
 
       if (!itemId || !state.inventory[itemId]) return;
 
       const item = state.inventory[itemId];
+      const available = refundableUnits(item);
+      if (available < qty) {
+        showToast('Chỉ đổi trả được hàng vừa nhập hôm nay (hàng tặng hoặc đã qua đêm thì không).');
+        return;
+      }
+
       let refunded = 0;
       onUpdateState(draft => {
         refunded = refundPurchase(draft.inventory[itemId], qty);
@@ -238,9 +205,7 @@ export function bindInventoryEvents(
       }
       audio.playCash();
       showToast(`Đã trả lại ${qty} ${item.name} (+${refunded.toLocaleString('vi-VN')}đ)`);
-    };
-
-    setupLongPress(btn, doRefund);
+    });
   });
 
   // 3. Ký hợp đồng mở khóa nguyên liệu mới (Unlock)

@@ -174,9 +174,17 @@ export function recordHelperFry(draft: GameState, session: SellingSession, quali
 // Bác Ba tiếp tế khi hết gà và hết tiền: 1 lần mỗi chương (trước đây không giới hạn → cày tiền được)
 export const BA_BA_AID_MONEY = 150000;
 export function requestBaBaAid(draft: GameState): boolean {
-  if ((draft.baBaAidChapter ?? 0) >= draft.currentChapter) return false;
-  draft.baBaAidChapter = draft.currentChapter;
   const { chicken_meat: meat, flour } = draft.inventory;
+  if ((draft.baBaAidChapter ?? 0) >= draft.currentChapter) {
+    // Nếu chương này bác đã cho 150k rồi mà vẫn cạn kiệt thịt gà:
+    // Bác Ba cho mượn tạm 5 miếng gà tươi để tiếp tục mở bán thoát hiểm
+    if (meat && meat.amount < 2) {
+      addStock(meat, 5);
+      return true;
+    }
+    return false;
+  }
+  draft.baBaAidChapter = draft.currentChapter;
   if (meat) addStock(meat, 15);
   if (flour) addStock(flour, 20);
   draft.money += BA_BA_AID_MONEY;
