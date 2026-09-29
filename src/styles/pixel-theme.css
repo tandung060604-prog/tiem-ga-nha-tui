@@ -3,16 +3,14 @@
    Full Game Overhaul: Banners, Characters, Food, Kitchen Equipment, Buttons & HUD
    ========================================================================== */
 
-/* 1. GLOBAL PIXEL RENDERING & TYPOGRAPHY */
+/* 1. GLOBAL PIXEL RENDERING & TYPOGRAPHY - PHƯƠNG ÁN A (STARDEW & KAIROSOFT HYBRID) */
 html, body {
-  font-family: var(--font-pixel-body), "VT323", monospace;
-  font-size: 17px;
-  -webkit-font-smoothing: none;
+  font-family: var(--font-pixel-body);
+  font-size: 15px;
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: geometricPrecision;
-  image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: crisp-edges;
+  text-rendering: optimizeLegibility;
   background-color: #2b1810;
 }
 
@@ -38,7 +36,7 @@ canvas,
   image-rendering: crisp-edges !important;
 }
 
-/* Headings in 16-bit Tiny5 Duo (100% Tiếng Việt) */
+/* Headings in 16-bit Tiny5 Duo / Silkscreen */
 h1, h2, h3, h4,
 .brand-title,
 .board-header h2,
@@ -49,16 +47,14 @@ h1, h2, h3, h4,
 .ending-kicker,
 .chapter-unlocked-title,
 .tutorial-speaker {
-  font-family: var(--font-pixel-heading), "Tiny5 Duo", "VT323", monospace !important;
+  font-family: var(--font-pixel-heading) !important;
   letter-spacing: 0.5px;
 }
 
-/* Body & numeric text in VT323 */
+/* Body & reading text in Be Vietnam Pro (100% tiếng Việt siêu nét, êm mắt) */
 p, span, div, b, small, button, input, select, textarea,
 .brand-tagline,
-.h-day-box b,
 .h-day-box small,
-.h-r b,
 .h-r small,
 .goal-info,
 .order-item-title,
@@ -68,7 +64,16 @@ p, span, div, b, small, button, input, select, textarea,
 .item-name,
 .item-price,
 .tutorial-text {
-  font-family: var(--font-pixel-body), "VT323", monospace !important;
+  font-family: var(--font-pixel-body);
+}
+
+/* Retro digital counter, clock and currency displays */
+.kitchen-hud .clock,
+.clock b,
+.cash-display,
+.stat-num,
+.money-badge {
+  font-family: var(--font-pixel-mono) !important;
 }
 
 /* ==========================================================================
@@ -187,8 +192,9 @@ p, span, div, b, small, button, input, select, textarea,
   border: 3px solid #5a3018 !important;
   border-radius: 4px !important;
   box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #8e542d, 2px 3px 0 #1a0c06 !important;
-  font-family: var(--font-pixel-body), "VT323", monospace !important;
-  font-size: 1.15rem !important;
+  font-family: var(--font-pixel-body) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.4 !important;
   padding: 8px 12px !important;
 }
 .title-speech-bubble::after {
@@ -387,8 +393,9 @@ p, span, div, b, small, button, input, select, textarea,
   border: 3px solid #5a3018 !important;
   border-radius: 4px !important;
   box-shadow: 0 4px 0 #1a0c06, inset 1px 1px 0 #fff !important;
-  font-family: var(--font-pixel-heading), "Tiny5 Duo", "VT323", monospace !important;
-  font-size: 0.85rem !important;
+  font-family: var(--font-pixel-body) !important;
+  font-size: 0.875rem !important;
+  line-height: 1.35 !important;
   padding: 6px 14px !important;
   top: calc(64px + var(--safe-top)) !important;
 }
@@ -557,9 +564,9 @@ p, span, div, b, small, button, input, select, textarea,
 .btn-story-choice {
   border-radius: 2px !important;
   border: 2px solid #2b1810 !important;
-  font-family: var(--font-pixel-body), "VT323", monospace !important;
-  font-size: 1.1rem !important;
-  font-weight: 700 !important;
+  font-family: var(--font-pixel-body) !important;
+  font-size: 0.925rem !important;
+  font-weight: 600 !important;
   cursor: pointer !important;
   box-shadow: 
     inset 1px 1px 0 rgba(255, 255, 255, 0.5), 
@@ -724,8 +731,9 @@ p, span, div, b, small, button, input, select, textarea,
   border: 2px solid #2b1810 !important;
   border-radius: 2px !important;
   box-shadow: 1px 2px 0 #1a0c06 !important;
-  font-family: var(--font-pixel-body), "VT323", monospace !important;
-  font-size: 1.05rem !important;
+  font-family: var(--font-pixel-body) !important;
+  font-size: 0.85rem !important;
+  line-height: 1.35 !important;
   color: #2b1810 !important;
 }
 
@@ -759,6 +767,9 @@ p, span, div, b, small, button, input, select, textarea,
     inset -3px -3px 0 #2b1810, 
     0 8px 0 #1a0c06 !important;
   color: #2b1810 !important;
+  font-family: var(--font-pixel-body) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.45 !important;
 }
 
 .modal-card h2,
@@ -772,7 +783,8 @@ p, span, div, b, small, button, input, select, textarea,
 .tutorial-actions button {
   border-radius: 2px !important;
   border: 2px solid #2b1810 !important;
-  font-family: var(--font-pixel-body), "VT323", monospace !important;
-  font-size: 1.1rem !important;
+  font-family: var(--font-pixel-body) !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
   box-shadow: 1px 2px 0 #1a0c06 !important;
 }

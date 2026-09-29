@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="../../node_modules/nes.css/css/nes.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=VT323&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Silkscreen:wght@400;700&family=VT323&display=swap" rel="stylesheet">
   <style>
     @font-face {
       font-family: 'Tiny5';
@@ -43,14 +43,20 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      -webkit-font-smoothing: none;
+    }
+
+    img, svg, canvas, .pixel-art {
       image-rendering: pixelated;
     }
 
     body {
       background: #1e120c radial-gradient(circle, #3d2315 0%, #150b06 100%);
       color: #faeed1;
-      font-family: 'Tiny5 Duo', 'VT323', monospace;
+      font-family: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       padding: 16px;
       display: flex;
       flex-direction: column;
@@ -141,6 +147,7 @@
     }
 
     .speaker-name {
+      font-family: 'Tiny5 Duo', 'Silkscreen', monospace;
       font-size: 13px;
       font-weight: bold;
       color: #7a3a0e;
@@ -150,9 +157,9 @@
     }
 
     .speech-bubble {
-      font-family: 'VT323', monospace;
-      font-size: 18px;
-      line-height: 1.25;
+      font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
       min-height: 52px;
     }
 
@@ -247,8 +254,9 @@
     .pixel-btn {
       flex: 1;
       padding: 10px 6px;
-      font-family: 'Silkscreen', monospace;
-      font-size: 11px;
+      font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+      font-weight: 600;
+      font-size: 13px;
       border: 3px solid #000;
       box-shadow: inset -2px -2px 0 0 #555, 3px 3px 0 #000;
       cursor: pointer;
