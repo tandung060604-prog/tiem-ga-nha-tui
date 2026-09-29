@@ -34,6 +34,31 @@
   box-shadow: var(--shadow-sm);
   transition: transform 0.15s ease, border-color 0.15s ease;
   cursor: pointer;
+  touch-action: manipulation;
+  contain: layout paint;
+}
+
+/* Stardew Floating Emote Bubble */
+.stardew-emote-bubble {
+  position: absolute;
+  top: -10px;
+  right: -4px;
+  background: #ffffff;
+  border: 1.5px solid var(--pixel-wood-dark);
+  border-radius: 4px;
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
+  font-size: 13px;
+  line-height: 1;
+  padding: 2px 4px;
+  animation: emoteBounce 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 6;
+  pointer-events: none;
+}
+
+@keyframes emoteBounce {
+  0% { transform: scale(0.3) translateY(8px); opacity: 0; }
+  65% { transform: scale(1.2) translateY(-2px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
 }
 
 .customer-card.active {
@@ -475,26 +500,28 @@
 
 .patience-bar {
   flex: 1;
-  height: 6px;
-  background: #ecdcc6;
-  border-radius: 3px;
+  height: 8px;
+  background: var(--pixel-wood-dark);
+  border: 1px solid var(--pixel-wood-light);
+  border-radius: 2px;
   overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .patience-fill {
   height: 100%;
   width: 100%;
-  background: var(--mint);
-  border-radius: 3px;
+  background: var(--pixel-green);
+  border-radius: 0;
   transition: width 0.3s linear, background-color 0.3s;
 }
 
 .patience-fill.mid {
-  background: var(--gold-dark);
+  background: var(--pixel-gold-base);
 }
 
 .patience-fill.low {
-  background: var(--warn);
+  background: var(--pixel-red);
 }
 
 /* Empty Queue State */

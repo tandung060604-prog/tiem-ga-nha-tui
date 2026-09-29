@@ -38,7 +38,7 @@ export const FRY_RECIPES: Record<string, FryRecipe> = {
   spicy_chicken: { type: 'chicken', sauce: 'spicy', stock: ['chicken_meat', 'flour', 'spicy_sauce'] },
   honey_garlic_chicken: { type: 'chicken', sauce: 'honey', stock: ['chicken_meat', 'flour', 'garlic_honey'] },
   shake_fries: { type: 'fries', sauce: null, stock: ['potato_cheese'] },
-  popcorn_chicken: { type: 'popcorn', sauce: null, stock: ['chicken_meat', 'flour'] },
+  popcorn_chicken: { type: 'popcorn', sauce: null, stock: ['popcorn_chicken', 'flour'] },
   spicy_thigh: { type: 'thigh', sauce: null, stock: ['chicken_thigh', 'flour'] },
   cheese_stick: { type: 'cheese', sauce: null, stock: ['cheese_stick_raw'] }
 };

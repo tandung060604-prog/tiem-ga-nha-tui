@@ -431,13 +431,7 @@ export class ReviewsEngine {
 
     const bonuses: string[] = [];
 
-    // Cứu vãn điểm sao tiêu chí nếu phản hồi đúng đắn
-    if (opt.starBonus && opt.starBonus > 0) {
-      const crit = review.weakestCriteria || 'taste';
-      draft.ratings[crit] = Math.min(5.0, Math.round((draft.ratings[crit] + opt.starBonus) * 10) / 10);
-      draft.ratings.overall = this.calculateOverallStars(draft.ratings);
-      bonuses.push(`+${opt.starBonus.toFixed(1)}⭐`);
-    }
+    // Trả lời đánh giá không cộng thêm sao cho quán (người chơi tự do phản hồi)
 
     // Tác động chỉ số ngầm Karma
     if (opt.karmaReward) {

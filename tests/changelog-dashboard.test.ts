@@ -2,14 +2,14 @@ import { describe, it, expect } from 'vitest';
 import { CHANGELOG_DATA, CURRENT_GAME_VERSION, CURRENT_VERSION_CODENAME } from '../src/content/changelog';
 import { renderUpdateDashboardModal } from '../src/ui/components/UpdateDashboardModal';
 
-describe('Bảng Tin Cập Nhật Phiên Bản Dashboard (v2.2.1)', () => {
-  it('1. Dữ liệu Changelog có version v2.2.1 và tên phiên bản chuẩn xác', () => {
-    expect(CURRENT_GAME_VERSION).toBe('v2.2.1');
-    expect(CURRENT_VERSION_CODENAME).toContain('Vòng Lặp Vàng');
+describe('Bảng Tin Cập Nhật Phiên Bản Dashboard (v2.5.0)', () => {
+  it('1. Dữ liệu Changelog có version v2.5.0 và tên phiên bản chuẩn xác', () => {
+    expect(CURRENT_GAME_VERSION).toBe('v2.5.0');
+    expect(CURRENT_VERSION_CODENAME).toContain('Đại Trùng Tu Pixel Art');
 
     const release = CHANGELOG_DATA[0];
     expect(release).toBeDefined();
-    expect(release.version).toBe('v2.2.1');
+    expect(release.version).toBe('v2.5.0');
     expect(release.isLatest).toBe(true);
     expect(release.metrics.length).toBeGreaterThanOrEqual(5);
     expect(release.categories.length).toBeGreaterThanOrEqual(2);
@@ -17,11 +17,11 @@ describe('Bảng Tin Cập Nhật Phiên Bản Dashboard (v2.2.1)', () => {
 
   it('2. renderUpdateDashboardModal tạo HTML chứa đầy đủ thông tin và các nút đóng', () => {
     const html = renderUpdateDashboardModal();
-    expect(html).toContain('v2.2.1');
+    expect(html).toContain('v2.5.0');
     expect(html).toContain('BẢNG TIN TIỆM GÀ NHÀ TUI');
     expect(html).toContain('btn-close-dashboard-top');
     expect(html).toContain('btn-close-dashboard-cta');
-    expect(html).toContain('Lọc Cặn Dầu');
-    expect(html).toContain('Sốt Bí Truyền');
+    expect(html).toContain('Stardew Valley');
+    expect(html).toContain('Typography');
   });
 });

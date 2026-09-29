@@ -48,6 +48,26 @@ describe('Bác Ba chỉ bước tiếp theo từ trạng thái thật của ca',
     expect(tutorialStep(started, s, idle, [item('shake_fries', 'raw')])).toBe('discard-raw');
   });
 
+  it('khách gọi gà viên popcorn → chỉ khay gà viên để chiên', () => {
+    const s = createSellingSession();
+    s.orders = [order([['popcorn_chicken', 1]])];
+    expect(tutorialStep(started, s, idle, [])).toBe('fry-popcorn');
+  });
+
+  it('khách gọi cánh gà sốt cay → Bác Ba chỉ khay sốt Yangnyeom trước, ướp xong mới thả gà', () => {
+    const s = createSellingSession();
+    s.orders = [order([['spicy_chicken', 1]])];
+    expect(tutorialStep(started, s, idle, [], null)).toBe('season-spicy');
+    expect(tutorialStep(started, s, idle, [], 'spicy')).toBe('fry-chicken');
+  });
+
+  it('khách gọi gà sốt bơ tỏi → Bác Ba chỉ khay sốt Bơ Tỏi trước, ướp xong mới thả gà', () => {
+    const s = createSellingSession();
+    s.orders = [order([['honey_garlic_chicken', 1]])];
+    expect(tutorialStep(started, s, idle, [], null)).toBe('season-honey');
+    expect(tutorialStep(started, s, idle, [], 'honey')).toBe('fry-chicken');
+  });
+
   it('mọi bước đều có lời thoại; bước cần bấm nút có chỗ chỉ vào', () => {
     for (const [step, t] of Object.entries(TUTORIAL_TEXT)) {
       expect(t.text.length, step).toBeGreaterThan(20);

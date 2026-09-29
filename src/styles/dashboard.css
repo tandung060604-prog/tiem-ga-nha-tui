@@ -1,42 +1,53 @@
-/* Dashboard Bảng Tin Cập Nhật Phiên Bản v2.1.0 - Tiệm Gà Nhà Tui */
+/* ==========================================================================
+   DASHBOARD BẢNG TIN CẬP NHẬT PHIÊN BẢN v2.5.0
+   Phong cách Pixel Art 16-Bit Stardew Valley (Bảng Thông Cáo Thị Trấn Gỗ Mộc)
+   ========================================================================== */
 
 .modal-card.is-dashboard,
-.modal-card:has(.update-dashboard-card) {
+.modal-card:has(.update-dashboard-card),
+#modal-content.is-dashboard {
   padding: 0 !important;
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
-  max-width: 520px !important;
+  max-width: 440px !important;
   width: 100% !important;
 }
 
 .update-dashboard-card {
   display: flex;
   flex-direction: column;
-  max-height: 86vh;
-  max-width: 520px;
+  max-height: 88vh;
+  max-width: 440px;
   width: 100%;
   margin: 0 auto;
-  background: linear-gradient(180deg, #fffdf8 0%, #fff7ed 100%);
-  border: 2.5px solid #f59e0b;
-  border-radius: 20px;
-  box-shadow: 0 16px 40px rgba(180, 83, 9, 0.25), 0 2px 6px rgba(0, 0, 0, 0.08);
+  background: #faeed1;
+  border: 4px solid #5a3018;
+  border-radius: 4px;
+  box-shadow: 
+    inset 2px 2px 0 #fff, 
+    inset -2px -2px 0 #8e542d, 
+    0 8px 0 #1a0c06, 
+    0 16px 36px rgba(0, 0, 0, 0.85);
   overflow: hidden;
   position: relative;
   text-align: left;
-  animation: dashPopIn 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  image-rendering: pixelated;
+  animation: dashPopIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 @keyframes dashPopIn {
-  0% { transform: scale(0.92); opacity: 0; }
+  0% { transform: scale(0.94); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }
 
+/* Header Bảng Hiệu Gỗ Mộc */
 .dash-header {
-  padding: 16px 16px 12px;
-  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-  border-bottom: 2px solid #fde68a;
+  padding: 10px 12px 8px;
+  background: #5a3018;
+  border-bottom: 3px solid #2b1810;
   position: relative;
+  box-shadow: inset 0 2px 0 #8e542d;
 }
 
 .dash-brand-row {
@@ -51,158 +62,176 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
-  color: #fff;
-  padding: 3px 10px;
-  border-radius: 20px;
+  background: #f7d046;
+  color: #5a3018;
+  border: 2px solid #2b1810;
+  border-radius: 2px;
+  padding: 2px 6px;
+  font-family: var(--font-pixel-heading), 'Tiny5 Duo', monospace;
   font-weight: 800;
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   letter-spacing: 0.5px;
-  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.35);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 1px 1px 0 #fff, 1px 2px 0 #1a0c06;
 }
 
 .dash-date-pill {
-  font-size: 0.72rem;
+  font-family: var(--font-pixel-body), 'VT323', monospace;
+  font-size: 0.95rem;
   font-weight: 700;
-  color: #92400e;
-  background: rgba(245, 158, 11, 0.15);
-  padding: 3px 8px;
-  border-radius: 12px;
+  color: #ffd166;
+  background: #3a1f11;
+  border: 1px solid #7a4805;
+  padding: 2px 6px;
+  border-radius: 2px;
 }
 
 .dash-close-x {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1.5px solid #fcd34d;
-  background: #ffffff;
-  color: #78350f;
+  width: 28px;
+  height: 28px;
+  border-radius: 2px;
+  border: 2px solid #1a0c06;
+  background: #8e542d;
+  color: #fff;
+  font-family: monospace;
   font-size: 1rem;
-  font-weight: 800;
+  font-weight: 900;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.15s ease, background 0.15s ease;
+  box-shadow: inset 1px 1px 0 #b87c4c, 0 2px 0 #1a0c06;
+  transition: transform 0.1s ease;
 }
 
 .dash-close-x:active {
-  transform: scale(0.9);
-  background: #fef3c7;
+  transform: translate(1px, 2px);
+  box-shadow: 0 0 0 #1a0c06;
 }
 
 .dash-main-title {
-  font-family: 'Baloo 2', cursive, sans-serif;
-  margin: 4px 0 0;
-  font-size: 1.32rem;
-  font-weight: 800;
-  color: #9a3412;
-  letter-spacing: -0.3px;
+  font-family: var(--font-pixel-heading), 'Tiny5 Duo', monospace !important;
+  margin: 2px 0 0;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #f7d046;
+  text-shadow: 2px 2px 0 #1a0c06;
   line-height: 1.2;
 }
 
 .dash-codename {
-  font-size: 0.82rem;
+  font-family: var(--font-pixel-body), 'VT323', monospace !important;
+  font-size: 1.05rem;
   font-weight: 800;
-  color: #b45309;
+  color: #faeed1;
   margin-top: 2px;
+  letter-spacing: 0.5px;
 }
 
 .dash-summary-lead {
   margin: 6px 0 0;
-  font-size: 0.78rem;
-  line-height: 1.45;
-  color: #78350f;
-  background: rgba(254, 243, 199, 0.6);
-  padding: 6px 10px;
-  border-radius: 8px;
-  border-left: 3px solid #f59e0b;
+  font-family: var(--font-pixel-body), 'Tiny5', monospace;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  color: #faeed1;
+  background: #2b1810;
+  padding: 6px 8px;
+  border-radius: 2px;
+  border: 2px solid #5a3018;
+  border-left: 4px solid #f7d046;
 }
 
-/* Quick Metrics 6 Grid */
+/* Quick Metrics 6 Grid (Stardew Style - 3 Cột Chuẩn minmax 0 1fr) */
 .dash-metrics-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  padding: 10px 14px;
-  background: #fffdf9;
-  border-bottom: 1.5px dashed #fed7aa;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  padding: 8px 10px;
+  background: #3a1f11;
+  border-bottom: 2px solid #2b1810;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .dash-metric-card {
-  background: #ffffff;
-  border: 1.5px solid #ffedd5;
-  border-radius: 10px;
-  padding: 6px 4px;
+  background: #2b1810;
+  border: 2px solid #5a3018;
+  border-radius: 2px;
+  padding: 5px 2px;
   text-align: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  box-shadow: inset 1px 1px 0 #8e542d, 1px 2px 0 #1a0c06;
 }
 
 .dash-metric-icon {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   margin-bottom: 1px;
 }
 
 .dash-metric-val {
-  font-size: 0.72rem;
+  font-family: var(--font-pixel-body), 'VT323', monospace;
+  font-size: 0.82rem;
   font-weight: 800;
-  color: #9a3412;
+  color: #f7d046;
+  white-space: normal;
+  line-height: 1.15;
+  word-break: break-word;
+  padding: 0 1px;
+}
+
+.dash-metric-lbl {
+  font-family: var(--font-pixel-body), 'Tiny5', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #faeed1;
+  opacity: 0.85;
+  margin-top: 1px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.dash-metric-lbl {
-  font-size: 0.62rem;
-  font-weight: 600;
-  color: #9a3412;
-  opacity: 0.8;
-  margin-top: 1px;
-}
-
-/* Scrollable Content */
+/* Scrollable Content (Parchment Texture) */
 .dash-scroll-body {
-  padding: 12px 14px;
+  padding: 10px 12px;
   overflow-y: auto;
-  max-height: 48vh;
+  max-height: 38vh;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   -webkit-overflow-scrolling: touch;
 }
 
 .dash-scroll-body::-webkit-scrollbar {
-  width: 5px;
+  width: 6px;
 }
 .dash-scroll-body::-webkit-scrollbar-thumb {
-  background: #fbd38d;
-  border-radius: 10px;
+  background: #8e542d;
+  border: 1px solid #2b1810;
+  border-radius: 2px;
 }
 
 .dash-category-sec {
-  background: #ffffff;
-  border: 1.5px solid #fed7aa;
-  border-radius: 12px;
+  background: #faeed1;
+  border: 2px solid #8e542d;
+  border-radius: 2px;
   padding: 10px 12px;
-  box-shadow: 0 2px 6px rgba(180, 83, 9, 0.05);
+  box-shadow: inset 1px 1px 0 #fff, 2px 2px 0 #1a0c06;
 }
 
 .dash-category-title {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: 'Baloo 2', cursive, sans-serif;
-  font-size: 0.96rem;
+  font-family: var(--font-pixel-heading), 'Tiny5 Duo', monospace;
+  font-size: 1rem;
   font-weight: 800;
-  color: #7c2d12;
-  border-bottom: 1.5px solid #ffedd5;
+  color: #5a3018;
+  border-bottom: 2px dashed #8e542d;
   padding-bottom: 6px;
   margin-bottom: 8px;
 }
 
 .dash-cat-icon {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
 }
 
 .dash-category-items {
@@ -212,9 +241,9 @@
 }
 
 .dash-item-box {
-  background: #fffaf0;
-  border: 1px solid #feebc8;
-  border-radius: 8px;
+  background: #fff8e8;
+  border: 1px solid #c49654;
+  border-radius: 2px;
   padding: 8px 10px;
 }
 
@@ -228,70 +257,80 @@
 
 .dash-item-tag {
   color: #ffffff;
-  font-size: 0.62rem;
+  font-family: var(--font-pixel-body), 'VT323', monospace;
+  font-size: 0.95rem;
   font-weight: 800;
   padding: 2px 6px;
-  border-radius: 6px;
+  border-radius: 2px;
   letter-spacing: 0.4px;
   text-transform: uppercase;
+  border: 1px solid #1a0c06;
+  box-shadow: 1px 1px 0 #1a0c06;
 }
 
 .dash-item-title {
   margin: 0;
-  font-size: 0.85rem;
+  font-family: var(--font-pixel-heading), 'Tiny5 Duo', monospace;
+  font-size: 0.95rem;
   font-weight: 800;
-  color: #431407;
+  color: #2b1810;
 }
 
 .dash-item-desc {
   margin: 0 0 6px;
-  font-size: 0.76rem;
-  color: #57321e;
+  font-family: var(--font-pixel-body), 'Tiny5', monospace;
+  font-size: 0.95rem;
+  color: #5a3018;
   line-height: 1.4;
 }
 
 .dash-item-bullets {
   margin: 0;
   padding-left: 16px;
-  font-size: 0.72rem;
-  color: #78350f;
-  line-height: 1.4;
+  font-family: var(--font-pixel-body), 'Tiny5', monospace;
+  font-size: 0.92rem;
+  color: #3a1f11;
+  line-height: 1.45;
 }
 
 .dash-item-bullets li {
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 
 /* Footer Action */
 .dash-footer {
   padding: 10px 14px calc(env(safe-area-inset-bottom, 0px) + 12px);
-  background: #fffbeb;
-  border-top: 2px solid #fed7aa;
+  background: #3a1f11;
+  border-top: 3px solid #2b1810;
 }
 
 .dash-cta-btn {
   width: 100%;
-  min-height: 46px;
+  min-height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+  background: #d92534;
   color: #ffffff;
-  border: 0;
-  border-radius: 12px;
-  font-family: 'Baloo 2', cursive, sans-serif;
-  font-size: 0.98rem;
+  border: 3px solid #2b1810;
+  border-radius: 3px;
+  font-family: var(--font-pixel-heading), 'Tiny5 Duo', monospace;
+  font-size: 1.05rem;
   font-weight: 800;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(194, 65, 12, 0.35);
-  transition: transform 0.1s ease, filter 0.1s ease;
+  box-shadow: 
+    inset 2px 2px 0 #ff7e8a, 
+    inset -2px -2px 0 #7e0a13, 
+    0 4px 0 #1a0c06;
+  text-shadow: 1px 1px 0 #7e0a13;
+  transition: transform 0.1s ease;
 }
 
 .dash-cta-btn:active {
-  transform: scale(0.97);
-  filter: brightness(0.92);
+  transform: translate(2px, 3px);
+  box-shadow: inset 2px 2px 0 #7e0a13, inset -2px -2px 0 #ff7e8a, 0 1px 0 #1a0c06;
 }
 
 /* Nút mở Changelog Dashboard trên Title Screen & Header */
@@ -299,18 +338,20 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-  border: 1.5px solid #f59e0b;
-  color: #92400e;
+  background: #5a3018;
+  border: 2px solid #2b1810;
+  color: #f7d046;
   padding: 4px 10px;
-  border-radius: 16px;
-  font-size: 0.76rem;
-  font-weight: 800;
+  border-radius: 2px;
+  font-family: var(--font-pixel-body), 'VT323', monospace;
+  font-size: 1.05rem;
+  font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(245, 158, 11, 0.2);
+  box-shadow: inset 1px 1px 0 #8e542d, 1px 2px 0 #1a0c06;
   transition: transform 0.1s ease;
 }
 
 .btn-dashboard-pill:active {
-  transform: scale(0.95);
+  transform: translate(1px, 2px);
+  box-shadow: 0 1px 0 #1a0c06;
 }

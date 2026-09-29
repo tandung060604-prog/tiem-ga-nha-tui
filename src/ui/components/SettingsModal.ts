@@ -59,6 +59,26 @@ export function renderSettingsModal(state: GameState): string {
         </button>
       </div>
 
+      <!-- Sliders Âm Lượng Riêng Biệt (report-tinh-nang #50) -->
+      <div style="background: rgba(0,0,0,0.04); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px;">
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; margin-bottom: 2px;">
+            <span>🔊 Âm lượng hiệu ứng (SFX)</span>
+            <span id="label-sfx-vol">${Math.round((state.sfxVolume ?? 0.8) * 100)}%</span>
+          </div>
+          <input id="slider-sfx-vol" type="range" min="0" max="100" value="${Math.round((state.sfxVolume ?? 0.8) * 100)}"
+            style="width: 100%; accent-color: var(--pixel-gold-dark, #c98e1e); cursor: pointer;" />
+        </div>
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; margin-bottom: 2px;">
+            <span>🎵 Âm lượng nhạc nền (BGM)</span>
+            <span id="label-bgm-vol">${Math.round((state.bgmVolume ?? 0.7) * 100)}%</span>
+          </div>
+          <input id="slider-bgm-vol" type="range" min="0" max="100" value="${Math.round((state.bgmVolume ?? 0.7) * 100)}"
+            style="width: 100%; accent-color: var(--pixel-gold-dark, #c98e1e); cursor: pointer;" />
+        </div>
+      </div>
+
       <!-- Progression Stats -->
       <div style="background: var(--bg); border-radius: 12px; padding: 10px; font-size: 0.78rem; display: flex; flex-direction: column; gap: 4px;">
         <div>🍗 Tổng miếng gà đã chiên: <b>${state.lifetimeStats.totalFried}</b></div>

@@ -46,7 +46,10 @@ export function canMake(state: Pick<GameState, 'menu' | 'currentChapter' | 'day'
   const live = state.menu.find(m => m.id === id);
   if (!def?.station || !live || def.chapter > state.currentChapter || (def.unlockDay ?? 1) > state.day) return false;
   if (def.components) return def.components.every(c => canMake(state, c.menuItemId));
-  return Object.keys(def.ingredients).every(ingId => state.inventory[ingId]?.unlocked !== false);
+  return Object.keys(def.ingredients).every(ingId => {
+    const inv = state.inventory[ingId];
+    return inv !== undefined && inv.unlocked === true;
+  });
 }
 
 export class OrdersEngine {
@@ -58,8 +61,8 @@ export class OrdersEngine {
     const combos = makeable.filter(m => CONTENT.get(m.id)?.components);
     const byRole = (role: BasketRole) => singles.filter(m => basketRoleOf(m.id) === role);
     const mains = byRole('main');
-    const mainPool = mains.length > 0 ? mains
-      : state.menu.filter(m => m.chapter <= state.currentChapter && SERVABLE_IDS.has(m.id) && basketRoleOf(m.id) === 'main');
+    const fallbackMains = state.menu.filter(m => m.chapter <= state.currentChapter && SERVABLE_IDS.has(m.id) && basketRoleOf(m.id) === 'main' && canMake(state, m.id));
+    const mainPool = mains.length > 0 ? mains : (fallbackMains.length > 0 ? fallbackMains : state.menu.filter(m => m.id === 'crispy_chicken'));
 
     const selectedItems: CustomerOrder['items'] = [];
     const addItem = (menuItemId: string, count: number) => {
@@ -118,7 +121,8 @@ export class OrdersEngine {
     }
     const extraItems = selectedItems.reduce((n, it) => n + it.count, 0) - 1;
 
-    const customerName = isDelivery ? `[App] ${isVip ? '👑 ' : ''}${char.name}` : isWalkupDrink ? `Người đi đường (${char.name})` : (isVip ? `👑 ${char.name} 💵` : `${char.name}`);
+    const isLongDistance = isDelivery && (state.deliveryRunnerDayCount ?? 0) < 2 && (random() < 0.35);
+    const customerName = isDelivery ? `${isLongDistance ? '🛵 [Giao Xa] ' : '[App] '}${isVip ? '👑 ' : ''}${char.name}` : isWalkupDrink ? `Người đi đường (${char.name})` : (isVip ? `👑 ${char.name} 💵` : `${char.name}`);
     const avatar = isDelivery ? '🛵' : char.avatar;
 
     // Thời gian kiên nhẫn: 28 - 42 giây (ảnh hưởng bởi archetype và nâng cấp không gian)
@@ -139,6 +143,7 @@ export class OrdersEngine {
       customerName,
       avatar,
       isDelivery,
+      ...(isLongDistance ? { isLongDistance: true } : {}),
       isVip,
       archetypeBadge: char.title,
       personality: char.personality,

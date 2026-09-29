@@ -1439,6 +1439,112 @@ export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
         reactionNarrative: 'Bạn đút túi 10 triệu tiền cọc. Bên đối thủ hí hửng đem về thử nghiệm nhưng chiên lên bột vừa cứng vừa ngấy dầu, không bao giờ đạt được hương vị Tiệm Gà Nhà Tui!'
       }
     ]
+  },
+
+  // 26. Đại chiến tờ rơi với Gà Rán Phố Cao (Chương 3, Ngày 20+)
+  {
+    id: 'incident_pho_cao_flyer_war',
+    title: 'Gà Rán Phố Cao Rải Tờ Rơi Giảm 50% Đầu Hẻm',
+    categoryTag: 'ĐỐI THỦ CẠNH TRANH',
+    icon: '⚔️',
+    characterName: 'Quản Lý Khang (Chuỗi Phố Cao)',
+    characterAvatar: '🕴️',
+    characterImg: charImg('char_10_winner_hung.png'),
+    emoteBubble: '📢',
+    characterRole: 'Đại Diện Chuỗi Nhượng Quyền Phố Cao',
+    context: 'Chuỗi Gà Rán Phố Cao thuê PG đứng ngay đầu Hẻm 1102 phát tờ rơi giảm giá 50%, kèm loa phát thanh chê gà rán vỉa hè trong hẻm "kém chuẩn công nghiệp" nhằm lôi kéo khách ruột của bạn.',
+    dialogue: 'Gà rán chuẩn chuỗi 5 sao ngoài phố lớn giảm nửa giá đây! Tội gì chui vào hẻm ăn gà chiên vỉa hè!',
+    phaseTiming: 'morning',
+    isSecurityRisk: false,
+    minChapter: 3,
+    minDay: 20,
+    rarity: 'rare',
+    unlockHint: 'Mở khóa từ Chương 3 (Ngày 20): Chuỗi gà công nghiệp Phố Cao bắt đầu cạnh tranh khốc liệt.',
+    choices: [
+      {
+        id: 'pho_cao_free_taste',
+        label: 'Tung "Thách Thức Giòn Rụm" mời nếm thử miễn phí',
+        subDesc: 'Tốn 50k gà tươi chiên nóng, khách ăn thử khen đứt đuôi chuỗi công nghiệp',
+        kicker: '🍗 CHẤT LƯỢNG LÊN TIẾNG',
+        karmaDelta: { craftsmanship: 25, community: 20 },
+        moneyDelta: -50000,
+        reactionTitle: 'Chiến Thắng Bằng Đẳng Cấp!',
+        reactionNarrative: 'Bạn mang khay gà vừa vớt nóng hổi thơm phức ra đầu hẻm mời khách ăn thử đối chứng. Mùi thơm ngào ngạt đánh bại hoàn toàn gà đông lạnh của Phố Cao! Khách xếp hàng dài dằng dặc tràn vào hẻm 1102!'
+      },
+      {
+        id: 'pho_cao_neighbors_support',
+        label: 'Nhờ Bác Ba và bà con hẻm vận động văn minh',
+        subDesc: 'Bà con hẻm 1102 ra đầu ngõ nhắc nhở, kiên quyết bảo vệ tiệm gà nhà mình',
+        kicker: '🏘️ TÌNH LÀNG NGHĨA XÓM',
+        karmaDelta: { community: 30, ambition: 5 },
+        moneyDelta: 0,
+        reactionTitle: 'Sức Mạnh Tình Thân Hẻm 1102',
+        reactionNarrative: 'Bác Ba cùng các cô chú trong hẻm ra đầu ngõ nhắc nhở đội ngũ tiếp thị không được xả rác và gây ồn ào. Khách quen trong hẻm đồng thanh tuyên bố: "Gà ở đây tươi ngon nóng hổi, chuỗi máy móc tuổi gì sánh bằng!"'
+      },
+      {
+        id: 'pho_cao_focus_kitchen',
+        label: 'Mặc kệ đối thủ, tập trung canh chảo vàng giòn nhất',
+        subDesc: 'Tập trung tối đa chất lượng phục vụ, không bị xao nhãng bởi chiêu trò',
+        kicker: '🍳 TÂM BẤT BIẾN GIỮA DÒNG ĐỜI',
+        karmaDelta: { craftsmanship: 20, ambition: 10 },
+        moneyDelta: 0,
+        reactionTitle: 'Hương Thơm Tự Nhiên Bay Xa',
+        reactionNarrative: 'Bạn điềm tĩnh đứng bên chảo dầu nóng, canh từng mẻ gà vàng ươm hoàn hảo. Mùi thơm từ hẻm bay ra tận mặt đường lôi cuốn từng lượt khách tự tìm đến nếm thử.'
+      }
+    ]
+  },
+
+  // 27. Cứu nguy Shipper Phố Cao chết máy (Chương 3, Ngày 22+)
+  {
+    id: 'incident_pho_cao_shipper_help',
+    title: 'Shipper Phố Cao Chết Máy Giữa Trưa Nắng Gắt',
+    categoryTag: 'TÌNH NGHĨA HẺM 1102',
+    icon: '🛵',
+    characterName: 'Shipper Hoàng (Giao Phố Cao)',
+    characterAvatar: '🛵',
+    characterImg: charImg('char_19_shipper_tuan.png'),
+    emoteBubble: '💦',
+    characterRole: 'Tài Xế Giao Hàng Cho Chuỗi Đối Thủ',
+    context: 'Một bạn shipper trẻ mặc áo đồng phục chuỗi Phố Cao dắt bộ chiếc xe xịt lốp trong trưa hè nắng đổ lửa 38°C, đứng mồ hôi nhễ nhại trước tiệm bạn, mặt tái mét vì sắp trễ đơn bị trừ lương.',
+    dialogue: 'Anh/chị ơi cho em xin ngụm nước với... Xe em bể bánh giữa trưa, còn 3 đơn gà Phố Cao giao trễ là em bị trừ sạch tiền công ngày hôm nay...',
+    phaseTiming: 'shift',
+    isSecurityRisk: false,
+    minChapter: 3,
+    minDay: 22,
+    rarity: 'rare',
+    unlockHint: 'Mở khóa từ Chương 3 (Ngày 22): Tình người giữa cái nắng Sài Gòn và những con hẻm.',
+    choices: [
+      {
+        id: 'shipper_iced_tea_tools',
+        label: 'Mời ly trà đá mát lạnh & chỉ tiệm Chú Tư vá xe nhanh',
+        subDesc: 'Tốn 5k trà đá, shipper cảm kích đăng bài cảm ơn làm tiệm viral trên mạng xã hội',
+        kicker: '💖 NGHĨA TÌNH SÀI GÒN',
+        karmaDelta: { community: 35, craftsmanship: 10 },
+        moneyDelta: -5000,
+        reactionTitle: 'Nghĩa Cử Ấm Áp Giữa Trưa Hè!',
+        reactionNarrative: 'Bạn rót ngay ly trà đá mát lạnh và dẫn bạn shipper sang tiệm Chú Tư vá xe cấp tốc. Bạn shipper sau đó viết bài cảm ơn "Chủ tiệm gà nhân hậu nhất Sài Gòn" trên nhóm Shipper Sài Gòn, kéo theo hàng trăm tài xế ủng hộ quán!'
+      },
+      {
+        id: 'shipper_exchange_fresh',
+        label: 'Bán giảm giá 1 hộp gà nóng của quán cho khách của anh ta',
+        subDesc: 'Đổi hộp gà nguội ngắt thành gà tươi nóng hổi giúp shipper cứu nguy đơn',
+        kicker: '🍗 TAY NGHỀ CỨU NGUY',
+        karmaDelta: { craftsmanship: 25, community: 20 },
+        moneyDelta: 30000,
+        reactionTitle: 'Vị Cứu Tinh Của Khách Ăn Gà',
+        reactionNarrative: 'Vị khách đặt đơn Phố Cao khi nhận được hộp gà chiên nóng giòn của Tiệm Gà Nhà Tui ngạc nhiên vì quá ngon, liền nhắn hỏi địa chỉ tiệm để từ nay chuyển hẳn sang ăn gà của quán bạn!'
+      },
+      {
+        id: 'shipper_give_water_free',
+        label: 'Cho mượn cây bơm xe và bình nước lọc',
+        subDesc: 'Hỗ trợ chân tình bằng công cụ sẵn có của quán',
+        kicker: '💧 GIỌT NƯỚC MÁT LÀNH',
+        karmaDelta: { community: 20 },
+        moneyDelta: 0,
+        reactionTitle: 'Tiếp Sức Đường Dài',
+        reactionNarrative: 'Được uống ngụm nước mát và bơm căng bánh xe, bạn shipper cúi đầu cảm ơn rối rít rồi tiếp tục hành trình giao hàng mưu sinh.'
+      }
+    ]
   }
 ];
 

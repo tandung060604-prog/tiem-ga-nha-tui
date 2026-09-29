@@ -199,7 +199,8 @@ export const ASSETS = {
     stickerCat: url('assets/ui/sticker_cat.png'),
     stickerLantern: url('assets/ui/sticker_lantern.png'),
     stickerDaisy: url('assets/ui/sticker_daisy.png'),
-    landingVnBg: url('assets/ui/landing_vn_bg.jpg')
+    landingVnBg: url('assets/ui/landing_vn_bg_clean.jpg'),
+    bannerStardewChicken: url('assets/ui/banner_stardew_chicken.png')
   }
 } as const;
 

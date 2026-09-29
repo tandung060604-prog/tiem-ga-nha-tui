@@ -1061,28 +1061,30 @@ body.selling-mode .awning::after {
   z-index: 35;
 }
 
-/* Story Novel Modal Buttons */
+/* Story Novel Modal Buttons - Stardew Wooden Selector */
 .story-act-btn {
   flex: 0 0 150px;
-  background: var(--panel);
-  border: 2px solid var(--line);
-  border-radius: 12px;
+  background: var(--pixel-parchment-bg);
+  border: 2px solid var(--pixel-wood-base);
+  border-radius: 4px;
   padding: 8px 10px;
   cursor: pointer;
   text-align: left;
   transition: all 0.15s ease;
   font-family: inherit;
+  box-shadow: inset 0 0 4px var(--pixel-parchment-shadow), 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .story-act-btn.active {
-  border-color: var(--red);
-  background: #fff0f0;
-  box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.2);
+  border-color: var(--pixel-gold-base);
+  background: #fff8eb;
+  box-shadow: 0 0 0 2px var(--pixel-gold-light), 2px 2px 0 var(--pixel-wood-dark);
 }
 
 .story-act-btn.locked {
   opacity: 0.6;
-  background: #f0e6d6;
+  background: #e2d2be;
+  border-color: #8c735d;
 }
 
 /* Mascot Gà Bông Animation Widget */
@@ -1355,16 +1357,17 @@ body.selling-mode .awning::after {
 }
 
 .story-reading-panel {
-  background: #faf4ea;
-  border: 2px solid var(--line);
-  border-radius: var(--radius-md);
-  padding: 14px;
+  background: var(--pixel-parchment-bg);
+  border: 3px solid var(--pixel-wood-base);
+  border-radius: 4px;
+  box-shadow: inset 0 0 12px var(--pixel-parchment-shadow), 3px 3px 0 rgba(0, 0, 0, 0.4);
+  padding: 16px;
   overflow-y: auto;
   max-height: 52vh;
   font-family: var(--font-body);
   line-height: 1.6;
-  font-size: 0.88rem;
-  color: #3d2c2e;
+  font-size: 0.9rem;
+  color: var(--pixel-parchment-text);
   position: relative;
   z-index: 1;
 }
@@ -1457,29 +1460,32 @@ body.selling-mode .awning::after {
   gap: 4px;
   width: 100%;
   text-align: left;
-  background: #ffffff;
-  border: 1.5px solid var(--line);
-  border-radius: 10px;
+  background: var(--pixel-parchment-bg);
+  border: 2px solid var(--pixel-wood-base);
+  border-radius: 4px;
   padding: 10px 12px;
   margin-bottom: 8px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.1s ease;
   box-sizing: border-box;
+  box-shadow: inset -2px -2px 0 var(--pixel-wood-dark), 2px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
 .btn-story-choice:hover:not(:disabled) {
-  border-color: var(--red);
-  background: #fff8f8;
+  border-color: var(--pixel-gold-base);
+  background: #fff8eb;
   transform: translateY(-1px);
 }
 
 .btn-story-choice:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
 }
 
 .btn-story-choice.chosen {
   background: #e8f5e9;
   border-color: #2e7d32;
+  box-shadow: inset 0 0 8px rgba(46, 125, 50, 0.25), 2px 2px 0 #1b5e20;
 }
 
 .btn-story-choice:disabled {

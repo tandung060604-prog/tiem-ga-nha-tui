@@ -77,6 +77,17 @@ class MusicBox {
     }
   }
 
+  private volume: number = 0.7;
+
+  getVolume() { return this.volume; }
+
+  setVolume(vol: number) {
+    this.volume = Math.max(0, Math.min(1, vol));
+    if (this.activeAudio) {
+      this.activeAudio.volume = Math.min(1, 0.45 * (this.volume / 0.7));
+    }
+  }
+
   setEnabled(on: boolean) {
     this.enabled = on;
     try { localStorage.setItem(MUSIC_PREF_KEY, on ? '1' : '0'); } catch { /* chế độ riêng tư */ }
@@ -108,7 +119,7 @@ class MusicBox {
     const targetAudio = (mode === 'selling') ? selling : title;
 
     if (targetAudio) {
-      this.crossFadeTo(targetAudio, 0.45);
+      this.crossFadeTo(targetAudio, 0.45 * (this.volume / 0.7));
       return;
     }
 

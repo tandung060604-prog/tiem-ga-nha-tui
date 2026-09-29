@@ -207,6 +207,7 @@ export interface CustomerOrder {
   customerName: string;
   avatar: string;
   isDelivery: boolean;
+  isLongDistance?: boolean; // Đơn giao xa cần tự chạy xe máy hoặc thuê ship ngoài (Delivery Runner)
   isMysteryGuest?: boolean;
   isWalkupDrink?: boolean; // người đi đường chỉ mua nước mang đi (đã gồm phụ thu)
   isVip?: boolean;         // Khách Sộp hào phóng
@@ -486,6 +487,36 @@ export interface GameState {
   expiredWasteNotification?: { items: string[]; totalValue: number; day: number } | null; // Thông báo hủy hàng hết hạn qua đêm
   secretSauceDay?: SecretSauceDayState | null; // Trạng thái Nồi Sốt Bí Truyền của ngày hôm nay
   todayOilFiltered?: boolean; // Đã chơi minigame lọc cặn dầu cuối ngày hôm nay chưa
+  bgmVolume?: number;                // Âm lượng nhạc nền (0.0 -> 1.0)
+  sfxVolume?: number;                // Âm lượng hiệu ứng âm thanh (0.0 -> 1.0)
+  todayMarketDiscount?: number;      // % giảm giá sỉ khi đi chợ trả giá hôm nay (0 -> 35%)
+  todayMarketBargained?: boolean;    // Đã đi chợ đầu ngày hôm nay chưa
+  deliveryRunnerDayCount?: number;   // Số đơn giao xa đã xử lý hôm nay (tối đa 2 đơn/ngày)
+}
+
+export interface BargainWholesaler {
+  id: string;
+  name: string;
+  stallName: string;
+  avatar: string;
+  dialogue: string;
+  specialty: string;
+}
+
+export interface BargainResult {
+  success: boolean;
+  discountPct: number;
+  discountPercent?: number;
+  message: string;
+  wholesaler: BargainWholesaler;
+}
+
+export interface DeliveryRunResult {
+  mode: 'manual' | 'outsourced';
+  crashes: number;
+  tipBonus: number;
+  speedRatingDelta: number;
+  message: string;
 }
 
 export interface OilCrumb {

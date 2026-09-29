@@ -778,6 +778,9 @@ export function closeDay(draft: GameState, session: SellingSession, event: GameE
     burntWaste: session.burntWaste ?? 0
   });
   draft.todayOilCost = 0;
+  draft.todayMarketDiscount = 0;
+  draft.todayMarketBargained = false;
+  draft.deliveryRunnerDayCount = 0;
 
 
   const perfectRatio = session.totalFriedCount > 0 ? session.perfectCount / session.totalFriedCount : 0.8;

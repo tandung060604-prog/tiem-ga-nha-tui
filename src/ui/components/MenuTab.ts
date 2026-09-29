@@ -3,19 +3,21 @@ import { audio } from '../../core/audio';
 import { REGULAR_CUSTOMERS } from '../../content/customers';
 import { ASSETS } from '../../content/assets';
 import { PRICE_BANDS, PRICE_STEP, adjustPrice, averagePriceRatio, communityDriftFromPrice, customerMultiplierFromPrice, priceBand, priceLimits, priceRatio, pricingTarget } from '../../core/pricing';
+import { canMake } from '../../core/orders';
 
 export function renderMenuTab(state: GameState): string {
   const currentChapter = state.currentChapter;
 
   const menuRows = state.menu.map((item, idx) => {
+    const canCook = canMake(state, item.id);
     const dayLocked = (item.unlockDay ?? 1) > state.day;
-    const isUnlocked = item.chapter <= currentChapter && !dayLocked;
+    const isUnlocked = item.chapter <= currentChapter && !dayLocked && canCook;
     const ratio = priceRatio(item);
     const band = priceBand(ratio);
     const limits = priceLimits(item);
     const lockTag = item.chapter > currentChapter
       ? `Chương ${item.chapter}`
-      : (dayLocked ? `Ngày ${item.unlockDay}` : '');
+      : (dayLocked ? `Ngày ${item.unlockDay}` : (!canCook ? 'Chưa ký HĐ kho' : ''));
 
     return `
       <div class="item-row" style="opacity: ${isUnlocked ? '1' : '0.5'};">

@@ -200,7 +200,6 @@ export function renderSummaryModal(
           <div style="margin-top: 8px; background: #fff; border-radius: 8px; padding: 6px 10px; font-size: 0.74rem; border-left: 3px solid #10b981; box-shadow: 0 1px 4px rgba(0,0,0,0.05);">
             <div style="color: #ea580c; font-weight: 800; display: flex; justify-content: space-between;">
               <span>🍗 Chủ Tiệm Đã Phản Hồi:</span>
-              ${review.playerReply ? `<span style="color: #10b981;">+${(review.playerReply.starBonus ?? 0.2).toFixed(1)}⭐ Cứu sao</span>` : ''}
             </div>
             <div style="color: #4a2c1d; font-style: italic; margin-top: 2px;">"${escapeHtml(review.playerReply?.text || review.ownerReply || '')}"</div>
             ${review.playerReply?.customerReaction ? `
@@ -211,7 +210,7 @@ export function renderSummaryModal(
           </div>
         ` : `
           <button id="btn-summary-reply-review" class="btn-sm" style="width: 100%; margin-top: 10px; font-weight: 800; padding: 7px 12px; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);">
-            <span>💬</span> Trả Lời Đánh Giá Ngay (💡 Bác Ba Mách Nước)
+            <span>💬</span> Trả Lời Đánh Giá Ngay
           </button>
         `}
       </div>

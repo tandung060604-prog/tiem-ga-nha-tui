@@ -24,16 +24,135 @@ export interface ChangelogRelease {
   }[];
 }
 
-export const CURRENT_GAME_VERSION = 'v2.2.1';
-export const CURRENT_VERSION_CODENAME = 'Vòng Lặp Vàng: Nấu Sốt Sáng & Lọc Dầu Đêm';
-export const CURRENT_BUILD_DATE = '28/09/2026';
+export const CURRENT_GAME_VERSION = 'v2.5.0';
+export const CURRENT_VERSION_CODENAME = 'Đại Trùng Tu Pixel Art: Hoài Niệm Stardew Valley & Typography Tiếng Việt Tuyệt Đối';
+export const CURRENT_BUILD_DATE = '29/09/2026';
 
 export const CHANGELOG_DATA: ChangelogRelease[] = [
+  {
+    version: 'v2.5.0',
+    codename: 'Đại Trùng Tu Pixel Art: Hoài Niệm Stardew Valley & Typography Tiếng Việt Tuyệt Đối',
+    releaseDate: '29/09/2026',
+    isLatest: true,
+    highlightSummary: 'Big Update đồ họa và trải nghiệm lớn nhất từ trước đến nay: Chuyển mình toàn diện sang phong cách Pixel Art 16-bit hoài niệm Stardew Valley! Bức tranh bìa & banner quầy xe Hẻm 1102 hoàn toàn mới từ Gemini AI, bộ font Tiny5 Duo / Tiny5 hỗ trợ 100% tiếng Việt chống lỗi font, 118 asset pixel sắc nét và âm thanh 16-bit acoustic ấm áp.',
+    metrics: [
+      { icon: '🎨', label: 'Bìa & Banner', value: 'Stardew 16-Bit' },
+      { icon: '🔡', label: 'Font Tiếng Việt', value: '100% Không Lỗi' },
+      { icon: '🍗', label: 'Asset Món & Bếp', value: '118 Pixel Thật' },
+      { icon: '🎵', label: 'Âm Thanh Retro', value: '16-Bit Acoustic' },
+      { icon: '⚡', label: 'Tốc Độ Khung Hình', value: '60-120 FPS' },
+      { icon: '🧪', label: 'Kiểm Định', value: '476 Tests PASS' }
+    ],
+    categories: [
+      {
+        categoryName: 'Mỹ Thuật Pixel Art & Bìa Mở Đầu Stardew Valley',
+        categoryIcon: '🎨',
+        items: [
+          {
+            tag: 'COVER ART',
+            tagColor: '#d97706',
+            title: 'Tranh Bìa & Biển Gỗ Treo Hẻm 1102 Chuẩn Stardew Valley',
+            desc: 'Được sáng tác bởi Gemini AI và inpaint tinh xảo từng pixel:',
+            details: [
+              'Khung cảnh Hẻm 1102 lúc hoàng hôn buông xuống ấm áp, lồng đèn đỏ và dây đèn tròn vàng rực rỡ.',
+              'Cô chủ tiệm rạng rỡ bưng mẹt đùi gà rán vàng ươm, Bác Ba phúc hậu canh chảo dầu sôi bốc hơi nghi ngút.',
+              'Bé Gà Bông linh vật đội nón bếp đứng cổ vũ trên quầy, bé Miu nằm ngủ ngoan trên ghế đẩu.',
+              'Bảng hiệu gỗ mộc vát cạnh đính đinh tán vàng, dây xích sắt treo cổ điển: "TIỆM GÀ NHÀ TUI · HẺM 1102 · GIÒN RỤM".'
+            ]
+          },
+          {
+            tag: 'PIXEL ASSETS',
+            tagColor: '#16a34a',
+            title: 'Chuyển Đổi Toàn Diện 118 Asset Sang 16-Bit Pixel Thật',
+            desc: 'Không còn nét vẽ vector mượt, toàn bộ thế giới Tiệm Gà Nhà Tui trở về phong cách đồ họa SNES:',
+            details: [
+              '36 Nhân vật & Pet cư dân Hẻm 1102 theo chuẩn pixel 48×48 sắc nét.',
+              '22 Món ăn, đồ uống, sốt ướp theo chuẩn pixel 32×32 bóng bẩy giòn rụm.',
+              'Toàn bộ thiết bị bếp: Chảo gang đúc dầu sôi phản quang, quầy khay GN inox, máy rót nước có đá viên pixel.',
+              'Hệ thống nút bấm 3D pixel bevel lún phím êm ái khi chạm 1 ngón cái.'
+            ]
+          }
+        ]
+      },
+      {
+        categoryName: 'Hệ Thống Typography Pixel Chống Lỗi Font Tiếng Việt',
+        categoryIcon: '🔡',
+        items: [
+          {
+            tag: 'TYPOGRAPHY',
+            tagColor: '#dc2626',
+            title: 'Độ Phủ 100% Ký Tự Tiếng Việt — Không Bao Giờ Nhảy Font',
+            desc: 'Khắc phục triệt để lỗi thiếu ký tự của các font pixel quốc tế cũ:',
+            details: [
+              'Tiny5 Duo: Chân chữ kép đậm 16-bit chuyên dụng cho Headings, Banner, Nút Bấm Hero và Bảng Giá.',
+              'Tiny5 Regular: Nét đơn thanh thoát dễ đọc cho Lời Thoại Visual Novel, Nhật Ký Cốt Truyện và Review GenZ.',
+              'VT323: Font Monospace CRT cổ điển cho Đồng Hồ Ca Bán và Số Tiền Cuối Ngày.',
+              'Độ phủ tuyệt đối 148/148 nguyên âm có dấu (U+1EA0-1EF9), tự lưu trữ offline WOFF2 chỉ 25KB, không lo giật FOUT.'
+            ]
+          }
+        ]
+      },
+      {
+        categoryName: 'Gameplay: Đàm Phán Chợ Đầu Mối & Giao Đơn Xa',
+        categoryIcon: '🛵',
+        items: [
+          {
+            tag: 'CHỢ LỚN',
+            tagColor: '#f59e0b',
+            title: 'Minigame Đi Chợ Trả Giá (Chợ Lớn Bargaining)',
+            desc: 'Gặp gỡ 3 tiểu thương Chợ Lớn (Cô Năm, Chú Bảy, Dì Tám) đầu ngày để mặc cả giá sỉ:',
+            details: [
+              '3 Chiến thuật đàm phán: Năn nỉ tình nghĩa (-15%), Cam kết số lượng lớn (-25%), Ép giá cứng rắn (-35%).',
+              'Đàm phán thành công giúp giảm trực tiếp giá mua toàn bộ nguyên liệu trong ngày.'
+            ]
+          },
+          {
+            tag: 'EXPRESS',
+            tagColor: '#0284c7',
+            title: 'Minigame Chạy Xe Giao Đơn Xa (Hẻm 1102 Express)',
+            desc: 'Thực khách ngoại khu đặt đơn gà lớn mang lại cơ hội kiếm tiền khủng:',
+            details: [
+              'Tự mình lái xe máy né ổ gà, rào chắn 3 làn trong 15s để nhận 100% tiền tip đậm (+35k-50k).',
+              'Hoặc thuê shipper ngoài nhanh gọn an toàn với mức phí hợp lý 15.000đ.'
+            ]
+          },
+          {
+            tag: 'QOL',
+            tagColor: '#8b5cf6',
+            title: 'Thao Tác Kho Nhanh & Thanh Trượt Âm Lượng Riêng Biệt',
+            desc: 'Nâng cấp trải nghiệm người dùng chuẩn game indie cao cấp:',
+            details: [
+              'Nhấn giữ nút +/- trong kho để mua/bán nguyên liệu nhanh với gia tốc tự động.',
+              'Thanh trượt điều chỉnh âm lượng riêng biệt cho Nhạc Nền (BGM) và Âm Hiệu 16-bit (SFX) trong Cài Đặt.'
+            ]
+          }
+        ]
+      },
+      {
+        categoryName: 'Âm Thanh Retro & Tối Ưu Hiệu Năng 60-120 FPS',
+        categoryIcon: '⚡',
+        items: [
+          {
+            tag: 'AUDIO & FEEL',
+            tagColor: '#7c3aed',
+            title: 'Hệ Thống Âm Thanh 16-Bit Acoustic & Game Feel',
+            desc: 'Mang bầu không khí thư thái chữa lành phong cách Pelican Town:',
+            details: [
+              'Âm thanh nhảy chữ typewriter blip khi nhân vật trò chuyện.',
+              'Tiếng click gỗ mộc ấm áp, tiếng chuông vàng khải hoàn khi chốt ngày có lãi.',
+              'Bong bóng cảm xúc Stardew Emote Bubbles (❤️, 💡, ❓, 💢, ✨) nảy mẩy trên thẻ thực khách.',
+              'Tối ưu WeakMap DOM Cache giúp giảm 100% Layout Thrashing, mượt mà 60-120 FPS trên mobile.'
+            ]
+          }
+        ]
+      }
+    ]
+  },
   {
     version: 'v2.2.1',
     codename: 'Vòng Lặp Vàng: Nấu Sốt Sáng & Lọc Dầu Đêm — Tuyển Chọn Bởi TypeSafe AI Jev',
     releaseDate: '28/09/2026',
-    isLatest: true,
+    isLatest: false,
     highlightSummary: 'Tuyển chọn trọn vẹn 2 tính năng vàng từ báo cáo mì cay theo khuyến nghị TypeSafe AI Jev: Sáng nêm Sốt Bí Truyền Má Bảy (Buff Vàng +3k tip & +0.25★ Hương Vị), Tối vớt cặn bột cháy cứu chảo chiên (Tiết kiệm tới 150k thay dầu & +0.2★ Vệ Sinh). Khép kín vòng lặp quản lý tiệm gà cực kỳ cuốn hút!',
     metrics: [
       { icon: '🍲', label: 'Nấu Sốt Sáng', value: '5 Gia Vị Tuyển Chọn' },

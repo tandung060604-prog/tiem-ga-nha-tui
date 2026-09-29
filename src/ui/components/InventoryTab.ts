@@ -91,13 +91,32 @@ export function renderInventoryTab(state: GameState): string {
     `;
   }).join('');
 
+  const marketDiscount = state.todayMarketDiscount || 0;
+  const marketBannerHtml = state.todayMarketBargained
+    ? (marketDiscount > 0
+        ? `<div style="background: rgba(16,185,129,0.12); border: 1.5px solid #10b981; border-radius: 6px; padding: 6px 10px; margin-bottom: 10px; font-size: 0.8rem; color: #065f46; display: flex; justify-content: space-between; align-items: center;">
+            <span>🏷️ <b>Đã đi Chợ Lớn:</b> Giảm -${marketDiscount}% giá nhập sỉ cả ngày hôm nay!</span>
+          </div>`
+        : `<div style="background: rgba(0,0,0,0.05); border: 1px dashed var(--line); border-radius: 6px; padding: 6px 10px; margin-bottom: 10px; font-size: 0.78rem; color: var(--soft);">
+            <span>🛒 Đã ghé chợ sáng nay (tiểu thương giữ nguyên giá sỉ).</span>
+          </div>`
+      )
+    : `<div style="background: var(--pixel-parchment-bg, #faeed1); border: 2px solid var(--pixel-wood-dark, #4a2810); border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 2px 2px 0 rgba(0,0,0,0.2);">
+        <div>
+          <div style="font-weight: 800; font-size: 0.86rem; color: var(--pixel-wood-dark, #4a2810);">🛒 Đi Chợ Đầu Mối Chợ Lớn</div>
+          <div style="font-size: 0.72rem; color: #6b4c35;">Mặc cả với tiểu thương để được giảm 15% - 35% giá nhập sỉ cả ngày!</div>
+        </div>
+        <button id="btn-open-market-bargain" class="pixel-btn is-warning" style="font-size: 0.74rem; padding: 5px 8px; white-space: nowrap;">ĐI CHỢ NGAY</button>
+      </div>`;
+
   return `
     <div class="sec-title">
       <span>📦 Quản Lý Kho & Nguyên Liệu</span>
       <span style="font-size: 0.78rem; color: var(--soft); font-weight: normal;">Lưu ý: Mua dư hết hạn là lỗ!</span>
     </div>
+    ${marketBannerHtml}
     <div class="sec-desc">
-      Nhập đủ gà tươi, bột, dầu và gia vị trước giờ mở bán (10:00). Bấm <b>-5</b> để hoàn trả nếu lỡ tay mua nhầm!
+      Nhập đủ gà tươi, bột, dầu và gia vị trước giờ mở bán (10:00). Bấm <b>-5</b> để hoàn trả nếu lỡ tay mua nhầm! Nhấn giữ nút để nhập nhanh.
       ${effects.shelfLifeBonus > 0 ? `<br><b style="color:var(--mint-dark,#10b981);">❄️ Kho lạnh bảo quản: +${effects.shelfLifeBonus} ngày hạn dùng cho mọi lô nhập mới!</b>` : ''}
     </div>
     <div class="inventory-list">
@@ -106,18 +125,54 @@ export function renderInventoryTab(state: GameState): string {
   `;
 }
 
+function setupLongPress(btn: HTMLElement, action: () => void) {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  let interval: ReturnType<typeof setInterval> | null = null;
+  let speed = 180;
+
+  const start = (e: Event) => {
+    e.preventDefault();
+    action();
+    speed = 180;
+    timer = setTimeout(() => {
+      interval = setInterval(() => {
+        action();
+        speed = Math.max(60, speed - 15);
+      }, speed);
+    }, 320);
+  };
+
+  const stop = () => {
+    if (timer) clearTimeout(timer);
+    if (interval) clearInterval(interval);
+    timer = null;
+    interval = null;
+  };
+
+  btn.addEventListener('pointerdown', start);
+  btn.addEventListener('pointerup', stop);
+  btn.addEventListener('pointerleave', stop);
+  btn.addEventListener('pointercancel', stop);
+}
+
 export function bindInventoryEvents(
   state: GameState,
   onUpdateState: (fn: (draft: GameState) => void) => void,
-  showToast: (msg: string) => void
+  showToast: (msg: string) => void,
+  onOpenMarketBargain?: () => void
 ) {
-  // 1. Nhập hàng (+5 / +10)
-  const buyButtons = document.querySelectorAll('.btn-buy');
+  // Đi chợ trả giá
+  const bargainBtn = document.getElementById('btn-open-market-bargain');
+  if (bargainBtn && onOpenMarketBargain) {
+    bargainBtn.addEventListener('click', onOpenMarketBargain);
+  }
+
+  // 1. Nhập hàng (+5 / +10) có hỗ trợ nhấn giữ gia tốc
+  const buyButtons = document.querySelectorAll<HTMLElement>('.btn-buy');
   buyButtons.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const target = e.currentTarget as HTMLElement;
-      const itemId = target.getAttribute('data-id');
-      const qty = parseInt(target.getAttribute('data-qty') || '5', 10);
+    const doBuy = () => {
+      const itemId = btn.getAttribute('data-id');
+      const qty = parseInt(btn.getAttribute('data-qty') || '5', 10);
 
       if (!itemId || !state.inventory[itemId]) return;
 
@@ -128,7 +183,8 @@ export function bindInventoryEvents(
       }
 
       const effects = upgradeEffects(state.upgrades);
-      const discount = effects.discountWholesale || 0;
+      const marketDiscount = state.todayMarketDiscount || 0;
+      const discount = Math.min(60, (effects.discountWholesale || 0) + marketDiscount);
       const unitCost = Math.round(item.cost * (1 - discount / 100));
       const totalCost = unitCost * qty;
 
@@ -141,22 +197,22 @@ export function bindInventoryEvents(
         const targetItem = draft.inventory[itemId];
         if (!targetItem || draft.money < totalCost) return;
         draft.money -= totalCost;
-        // Lô mới có hạn riêng; cộng thêm ngày bảo quản của kho lạnh; ghi giá sỉ đã trả
         addStock(targetItem, qty, unitCost, effects.shelfLifeBonus);
       });
 
       audio.playCash();
       showToast(`Đã nhập +${qty} ${item.name} (-${totalCost.toLocaleString('vi-VN')}đ)`);
-    });
+    };
+
+    setupLongPress(btn, doBuy);
   });
 
-  // 2. Hoàn vốn / Giảm nhập (-5)
-  const refundButtons = document.querySelectorAll('.btn-refund');
+  // 2. Hoàn vốn / Giảm nhập (-5) có hỗ trợ nhấn giữ gia tốc
+  const refundButtons = document.querySelectorAll<HTMLElement>('.btn-refund');
   refundButtons.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const target = e.currentTarget as HTMLElement;
-      const itemId = target.getAttribute('data-id');
-      const qty = parseInt(target.getAttribute('data-qty') || '5', 10);
+    const doRefund = () => {
+      const itemId = btn.getAttribute('data-id');
+      const qty = parseInt(btn.getAttribute('data-qty') || '5', 10);
 
       if (!itemId || !state.inventory[itemId]) return;
 
@@ -173,7 +229,9 @@ export function bindInventoryEvents(
       }
       audio.playCash();
       showToast(`Đã trả lại ${qty} ${item.name} (+${refunded.toLocaleString('vi-VN')}đ)`);
-    });
+    };
+
+    setupLongPress(btn, doRefund);
   });
 
   // 3. Ký hợp đồng mở khóa nguyên liệu mới (Unlock)

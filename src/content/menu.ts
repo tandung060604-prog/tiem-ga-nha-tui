@@ -219,7 +219,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
     basketRole: 'main',
     station: 'fryer',
     steps: ['Chiên mẻ nhỏ'],
-    ingredients: { chicken_meat: 1, flour: 1 }
+    ingredients: { popcorn_chicken: 1, flour: 1 }
   },
   {
     id: 'peach_tea',

@@ -1,0 +1,778 @@
+/* ==========================================================================
+   STARDEW VALLEY 16-BIT RETRO PIXEL ART THEME FOR TIỆM GÀ NHÀ TUI
+   Full Game Overhaul: Banners, Characters, Food, Kitchen Equipment, Buttons & HUD
+   ========================================================================== */
+
+/* 1. GLOBAL PIXEL RENDERING & TYPOGRAPHY */
+html, body {
+  font-family: var(--font-pixel-body), "VT323", monospace;
+  font-size: 17px;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  background-color: #2b1810;
+}
+
+/* Ensure ALL pixel sprites stay ultra crisp with no anti-aliased blur */
+img,
+svg,
+canvas,
+.pixel-art,
+.brand-logo-img,
+.store-logo-badge,
+.t-img,
+.order-food-thumb,
+.gn-pan img,
+.char-actor img,
+.shelf-box img,
+.prep-basket-thumb,
+.board-drumstick-sticker,
+.board-neon-sticker,
+.mascot-avatar,
+.story-portrait img {
+  image-rendering: pixelated !important;
+  image-rendering: -moz-crisp-edges !important;
+  image-rendering: crisp-edges !important;
+}
+
+/* Headings in 16-bit Tiny5 Duo (100% Tiếng Việt) */
+h1, h2, h3, h4,
+.brand-title,
+.board-header h2,
+.modal-card h2,
+.modal-card h3,
+.incident-title,
+.story-speaker,
+.ending-kicker,
+.chapter-unlocked-title,
+.tutorial-speaker {
+  font-family: var(--font-pixel-heading), "Tiny5 Duo", "VT323", monospace !important;
+  letter-spacing: 0.5px;
+}
+
+/* Body & numeric text in VT323 */
+p, span, div, b, small, button, input, select, textarea,
+.brand-tagline,
+.h-day-box b,
+.h-day-box small,
+.h-r b,
+.h-r small,
+.goal-info,
+.order-item-title,
+.t-name,
+.t-stock,
+.thought-text,
+.item-name,
+.item-price,
+.tutorial-text {
+  font-family: var(--font-pixel-body), "VT323", monospace !important;
+}
+
+/* ==========================================================================
+   2. TITLE SCREEN & GRAND OPENING BANNER (STARDEW WOODEN SIGNBOARD)
+   ========================================================================== */
+
+.title-screen {
+  background-color: #1a0c06 !important;
+  image-rendering: pixelated !important;
+}
+
+.title-awning {
+  height: calc(16px + env(safe-area-inset-top)) !important;
+  background: repeating-linear-gradient(90deg, #d92534 0 16px, #faeed1 16px 32px) !important;
+  border-bottom: 2px solid #2b1810 !important;
+  box-shadow: 0 4px 0 #1a0c06 !important;
+}
+
+/* Title Screen Dark Vignette & Background Overlay */
+.title-overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+  background: 
+    linear-gradient(180deg, #1a0c06 0%, rgba(26, 12, 6, 0.96) 18%, rgba(26, 12, 6, 0.75) 26%, rgba(26, 12, 6, 0.2) 34%, transparent 42%),
+    linear-gradient(0deg, rgba(20, 10, 5, 0.95) 0%, rgba(20, 10, 5, 0.65) 22%, transparent 45%) !important;
+}
+
+/* Title Stardew Signboard Banner */
+.title-banner-container {
+  position: relative !important;
+  z-index: 20 !important;
+  display: flex !important;
+  justify-content: center !important;
+  padding: calc(22px + env(safe-area-inset-top)) 10px 0 !important;
+  width: 100% !important;
+  max-width: 440px !important;
+}
+
+.title-stardew-banner {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.85)) !important;
+  animation: titleFloat 4s ease-in-out infinite !important;
+}
+
+.banner-stardew-img {
+  width: 100% !important;
+  max-width: 420px !important;
+  height: auto !important;
+  object-fit: contain !important;
+  image-rendering: pixelated !important;
+  image-rendering: -moz-crisp-edges !important;
+  image-rendering: crisp-edges !important;
+}
+
+/* Rustic Stardew Hanging Wooden Signboard */
+.title-brand-card {
+  background: #5a3018 !important;
+  border: 3px solid #2b1810 !important;
+  border-radius: 4px !important;
+  box-shadow: 
+    inset 2px 2px 0 #8e542d, 
+    inset -2px -2px 0 #1a0c06, 
+    0 5px 0 #1a0c06, 
+    0 10px 24px rgba(0, 0, 0, 0.75) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 10px 16px !important;
+  position: relative;
+}
+
+/* Wooden Signboard Iron Chains */
+.title-brand-card::before,
+.title-brand-card::after {
+  content: '' !important;
+  position: absolute !important;
+  top: -18px !important;
+  width: 6px !important;
+  height: 18px !important;
+  background: repeating-linear-gradient(180deg, #555 0 3px, #1a0c06 3px 6px) !important;
+  border: 1px solid #1a0c06 !important;
+}
+.title-brand-card::before { left: 24px; }
+.title-brand-card::after { right: 24px; }
+
+.brand-crest {
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 4px !important;
+  background: #faeed1 !important;
+  border: 2px solid #f7d046 !important;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #c98e1e, 1px 2px 0 #2b1810 !important;
+}
+
+.brand-title {
+  color: #f7d046 !important;
+  background: none !important;
+  -webkit-text-fill-color: initial !important;
+  text-shadow: 2px 2px 0 #7a4805, -1px -1px 0 #fff4c0 !important;
+  font-size: 1.3rem !important;
+}
+
+.brand-tagline {
+  color: #faeed1 !important;
+  text-shadow: 1px 1px 0 #1a0c06 !important;
+  font-size: 1.05rem !important;
+}
+
+/* Stardew Floating Dialogue / Speech Bubble */
+.title-speech-bubble {
+  background: #faeed1 !important;
+  color: #2b1810 !important;
+  border: 3px solid #5a3018 !important;
+  border-radius: 4px !important;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #8e542d, 2px 3px 0 #1a0c06 !important;
+  font-family: var(--font-pixel-body), "VT323", monospace !important;
+  font-size: 1.15rem !important;
+  padding: 8px 12px !important;
+}
+.title-speech-bubble::after {
+  border-top-color: #5a3018 !important;
+}
+
+/* Bottom Action Deck Panel */
+.title-action-deck {
+  background: #3a1f11 !important;
+  border: 3px solid #2b1810 !important;
+  border-radius: 4px !important;
+  box-shadow: inset 2px 2px 0 #5a3018, inset -2px -2px 0 #1a0c06, 0 6px 0 #1a0c06 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.save-status-chip {
+  background: #2b1810 !important;
+  border: 2px solid #5a3018 !important;
+  border-radius: 2px !important;
+  color: #f7d046 !important;
+  font-size: 0.95rem !important;
+}
+
+/* Hero CTA Button (Title & Start Selling) */
+.btn-title-hero {
+  min-height: 52px !important;
+  border-radius: 4px !important;
+  background: #d92534 !important;
+  border: 3px solid #2b1810 !important;
+  box-shadow: 
+    inset 2px 2px 0 #ff7e8a, 
+    inset -2px -2px 0 #7e0a13, 
+    0 4px 0 #1a0c06 !important;
+  animation: none !important;
+}
+.btn-title-hero:hover {
+  background: #e63946 !important;
+}
+.btn-title-hero:active {
+  transform: translate(2px, 3px) !important;
+  box-shadow: inset 2px 2px 0 #7e0a13, inset -2px -2px 0 #ff7e8a, 0 1px 0 #1a0c06 !important;
+}
+.hero-btn-content {
+  font-family: var(--font-pixel-heading), "Tiny5 Duo", "VT323", monospace !important;
+  font-size: 1.15rem !important;
+  text-shadow: 2px 2px 0 #7e0a13 !important;
+}
+
+.btn-control-pill {
+  background: #5a3018 !important;
+  border: 2px solid #2b1810 !important;
+  border-radius: 4px !important;
+  box-shadow: inset 1px 1px 0 #8e542d, inset -1px -1px 0 #1a0c06, 0 3px 0 #1a0c06 !important;
+  color: #faeed1 !important;
+  font-size: 1rem !important;
+}
+.btn-control-pill:active {
+  transform: translate(1px, 2px) !important;
+  box-shadow: inset 1px 1px 0 #1a0c06, 0 1px 0 #1a0c06 !important;
+}
+
+/* ==========================================================================
+   3. HEADER & HUD (STARDEW VALLEY TOP STATUS BAR)
+   ========================================================================== */
+
+.header {
+  background: #5a3018 !important;
+  border-bottom: 3px solid #2b1810 !important;
+  box-shadow: inset 0 -2px 0 #3a1f11, 0 3px 6px rgba(0, 0, 0, 0.45) !important;
+  color: #faeed1 !important;
+  padding: calc(var(--safe-top) + 6px) 8px 6px !important;
+  display: grid !important;
+  grid-template-columns: auto 1fr auto !important;
+  align-items: center !important;
+  gap: 6px !important;
+  min-height: 52px !important;
+}
+
+.h-l {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.h-day-box {
+  line-height: 1.1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+.h-day-box b {
+  color: #f7d046 !important;
+  font-size: 1.05rem !important;
+  text-shadow: 1px 1px 0 #1a0c06 !important;
+  line-height: 1.1 !important;
+}
+.h-day-box small {
+  color: #ffeedd !important;
+  font-size: 0.85rem !important;
+  line-height: 1.1 !important;
+}
+
+.h-m {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 1px !important;
+  min-width: 0 !important;
+}
+
+.h-m .store-badge {
+  background: #8e542d !important;
+  border: 2px solid #2b1810 !important;
+  border-radius: 2px !important;
+  color: #f7d046 !important;
+  font-size: 0.85rem !important;
+  box-shadow: inset 1px 1px 0 #b87c4c, inset -1px -1px 0 #5a3018, 1px 2px 0 #1a0c06 !important;
+  padding: 1px 6px !important;
+  max-width: 130px !important;
+  line-height: 1.2 !important;
+}
+
+.store-logo-badge {
+  border-radius: 2px !important;
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.h-m .money {
+  color: #ffd166 !important;
+  font-family: var(--font-pixel-heading), "Tiny5 Duo", "VT323", monospace !important;
+  font-size: 0.95rem !important;
+  text-shadow: 1px 1px 0 #1a0c06 !important;
+  line-height: 1.1 !important;
+  margin: 0 !important;
+}
+
+.h-r {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  line-height: 1.1 !important;
+}
+
+.h-r .stars {
+  color: #f7d046 !important;
+  text-shadow: 1px 1px 0 #1a0c06 !important;
+  font-size: 0.82rem !important;
+  letter-spacing: 0.5px !important;
+  line-height: 1.1 !important;
+}
+
+.h-r b {
+  color: #ffd166 !important;
+  font-size: 1.05rem !important;
+  text-shadow: 1px 1px 0 #1a0c06 !important;
+}
+.h-r small {
+  color: #faeed1 !important;
+  font-size: 0.82rem !important;
+  line-height: 1.1 !important;
+}
+
+.h-btn {
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 2px !important;
+  border: 2px solid #2b1810 !important;
+  background: #faeed1 !important;
+  color: #2b1810 !important;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #c49654, 1px 2px 0 #1a0c06 !important;
+  font-size: 0.9rem !important;
+}
+.h-btn:active {
+  transform: translate(1px, 2px) !important;
+  box-shadow: inset 1px 1px 0 #c49654, 0 1px 0 #1a0c06 !important;
+}
+
+/* Awning Strip */
+.awning {
+  height: 16px !important;
+  background: repeating-linear-gradient(90deg, #d92534 0 16px, #faeed1 16px 32px) !important;
+  box-shadow: 0 3px 0 #1a0c06 !important;
+  border-bottom: 2px solid #2b1810 !important;
+}
+.awning::after {
+  display: none !important;
+}
+
+/* Toast */
+.toast {
+  background: #faeed1 !important;
+  color: #2b1810 !important;
+  border: 3px solid #5a3018 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 4px 0 #1a0c06, inset 1px 1px 0 #fff !important;
+  font-family: var(--font-pixel-heading), "Tiny5 Duo", "VT323", monospace !important;
+  font-size: 0.85rem !important;
+  padding: 6px 14px !important;
+  top: calc(64px + var(--safe-top)) !important;
+}
+
+/* ==========================================================================
+   4. CHALKBOARD & BULLETIN BOARD (STARDEW COMMUNITY QUEST BOARD)
+   ========================================================================== */
+
+.prep-container {
+  padding-bottom: 96px !important;
+}
+
+.board {
+  background: #faeed1 !important;
+  border: 4px solid #5a3018 !important;
+  border-radius: 4px !important;
+  box-shadow: 
+    inset 2px 2px 0 #fff4c0, 
+    inset -2px -2px 0 #c49654, 
+    0 5px 0 #1a0c06 !important;
+  color: #2b1810 !important;
+  position: relative;
+}
+
+/* 4 Metal Nail Pins on Board Corners */
+.board::before {
+  content: '●';
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  color: #7a4805;
+  font-size: 12px;
+  line-height: 1;
+  text-shadow: 1px 1px 0 #faeed1;
+}
+
+.bistro-badge {
+  background: #5a3018 !important;
+  border: 2px solid #2b1810 !important;
+  border-radius: 2px !important;
+  color: #f7d046 !important;
+  font-size: 0.95rem !important;
+  box-shadow: inset 1px 1px 0 #8e542d, 1px 2px 0 #1a0c06 !important;
+}
+
+.board-header h2 {
+  color: #2b1810 !important;
+  font-size: 1.15rem !important;
+}
+
+.board-header .weather-badge {
+  background: #8e542d !important;
+  border: 2px solid #2b1810 !important;
+  border-radius: 2px !important;
+  color: #faeed1 !important;
+  font-size: 0.95rem !important;
+  box-shadow: inset 1px 1px 0 #b87c4c, 1px 2px 0 #1a0c06 !important;
+}
+
+.goal-bar.deposit-progress {
+  height: 14px !important;
+  background: #3a1f11 !important;
+  border: 2px solid #2b1810 !important;
+  border-radius: 2px !important;
+  box-shadow: inset 1px 1px 0 #1a0c06 !important;
+}
+
+.goal-bar-fill {
+  background: repeating-linear-gradient(90deg, #f7d046 0 8px, #e5b338 8px 16px) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.board-event-note {
+  color: #3a1f11 !important;
+  font-size: 1rem !important;
+}
+
+/* ==========================================================================
+   5. TABS BAR & FOLDER TABS (16-BIT WOODEN DESK TABS)
+   ========================================================================== */
+
+.tabs-bar {
+  background: #3a1f11 !important;
+  border: 2px solid #2b1810 !important;
+  border-bottom: none !important;
+  border-radius: 0 !important;
+  padding: 4px 4px 0 !important;
+  gap: 2px !important;
+}
+
+.tab-btn {
+  background: #5a3018 !important;
+  border: 2px solid #2b1810 !important;
+  border-bottom: none !important;
+  border-radius: 2px 2px 0 0 !important;
+  color: #faeed1 !important;
+  font-size: 0.95rem !important;
+  box-shadow: inset 1px 1px 0 #8e542d !important;
+  padding: 5px 2px 4px !important;
+  overflow: hidden !important;
+}
+
+.tab-btn span:last-child {
+  font-size: 0.82rem !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  max-width: 100% !important;
+}
+
+.tab-btn.active {
+  background: #faeed1 !important;
+  color: #2b1810 !important;
+  border-top: 3px solid #f7d046 !important;
+  box-shadow: inset 1px 1px 0 #ffffff !important;
+  font-weight: bold !important;
+  transform: translateY(-2px) !important;
+}
+
+.pane {
+  background: #faeed1 !important;
+  border: 2px solid #2b1810 !important;
+  border-top: none !important;
+  border-radius: 0 0 4px 4px !important;
+  color: #2b1810 !important;
+}
+
+/* ==========================================================================
+   6. ALL BUTTONS IN GAME (CRISP 16-BIT PIXEL BEVELS)
+   ========================================================================== */
+
+/* Main Big Open Selling Button */
+.btn-big-open {
+  border-radius: 4px !important;
+  border: 3px solid #2b1810 !important;
+  background: #d92534 !important;
+  color: #ffffff !important;
+  box-shadow: 
+    inset 2px 2px 0 #ff7e8a, 
+    inset -2px -2px 0 #7e0a13, 
+    0 5px 0 #1a0c06 !important;
+  font-family: var(--font-pixel-heading), "Tiny5 Duo", "VT323", monospace !important;
+  font-size: 1.15rem !important;
+  text-shadow: 2px 2px 0 #7e0a13 !important;
+  letter-spacing: 0.5px;
+}
+.btn-big-open:hover {
+  background: #e63946 !important;
+}
+.btn-big-open:active {
+  transform: translate(2px, 3px) !important;
+  box-shadow: inset 2px 2px 0 #7e0a13, inset -2px -2px 0 #ff7e8a, 0 1px 0 #1a0c06 !important;
+}
+
+/* Small, Action & Card Buttons */
+.btn-sm,
+.btn-sm.primary,
+.btn-bunny-card,
+.btn-incident-card,
+.btn-story-card,
+.btn-sauce-card,
+.btn-unlock,
+.btn-refund,
+.choice-btn,
+.btn-story-choice {
+  border-radius: 2px !important;
+  border: 2px solid #2b1810 !important;
+  font-family: var(--font-pixel-body), "VT323", monospace !important;
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  box-shadow: 
+    inset 1px 1px 0 rgba(255, 255, 255, 0.5), 
+    inset -1px -1px 0 rgba(0, 0, 0, 0.25), 
+    1px 2px 0 #1a0c06 !important;
+}
+
+.btn-sm:active,
+.btn-bunny-card:active,
+.btn-incident-card:active,
+.btn-story-card:active,
+.btn-refund:active,
+.choice-btn:active {
+  transform: translate(1px, 2px) !important;
+  box-shadow: 
+    inset -1px -1px 0 rgba(255, 255, 255, 0.5), 
+    inset 1px 1px 0 rgba(0, 0, 0, 0.25), 
+    0 1px 0 #1a0c06 !important;
+}
+
+.btn-sm.primary {
+  background: #d92534 !important;
+  color: #fff !important;
+  box-shadow: inset 1px 1px 0 #ff7e8a, inset -1px -1px 0 #7e0a13, 1px 2px 0 #1a0c06 !important;
+}
+
+.btn-bunny-card {
+  background: #f7d046 !important;
+  color: #5a3018 !important;
+  box-shadow: inset 1px 1px 0 #fff4c0, inset -1px -1px 0 #7a4805, 1px 2px 0 #1a0c06 !important;
+}
+
+.btn-incident-card {
+  background: #8e542d !important;
+  color: #faeed1 !important;
+  box-shadow: inset 1px 1px 0 #b87c4c, inset -1px -1px 0 #3a1f11, 1px 2px 0 #1a0c06 !important;
+}
+
+.btn-story-card {
+  background: #3ca346 !important;
+  color: #fff !important;
+  box-shadow: inset 1px 1px 0 #78d680, inset -1px -1px 0 #1e5923, 1px 2px 0 #1a0c06 !important;
+}
+
+.btn-refund {
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #ef4444, 1px 2px 0 #1a0c06 !important;
+}
+
+/* ==========================================================================
+   7. KITCHEN SELLING VIEW & EQUIPMENT STATIONS
+   ========================================================================== */
+
+.kitchen-hud {
+  background: #3a1f11 !important;
+  border-bottom: 3px solid #2b1810 !important;
+  color: #faeed1 !important;
+  min-height: 48px !important;
+}
+
+.kitchen-hud .clock {
+  color: #f7d046 !important;
+  font-family: var(--font-pixel-mono), "VT323", monospace !important;
+  font-size: 1.15rem !important;
+  white-space: nowrap !important;
+  letter-spacing: 0px !important;
+  text-shadow: 1px 1px 0 #000 !important;
+}
+
+.kitchen-hud .rush-badge {
+  background: #d92534 !important;
+  border: 1px solid #1a0c06 !important;
+  box-shadow: 1px 1px 0 #000 !important;
+  font-family: var(--font-pixel-heading), "Tiny5 Duo", "VT323", monospace !important;
+  font-size: 0.75rem !important;
+}
+
+.kitchen-counter {
+  background: #5a3018 !important;
+  border-top: 6px solid #8e542d !important;
+  box-shadow: inset 0 3px 0 #2b1810 !important;
+}
+
+/* Fryer Card & Equipments */
+.fryer-card {
+  background: #faeed1 !important;
+  border: 3px solid #2b1810 !important;
+  border-radius: 4px !important;
+  box-shadow: inset 2px 2px 0 #fff, inset -2px -2px 0 #c49654, 2px 3px 0 #1a0c06 !important;
+}
+
+.fry-pot {
+  background: #23120b !important;
+  border: 3px solid #1a0c06 !important;
+  border-radius: 4px !important;
+  box-shadow: inset 2px 2px 0 #4a2810, inset -2px -2px 0 #000 !important;
+}
+
+/* Holding Tray Equipment Slots */
+.tray-item {
+  background: #3a1f11 !important;
+  border: 2px solid #1a0c06 !important;
+  border-radius: 2px !important;
+  box-shadow: inset 2px 2px 0 #1a0c06, inset -2px -2px 0 #5a3018 !important;
+}
+.tray-item.empty {
+  background: #2b1810 !important;
+  border: 2px dashed #5a3018 !important;
+}
+
+/* Stainless Steel GN Pan Slots */
+.gn-pan {
+  background: #d8dde3 !important;
+  border: 2px solid #2b1810 !important;
+  border-radius: 2px !important;
+  box-shadow: inset 2px 2px 0 #ffffff, inset -2px -2px 0 #7b828a, 1px 2px 0 #1a0c06 !important;
+}
+.gn-pan:active {
+  transform: translate(1px, 2px) !important;
+  box-shadow: inset 2px 2px 0 #7b828a, inset -2px -2px 0 #ffffff, 0 1px 0 #1a0c06 !important;
+}
+
+/* Station Buttons & Fast-forward */
+.station-btn,
+#btn-toggle-fast,
+.btn-serve {
+  border-radius: 2px !important;
+  border: 2px solid #2b1810 !important;
+  font-family: var(--font-pixel-heading), "Tiny5 Duo", "VT323", monospace !important;
+  font-size: 0.85rem !important;
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.4), inset -1px -1px 0 rgba(0, 0, 0, 0.3), 1px 2px 0 #1a0c06 !important;
+}
+
+.btn-serve {
+  background: #d92534 !important;
+  color: #fff !important;
+}
+
+/* ==========================================================================
+   8. CUSTOMER CARDS & RETRO EMOTE BUBBLES
+   ========================================================================== */
+
+.customer-card {
+  background: #faeed1 !important;
+  border: 2px solid #5a3018 !important;
+  border-radius: 2px !important;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #c49654, 2px 3px 0 #1a0c06 !important;
+  color: #2b1810 !important;
+}
+
+.customer-card.active {
+  border-color: #f7d046 !important;
+  box-shadow: 
+    inset 2px 2px 0 #fff4c0, 
+    inset -2px -2px 0 #7a4805, 
+    0 0 10px rgba(247, 208, 70, 0.75) !important;
+}
+
+.thought-bubble {
+  background: #ffffff !important;
+  border: 2px solid #2b1810 !important;
+  border-radius: 2px !important;
+  box-shadow: 1px 2px 0 #1a0c06 !important;
+  font-family: var(--font-pixel-body), "VT323", monospace !important;
+  font-size: 1.05rem !important;
+  color: #2b1810 !important;
+}
+
+.stardew-emote-bubble {
+  border: 2px solid #2b1810 !important;
+  border-radius: 2px !important;
+  box-shadow: 1px 2px 0 #1a0c06 !important;
+}
+
+.patience-bar {
+  background: #3a1f11 !important;
+  border: 1px solid #1a0c06 !important;
+  border-radius: 1px !important;
+}
+
+/* ==========================================================================
+   9. MODALS, TUTORIAL & DIALOGUES (STARDEW 9-SLICE WOODEN PARCHMENT BOX)
+   ========================================================================== */
+
+.modal-card,
+.confirm-dialog,
+.incident-dialog,
+.settings-modal,
+.story-dialog-box,
+.tutorial-bubble {
+  background: #faeed1 !important;
+  border: 4px solid #5a3018 !important;
+  border-radius: 4px !important;
+  box-shadow: 
+    inset 3px 3px 0 #f7d046, 
+    inset -3px -3px 0 #2b1810, 
+    0 8px 0 #1a0c06 !important;
+  color: #2b1810 !important;
+}
+
+.modal-card h2,
+.confirm-message,
+.incident-title,
+.tutorial-speaker {
+  color: #5a3018 !important;
+  text-shadow: 1px 1px 0 #fff4c0 !important;
+}
+
+.tutorial-actions button {
+  border-radius: 2px !important;
+  border: 2px solid #2b1810 !important;
+  font-family: var(--font-pixel-body), "VT323", monospace !important;
+  font-size: 1.1rem !important;
+  box-shadow: 1px 2px 0 #1a0c06 !important;
+}

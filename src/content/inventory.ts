@@ -188,5 +188,18 @@ export const INITIAL_INVENTORY: { [id: string]: Omit<InventoryItem, 'batches'> }
     unlocked: false,
     unlockDay: 8,
     unlockCost: 60000
+  },
+  popcorn_chicken: {
+    id: 'popcorn_chicken',
+    name: 'Gà viên Popcorn tẩm vị',
+    unit: 'phần',
+    cost: 10000,
+    amount: 0,
+    shelfLifeDays: 3,
+    currentLifeDays: 3,
+    icon: '🍿',
+    unlocked: false,
+    unlockDay: 5,
+    unlockCost: 50000
   }
 };

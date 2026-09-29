@@ -71,18 +71,6 @@ export function renderReviewReplyModal(review: CustomerReview): string {
         ` : ''}
       </div>
 
-      <!-- Hộp Cố Vấn Bác Ba Mách Nước -->
-      <div class="advisor-hint-card">
-        <div class="advisor-hint-header">
-          <span class="advisor-bulb-icon">💡</span>
-          <span class="advisor-hint-title">BÁC BA CỐ VẤN MÁCH NƯỚC</span>
-          <span class="advisor-badge-recom">TÂM LÝ KHÁCH HÀNG</span>
-        </div>
-        <p class="advisor-hint-body">
-          ${escapeHtml(review.advisorHint || 'Khách ghé tiệm quý ở tấm lòng chân thật. Dù khen hay góp ý, cứ bình tâm lắng nghe và ứng xử thật khéo léo con nghen!')}
-        </p>
-      </div>
-
       <!-- Trạng thái: Đã trả lời hoặc Chọn phương án trả lời -->
       ${isAlreadyReplied ? `
         <div class="replied-history-card">
@@ -101,7 +89,6 @@ export function renderReviewReplyModal(review: CustomerReview): string {
 
           ${review.playerReply ? `
             <div class="reply-outcome-bar">
-              <span class="outcome-pill">⭐ +${(review.playerReply.starBonus ?? 0.2).toFixed(1)} Điểm Sao</span>
               ${review.playerReply.karmaBonus?.community ? `<span class="outcome-pill">💖 Tình Hẻm +${review.playerReply.karmaBonus.community}</span>` : ''}
               ${review.playerReply.karmaBonus?.craftsmanship ? `<span class="outcome-pill">🔪 Tay Nghề +${review.playerReply.karmaBonus.craftsmanship}</span>` : ''}
               ${review.playerReply.karmaBonus?.ambition ? `<span class="outcome-pill">🏆 Tham Vọng +${review.playerReply.karmaBonus.ambition}</span>` : ''}
@@ -117,25 +104,19 @@ export function renderReviewReplyModal(review: CustomerReview): string {
       ` : `
         <div class="reply-options-list">
           <div class="options-header-label">
-            <span>🎯 Chọn 1 trong 3 cách ứng xử của bạn:</span>
+            <span>🎯 Chọn cách hồi đáp của riêng bạn:</span>
           </div>
 
           ${options.map((opt: ReviewReplyOption) => {
             const stratKey = opt.strategy || opt.style || 'sincere';
             const strat = STRATEGY_BADGES[stratKey] || { label: 'Phản Hồi', icon: '💬', theme: 'theme-sincere' };
-            const isRec = opt.isRecommended;
 
             return `
-              <div class="reply-option-card ${strat.theme} ${isRec ? 'is-recommended-card' : ''}">
+              <div class="reply-option-card ${strat.theme}">
                 <div class="opt-card-header">
                   <div class="opt-strat-badge">
                     <span>${strat.icon}</span> ${strat.label}
                   </div>
-                  ${isRec ? `
-                    <div class="recom-sparkle-badge">
-                      ⭐ BÁC BA GỢI Ý ĐÚNG
-                    </div>
-                  ` : ''}
                 </div>
 
                 <div class="opt-speech-text">
@@ -143,16 +124,15 @@ export function renderReviewReplyModal(review: CustomerReview): string {
                 </div>
 
                 <div class="opt-footer">
-                  <!-- Đã ẩn điểm số cộng thưởng theo yêu cầu người chơi, chỉ giữ phong cách hồi đáp -->
                   <div class="opt-tone-pill" style="font-size: 0.72rem; font-weight: 700; color: var(--soft); display: flex; align-items: center; gap: 4px;">
                     <span>${strat.icon}</span> ${strat.label}
                   </div>
                   <button 
-                    class="btn-sm btn-choose-reply ${isRec ? 'primary' : ''}" 
+                    class="btn-sm btn-choose-reply primary" 
                     data-review-id="${review.id}" 
                     data-option-id="${opt.id}"
                   >
-                    ${isRec ? '👉 Chọn Hồi Đáp Này (Tối Ưu)' : 'Chọn Hồi Đáp'}
+                    Chọn Hồi Đáp
                   </button>
                 </div>
               </div>

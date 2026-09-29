@@ -43,6 +43,30 @@ class AudioManager {
     }
   }
 
+  private sfxVolume: number = 0.8;
+  private sfxGainNode: GainNode | null = null;
+
+  public getSfxVolume(): number {
+    return this.sfxVolume;
+  }
+
+  public setSfxVolume(vol: number) {
+    this.sfxVolume = Math.max(0, Math.min(1, vol));
+    if (this.ctx && this.sfxGainNode) {
+      this.sfxGainNode.gain.setValueAtTime(this.sfxVolume, this.ctx.currentTime);
+    }
+  }
+
+  public dest(): AudioNode {
+    if (!this.ctx) return {} as AudioNode;
+    if (!this.sfxGainNode) {
+      this.sfxGainNode = this.ctx.createGain();
+      this.sfxGainNode.gain.setValueAtTime(this.sfxVolume, this.ctx.currentTime);
+      this.sfxGainNode.connect(this.ctx.destination);
+    }
+    return this.sfxGainNode;
+  }
+
   public setMuted(muted: boolean) {
     this.isMuted = muted;
     this.muteListeners.forEach(l => l(muted));
@@ -78,7 +102,7 @@ class AudioManager {
     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
 
     osc.connect(gain);
-    gain.connect(this.ctx.destination);
+    gain.connect(this.dest());
 
     osc.start(now);
     osc.stop(now + 0.06);
@@ -109,7 +133,7 @@ class AudioManager {
 
     osc1.connect(gain);
     osc2.connect(gain);
-    gain.connect(this.ctx.destination);
+    gain.connect(this.dest());
 
     osc1.start(now);
     osc2.start(now);
@@ -139,7 +163,7 @@ class AudioManager {
       gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.35);
 
       osc.connect(gain);
-      gain.connect(this.ctx.destination);
+      gain.connect(this.dest());
 
       osc.start(startTime);
       osc.stop(startTime + 0.35);
@@ -164,7 +188,7 @@ class AudioManager {
     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
 
     osc.connect(gain);
-    gain.connect(this.ctx.destination);
+    gain.connect(this.dest());
 
     osc.start(now);
     osc.stop(now + 0.25);
@@ -199,7 +223,7 @@ class AudioManager {
 
     noise.connect(filter);
     filter.connect(this.sizzleGain);
-    this.sizzleGain.connect(this.ctx.destination);
+    this.sizzleGain.connect(this.dest());
 
     noise.start();
     this.sizzleNode = noise;
@@ -244,7 +268,7 @@ class AudioManager {
 
       osc.connect(filter);
       filter.connect(gain);
-      gain.connect(this.ctx.destination);
+      gain.connect(this.dest());
 
       osc.start(now);
       osc.stop(now + 0.9);
@@ -258,7 +282,7 @@ class AudioManager {
     subOsc.frequency.exponentialRampToValueAtTime(35, now + 0.5);
     subGain.gain.setValueAtTime(0.35, now);
     subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-    subOsc.connect(subGain).connect(this.ctx.destination);
+    subOsc.connect(subGain).connect(this.dest());
     subOsc.start(now);
     subOsc.stop(now + 0.5);
   }
@@ -283,7 +307,7 @@ class AudioManager {
     const nGain = this.ctx.createGain();
     nGain.gain.setValueAtTime(0.35, now);
     nGain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
-    noise.connect(nFilter).connect(nGain).connect(this.ctx.destination);
+    noise.connect(nFilter).connect(nGain).connect(this.dest());
     noise.start(now);
 
     // 2. Tiếng ré hoảng sợ (pitch sweep xuống nhanh)
@@ -297,7 +321,7 @@ class AudioManager {
       osc.frequency.exponentialRampToValueAtTime(freq * 0.4, t + 0.35);
       gain.gain.setValueAtTime(0.12, t);
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
-      osc.connect(gain).connect(this.ctx.destination);
+      osc.connect(gain).connect(this.dest());
       osc.start(t);
       osc.stop(t + 0.35);
     });
@@ -318,7 +342,7 @@ class AudioManager {
     osc.frequency.exponentialRampToValueAtTime(320, now + 0.3);
     gain.gain.setValueAtTime(0.25, now);
     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-    osc.connect(gain).connect(this.ctx.destination);
+    osc.connect(gain).connect(this.dest());
     osc.start(now);
     osc.stop(now + 0.3);
   }
@@ -340,7 +364,7 @@ class AudioManager {
       osc.frequency.setValueAtTime(f, t);
       gain.gain.setValueAtTime(0.18, t);
       gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
-      osc.connect(gain).connect(this.ctx.destination);
+      osc.connect(gain).connect(this.dest());
       osc.start(t);
       osc.stop(t + 0.45);
     });
@@ -364,7 +388,7 @@ class AudioManager {
     gain.gain.setValueAtTime(0.25, now);
     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
 
-    osc.connect(gain).connect(this.ctx.destination);
+    osc.connect(gain).connect(this.dest());
     osc.start(now);
     osc.stop(now + 0.12);
   }
@@ -390,7 +414,7 @@ class AudioManager {
       gain.gain.setValueAtTime(0.2, startTime);
       gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.6);
 
-      osc.connect(gain).connect(this.ctx.destination);
+      osc.connect(gain).connect(this.dest());
       osc.start(startTime);
       osc.stop(startTime + 0.6);
     });
@@ -413,7 +437,7 @@ class AudioManager {
     gain.gain.setValueAtTime(0.18, now);
     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
 
-    osc.connect(gain).connect(this.ctx.destination);
+    osc.connect(gain).connect(this.dest());
     osc.start(now);
     osc.stop(now + 0.25);
   }
@@ -442,7 +466,7 @@ class AudioManager {
     gain.gain.setValueAtTime(0.2, now);
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
 
-    osc.connect(filter).connect(gain).connect(this.ctx.destination);
+    osc.connect(filter).connect(gain).connect(this.dest());
     osc.start(now);
     osc.stop(now + 0.08);
   }
@@ -469,10 +493,141 @@ class AudioManager {
       gain.gain.setValueAtTime(0.22, startTime);
       gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.5);
 
-      osc.connect(gain).connect(this.ctx.destination);
+      osc.connect(gain).connect(this.dest());
       osc.start(startTime);
       osc.stop(startTime + 0.5);
     });
+  }
+
+  // Âm thanh gõ chữ Typewriter phong cách Stardew Valley (nhảy từng ký tự hội thoại)
+  public playDialogueBlip(pitchOffset: number = 0) {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    // Biến thiên tần số nhẹ để giọng nói nhân vật nghe sống động
+    const baseFreq = 480 + (pitchOffset % 5) * 35;
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(baseFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.65, now + 0.035);
+
+    gain.gain.setValueAtTime(0.09, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+
+    osc.connect(gain);
+    gain.connect(this.dest());
+
+    osc.start(now);
+    osc.stop(now + 0.035);
+  }
+
+  // Âm thanh gõ gỗ mộc mạc (Wooden UI Click)
+  public playWoodClick() {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(320, now);
+    osc.frequency.exponentialRampToValueAtTime(120, now + 0.05);
+
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+
+    osc.connect(gain);
+    gain.connect(this.dest());
+
+    osc.start(now);
+    osc.stop(now + 0.05);
+  }
+
+  // Âm thanh chuông vàng Stardew Valley (Hoàn thành nhiệm vụ / thu hoạch lớn)
+  public playGoldChime() {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const notes = [1046.50, 1318.51, 1567.98, 2093.00]; // C6, E6, G6, C7
+    notes.forEach((freq, idx) => {
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const t = now + idx * 0.055;
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, t);
+
+      gain.gain.setValueAtTime(0.18, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
+
+      osc.connect(gain);
+      gain.connect(this.dest());
+
+      osc.start(t);
+      osc.stop(t + 0.38);
+    });
+  }
+
+  // Âm thanh mở cuộn thư / bảng thông báo nhiệm vụ Parchment Scroll
+  public playScrollOpen() {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const bufSize = Math.floor(this.ctx.sampleRate * 0.15);
+    const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.04));
+    }
+
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buf;
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 1200;
+    filter.Q.value = 2.0;
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.15, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+    noise.connect(filter).connect(gain).connect(this.dest());
+    noise.start(now);
+  }
+
+  // Âm thanh vớt món ăn / nhấc gà chín vào khay (Plop âm ấm)
+  public playHarvestPlop() {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(280, now);
+    osc.frequency.exponentialRampToValueAtTime(540, now + 0.07);
+
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.07);
+
+    osc.connect(gain);
+    gain.connect(this.dest());
+
+    osc.start(now);
+    osc.stop(now + 0.07);
   }
 }
 

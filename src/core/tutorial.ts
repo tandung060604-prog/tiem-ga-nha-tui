@@ -1,5 +1,5 @@
 import { TrayItem } from '../types/game';
-import type { CookingState } from './cooking';
+import type { CookingState, Sauce } from './cooking';
 import { CookingEngine } from './cooking';
 import { missingItems } from './staff';
 import { isDrinkId, isScoopId } from './stations';
@@ -10,7 +10,7 @@ import type { SellingSession } from './sellingSim';
 // Trong lúc hướng dẫn, đồng hồ/khách đứng yên (tickSelling bỏ qua khi session.tutorial = true), chảo vẫn chạy.
 
 export type TutorialStep =
-  | 'intro' | 'fry-chicken' | 'fry-fries' | 'drink' | 'scoop' | 'wait' | 'lift' | 'discard-raw' | 'serve' | 'done';
+  | 'intro' | 'fry-chicken' | 'fry-fries' | 'fry-popcorn' | 'season-spicy' | 'season-honey' | 'drink' | 'scoop' | 'wait' | 'lift' | 'discard-raw' | 'serve' | 'done';
 
 export interface TutorialHint {
   step: TutorialStep;
@@ -26,6 +26,9 @@ export const TUTORIAL_TEXT: Record<TutorialStep, Omit<TutorialHint, 'step'>> = {
   },
   'fry-chicken': { text: 'Khách gọi gà. Bấm "+ Gà Rán" để thả một miếng vào chảo nè.', target: '#btn-fry-chicken' },
   'fry-fries': { text: 'Khách gọi khoai. Bấm "+ Khoai" để thả khoai vô chảo.', target: '#btn-fry-fries' },
+  'fry-popcorn': { text: 'Khách gọi Gà Viên Popcorn! Bấm khay "Gà Viên" trên quầy inox để thả mẻ gà viên vào chảo chiên nha con.', target: '#btn-fry-popcorn' },
+  'season-spicy': { text: 'Khách gọi Cánh Gà Sốt Cay! Con hãy chạm khay "Sốt Yangnyeom" trên quầy inox để ướp sốt trước khi thả gà vào chảo nè.', target: '#btn-season-spicy' },
+  'season-honey': { text: 'Khách gọi Gà Sốt Bơ Tỏi! Con hãy chạm khay "Sốt Bơ Tỏi" trên quầy inox để ướp sốt trước khi thả gà vào chảo nè.', target: '#btn-season-honey' },
   'drink': { text: 'Nước ngọt thì khỏi chiên: chạm vòi máy nước bác chỉ sáng, máy tự rót đúng loại khách còn thiếu vô khay liền.', target: '#btn-add-drink' },
   'scoop': { text: 'Củ cải muối thì khỏi chiên: chạm khay củ cải vàng trên quầy inox để múc một phần vô khay. Ăn gà kèm củ cải cho đỡ ngấy, khách khen ngon lắm!', target: '#btn-scoop-danmuji' },
   'wait': { text: 'Canh thanh đo nha. Còn ở vùng SỐNG thì chưa được nhấc — đợi kim chạy tới vùng VÀNG GIÒN.', target: '.cook-gauge-container' },
@@ -45,7 +48,11 @@ export interface TutorialState {
 
 // Bước hiện tại, từ trạng thái ca bán. `firstServed`: đã giao xong ít nhất một khách kể từ lúc bắt đầu hướng dẫn.
 export function tutorialStep(
-  t: TutorialState, session: Pick<SellingSession, 'orders' | 'servedCount'>, cook: CookingState, tray: readonly TrayItem[]
+  t: TutorialState,
+  session: Pick<SellingSession, 'orders' | 'servedCount'>,
+  cook: CookingState,
+  tray: readonly TrayItem[],
+  activeSeasoning?: Sauce | null
 ): TutorialStep {
   if (!t.introSeen) return 'intro';
   if (session.servedCount > t.servedAtStart) return 'done';
@@ -63,6 +70,13 @@ export function tutorialStep(
   if (next && isDrinkId(next)) return 'drink'; // Coca, 7Up, Fanta… đều rót ở máy nước
   if (next && isScoopId(next)) return 'scoop';
   if (next === 'shake_fries') return 'fry-fries';
+  if (next === 'popcorn_chicken') return 'fry-popcorn';
+  if (next === 'spicy_chicken') {
+    return activeSeasoning === 'spicy' ? 'fry-chicken' : 'season-spicy';
+  }
+  if (next === 'honey_garlic_chicken') {
+    return activeSeasoning === 'honey' ? 'fry-chicken' : 'season-honey';
+  }
   return 'fry-chicken';
 }
 

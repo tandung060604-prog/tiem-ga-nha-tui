@@ -1,4 +1,4 @@
-import { GameState, GamePhase, DayLedger, CustomerReview, StoryEndingId } from './types/game';
+import { GameState, GamePhase, DayLedger, CustomerReview, StoryEndingId, CustomerOrder } from './types/game';
 import { stateManager } from './core/state';
 import { audio } from './core/audio';
 import { Haptics } from './core/haptics';
@@ -56,7 +56,12 @@ import { DAILY_INCIDENTS } from './content/dailyIncidents';
 import { renderIncidentPrompt, renderIncidentConfirmPrompt, renderIncidentReaction, renderIncidentAlbumModal } from './ui/components/DailyIncidentModal';
 import { openSecretSauceModal } from './ui/components/SecretSauceModal';
 import { openOilFilterModal } from './ui/components/OilFilterModal';
-import type { DailyIncident } from './types/game';
+import { getTodayWholesaler, executeBargain, BargainTactic } from './core/marketBargain';
+import { renderMarketBargainModal } from './ui/components/MarketBargainModal';
+import { DeliveryRunnerEngine, DeliveryRunState } from './core/deliveryRunner';
+import { renderDeliveryPromptModal, renderDeliveryRunnerGame, renderDeliveryResultModal } from './ui/components/DeliveryRunnerModal';
+import type { DailyIncident, DeliveryRunResult } from './types/game';
+import confetti from 'canvas-confetti';
 
 type TabId = 'inventory' | 'upgrades' | 'staff' | 'reviews' | 'menu';
 
@@ -889,7 +894,8 @@ class AppController {
         bindInventoryEvents(
           state,
           fn => stateManager.update(fn),
-          msg => this.showToast(msg)
+          msg => this.showToast(msg),
+          () => this.openMarketBargainModal()
         );
         break;
       case 'upgrades':
@@ -962,7 +968,7 @@ class AppController {
   // Tính bước hướng dẫn từ trạng thái ca bán, vẽ bong bóng. Bước 'done' → đồng hồ chạy lại ngay.
   private updateTutorial(session: SellingSession) {
     if (!this.tutorial) return;
-    const step = tutorialStep(this.tutorial, session, cookingEngine.getCookState(), cookingEngine.getTray());
+    const step = tutorialStep(this.tutorial, session, cookingEngine.getCookState(), cookingEngine.getTray(), cookingEngine.getActiveSeasoning());
     session.tutorial = step !== 'done';
     syncTutorialLayer(tutorialHint(step), {
       onButton: () => {
@@ -1195,12 +1201,9 @@ class AppController {
     for (const ev of events) {
       switch (ev.type) {
         case 'helperDone': {
-          let helperPoliceInsp: PoliceInspectionResult | null = null;
           stateManager.update(draft => {
             recordHelperFry(draft, session, ev.item.quality);
-            helperPoliceInsp = checkPoliceOilInspection(draft);
           });
-          if (helperPoliceInsp) this.handlePoliceInspection(helperPoliceInsp);
           if (ev.item.quality === 'burnt') this.showToast(`😅 ${ev.cook} lỡ tay chiên cháy ${ev.item.name}!`);
           break;
         }
@@ -1228,14 +1231,9 @@ class AppController {
   }
 
   private onFryerLifted(result: ReturnType<typeof cookingEngine.liftFryer>) {
-    let policeInsp: PoliceInspectionResult | null = null;
     stateManager.update(draft => {
       recordFryerLift(draft, this.sellingSession, result);
-      policeInsp = checkPoliceOilInspection(draft);
     });
-    if (policeInsp) {
-      this.handlePoliceInspection(policeInsp);
-    }
     if (!result.trayItem) this.showToast('Khay đầy, món vừa vớt bị bỏ!');
     if (result.quality === 'perfect') {
       Haptics.perfect();
@@ -1275,11 +1273,11 @@ class AppController {
       ? '⚠️ BIÊN BẢN CẢNH CÁO VỆ SINH ATVSTP (LẦN 1/3)'
       : '🚨 QUYẾT ĐỊNH XỬ PHẠT HÀNH CHÍNH (LẦN 2/3)';
     const title = isStrike1
-      ? 'Phát Hiện Chảo Dầu Đen Khét Lẹt!'
-      : 'Xử Phạt 200.000đ Tái Phạm Dầu Đen!';
+      ? 'Khách Hàng Phản Ánh Dầu Đen Khét Lẹt!'
+      : 'Xử Phạt 200.000đ Tái Phạm Bán Gà Dầu Đen!';
     const quote = isStrike1
-      ? 'Chủ tiệm có biết chiên gà bằng dầu đen sì bốc khói khét lẹt này là vi phạm nghiêm trọng ATVSTP không? Dầu cháy đen sinh ra độc tố Acrylamide cực kỳ nguy hiểm cho sức khỏe thực khách! Lần đầu tôi lập biên bản nhắc nhở, yêu cầu bấm Thay Dầu (150k) ngay lập tức!'
-      : 'Bất chấp cảnh cáo lần trước, tiệm vẫn ngoan cố dùng dầu đen sì để chiên bán! Đội Quản lý & Công an chính thức lập biên bản xử phạt 200.000đ! Cảnh báo lần cuối: Nếu còn bị bắt lần thứ 3, tiệm sẽ bị niêm phong và khởi tố đi tù ngay lập tức!';
+      ? 'Khách hàng vừa gọi phản ánh quán dùng dầu đen sì bốc khói khét lẹt để chiên bán, vi phạm nghiêm trọng ATVSTP! Dầu cháy đen sinh ra độc tố Acrylamide cực kỳ nguy hiểm cho sức khỏe! Lần đầu tôi lập biên bản nhắc nhở, yêu cầu bấm Thay Dầu (150k) ngay lập tức!'
+      : 'Bất chấp phản ánh từ khách và biên bản cảnh cáo lần trước, tiệm vẫn ngoan cố dùng dầu đen sì chiên bán! Đội Quản lý & Công an chính thức lập biên bản xử phạt 200.000đ! Cảnh báo lần cuối: Nếu còn bị khách báo vi phạm lần thứ 3, tiệm sẽ bị niêm phong và khởi tố đi tù ngay lập tức!';
     const actionBtn = isStrike1
       ? '✍️ Ký Biên Bản & Cam Kết Thay Dầu Ngay'
       : '💸 Chấp Hành Nộp Phạt 200.000đ & Tiếp Tục Bán';
@@ -1655,10 +1653,17 @@ class AppController {
           patienceRatio: result.order.patienceCurrent / Math.max(1, result.order.patienceMax),
           menuLookup: id => menu.find(m => m.id === id)?.name || id
         });
+        let policeInsp: PoliceInspectionResult | null = null;
         stateManager.update(draft => {
           creditSale(draft, result.paid, 0);
           ReviewsEngine.applyRealtimeReview(draft, review);
+          if (curState.oilCondition === 'dirty') {
+            policeInsp = checkPoliceOilInspection(draft);
+          }
         });
+        if (policeInsp) {
+          this.handlePoliceInspection(policeInsp);
+        }
         this.render();
         return;
       }
@@ -1686,6 +1691,14 @@ class AppController {
     }
 
     const { order, paid, tip, feedbackNotes } = result;
+
+    // Đơn giao xa (Minigame Chạy Xe Giao Đơn Xa / Thuê Shipper)
+    const isLongDistanceDelivery = order.isDelivery && order.isLongDistance && !order.isBunny && (curState.deliveryRunnerDayCount ?? 0) < 2;
+    if (isLongDistanceDelivery) {
+      this.promptDeliveryRunner(order, paid, tip, feedbackNotes);
+      return;
+    }
+
     let letter: BunnyLetter | undefined;
     const patienceRatio = order.patienceCurrent / Math.max(1, order.patienceMax);
     const hasBurnt = (order.burntPenalty ?? 0) > 0;
@@ -1698,7 +1711,13 @@ class AppController {
     const spaceLevel = curState.upgrades.space?.currentLevel || 1;
     const isPerfect = (order.perfectBonus ?? 0) > 0;
 
-    const review = ReviewsEngine.generateCustomerReview(curState.day, order, {
+    // Số lượt đánh giá chỉ chiếm ~1/3 số khách: (session.servedCount % 3 === 0)
+    // Trừ trường hợp đặc biệt: sự cố nghiêm trọng (gà cháy, dầu bẩn) hoặc khách VIP / Bé Thỏ
+    const isSevereIncident = hasBurnt || hasDirtyOil;
+    const isVipCustomer = order.isBunny || (order.personalityLabel && order.personalityLabel.includes('VIP'));
+    const shouldGenerateReview = isSevereIncident || isVipCustomer || (session.servedCount % 3 === 0);
+
+    const review = shouldGenerateReview ? ReviewsEngine.generateCustomerReview(curState.day, order, {
       kind: 'complete',
       patienceRatio,
       hasBurnt,
@@ -1707,13 +1726,23 @@ class AppController {
       menuLookup: id => menu.find(m => m.id === id)?.name || id,
       priceRatio: orderPriceRatio,
       spaceLevel
-    });
+    }) : null;
 
+    let policeInsp: PoliceInspectionResult | null = null;
     stateManager.update(draft => {
       creditSale(draft, paid, tip);
       if (order.isBunny) letter = applyBunnyReward(draft, order);
-      ReviewsEngine.applyRealtimeReview(draft, review);
+      if (review) {
+        ReviewsEngine.applyRealtimeReview(draft, review);
+      }
+      if (hasDirtyOil) {
+        policeInsp = checkPoliceOilInspection(draft);
+      }
     });
+
+    if (policeInsp) {
+      this.handlePoliceInspection(policeInsp);
+    }
 
     if (letter) {
       audio.playPerfect();
@@ -1730,6 +1759,238 @@ class AppController {
       this.showToast(`${personalityTag}+${(paid + tip).toLocaleString('vi-VN')}đ (${notesStr}) 💵`);
     }
     this.render();
+  }
+
+  // --- MINIGAME CHỢ ĐẦU MỐI CHỢ LỚN (ĐÀM PHÁN GIÁ SỈ) ---
+  private openMarketBargainModal() {
+    const state = stateManager.getState();
+    const wholesaler = getTodayWholesaler(state.day);
+    audio.playPop();
+    this.openModal(renderMarketBargainModal(wholesaler, null));
+
+    const closeBtn = document.getElementById('btn-close-market');
+    if (closeBtn) {
+      closeBtn.onclick = () => {
+        audio.playPop();
+        this.closeModal();
+        this.render();
+      };
+    }
+
+    const tacticBtns = document.querySelectorAll<HTMLElement>('.btn-bargain-tactic');
+    tacticBtns.forEach(btn => {
+      btn.onclick = () => {
+        const tactic = btn.dataset.tactic as BargainTactic;
+        if (!tactic) return;
+        const result = executeBargain(wholesaler, tactic);
+        stateManager.update(draft => {
+          draft.todayMarketBargained = true;
+          draft.todayMarketDiscount = result.discountPct;
+        });
+        audio.playCash();
+        if (result.discountPct >= 25) {
+          audio.playGoldChime();
+        }
+        this.openModal(renderMarketBargainModal(wholesaler, result));
+        const resultCloseBtn = document.getElementById('btn-close-bargain-result') || document.getElementById('btn-close-market');
+        if (resultCloseBtn) {
+          resultCloseBtn.onclick = () => {
+            audio.playPop();
+            this.closeModal();
+            this.render();
+            this.showToast(result.discountPct > 0
+              ? `🛒 Giảm giá nhập sỉ ${result.discountPct}% cho toàn bộ nguyên liệu hôm nay!`
+              : '🛒 Hôm nay tiểu thương giữ nguyên giá sỉ gốc.');
+          };
+        }
+      };
+    });
+  }
+
+  // --- MINIGAME CHẠY XE GIAO ĐƠN XA (HẺM 1102 EXPRESS) ---
+  private promptDeliveryRunner(
+    order: CustomerOrder,
+    paid: number,
+    baseTip: number,
+    feedbackNotes?: string[]
+  ) {
+    if (this.sellingSession) this.sellingSession.isPaused = true;
+    this.incidentPausedSelling = true;
+    audio.playPop();
+    this.openModal(renderDeliveryPromptModal(order));
+
+    const outsourceBtn = document.getElementById('btn-outsource-delivery');
+    if (outsourceBtn) {
+      outsourceBtn.onclick = () => {
+        audio.playCash();
+        const runRes = DeliveryRunnerEngine.evaluateOutsource();
+        this.finishDeliveryRunner(order, paid, baseTip, runRes, feedbackNotes);
+      };
+    }
+
+    const runBtn = document.getElementById('btn-start-delivery-run');
+    if (runBtn) {
+      runBtn.onclick = () => {
+        audio.playPop();
+        this.startDeliveryRunnerGame(order, paid, baseTip, feedbackNotes);
+      };
+    }
+  }
+
+  private startDeliveryRunnerGame(
+    order: CustomerOrder,
+    paid: number,
+    baseTip: number,
+    feedbackNotes?: string[]
+  ) {
+    const runState = DeliveryRunnerEngine.createInitialState(15);
+    this.openModal(renderDeliveryRunnerGame(runState));
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+        DeliveryRunnerEngine.moveLeft(runState);
+        audio.playPop();
+        this.updateRunnerDom(runState);
+      } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+        DeliveryRunnerEngine.moveRight(runState);
+        audio.playPop();
+        this.updateRunnerDom(runState);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+
+    const modalContent = document.getElementById('modal-content');
+    const onModalClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('#btn-runner-left')) {
+        DeliveryRunnerEngine.moveLeft(runState);
+        audio.playPop();
+        this.updateRunnerDom(runState);
+      } else if (target.closest('#btn-runner-right')) {
+        DeliveryRunnerEngine.moveRight(runState);
+        audio.playPop();
+        this.updateRunnerDom(runState);
+      } else {
+        const laneEl = target.closest<HTMLElement>('[data-runner-lane]');
+        if (laneEl) {
+          const lane = parseInt(laneEl.dataset.runnerLane || '1', 10);
+          if (lane === 0 || lane === 1 || lane === 2) {
+            DeliveryRunnerEngine.setLane(runState, lane);
+            audio.playPop();
+            this.updateRunnerDom(runState);
+          }
+        }
+      }
+    };
+    modalContent?.addEventListener('click', onModalClick);
+
+    const cleanup = () => {
+      window.removeEventListener('keydown', onKey);
+      modalContent?.removeEventListener('click', onModalClick);
+      clearInterval(loopTimer);
+    };
+
+    const loopTimer = setInterval(() => {
+      if (!this.isModalOpen()) {
+        cleanup();
+        return;
+      }
+
+      const crashed = DeliveryRunnerEngine.tick(runState, 60);
+      if (crashed) {
+        audio.playBurnt();
+        Haptics.warning();
+      }
+
+      this.updateRunnerDom(runState);
+
+      if (runState.isFinished) {
+        cleanup();
+        const result = DeliveryRunnerEngine.evaluateResult(runState);
+        this.finishDeliveryRunner(order, paid, baseTip, result, feedbackNotes);
+      }
+    }, 60);
+  }
+
+  private updateRunnerDom(state: DeliveryRunState) {
+    const content = document.getElementById('modal-content');
+    if (!content) return;
+    content.innerHTML = renderDeliveryRunnerGame(state);
+  }
+
+  private finishDeliveryRunner(
+    order: CustomerOrder,
+    paid: number,
+    baseTip: number,
+    runResult: DeliveryRunResult,
+    _feedbackNotes?: string[]
+  ) {
+    const curState = stateManager.getState();
+    const menu = curState.menu;
+    const patienceRatio = order.patienceCurrent / Math.max(1, order.patienceMax);
+    const hasBurnt = (order.burntPenalty ?? 0) > 0;
+    const hasDirtyOil = curState.oilCondition === 'dirty';
+    const isPerfect = runResult.mode === 'manual' && runResult.crashes === 0;
+
+    const finalTip = Math.max(0, baseTip + runResult.tipBonus);
+    const costDeduction = runResult.mode === 'outsourced' ? 15000 : 0;
+
+    const review = ReviewsEngine.generateCustomerReview(curState.day, order, {
+      kind: 'complete',
+      patienceRatio: isPerfect ? 1.0 : patienceRatio,
+      hasBurnt,
+      hasDirtyOil,
+      isPerfect,
+      menuLookup: id => menu.find(m => m.id === id)?.name || id,
+      priceRatio: 1.0,
+      spaceLevel: curState.upgrades.space?.currentLevel || 1
+    });
+
+    if (review && runResult.speedRatingDelta !== 0) {
+      review.stars = Math.max(1, Math.min(5, Number((review.stars + runResult.speedRatingDelta).toFixed(1))));
+    }
+
+    let policeInsp: PoliceInspectionResult | null = null;
+    stateManager.update(draft => {
+      draft.deliveryRunnerDayCount = (draft.deliveryRunnerDayCount ?? 0) + 1;
+      creditSale(draft, paid, finalTip);
+      if (costDeduction > 0) {
+        draft.money = Math.max(0, draft.money - costDeduction);
+      }
+      if (review) {
+        ReviewsEngine.applyRealtimeReview(draft, review);
+      }
+      if (hasDirtyOil) {
+        policeInsp = checkPoliceOilInspection(draft);
+      }
+    });
+
+    if (policeInsp) {
+      this.handlePoliceInspection(policeInsp);
+    }
+
+    if (isPerfect) {
+      audio.playGoldChime();
+    } else {
+      audio.playCash();
+    }
+
+    this.openModal(renderDeliveryResultModal(runResult));
+    const closeBtn = document.getElementById('btn-close-delivery-result');
+    if (closeBtn) {
+      closeBtn.onclick = () => {
+        audio.playPop();
+        this.closeModal();
+        if (this.sellingSession) {
+          this.sellingSession.isPaused = false;
+          this.lastTimestamp = performance.now();
+        }
+        const tipStr = finalTip > 0 ? ` (+${finalTip.toLocaleString('vi-VN')}đ tip)` : '';
+        const outsourceStr = costDeduction > 0 ? ` (-${costDeduction.toLocaleString('vi-VN')}đ ship)` : '';
+        this.showToast(`🛵 Giao đơn ${order.customerName}: +${paid.toLocaleString('vi-VN')}đ${tipStr}${outsourceStr}!`);
+        this.render();
+      };
+    }
   }
 
   // Hủy đơn của khách hàng khi hết món/hết nguyên liệu và gửi lời xin lỗi lịch sự
@@ -1796,7 +2057,17 @@ class AppController {
       this.showToast('⚠️ Dầu chiên đen thui! Ngày mai sao Vệ sinh + Hương vị sẽ bị trừ. Nhớ thay dầu sớm nha!');
     }
 
-    audio.playPerfect();
+    audio.playGoldChime();
+    if (result.ledger.netProfit > 0) {
+      try {
+        confetti({
+          particleCount: 50,
+          spread: 60,
+          origin: { y: 0.6 },
+          colors: ['#f7d046', '#c98e1e', '#3ca346', '#faeed1']
+        });
+      } catch {}
+    }
     // Lưu lại kết quả rent để hiển thị modal sau summary
     const rentResult = result.rentDue;
     this.openModal(renderSummaryModal(stateManager.getState(), result.ledger, result.review, result.advisorTip));
@@ -2183,6 +2454,28 @@ class AppController {
       audioToggleBtn.onclick = () => {
         audio.toggleMute();
         this.openSettings(); // re-render settings
+      };
+    }
+
+    const sfxSlider = document.getElementById('slider-sfx-vol') as HTMLInputElement | null;
+    if (sfxSlider) {
+      sfxSlider.oninput = () => {
+        const val = parseInt(sfxSlider.value, 10) / 100;
+        audio.setSfxVolume(val);
+        const label = document.getElementById('label-sfx-vol');
+        if (label) label.textContent = `${Math.round(val * 100)}%`;
+        stateManager.update(draft => { draft.sfxVolume = val; });
+      };
+    }
+
+    const bgmSlider = document.getElementById('slider-bgm-vol') as HTMLInputElement | null;
+    if (bgmSlider) {
+      bgmSlider.oninput = () => {
+        const val = parseInt(bgmSlider.value, 10) / 100;
+        music.setVolume(val);
+        const label = document.getElementById('label-bgm-vol');
+        if (label) label.textContent = `${Math.round(val * 100)}%`;
+        stateManager.update(draft => { draft.bgmVolume = val; });
       };
     }
 

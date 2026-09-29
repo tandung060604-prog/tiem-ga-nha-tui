@@ -190,7 +190,7 @@ export function bindStoryEvents(
   actBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
       const idx = parseInt((e.currentTarget as HTMLElement).getAttribute('data-act-idx') || '0', 10);
-      audio.playPop();
+      audio.playWoodClick();
       onOpenStoryWithIndex(idx);
     });
   });
@@ -207,7 +207,7 @@ export function bindStoryEvents(
       onUpdateState(draft => {
         const res = chooseDialogueOption(draft, actIdx, optId);
         if (res.success) {
-          audio.playPerfect();
+          audio.playGoldChime();
           if (showToast) showToast(`✨ Đã chọn hướng đi mới! Điểm Karma được cập nhật.`);
         } else if (showToast && res.message) {
           showToast(res.message);

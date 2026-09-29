@@ -181,24 +181,75 @@ export function sellingStructureKey(state: GameState, session: SellingSession): 
   ]);
 }
 
-// Cập nhật tại chỗ các giá trị chạy theo thời gian; không tạo/xóa node.
-// Cập nhật tại chỗ các giá trị chạy theo thời gian; không tạo/xóa node.
+interface CachedCustomerCard {
+  card: HTMLElement;
+  fill: HTMLElement | null;
+  moodEmoji: HTMLElement | null;
+  emoteBubble: HTMLElement | null;
+  thoughtEl: HTMLElement | null;
+  thoughtText: HTMLElement | null;
+  img: HTMLImageElement | null;
+}
+
+interface SellingDomCache {
+  clock: HTMLElement | null;
+  custCounter: HTMLElement | null;
+  pointer: HTMLElement | null;
+  hint: HTMLElement | null;
+  fryPot: HTMLElement | null;
+  streakContainer: HTMLElement | null;
+  helpers: (HTMLElement | null)[];
+  timers: Map<TimerStationId, HTMLElement | null>;
+  cards: Map<string, CachedCustomerCard>;
+}
+
+const sellingDomCacheMap = new WeakMap<HTMLElement, SellingDomCache>();
+
+function getSellingDomCache(root: HTMLElement): SellingDomCache {
+  let cache = sellingDomCacheMap.get(root);
+  if (!cache) {
+    cache = {
+      clock: root.querySelector('.clock b'),
+      custCounter: root.querySelector('.hud-customers b'),
+      pointer: root.querySelector('.cook-gauge-pointer'),
+      hint: root.querySelector('.pot-hint'),
+      fryPot: root.querySelector('#btn-fry-pot'),
+      streakContainer: root.querySelector('#streak-flame-container'),
+      helpers: [],
+      timers: new Map(),
+      cards: new Map()
+    };
+    sellingDomCacheMap.set(root, cache);
+  }
+  return cache;
+}
+
+// Cập nhật tại chỗ các giá trị chạy theo thời gian; dùng SellingDomCache để đạt 60-120 FPS.
 export function patchSellingView(root: HTMLElement, session: SellingSession, state?: GameState): void {
+  const cache = getSellingDomCache(root);
+
   if (state) {
     const cooks = staffEffects(state.staff, session.gameHour).cooks;
     cooks.forEach((c, i) => {
-      const el = root.querySelector<HTMLElement>(`.helper-progress[data-helper="${i}"]`);
+      let el = cache.helpers[i];
+      if (el === undefined) {
+        el = root.querySelector<HTMLElement>(`.helper-progress[data-helper="${i}"]`);
+        cache.helpers[i] = el;
+      }
       const slot = session.helpers?.[i];
       if (el && slot) el.textContent = `${Math.min(100, Math.round((slot.elapsedMs / c.cycleMs) * 100))}%`;
     });
   }
-  const clock = root.querySelector('.clock b');
-  if (clock) clock.textContent = formatClock(session.gameHour);
-  const custCounter = root.querySelector('.hud-customers b');
-  if (custCounter) custCounter.textContent = `${session.servedCount}/${session.expectedCustomers || 10}`;
+
+  if (cache.clock) cache.clock.textContent = formatClock(session.gameHour);
+  if (cache.custCounter) cache.custCounter.textContent = `${session.servedCount}/${session.expectedCustomers || 10}`;
 
   for (const id of Object.keys(TIMER_RECIPES) as TimerStationId[]) {
-    const el = root.querySelector<HTMLElement>(`.timer-progress[data-timer="${id}"]`);
+    let el = cache.timers.get(id);
+    if (el === undefined) {
+      el = root.querySelector<HTMLElement>(`.timer-progress[data-timer="${id}"]`);
+      cache.timers.set(id, el);
+    }
     const elapsed = session.timers[id];
     if (el && elapsed !== null) {
       const r = TIMER_RECIPES[id];
@@ -208,82 +259,93 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
   }
 
   for (const order of session.orders) {
-    const card = root.querySelector<HTMLElement>(`.customer-card[data-order-id="${order.id}"]`);
-    if (!card) continue;
-    const p = patienceLevel(order);
-    card.classList.toggle('angry', p.angry);
-    const mood = getCustomerMood(order);
-    card.dataset.mood = mood;
-
-    const fill = card.querySelector<HTMLElement>('.patience-fill');
-    if (fill) {
-      fill.style.width = `${p.percent}%`;
-      fill.classList.toggle('mid', p.cls === 'mid');
-      fill.classList.toggle('low', p.cls === 'low');
+    let c = cache.cards.get(order.id);
+    if (!c || !c.card.isConnected) {
+      const card = root.querySelector<HTMLElement>(`.customer-card[data-order-id="${order.id}"]`);
+      if (!card) continue;
+      c = {
+        card,
+        fill: card.querySelector<HTMLElement>('.patience-fill'),
+        moodEmoji: card.querySelector<HTMLElement>('.mood-indicator'),
+        emoteBubble: card.querySelector<HTMLElement>('.stardew-emote-bubble'),
+        thoughtEl: card.querySelector<HTMLElement>('.thought-bubble'),
+        thoughtText: card.querySelector<HTMLElement>('.thought-text'),
+        img: card.querySelector<HTMLImageElement>('.char-sprite-img')
+      };
+      cache.cards.set(order.id, c);
     }
-    const moodEmoji = card.querySelector<HTMLElement>('.mood-indicator');
-    if (moodEmoji) {
-      moodEmoji.textContent = p.angry ? '💢' : p.cls === 'low' ? '🥺' : p.cls === 'mid' ? '😋' : '✨';
+
+    const p = patienceLevel(order);
+    c.card.classList.toggle('angry', p.angry);
+    const mood = getCustomerMood(order);
+    c.card.dataset.mood = mood;
+
+    if (c.fill) {
+      c.fill.style.width = `${p.percent}%`;
+      c.fill.classList.toggle('mid', p.cls === 'mid');
+      c.fill.classList.toggle('low', p.cls === 'low');
+    }
+    if (c.moodEmoji) {
+      c.moodEmoji.textContent = p.angry ? '💢' : p.cls === 'low' ? '🥺' : p.cls === 'mid' ? '😋' : '✨';
+    }
+    if (c.emoteBubble) {
+      const emoteChar = p.angry ? '💢' : p.cls === 'low' ? '💦' : (order.isVip ? '❤️' : p.cls === 'mid' ? '💡' : '✨');
+      if (c.emoteBubble.textContent !== emoteChar) {
+        c.emoteBubble.textContent = emoteChar;
+      }
     }
 
     // Dynamic Thought Bubble update
-    const thoughtEl = card.querySelector<HTMLElement>('.thought-bubble');
-    if (thoughtEl && thoughtEl.dataset.mood !== mood) {
-      thoughtEl.dataset.mood = mood;
-      thoughtEl.className = `thought-bubble ${mood}`;
-      const textSpan = thoughtEl.querySelector('.thought-text');
-      if (textSpan) textSpan.textContent = getMoodThought(mood, order);
+    if (c.thoughtEl && c.thoughtEl.dataset.mood !== mood) {
+      c.thoughtEl.dataset.mood = mood;
+      c.thoughtEl.className = `thought-bubble ${mood}`;
+      if (c.thoughtText) c.thoughtText.textContent = getMoodThought(mood, order);
     }
 
     // Dynamic 2D sprite expression swap
-    const img = card.querySelector<HTMLImageElement>('.char-sprite-img');
-    if (img) {
-      const standSrc = card.dataset.standSrc;
-      const angrySrc = card.dataset.angrySrc;
-      const walkSrc = card.dataset.walkSrc;
+    if (c.img) {
+      const standSrc = c.card.dataset.standSrc;
+      const angrySrc = c.card.dataset.angrySrc;
+      const walkSrc = c.card.dataset.walkSrc;
       const isNew = Date.now() - order.startTime < 750;
 
       if (p.angry && angrySrc) {
-        if (!img.src.endsWith(angrySrc)) img.src = angrySrc;
-        img.classList.remove('standing', 'walking');
-        img.classList.add('angry');
+        if (!c.img.src.endsWith(angrySrc)) c.img.src = angrySrc;
+        c.img.classList.remove('standing', 'walking');
+        c.img.classList.add('angry');
       } else if (isNew && walkSrc) {
-        if (!img.src.endsWith(walkSrc)) img.src = walkSrc;
-        img.classList.remove('standing', 'angry');
-        img.classList.add('walking');
+        if (!c.img.src.endsWith(walkSrc)) c.img.src = walkSrc;
+        c.img.classList.remove('standing', 'angry');
+        c.img.classList.add('walking');
       } else if (standSrc) {
-        if (!img.src.endsWith(standSrc)) img.src = standSrc;
-        img.classList.remove('angry', 'walking');
-        img.classList.add('standing');
+        if (!c.img.src.endsWith(standSrc)) c.img.src = standSrc;
+        c.img.classList.remove('angry', 'walking');
+        c.img.classList.add('standing');
       }
     }
   }
 
   const cook = cookingEngine.getCookState();
-  const pointer = root.querySelector<HTMLElement>('.cook-gauge-pointer');
-  if (pointer) pointer.style.left = `${Math.min(100, Math.round(cook.progress))}%`;
-  const hint = root.querySelector('.pot-hint');
-  if (hint) hint.textContent = potHint();
+  if (cache.pointer) cache.pointer.style.left = `${Math.min(100, Math.round(cook.progress))}%`;
+  if (cache.hint) cache.hint.textContent = potHint();
 
-  const fryPot = root.querySelector<HTMLElement>('#btn-fry-pot');
-  if (fryPot) {
+  if (cache.fryPot) {
     if (cook.isFrying) {
       const quality = cookingEngine.calculateCurrentQuality();
-      fryPot.classList.toggle('perfect-glow', quality === 'perfect');
-      fryPot.classList.toggle('burnt-smoke', quality === 'burnt');
+      cache.fryPot.classList.toggle('perfect-glow', quality === 'perfect');
+      cache.fryPot.classList.toggle('burnt-smoke', quality === 'burnt');
     }
-    fryPot.classList.toggle('streak-fire', (session.perfectStreak || 0) >= 2);
+    cache.fryPot.classList.toggle('streak-fire', (session.perfectStreak || 0) >= 2);
   }
 
   // Dynamic Perfect Streak Flame update
-  const streakContainer = root.querySelector<HTMLElement>('#streak-flame-container');
-  if (streakContainer) {
+  if (cache.streakContainer) {
     const streak = session.perfectStreak || 0;
-    const currentStreak = streakContainer.dataset.streak ? parseInt(streakContainer.dataset.streak, 10) : 0;
+    const currentStreak = cache.streakContainer.dataset.streak ? parseInt(cache.streakContainer.dataset.streak, 10) : 0;
     if (streak !== currentStreak) {
-      streakContainer.dataset.streak = String(streak);
+      cache.streakContainer.dataset.streak = String(streak);
       if (streak >= 2) {
-        streakContainer.innerHTML = `
+        cache.streakContainer.innerHTML = `
           <div class="streak-flame ${streak >= 5 ? 'super-fire' : ''}" data-streak="${streak}">
             <span class="flame-icon">🔥</span>
             <span class="streak-count">Chuỗi x${streak} PERFECT!</span>
@@ -291,7 +353,7 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
           </div>
         `;
       } else {
-        streakContainer.innerHTML = '';
+        cache.streakContainer.innerHTML = '';
       }
     }
   }
@@ -564,6 +626,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <div class="char-actor">
             ${actorHtml}
             <div class="char-shadow"></div>
+            <div class="stardew-emote-bubble" title="Cảm xúc">${isAngry ? '💢' : patienceColorClass === 'low' ? '💦' : (ord.isVip ? '❤️' : '✨')}</div>
           </div>
           <div class="cust-info-col">
             <div class="cust-name-row">

@@ -1,3 +1,27 @@
+@import "@fontsource/vt323";
+@import "nes.css/css/nes.min.css";
+
+/* ==========================================================================
+   HỆ THỐNG FONT PIXEL STARDEW CHỐNG LỖI FONT 100% TIẾNG VIỆT
+   Tiny5 Duo (Headings/Buttons/HUD) + Tiny5 (Body/Story/Review) + VT323 (Monospace)
+   Self-hosted offline, zero latency, 25KB WOFF2, không bao giờ nhảy font
+   ========================================================================== */
+@font-face {
+  font-family: 'Tiny5';
+  src: url('./fonts/Tiny5-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Tiny5 Duo';
+  src: url('./fonts/Tiny5Duo-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   color-scheme: only light;
   
@@ -45,25 +69,44 @@
   --k-orange: #fb8500;
   --k-wood: #8d4f2b;
 
-  /* Typography */
-  --font-display: "Baloo 2", cursive, system-ui, sans-serif;
-  --font-body: "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-handwriting: "Patrick Hand", "Baloo 2", cursive, sans-serif;
+  /* Stardew Valley Cozy Pixel Palette */
+  --pixel-wood-dark: #2b1810;
+  --pixel-wood-base: #5a3018;
+  --pixel-wood-light: #8e542d;
+  --pixel-wood-highlight: #b87c4c;
+  --pixel-parchment-bg: #faeed1;
+  --pixel-parchment-border: #8d4f2b;
+  --pixel-parchment-shadow: #5a3018;
+  --pixel-parchment-text: #2b1810;
+  --pixel-gold-light: #f7d046;
+  --pixel-gold-base: #c98e1e;
+  --pixel-gold-dark: #7a4805;
+  --pixel-green: #3ca346;
+  --pixel-red: #d92534;
+  --pixel-night-blue: #1c2646;
+
+  /* Typography - Stardew Pixel Font System Chống Lỗi Font 100% */
+  --font-display: "Tiny5 Duo", "VT323", monospace;
+  --font-body: "Tiny5", "VT323", monospace;
+  --font-handwriting: "Tiny5", "VT323", monospace;
+  --font-pixel-heading: "Tiny5 Duo", "VT323", monospace;
+  --font-pixel-body: "Tiny5", "VT323", monospace;
+  --font-pixel-mono: "VT323", monospace;
 
   /* Type Scale */
-  --text-xs: 0.6875rem;    /* 11px */
-  --text-sm: 0.75rem;      /* 12px */
-  --text-base: 0.875rem;   /* 14px */
-  --text-md: 1rem;         /* 16px */
-  --text-lg: 1.125rem;     /* 18px */
-  --text-xl: 1.375rem;     /* 22px */
-  --text-2xl: 1.75rem;     /* 28px */
-  --text-3xl: 2.25rem;     /* 36px */
+  --text-xs: 0.8125rem;   /* 13px */
+  --text-sm: 0.875rem;    /* 14px */
+  --text-base: 1.0625rem; /* 17px */
+  --text-md: 1.1875rem;   /* 19px */
+  --text-lg: 1.3125rem;   /* 21px */
+  --text-xl: 1.5rem;      /* 24px */
+  --text-2xl: 1.875rem;   /* 30px */
+  --text-3xl: 2.375rem;   /* 38px */
 
   /* Line Height */
   --leading-tight: 1.15;
-  --leading-normal: 1.4;
-  --leading-relaxed: 1.6;
+  --leading-normal: 1.35;
+  --leading-relaxed: 1.5;
 
   /* Spacing System (4px base) */
   --space-1: 0.25rem;      /* 4px */
@@ -75,36 +118,36 @@
   --space-8: 2rem;         /* 32px */
   --space-10: 2.5rem;      /* 40px */
 
-  /* Box Shadows */
-  --shadow-sm: 0 2px 0 rgba(61, 44, 46, 0.08);
-  --shadow-md: 0 4px 0 rgba(61, 44, 46, 0.12);
-  --shadow-lg: 0 8px 16px rgba(61, 44, 46, 0.15);
-  --shadow-button: 0 4px 0 var(--red-dark);
-  --shadow-btn-red: 0 4px 0 var(--red-dark);
-  --shadow-btn-gold: 0 4px 0 var(--gold-dark);
-  --shadow-wood: 0 4px 0 rgba(0, 0, 0, 0.18);
-  --shadow-sticker: 0 3px 0 var(--ink);
-  --shadow-modal: 0 8px 0 rgba(61, 44, 46, 0.25);
-  --shadow-glow-gold: 0 0 16px rgba(255, 209, 102, 0.6);
-  --shadow-glow-orange: 0 0 18px rgba(244, 162, 97, 0.65);
+  /* Box Shadows - Stardew 16-Bit Pixel Bevels */
+  --shadow-sm: 1px 1px 0 #2b1810;
+  --shadow-md: 2px 2px 0 #2b1810;
+  --shadow-lg: 3px 3px 0 #2b1810;
+  --shadow-button: 0 4px 0 #7a151b, inset 0 2px 0 rgba(255, 255, 255, 0.35);
+  --shadow-btn-red: 0 4px 0 #6e1017, inset 0 2px 0 rgba(255, 255, 255, 0.35);
+  --shadow-btn-gold: 0 4px 0 #7a4805, inset 0 2px 0 rgba(255, 255, 255, 0.45);
+  --shadow-wood: 0 4px 0 #1a0c06, inset 0 2px 0 rgba(255, 255, 255, 0.2);
+  --shadow-sticker: 2px 2px 0 #1a0c06;
+  --shadow-modal: 4px 4px 0 #1a0c06;
+  --shadow-glow-gold: 0 0 10px rgba(255, 209, 102, 0.65);
+  --shadow-glow-orange: 0 0 10px rgba(244, 162, 97, 0.65);
 
-  /* Border radius */
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius-pill: 999px;
-  --radius-full: 9999px;
+  /* Border radius - 16-Bit Pixel Sharp & Beveled */
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 2px;
+  --radius-lg: 4px;
+  --radius-pill: 2px;
+  --radius-full: 4px;
 
   /* Borders */
-  --border-thin: 1.5px solid var(--line);
-  --border-sticker: 2px solid var(--ink);
-  --border-thick: 3px solid var(--ink);
+  --border-thin: 2px solid #2b1810;
+  --border-sticker: 2px solid #2b1810;
+  --border-thick: 3px solid #2b1810;
 
   /* Animation timing */
-  --dur-fast: 120ms;
-  --dur-normal: 200ms;
-  --dur-slow: 300ms;
+  --dur-fast: 100ms;
+  --dur-normal: 180ms;
+  --dur-slow: 280ms;
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -156,4 +199,20 @@ body.selling-mode {
   position: fixed;
   inset: 0;
   width: 100%;
+}
+
+/* Crisp Pixel Art Rendering */
+.pixel-art,
+img.pixel-art,
+canvas.pixel-art,
+.pixel-box,
+.portrait-box,
+.t-img,
+.gn-pan img,
+.order-food-thumb,
+.shelf-box img,
+.prep-basket-thumb {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }

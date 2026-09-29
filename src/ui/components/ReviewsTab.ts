@@ -84,7 +84,6 @@ export function renderReviewsTab(state: GameState): string {
           <div style="background: #f7ede0; border-left: 3px solid var(--red); border-radius: 4px 8px 8px 4px; padding: 6px 10px; margin-top: 6px; font-size: 0.75rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
               <b style="color: var(--red);">🍗 Chủ Tiệm Đã Trả Lời:</b>
-              ${rev.playerReply ? `<span style="font-size: 0.65rem; font-weight: 800; background: #10b981; color: #fff; padding: 1px 6px; border-radius: 4px;">+${(rev.playerReply.starBonus ?? 0.2).toFixed(1)}⭐ Cứu sao</span>` : ''}
             </div>
             <div style="color: #431407; font-style: italic;">"${escapeHtml(rev.playerReply?.text || rev.ownerReply || '')}"</div>
 
@@ -101,12 +100,9 @@ export function renderReviewsTab(state: GameState): string {
             </button>
           </div>
         ` : `
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
-            <span style="font-size: 0.68rem; color: #b45309; font-weight: 700;">
-              💡 Có lời khuyên từ Bác Ba Cố Vấn
-            </span>
+          <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 6px;">
             <button class="btn-sm btn-open-reply primary" data-review-id="${rev.id}" style="font-size: 0.72rem; padding: 4px 10px; font-weight: 800;">
-              💬 Trả Lời Đánh Giá (Bác Ba Mách Nước)
+              💬 Trả Lời Đánh Giá
             </button>
           </div>
         `}

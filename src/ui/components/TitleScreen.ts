@@ -2,6 +2,7 @@ import { GameState } from '../../types/game';
 import { ASSETS } from '../../content/assets';
 import { escapeHtml } from '../escapeHtml';
 import { audio } from '../../core/audio';
+import { CURRENT_GAME_VERSION } from '../../content/changelog';
 
 const OWNER_QUOTES = [
   'Tiệm Gà Nhà Tui xin chào bạn! Gà vàng giòn rụm đang chờ nè! 🍗✨',
@@ -29,16 +30,10 @@ export function renderTitleScreen(state: GameState, hasProgress: boolean, musicO
       <!-- Scalloped Awning on top edge -->
       <div class="title-awning"></div>
 
-      <!-- Grand Opening Game Banner -->
+      <!-- Grand Opening Game Banner (Stardew Valley Wooden Signboard) -->
       <header class="title-banner-container">
-        <div class="title-brand-card">
-          <div class="brand-crest">
-            <img src="${ASSETS.ui.logoKoreanChicken}" class="brand-logo-img" alt="Logo Tiệm Gà" />
-          </div>
-          <div class="brand-text">
-            <h1 class="brand-title">TIỆM GÀ NHÀ TUI</h1>
-            <p class="brand-tagline">Quán Gà Rán Giòn Rụm Hẻm 1102</p>
-          </div>
+        <div class="title-stardew-banner">
+          <img src="${ASSETS.ui.bannerStardewChicken}" class="banner-stardew-img pixel-art" alt="Tiệm Gà Nhà Tui - Banner Stardew Valley" />
         </div>
       </header>
 
@@ -84,7 +79,7 @@ export function renderTitleScreen(state: GameState, hasProgress: boolean, musicO
           <div class="title-controls-row">
             <button id="btn-title-changelog" class="btn-control-pill" aria-label="Xem bản cập nhật">
               <span class="control-icon">📜</span>
-              <span class="control-text">Bản Cập Nhật v2.1.0</span>
+              <span class="control-text">Bản Cập Nhật ${CURRENT_GAME_VERSION}</span>
             </button>
 
             <button id="btn-title-music" class="btn-control-pill" aria-label="Bật tắt nhạc nền">

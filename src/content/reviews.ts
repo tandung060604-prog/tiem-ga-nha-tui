@@ -1144,7 +1144,7 @@ export const CUSTOMER_REACTION_POOLS = {
     "Khách phản hồi: 'Cợt nhả thiếu chuyên nghiệp! Quán buôn bán kiểu này sớm muộn gì cũng mất hết khách quen.'",
     "Khách phản hồi: 'Không thấy vui một chút nào! Đồ ăn dở tệ mà còn giở giọng bông đùa, 1 sao vĩnh viễn!'",
     "Khách phản hồi: 'Lấy sự tắc trách ra làm trò cười câu like, không hề thấy sự cầu thị nào ở đây cả!'",
-    "Khách phản hồi: 'Tui đang tức sôi máu mà đọc rep kiểu này chỉ muốn report quán ngay và luôn!'",
+    "Khách phản hồi: 'Tui đang bực mình tức sôi máu mà đọc rep cợt nhả kiểu này chỉ muốn report quán ngay và luôn!'",
     "Khách phản hồi: 'Hết nói nổi! Quá thất vọng, đổi tên thành gánh hài đi chứ đừng bán đồ ăn nữa, làm ăn tắc trách!'",
     "Khách phản hồi: 'Giỡn nhây không đúng chỗ rồi em ơi. Buôn bán ẩm thực là tính mạng con người đó nghen!'"
   ],
