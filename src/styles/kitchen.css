@@ -154,9 +154,14 @@
   flex-shrink: 0;
 }
 
-.oil-dot.clean { background: #ffd166; }
-.oil-dot.medium { background: #d38b28; }
-.oil-dot.dirty { background: #4a2810; }
+.oil-dot.clean, .oil-dot.oil-clean { background: #ffd166; box-shadow: 0 0 6px #ffd166; }
+.oil-dot.medium, .oil-dot.oil-medium { background: #d38b28; box-shadow: 0 0 6px #d38b28; }
+.oil-dot.dirty, .oil-dot.oil-dirty { background: #e11d48; box-shadow: 0 0 8px #e11d48; animation: blinkWarning 0.8s infinite alternate; }
+
+@keyframes blinkWarning {
+  0% { opacity: 0.35; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1.1); }
+}
 
 /* The Pot with bubbling oil (Chảo gang chiên ngập dầu Chợ Lớn đầu tư) */
 .fry-pot {
@@ -211,6 +216,10 @@
   border-radius: 14px;
   overflow: hidden;
   pointer-events: none;
+}
+
+.fry-pot.oil-clean {
+  background: radial-gradient(ellipse at 50% 35%, #fff1b8 0%, #fbbf24 35%, #d97706 70%, #78350f 100%);
 }
 
 .fry-pot.oil-medium {
@@ -497,13 +506,15 @@
   border-radius: 7px;
   border: 1.5px solid #8a5a3b;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .cook-gauge-zones {
   position: absolute;
   inset: 0;
   display: flex;
+  overflow: hidden;
+  border-radius: 5px;
 }
 
 .zone-raw {
@@ -535,21 +546,21 @@
 
 .cook-gauge-pointer {
   position: absolute;
-  top: -2px;
-  bottom: -2px;
+  top: -3px;
+  bottom: -3px;
   width: 5px;
   background: linear-gradient(180deg, #ffd700 0%, #d97706 40%, #451a03 100%);
   border-radius: 2.5px;
   transform: translateX(-50%);
-  transition: left 0.08s linear;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.6), 0 0 8px rgba(245, 158, 11, 0.8);
   z-index: 4;
+  pointer-events: none;
 }
 
 .cook-gauge-pointer::before {
   content: '';
   position: absolute;
-  top: -4px;
+  top: -5px;
   left: 50%;
   transform: translateX(-50%);
   width: 0;

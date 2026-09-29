@@ -167,11 +167,10 @@ const streakTipLabel = (streak: number) => `+${(perfectTip(streak) / 1000).toLoc
 // Mọi thứ làm thay đổi CẤU TRÚC màn bán hàng. Khác key cũ → dựng lại HTML; giống → chỉ patch.
 export function sellingStructureKey(state: GameState, session: SellingSession): string {
   const cook = cookingEngine.getCookState();
-  const quality = cookingEngine.calculateCurrentQuality();
   return JSON.stringify([
     session.orders.map(o => [o.id, o.items.map(it => it.served)]),
     cookingEngine.getTray().map(t => t.id + (t.condiment ?? '')),
-    cook.isFrying, cook.fryingType, quality, cookingEngine.getActiveSeasoning(),
+    cook.isFrying, cook.fryingType, cookingEngine.getActiveSeasoning(),
     state.oilCondition, state.currentChapter,
     session.isFastForward, isRushHour(session.gameHour),
     session.perfectStreak >= 2,
@@ -196,6 +195,11 @@ interface SellingDomCache {
   pointer: HTMLElement | null;
   hint: HTMLElement | null;
   fryPot: HTMLElement | null;
+  oilDot: HTMLElement | null;
+  oilLabel: HTMLElement | null;
+  foodPanImg: HTMLImageElement | null;
+  foodStatusBadge: HTMLElement | null;
+  fryingFoodItem: HTMLElement | null;
   streakContainer: HTMLElement | null;
   helpers: (HTMLElement | null)[];
   timers: Map<TimerStationId, HTMLElement | null>;
@@ -206,12 +210,17 @@ const sellingDomCacheMap = new WeakMap<HTMLElement, SellingDomCache>();
 
 function getSellingDomCache(root: HTMLElement): SellingDomCache {
   let cache = sellingDomCacheMap.get(root);
-  if (!cache) {
+  if (!cache || !cache.clock?.isConnected || !cache.fryPot?.isConnected) {
     cache = {
       clock: root.querySelector('.clock b'),
       pointer: root.querySelector('.cook-gauge-pointer'),
       hint: root.querySelector('.pot-hint'),
       fryPot: root.querySelector('#btn-fry-pot'),
+      oilDot: root.querySelector('.oil-dot'),
+      oilLabel: root.querySelector('.oil-status-label'),
+      foodPanImg: root.querySelector('.food-pan-img'),
+      foodStatusBadge: root.querySelector('.food-status-badge'),
+      fryingFoodItem: root.querySelector('.frying-food-item'),
       streakContainer: root.querySelector('#streak-flame-container'),
       helpers: [],
       timers: new Map(),
@@ -323,14 +332,63 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
   }
 
   const cook = cookingEngine.getCookState();
-  if (cache.pointer) cache.pointer.style.left = `${Math.min(100, Math.round(cook.progress))}%`;
+  if (cache.pointer) {
+    const progress = Math.min(100, Math.max(0, cook.progress));
+    cache.pointer.style.left = `${progress.toFixed(2)}%`;
+  }
   if (cache.hint) cache.hint.textContent = potHint();
 
+  const currentOil = state?.oilCondition ?? 'clean';
+  if (cache.oilDot) {
+    cache.oilDot.className = `oil-dot ${currentOil}`;
+  }
+  if (cache.oilLabel) {
+    const label = currentOil === 'clean' ? 'Vàng óng' : currentOil === 'medium' ? 'Nâu sẫm' : 'Đen khét';
+    if (cache.oilLabel.textContent !== label) cache.oilLabel.textContent = label;
+  }
+
   if (cache.fryPot) {
+    cache.fryPot.classList.toggle('oil-clean', currentOil === 'clean');
+    cache.fryPot.classList.toggle('oil-medium', currentOil === 'medium');
+    cache.fryPot.classList.toggle('oil-dirty', currentOil === 'dirty');
+
     if (cook.isFrying) {
       const quality = cookingEngine.calculateCurrentQuality();
       cache.fryPot.classList.toggle('perfect-glow', quality === 'perfect');
       cache.fryPot.classList.toggle('burnt-smoke', quality === 'burnt');
+
+      if (cache.foodStatusBadge) {
+        cache.foodStatusBadge.className = `food-status-badge ${quality}`;
+        const qualityTag = quality === 'perfect' ? '⭐ VÀNG GIÒN' : quality === 'burnt' ? '💥 CHÁY KHÉT' : quality === 'good' ? 'VỪA CHÍN' : 'SỐNG';
+        let foodLabel = '🍗 GÀ GIÒN';
+        if (cook.fryingType === 'thigh') foodLabel = '🍗 MÁ ĐÙI CAY';
+        else if (cook.fryingType === 'fries') foodLabel = '🍟 KHOAI LẮC';
+        else if (cook.fryingType === 'popcorn') foodLabel = '🍿 GÀ VIÊN';
+        else if (cook.fryingType === 'cheese') foodLabel = '🧀 PHÔ MAI QUE';
+        cache.foodStatusBadge.textContent = `${foodLabel} · ${qualityTag}`;
+      }
+
+      if (cache.fryingFoodItem) {
+        cache.fryingFoodItem.className = `frying-food-item ${quality} sizzle-active`;
+      }
+
+      if (cache.foodPanImg) {
+        let foodImg = ASSETS.food.crispyChickenPerfect;
+        if (cook.fryingType === 'thigh') {
+          foodImg = quality === 'raw' ? ASSETS.kitchen.gnPrepThighRaw : quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.spicyThigh;
+        } else if (cook.fryingType === 'fries') {
+          foodImg = quality === 'raw' ? ASSETS.kitchen.gnPrepFriesRaw : quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.shakeFries;
+        } else if (cook.fryingType === 'popcorn') {
+          foodImg = quality === 'raw' ? ASSETS.kitchen.gnPrepPopcornRaw : quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.popcornChicken;
+        } else if (cook.fryingType === 'cheese') {
+          foodImg = quality === 'raw' ? ASSETS.kitchen.gnPrepCheeseStickRaw : quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.cheeseStick;
+        } else {
+          foodImg = quality === 'raw' ? ASSETS.food.crispyChickenRaw : quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.crispyChickenPerfect;
+        }
+        if (!cache.foodPanImg.src.endsWith(foodImg)) {
+          cache.foodPanImg.src = foodImg;
+        }
+      }
     }
     cache.fryPot.classList.toggle('streak-fire', (session.perfectStreak || 0) >= 2);
   }
@@ -806,12 +864,12 @@ export function renderSellingView(state: GameState, session: SellingSession): st
               <span>🍳 Bếp Chiên</span>
               <div class="oil-status">
                 <span class="oil-dot ${oilCondition}"></span>
-                <span>${oilLabel}</span>
+                <span class="oil-status-label">${oilLabel}</span>
               </div>
             </div>
 
             <!-- The Boiling Pot with Real Food Asset -->
-            <div id="btn-fry-pot" class="fry-pot ${oilCondition !== 'clean' ? 'oil-' + oilCondition : ''} ${cookState.isFrying && quality === 'perfect' ? 'perfect-glow' : ''} ${session.perfectStreak >= 2 ? 'streak-fire' : ''}">
+            <div id="btn-fry-pot" class="fry-pot ${'oil-' + oilCondition} ${cookState.isFrying && quality === 'perfect' ? 'perfect-glow' : ''} ${session.perfectStreak >= 2 ? 'streak-fire' : ''}">
               <div class="bubble" style="left: 15%; animation-delay: 0s;"></div>
               <div class="bubble" style="left: 38%; animation-delay: 0.3s;"></div>
               <div class="bubble" style="left: 65%; animation-delay: 0.6s;"></div>

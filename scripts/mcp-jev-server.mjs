@@ -14,22 +14,32 @@ import { TypeSafeClient, choice, score, noul } from "@typesafe-ai/sdk";
 import fs from "node:fs";
 import path from "node:path";
 
+import { fileURLToPath } from "node:url";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const projectRoot = path.resolve(__dirname, "..");
+
 // Auto load .env if TYPESAFE_API_KEY is not already in environment
 if (!process.env.TYPESAFE_API_KEY) {
   try {
-    const envPath = path.resolve(process.cwd(), ".env");
-    if (fs.existsSync(envPath)) {
-      const content = fs.readFileSync(envPath, "utf-8");
-      for (const line of content.split(/\r?\n/)) {
-        const trimmed = line.trim();
-        if (trimmed && !trimmed.startsWith("#")) {
-          const eqIdx = trimmed.indexOf("=");
-          if (eqIdx > 0) {
-            const k = trimmed.slice(0, eqIdx).trim();
-            const v = trimmed.slice(eqIdx + 1).trim();
-            process.env[k] = v;
+    const envCandidates = [
+      path.resolve(process.cwd(), ".env"),
+      path.resolve(projectRoot, ".env"),
+    ];
+    for (const envPath of envCandidates) {
+      if (fs.existsSync(envPath)) {
+        const content = fs.readFileSync(envPath, "utf-8");
+        for (const line of content.split(/\r?\n/)) {
+          const trimmed = line.trim();
+          if (trimmed && !trimmed.startsWith("#")) {
+            const eqIdx = trimmed.indexOf("=");
+            if (eqIdx > 0) {
+              const k = trimmed.slice(0, eqIdx).trim();
+              const v = trimmed.slice(eqIdx + 1).trim();
+              process.env[k] = v;
+            }
           }
         }
+        break;
       }
     }
   } catch (e) {

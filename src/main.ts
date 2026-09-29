@@ -115,6 +115,10 @@ class AppController {
   private expectedCustomers = 0;
 
   constructor() {
+    if (import.meta.env?.DEV) {
+      (window as any).__app = this;
+      (window as any).__stateManager = stateManager;
+    }
     this.init();
   }
 
