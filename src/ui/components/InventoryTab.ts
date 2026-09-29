@@ -129,9 +129,11 @@ function setupLongPress(btn: HTMLElement, action: () => void) {
   let timer: ReturnType<typeof setTimeout> | null = null;
   let interval: ReturnType<typeof setInterval> | null = null;
   let speed = 180;
+  let pointerFired = false;
 
   const start = (e: Event) => {
     e.preventDefault();
+    pointerFired = true;
     action();
     speed = 180;
     timer = setTimeout(() => {
@@ -147,12 +149,19 @@ function setupLongPress(btn: HTMLElement, action: () => void) {
     if (interval) clearInterval(interval);
     timer = null;
     interval = null;
+    setTimeout(() => { pointerFired = false; }, 100);
   };
 
   btn.addEventListener('pointerdown', start);
   btn.addEventListener('pointerup', stop);
   btn.addEventListener('pointerleave', stop);
   btn.addEventListener('pointercancel', stop);
+  btn.addEventListener('click', (e) => {
+    if (!pointerFired) {
+      e.preventDefault();
+      action();
+    }
+  });
 }
 
 export function bindInventoryEvents(
