@@ -888,18 +888,15 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <!-- Real Cast Iron Fryer Card (Bếp Chiên Ngập Dầu Chợ Lớn) -->
           <div class="fryer-card">
             <div class="fryer-header">
-              <div class="fryer-title-row">
-                <span class="fryer-title">
-                  <img src="${ASSETS.icons.bell}" class="pixel-card-title-icon" alt="" /> Bếp Chiên
-                </span>
-                <div class="oil-status">
-                  <span class="oil-dot ${oilCondition}"></span>
-                  <span class="oil-status-label">${oilLabel}</span>
-                </div>
-              </div>
-              <button id="btn-change-oil" class="oil-change-btn ${oilCondition === 'dirty' ? 'dirty-alert' : ''}" title="Thay chảo dầu mới (150.000đ)">
+              <span class="fryer-title">
+                <img src="${ASSETS.icons.bell}" class="pixel-card-title-icon" alt="" /> Bếp Chiên
+              </span>
+              <button id="btn-change-oil" class="oil-change-btn ${oilCondition === 'dirty' ? 'dirty-alert' : ''}" title="Dầu: ${oilLabel} - Chạm để thay chảo mới (150.000đ)">
+                <span class="oil-dot ${oilCondition}"></span>
+                <span class="oil-status-label">${oilLabel}</span>
+                <span class="oil-sep">|</span>
                 <img src="${ASSETS.icons.oilCan}" class="btn-pixel-icon-xs" alt="" />
-                <span>Thay dầu 150k</span>
+                <span>150k</span>
               </button>
             </div>
 

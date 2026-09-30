@@ -165,8 +165,8 @@
 
 /* The Pot with bubbling oil (Chảo gang chiên ngập dầu Chợ Lớn đầu tư) */
 .fry-pot {
-  height: 125px;
-  flex: 0 0 125px;
+  height: 112px;
+  flex: 0 0 112px;
   border-radius: 18px;
   border: 4px solid #2e180d;
   background: radial-gradient(ellipse at 50% 35%, #fff1b8 0%, #fbbf24 35%, #d97706 70%, #78350f 100%);
@@ -605,24 +605,37 @@
   border: 1.5px solid #d4a373;
   background: #fffbf0;
   color: #78350f;
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 0.68rem;
+  border-radius: 8px;
+  padding: 4px 6px;
+  font-size: 0.65rem;
   font-weight: 800;
   cursor: pointer;
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
   box-sizing: border-box;
   max-width: 100%;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: all 0.15s ease;
+}
+
+.oil-change-btn .oil-sep {
+  opacity: 0.4;
+  margin: 0 1px;
 }
 
 .oil-change-btn:hover {
   background: var(--bg);
   color: var(--ink);
+}
+
+.oil-change-btn.dirty-alert {
+  border-color: #ef4444;
+  background: #fef2f2;
+  color: #b91c1c;
+  animation: pulseWarning 1s infinite alternate;
 }
 
 /* Prep / Assemble Station (Khay hoàn thiện & bàn giao) */

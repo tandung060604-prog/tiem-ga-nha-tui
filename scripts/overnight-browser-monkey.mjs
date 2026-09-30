@@ -24,16 +24,9 @@ function log(msg) {
 }
 
 function triggerJevTriage(title, symptom, source) {
-  try {
-    const cleanTitle = title.replace(/["\r\n]/g, ' ');
-    const cleanSymptom = symptom.replace(/["\r\n]/g, ' ');
-    const p = spawn('npx', ['tsx', 'scripts/consult-jev-bug-triage.ts', `"${cleanTitle}"`, `"${cleanSymptom}"`, `"${source}"`], {
-      detached: true,
-      stdio: 'ignore',
-      shell: true,
-    });
-    p.unref();
-  } catch {}
+  // Ghi log lỗi vào file an toàn, tuyệt đối KHÔNG spawn child process shell để tránh bão cửa sổ PowerShell/CMD trên Windows
+  const line = `[TRIAGE LOG] ${title}: ${symptom} (${source})`;
+  log(line);
 }
 
 // Đọc tham số dòng lệnh: node scripts/overnight-browser-monkey.mjs [--hours H] [--days D] [--headless false] [--url URL]
@@ -402,17 +395,21 @@ class OvernightMonkey {
 
       // 0. Thay dầu mới nếu dầu đã xuống cấp/bẩn hoặc đã rán nhiều mẻ (bảo vệ uy tín & tránh công an phạt)
       const oilBtn = page.locator('#btn-change-oil');
-      if (await oilBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
-        const shouldChangeOil = await page.evaluate(() => {
-          const s = window.__stateManager?.getState();
-          return s && s.money >= 150000 && (s.oilCondition === 'dirty' || s.oilCondition === 'degraded' || (s.oilBatchesCooked ?? 0) >= 5);
-        }).catch(() => false);
+      const now = Date.now();
+      if (!this.lastOilAttempt || now - this.lastOilAttempt > 5000) {
+        if (await oilBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
+          const shouldChangeOil = await page.evaluate(() => {
+            const s = window.__stateManager?.getState();
+            return s && s.money >= 150000 && (s.oilCondition === 'dirty' || (s.oilBatchesCooked ?? 0) >= 5);
+          }).catch(() => false);
 
-        if (shouldChangeOil) {
-          log(`🛢️ Phát hiện dầu xuống cấp/bẩn -> Bấm THAY DẦU 150k...`);
-          await oilBtn.first().click({ force: true }).catch(() => {});
-          await sleep(150);
-          return true;
+          if (shouldChangeOil) {
+            this.lastOilAttempt = now;
+            log(`🛢️ Phát hiện dầu xuống cấp/bẩn -> Bấm THAY DẦU 150k...`);
+            await oilBtn.first().click({ force: true }).catch(() => {});
+            await sleep(300);
+            return true;
+          }
         }
       }
 
