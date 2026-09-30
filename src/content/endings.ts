@@ -72,12 +72,13 @@ export const STORY_ENDINGS: Record<StoryEndingId, StoryEnding> = {
 
 export function applyKarmaChange(
   karma: KarmaState,
-  delta: { community?: number; craftsmanship?: number; ambition?: number }
+  delta?: { community?: number; craftsmanship?: number; ambition?: number }
 ): KarmaState {
+  const d = delta ?? {};
   return {
-    community: Math.max(0, Math.min(100, karma.community + (delta.community ?? 0))),
-    craftsmanship: Math.max(0, Math.min(100, karma.craftsmanship + (delta.craftsmanship ?? 0))),
-    ambition: Math.max(0, Math.min(100, karma.ambition + (delta.ambition ?? 0)))
+    community: Math.max(0, Math.min(100, karma.community + (d.community ?? 0))),
+    craftsmanship: Math.max(0, Math.min(100, karma.craftsmanship + (d.craftsmanship ?? 0))),
+    ambition: Math.max(0, Math.min(100, karma.ambition + (d.ambition ?? 0)))
   };
 }
 
