@@ -117,7 +117,7 @@ describe('máy nước, gà viên, combo', () => {
       expect.objectContaining({ menuItemId: 'crispy_chicken', count: 2 }),
       expect.objectContaining({ menuItemId: 'soda', count: 2 })
     ]));
-    expect(duo?.totalPrice).toBe(89000);
+    expect(duo?.totalPrice).toBe(95000);
   });
 
   it('chưa làm được gà viên (chương 2) thì không có Bucket gia đình', () => {

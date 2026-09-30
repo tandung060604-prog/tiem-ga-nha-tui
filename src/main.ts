@@ -1474,6 +1474,15 @@ class AppController {
         stateManager.update(draft => { r = scoopSide(draft, session, cookingEngine, side); });
         return r === 'ok';
       },
+      squeeze: sauce => {
+        const sq = squeezeCondiment(cookingEngine.getTray(), session.orders, sauce);
+        if (sq) {
+          audio.playSquirt();
+          this.haptic(15);
+          return true;
+        }
+        return false;
+      },
       traySize: cookingEngine.getTraySize()
     });
     for (const ev of events) {
@@ -1992,13 +2001,22 @@ class AppController {
         return;
     }
 
-    const { order, paid, tip, feedbackNotes } = result;
+    const { order, paid, tip: initialTip, feedbackNotes } = result;
+    let tip = initialTip;
 
-    // Đơn giao xa (Minigame Chạy Xe Giao Đơn Xa / Thuê Shipper)
+    // Đơn giao xa: nếu có Shipper nhà -> Shipper hỏa tốc giao an toàn, tự động nhận tip mà không gián đoạn ca bán!
+    const houseDriver = curState.staff.find(m => m.role === 'delivery' && m.mood > 25);
     const isLongDistanceDelivery = order.isDelivery && order.isLongDistance && !order.isBunny && (curState.deliveryRunnerDayCount ?? 0) < 2;
     if (isLongDistanceDelivery) {
-      this.promptDeliveryRunner(order, paid, tip, feedbackNotes);
-      return;
+      if (houseDriver) {
+        const extraDriverTip = 25000;
+        tip += extraDriverTip;
+        this.showToast(`🛵 Shipper ${houseDriver.name} đã hỏa tốc giao đơn xa an toàn! (+${extraDriverTip.toLocaleString('vi-VN')}đ tip) 📦`);
+        audio.playCash();
+      } else {
+        this.promptDeliveryRunner(order, paid, tip, feedbackNotes);
+        return;
+      }
     }
 
     let letter: BunnyLetter | undefined;

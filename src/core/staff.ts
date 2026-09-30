@@ -1,4 +1,4 @@
-import { CustomerOrder, QualityRating, StaffMember, TrayItem } from '../types/game';
+import { Condiment, CustomerOrder, QualityRating, StaffMember, TrayItem } from '../types/game';
 import type { FryType, Sauce } from './cooking';
 import { ASSEMBLY_RECIPES, DrinkId, ScoopId, isAssemblyId, isDrinkId, isScoopId } from './stations';
 import { random } from './rng';
@@ -72,6 +72,27 @@ export function missingItems(order: CustomerOrder, tray: readonly TrayItem[]): s
     }
   }
   return missing;
+}
+
+/**
+ * Kiểm tra xem khách có món nào dặn tương (condiment) mà trong khay CHƯA CÓ món chín cùng loại đã được xịt tương hay không.
+ * Trả về loại tương đang còn thiếu, hoặc null nếu khách không dặn tương hoặc khay đã có đủ món xịt tương.
+ */
+export function orderPendingCondiment(order: CustomerOrder, tray: readonly TrayItem[]): Condiment | null {
+  for (const it of order.items) {
+    if (!it.condiment) continue;
+    const needed = it.count - (it.condimentServed ?? 0);
+    if (needed <= 0) continue;
+
+    const matchingSauced = tray.filter(
+      t => t.quality !== 'raw' && t.menuItemId === it.menuItemId && t.condiment === it.condiment
+    ).length;
+
+    if (matchingSauced < needed) {
+      return it.condiment;
+    }
+  }
+  return null;
 }
 
 // ---------------------------------------------------------------------------
@@ -192,6 +213,7 @@ export interface StaffHooks {
   place: (item: TrayItem) => boolean;           // đặt vào khay; khay đầy → false (giữ trong giỏ, thử lại)
   pour: (drink: DrinkId) => boolean;           // phục vụ rót nước (trừ kho, đặt vào khay)
   scoop?: (side: ScoopId) => boolean;          // phục vụ múc món kèm từ khay inox (củ cải, bắp cải)
+  squeeze?: (condiment: Condiment) => boolean;  // phục vụ xịt tương dặn kèm lên món trong khay
   traySize: number;
 }
 
@@ -261,22 +283,39 @@ export function tickStaff(
     session.totalFriedCount += 1;
   });
 
-  // Phục vụ rót nước / múc món kèm cho 2 khách đầu (mỗi phần một nhịp), chừa 1 ô khay cho chủ quán
+  // Phục vụ rót nước / múc món kèm / tự xịt tương dặn kèm cho 2 khách đầu (mỗi phần một nhịp), chừa 1 ô khay cho chủ quán
   if (eff.waiterServeMs !== null) {
     session.pourMs = (session.pourMs ?? 0) + gameDt;
-    const busy = session.helpers.filter(Boolean).length;
-    if (session.pourMs >= eff.waiterServeMs && tray.length + busy < hooks.traySize - 1) {
-      const missing = session.orders.slice(0, 2).flatMap(o => missingItems(o, tray));
-      const drink = missing.find(isDrinkId);
-      const side = missing.find(isScoopId);
-      if (drink && hooks.pour(drink)) session.pourMs = 0;
-      else if (side && hooks.scoop?.(side)) session.pourMs = 0;
+    if (session.pourMs >= eff.waiterServeMs) {
+      const pendingSauce = session.orders[0] ? orderPendingCondiment(session.orders[0], tray) : null;
+      // 1. Phục vụ thông minh: tự xịt tương dặn kèm lên món chiên đã có trong khay (không cần ô khay trống)
+      if (pendingSauce && hooks.squeeze?.(pendingSauce)) {
+        session.pourMs = 0;
+      } else {
+        // 2. Rót nước / múc món kèm cần thêm ô khay mới, nên phải chừa 1 ô khay cho chủ quán
+        const trayLimit = (hooks.traySize ?? 4) - 1;
+        const busy = session.helpers.filter(Boolean).length;
+        if (tray.length + busy < trayLimit) {
+          const missing = session.orders.slice(0, 2).flatMap(o => missingItems(o, tray));
+          const drink = missing.find(isDrinkId);
+          const side = missing.find(isScoopId);
+
+          if (drink && hooks.pour(drink)) {
+            session.pourMs = 0;
+          } else if (side && hooks.scoop?.(side)) {
+            session.pourMs = 0;
+          }
+        }
+      }
     }
   }
 
-  // Phục vụ: khách đầu hàng đã đủ món trong khay → tự lên món sau một nhịp
+  // Phục vụ: khách đầu hàng đã đủ món trong khay VÀ ĐÃ XỊT ĐỦ TƯƠNG DẶN KÈM → tự lên món sau một nhịp
   const first = session.orders[0];
-  if (eff.waiterServeMs !== null && first && missingItems(first, tray).length === 0) {
+  const pendingCondiment = first ? orderPendingCondiment(first, tray) : null;
+  const isOrderFullyReady = first && missingItems(first, tray).length === 0 && !pendingCondiment;
+
+  if (eff.waiterServeMs !== null && isOrderFullyReady) {
     session.waiterMs += gameDt;
     if (session.waiterMs >= eff.waiterServeMs) {
       session.waiterMs = 0;

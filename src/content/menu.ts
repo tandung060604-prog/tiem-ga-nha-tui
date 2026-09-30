@@ -155,8 +155,8 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   {
     id: 'combo_duo',
     name: 'Combo Cặp Đôi Hẹn Hò',
-    basePrice: 89000,
-    currentPrice: 89000,
+    basePrice: 95000,
+    currentPrice: 95000,
     chapter: 2,
     icon: '🍱',
     category: 'combo',
@@ -197,8 +197,8 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   {
     id: 'chicken_burger',
     name: 'Burger Gà Giòn',
-    basePrice: 55000,
-    currentPrice: 55000,
+    basePrice: 59000,
+    currentPrice: 59000,
     chapter: 3,
     icon: '🍔',
     category: 'chicken',
@@ -280,8 +280,8 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   {
     id: 'family_bucket',
     name: 'Bucket Đại Tiệc Gia Đình',
-    basePrice: 179000,
-    currentPrice: 179000,
+    basePrice: 189000,
+    currentPrice: 189000,
     chapter: 3,
     icon: '🪣',
     category: 'combo',

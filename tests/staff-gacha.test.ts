@@ -54,8 +54,8 @@ describe('Staff Gacha System - Comprehensive Tests', () => {
 
       if (s.rarity === 'C') {
         expect(s.stars).toBe(1);
-        expect(s.hourlyWage).toBeGreaterThanOrEqual(18000);
-        expect(s.hourlyWage).toBeLessThanOrEqual(25000);
+        expect(s.hourlyWage).toBeGreaterThanOrEqual(15000);
+        expect(s.hourlyWage).toBeLessThanOrEqual(18000);
         expect(s.laziness).toBeGreaterThanOrEqual(15);
         expect(s.laziness).toBeLessThanOrEqual(30);
         expect(s.errorRate).toBeGreaterThanOrEqual(10);
@@ -63,8 +63,8 @@ describe('Staff Gacha System - Comprehensive Tests', () => {
         expect(s.speed).toBeLessThan(65);
       } else if (s.rarity === 'R') {
         expect(s.stars).toBe(2);
-        expect(s.hourlyWage).toBeGreaterThanOrEqual(28000);
-        expect(s.hourlyWage).toBeLessThanOrEqual(40000);
+        expect(s.hourlyWage).toBeGreaterThanOrEqual(20000);
+        expect(s.hourlyWage).toBeLessThanOrEqual(28000);
         expect(s.laziness).toBeGreaterThanOrEqual(5);
         expect(s.laziness).toBeLessThanOrEqual(12);
         expect(s.errorRate).toBeGreaterThanOrEqual(3);
@@ -72,8 +72,8 @@ describe('Staff Gacha System - Comprehensive Tests', () => {
         expect(s.speed).toBeGreaterThanOrEqual(65);
       } else if (s.rarity === 'SR') {
         expect(s.stars).toBe(3);
-        expect(s.hourlyWage).toBeGreaterThanOrEqual(48000);
-        expect(s.hourlyWage).toBeLessThanOrEqual(70000);
+        expect(s.hourlyWage).toBeGreaterThanOrEqual(35000);
+        expect(s.hourlyWage).toBeLessThanOrEqual(48000);
         expect(s.laziness).toBeGreaterThanOrEqual(1);
         expect(s.laziness).toBeLessThanOrEqual(4);
         expect(s.errorRate).toBeGreaterThanOrEqual(0);
@@ -81,8 +81,8 @@ describe('Staff Gacha System - Comprehensive Tests', () => {
         expect(s.speed).toBeGreaterThanOrEqual(85);
       } else if (s.rarity === 'SSR') {
         expect(s.stars).toBe(5);
-        expect(s.hourlyWage).toBeGreaterThanOrEqual(80000);
-        expect(s.hourlyWage).toBeLessThanOrEqual(100000);
+        expect(s.hourlyWage).toBeGreaterThanOrEqual(65000);
+        expect(s.hourlyWage).toBeLessThanOrEqual(90000);
         expect(s.laziness).toBe(0);
         expect(s.errorRate).toBe(0);
         expect(s.speed).toBeGreaterThanOrEqual(95);

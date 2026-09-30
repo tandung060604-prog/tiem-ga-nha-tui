@@ -629,6 +629,30 @@ class AudioManager {
     osc.start(now);
     osc.stop(now + 0.07);
   }
+
+  // Âm thanh xịt tương cà / tương ớt (tiếng phụt nước sốt vui nhộn)
+  public playSquirt() {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(420, now);
+    osc.frequency.exponentialRampToValueAtTime(160, now + 0.08);
+
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+
+    osc.connect(gain);
+    gain.connect(this.dest());
+
+    osc.start(now);
+    osc.stop(now + 0.08);
+  }
 }
 
 export const audio = new AudioManager();
