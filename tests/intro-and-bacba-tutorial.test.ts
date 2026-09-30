@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { TUTORIAL_TEXT, BAC_BA_GAME_TIPS } from '../src/core/tutorial';
-import { renderIntroCinematicModal, shouldShowIntroVideo } from '../src/ui/components/IntroCinematicModal';
+import { renderIntroCinematicModal, shouldShowIntroVideo, INTRO_VOICEOVER_PHASES } from '../src/ui/components/IntroCinematicModal';
 import { renderBacBaManualModal } from '../src/ui/components/BacBaManualModal';
 
 describe('Bác Ba Miền Tây Tutorial & Tips', () => {
@@ -31,13 +31,23 @@ describe('Bác Ba Miền Tây Tutorial & Tips', () => {
 });
 
 describe('Intro Cinematic Modal & Bac Ba Manual Modal UI', () => {
-  it('renderIntroCinematicModal tạo cấu trúc HTML hợp lệ có nút bắt đầu và bỏ qua', () => {
+  it('renderIntroCinematicModal tạo cấu trúc HTML hợp lệ có phong cách 3D Voxel và timeline 12s', () => {
     const html = renderIntroCinematicModal();
     expect(html).toContain('intro-cinematic-overlay');
+    expect(html).toContain('3D VOXEL VEO 3');
+    expect(html).toContain('intro-3d-viewport');
+    expect(html).toContain('intro-video-timeline');
+    expect(html).toContain('btn-intro-replay');
     expect(html).toContain('BẮT ĐẦU VÀO TIỆM GÀ');
     expect(html).toContain('Bỏ qua ✕');
     expect(html).toContain('Bác Ba Nghệ Nhân:');
     expect(html).toContain('Mèn đét ơi!');
+  });
+
+  it('INTRO_VOICEOVER_PHASES trải dài từ 0s tới 12-14s với đầy đủ 4 giai đoạn mở màn', () => {
+    expect(INTRO_VOICEOVER_PHASES.length).toBe(4);
+    expect(INTRO_VOICEOVER_PHASES[0].start).toBe(0);
+    expect(INTRO_VOICEOVER_PHASES[INTRO_VOICEOVER_PHASES.length - 1].end).toBeGreaterThanOrEqual(12);
   });
 
   it('renderBacBaManualModal tạo giao diện cẩm nang 4 phần trực quan', () => {
