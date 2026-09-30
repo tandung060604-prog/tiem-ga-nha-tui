@@ -18,12 +18,11 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
 
-// Auto load .env if TYPESAFE_API_KEY is not already in environment
-if (!process.env.TYPESAFE_API_KEY) {
+function getClient() {
   try {
     const envCandidates = [
-      path.resolve(process.cwd(), ".env"),
       path.resolve(projectRoot, ".env"),
+      path.resolve(process.cwd(), ".env"),
     ];
     for (const envPath of envCandidates) {
       if (fs.existsSync(envPath)) {
@@ -35,23 +34,23 @@ if (!process.env.TYPESAFE_API_KEY) {
             if (eqIdx > 0) {
               const k = trimmed.slice(0, eqIdx).trim();
               const v = trimmed.slice(eqIdx + 1).trim();
-              process.env[k] = v;
+              if (k === "TYPESAFE_API_KEY" && v) {
+                process.env.TYPESAFE_API_KEY = v;
+              }
             }
           }
         }
         break;
       }
     }
-  } catch (e) {
-    console.error("Warning: Could not read .env:", e);
-  }
-}
+  } catch (e) {}
 
-const client = new TypeSafeClient({
-  apiKey: process.env.TYPESAFE_API_KEY,
-  timeout: 10000,
-  retry: { maxRetries: 2 },
-});
+  return new TypeSafeClient({
+    apiKey: process.env.TYPESAFE_API_KEY,
+    timeout: 10000,
+    retry: { maxRetries: 2 },
+  });
+}
 
 const server = new Server(
   {
@@ -220,7 +219,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     if (name === "jev_choice") {
       const { state, prompt, choices: rawChoices } = args;
-      const res = await client.systemOne({
+      const res = await getClient().systemOne({
         state: state || {},
         questions: {
           result: choice(prompt, rawChoices),
@@ -248,7 +247,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     if (name === "jev_score") {
       const { state, prompt, scale: rawScale } = args;
-      const res = await client.systemOne({
+      const res = await getClient().systemOne({
         state: state || {},
         questions: {
           result: score(prompt, rawScale),
@@ -276,7 +275,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     if (name === "jev_noul") {
       const { state, prompt, trueDescription, falseDescription } = args;
-      const res = await client.systemOne({
+      const res = await getClient().systemOne({
         state: state || {},
         questions: {
           result: noul(prompt, {
@@ -318,7 +317,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         }
       }
 
-      const res = await client.systemOne({
+      const res = await getClient().systemOne({
         state: state || {},
         questions: builtQuestions,
       });
@@ -369,7 +368,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         );
       }
 
-      const res = await client.systemOne({
+      const res = await getClient().systemOne({
         state: { text, ...(extraContext || {}) },
         questions: builtQuestions,
       });
@@ -395,7 +394,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     if (name === "jev_triage_bug") {
       const { bugTitle, symptom, context, sourceFile, screenshot } = args;
       const started = performance.now();
-      const res = await client.systemOne({
+      const res = await getClient().systemOne({
         state: {
           game: "Tiệm Gà Nhà Tui",
           project: "Web Mobile Simulation / Stardew Valley Indie Pixel Style",

@@ -190,11 +190,43 @@ class OvernightMonkey {
       return true;
     }
 
-    // Modal Kết Thúc Trò Chơi (Ending Modal)
-    const endingCloseBtn = page.locator('#btn-close-ending, #btn-restart-game');
+    // Modal Kết Thúc Trò Chơi (Ending Modal): Ưu tiên Bấm Chơi Lại Mới để reset vòng lặp kiểm thử
+    const endingRestartBtn = page.locator('#btn-restart-game');
+    if (await endingRestartBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`🏆 Nhận diện Ending Modal -> Bấm CHƠI LẠI MỚI để kiểm thử chu kỳ tiếp theo...`);
+      await endingRestartBtn.first().click({ force: true });
+      await sleep(300);
+      const confirmOk = page.locator('#btn-confirm-ok');
+      if (await confirmOk.first().isVisible({ timeout: 500 }).catch(() => false)) {
+        log(`🔄 Xác nhận xóa save & chơi lại từ đầu...`);
+        await confirmOk.first().click({ force: true });
+        await sleep(500);
+      }
+      return true;
+    }
+
+    const endingCloseBtn = page.locator('#btn-close-ending');
     if (await endingCloseBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
-      log(`🏆 Xử lý Ending Modal -> Tiếp tục hành trình...`);
+      log(`🏆 Xử lý Đóng Ending Modal -> Trở về chuẩn bị...`);
       await endingCloseBtn.first().click({ force: true });
+      await sleep(300);
+      return true;
+    }
+
+    // Modal Xác Nhận (Confirm Dialog) độc lập
+    const standaloneConfirm = page.locator('#btn-confirm-ok');
+    if (await standaloneConfirm.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`✅ Xác nhận hộp thoại Confirm (#btn-confirm-ok)...`);
+      await standaloneConfirm.first().click({ force: true });
+      await sleep(300);
+      return true;
+    }
+
+    // Modal Biên bản Công An kiểm tra vệ sinh / phạt dầu đen
+    const policeConfirm = page.locator('#btn-police-confirm');
+    if (await policeConfirm.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`👮‍♂️ Bấm xác nhận Biên Bản Công An (#btn-police-confirm)...`);
+      await policeConfirm.first().click({ force: true });
       await sleep(300);
       return true;
     }
@@ -358,6 +390,32 @@ class OvernightMonkey {
     // B. PHA BÁN HÀNG (SELLING SCREEN)
     const sellingScreen = page.locator('.selling-screen');
     if (await sellingScreen.isVisible({ timeout: 60 }).catch(() => false)) {
+      // Kiểm tra nếu game đang ở trạng thái Ending hoặc không trong phase selling thì không click bừa
+      const isActuallySelling = await page.evaluate(() => {
+        const s = window.__stateManager?.getState();
+        return s && s.phase === 'selling' && !s.activeEnding;
+      }).catch(() => true);
+
+      if (!isActuallySelling) {
+        return false;
+      }
+
+      // 0. Thay dầu mới nếu dầu đã xuống cấp/bẩn hoặc đã rán nhiều mẻ (bảo vệ uy tín & tránh công an phạt)
+      const oilBtn = page.locator('#btn-change-oil');
+      if (await oilBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
+        const shouldChangeOil = await page.evaluate(() => {
+          const s = window.__stateManager?.getState();
+          return s && s.money >= 150000 && (s.oilCondition === 'dirty' || s.oilCondition === 'degraded' || (s.oilBatchesCooked ?? 0) >= 5);
+        }).catch(() => false);
+
+        if (shouldChangeOil) {
+          log(`🛢️ Phát hiện dầu xuống cấp/bẩn -> Bấm THAY DẦU 150k...`);
+          await oilBtn.first().click({ force: true }).catch(() => {});
+          await sleep(150);
+          return true;
+        }
+      }
+
       // 1. Bật tua nhanh nếu chưa bật (chỉ bấm khi đang ở chế độ 1x)
       const fastBtn = page.locator('#btn-toggle-fast');
       if (await fastBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
@@ -495,10 +553,15 @@ class OvernightMonkey {
       const nextDayBtn = document.querySelector('#btn-start-next-day, #btn-summary-next-day');
       if (nextDayBtn instanceof HTMLElement) { nextDayBtn.click(); return; }
 
-      const incidentButtons = document.querySelectorAll('#btn-incident-continue, #btn-incident-confirm-yes, .incident-choice-btn');
+      const incidentButtons = document.querySelectorAll('#btn-incident-continue, #btn-incident-confirm-yes, .incident-choice-btn, #btn-police-confirm');
       for (const b of incidentButtons) {
         if (b instanceof HTMLElement) { b.click(); return; }
       }
+
+      const restartBtn = document.getElementById('btn-restart-game');
+      if (restartBtn instanceof HTMLElement) { restartBtn.click(); return; }
+      const confirmOkBtn = document.getElementById('btn-confirm-ok');
+      if (confirmOkBtn instanceof HTMLElement) { confirmOkBtn.click(); return; }
 
       const closeButtons = document.querySelectorAll('.dash-close-x, #btn-modal-close-icon, [id*="btn-close"], .btn-close, .modal-close');
       for (const btn of closeButtons) {

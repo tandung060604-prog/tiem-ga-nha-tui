@@ -590,7 +590,12 @@ class AppController {
     const html = renderEndingModal(state, endingId);
     this.openModal(html);
     bindEndingEvents(
-      () => this.closeModal(),
+      () => {
+        this.closeModal();
+        if (stateManager.getState().activeEnding && stateManager.getState().phase === 'selling') {
+          this.setPhase('prep');
+        }
+      },
       () => {
         void this.confirmDialog(
           'Bạn có chắc chắn muốn xóa dữ liệu và chơi lại từ đầu không?',

@@ -40,3 +40,23 @@
   - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 65.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
 ---
+
+### 🐞 [09:06:08 30/9/2026] Test Key
+- **Triệu chứng:** Test symptom
+- **Vị trí:** `Test context` 
+- **Đánh giá Jev (518ms):**
+  - **Mức độ (Severity):** `p0_blocker` (Độ tin cậy: 96.0%)
+  - **Nguyên nhân gốc (Root Cause):** `state_lifecycle` (Độ tin cậy: 100.0%)
+  - **Chiến lược Fix:** `defensive_nullcheck_fallback` (Độ tin cậy: 56.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---
+
+### 🐞 [09:13:11 30/9/2026] Bad Police Ending Softlock & Lack of Oil Changing in Monkey
+- **Triệu chứng:** Log stops at [08:13:46] 🏆 Xử lý Ending Modal -> Tiếp tục hành trình... and freezes indefinitely on a zombie selling screen with stopped loop because #btn-close-ending was clicked instead of restart, and monkey never changes dirty oil causing 3 strikes game over.
+- **Vị trí:** `scripts/overnight-browser-monkey.mjs, src/main.ts` 
+- **Đánh giá Jev (456ms):**
+  - **Mức độ (Severity):** `p0_blocker` (Độ tin cậy: 100.0%)
+  - **Nguyên nhân gốc (Root Cause):** `ui_modal_stack` (Độ tin cậy: 47.0%)
+  - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 72.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---
