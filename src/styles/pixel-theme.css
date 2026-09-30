@@ -892,3 +892,237 @@ body.selling-mode .toast {
   font-weight: 600 !important;
   box-shadow: 1px 2px 0 #1a0c06 !important;
 }
+
+/* ==========================================================================
+   10. PIXEL ICONS (STARDEW 16-BIT UI SPRITES) & PATIENCE CIRCULAR RING
+   ========================================================================== */
+
+.h-pixel-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+.h-pixel-coin {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+  vertical-align: -1px;
+  margin-right: 2px;
+}
+.h-pixel-star {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  vertical-align: -1px;
+  margin-right: 1px;
+}
+
+.tab-pixel-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 2px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+}
+
+.hud-pixel-icon {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 3px;
+}
+
+.btn-pixel-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+.btn-pixel-icon-sm {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 3px;
+}
+.btn-pixel-icon-xs {
+  width: 13px;
+  height: 13px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 2px;
+}
+.btn-pixel-icon-lg {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+.pixel-card-title-icon,
+.pixel-section-icon {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 3px;
+}
+.badge-pixel-star-xs {
+  width: 11px;
+  height: 11px;
+  object-fit: contain;
+  vertical-align: -1px;
+  margin-right: 2px;
+}
+.emote-pixel-img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+.pan-big-pixel-img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));
+}
+.pixel-lock-img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+.board-pixel-icon-xs {
+  width: 13px;
+  height: 13px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 2px;
+}
+.board-pixel-icon-sm {
+  width: 17px;
+  height: 17px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+/* Feature 51 aenhatrang.com: Vòng thời gian quanh khách (Circular patience ring) */
+.patience-ring-svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  width: 52px;
+  height: 52px;
+  pointer-events: none;
+  z-index: 0;
+}
+.ring-track {
+  fill: none;
+  stroke: rgba(43, 24, 16, 0.22);
+  stroke-width: 3.5px;
+}
+.ring-fill {
+  fill: none;
+  stroke: #22c55e;
+  stroke-width: 3.5px;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.15s linear, stroke 0.25s ease;
+}
+.ring-fill.mid {
+  stroke: #f59e0b;
+}
+.ring-fill.low {
+  stroke: #ef4444;
+  animation: ringUrgentPulse 0.5s infinite alternate ease-in-out;
+}
+@keyframes ringUrgentPulse {
+  0% { stroke-width: 3.5px; filter: drop-shadow(0 0 1px #ef4444); }
+  100% { stroke-width: 5px; filter: drop-shadow(0 0 6px #ef4444); }
+}
+
+/* Cứu hộ tiếp tế khẩn cấp khi hết hàng giữa ngày (aenhatrang report #48 & #21) */
+.pan-emergency-restock {
+  border-color: #f59e0b !important;
+  animation: restockGlow 1.2s infinite alternate ease-in-out;
+}
+.badge-restock-pulse {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  color: #fff !important;
+  font-weight: 800 !important;
+  font-size: 0.65rem !important;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.7);
+  animation: badgePulse 0.8s infinite alternate;
+}
+@keyframes restockGlow {
+  0% { box-shadow: 0 0 0 rgba(245, 158, 11, 0); }
+  100% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.6); }
+}
+@keyframes badgePulse {
+  0% { transform: scale(0.95); }
+  100% { transform: scale(1.08); }
+}
+
+/* Bố cục quầy chiên cân đối & nút Thay dầu trong Fryer Header */
+.fryer-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.fryer-title {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: #2b1810;
+  display: inline-flex;
+  align-items: center;
+}
+.oil-change-btn.dirty-alert {
+  background: #fee2e2 !important;
+  border-color: #ef4444 !important;
+  color: #991b1b !important;
+  animation: dirtyAlertPulse 0.8s infinite alternate;
+}
+@keyframes dirtyAlertPulse {
+  0% { transform: scale(1); box-shadow: 0 0 2px #ef4444; }
+  100% { transform: scale(1.04); box-shadow: 0 0 8px #ef4444; }
+}
+
+/* Kệ chai tương gọn gàng không chiếm chiều dọc */
+.prep-bottles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 4px;
+}
+.prep-bottles .shelf-tile {
+  min-height: 44px;
+  height: 44px;
+  flex-direction: row;
+  justify-content: flex-start;
+  padding: 2px 8px;
+  gap: 6px;
+}
+.prep-bottles .shelf-img.bottle {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+.prep-bottles .shelf-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-align: left;
+}
+.prep-bottles .shelf-badge {
+  top: 2px;
+  right: 4px;
+  font-size: 0.52rem;
+  padding: 1px 3px;
+  border-radius: 4px;
+}
+

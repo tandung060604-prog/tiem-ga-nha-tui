@@ -183,6 +183,7 @@ export function sellingStructureKey(state: GameState, session: SellingSession): 
 interface CachedCustomerCard {
   card: HTMLElement;
   fill: HTMLElement | null;
+  ringFill: SVGCircleElement | null;
   moodEmoji: HTMLElement | null;
   emoteBubble: HTMLElement | null;
   thoughtEl: HTMLElement | null;
@@ -272,6 +273,7 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
       c = {
         card,
         fill: card.querySelector<HTMLElement>('.patience-fill'),
+        ringFill: card.querySelector<SVGCircleElement>('.ring-fill'),
         moodEmoji: card.querySelector<HTMLElement>('.mood-indicator'),
         emoteBubble: card.querySelector<HTMLElement>('.stardew-emote-bubble'),
         thoughtEl: card.querySelector<HTMLElement>('.thought-bubble'),
@@ -291,13 +293,30 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
       c.fill.classList.toggle('mid', p.cls === 'mid');
       c.fill.classList.toggle('low', p.cls === 'low');
     }
+    if (c.ringFill) {
+      const offset = (138.23 * (1 - p.percent / 100)).toFixed(1);
+      c.ringFill.style.strokeDashoffset = `${offset}`;
+      c.ringFill.classList.toggle('mid', p.cls === 'mid');
+      c.ringFill.classList.toggle('low', p.cls === 'low');
+    }
     if (c.moodEmoji) {
       c.moodEmoji.textContent = p.angry ? '💢' : p.cls === 'low' ? '🥺' : p.cls === 'mid' ? '😋' : '✨';
     }
     if (c.emoteBubble) {
-      const emoteChar = p.angry ? '💢' : p.cls === 'low' ? '💦' : (order.isVip ? '❤️' : p.cls === 'mid' ? '💡' : '✨');
-      if (c.emoteBubble.textContent !== emoteChar) {
-        c.emoteBubble.textContent = emoteChar;
+      if (p.angry) {
+        c.emoteBubble.textContent = '💢';
+      } else if (p.cls === 'low') {
+        c.emoteBubble.textContent = '💦';
+      } else if (order.isVip) {
+        if (!c.emoteBubble.querySelector('img')) {
+          c.emoteBubble.innerHTML = `<img src="${ASSETS.icons.heart}" class="emote-pixel-img" alt="VIP" />`;
+        }
+      } else if (p.cls === 'mid') {
+        c.emoteBubble.textContent = '💡';
+      } else {
+        if (!c.emoteBubble.querySelector('img')) {
+          c.emoteBubble.innerHTML = `<img src="${ASSETS.icons.sparkle}" class="emote-pixel-img" alt="✨" />`;
+        }
       }
     }
 
@@ -655,7 +674,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
     const initialCls = isAngry ? 'angry' : isNew ? 'walking' : 'standing';
     const actorHtml = `<img src="${initialSrc}" alt="${visual.name}" class="char-sprite-img ${initialCls}" />`;
     const queueBadge = idx === 0 
-      ? '<span class="queue-pos-badge first">👑 Đang phục vụ</span>' 
+      ? `<span class="queue-pos-badge first"><img src="${ASSETS.icons.star}" class="badge-pixel-star-xs" alt="" /> Đang phục vụ</span>` 
       : idx === 1 
       ? '<span class="queue-pos-badge next">2️⃣ Kế tiếp</span>' 
       : `<span class="queue-pos-badge wait">${idx + 1}️⃣ Xếp hàng</span>`;
@@ -679,18 +698,25 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         <!-- 2D Character Walking & Standing Stage -->
         <div class="cust-stage">
           <div class="char-actor">
+            <!-- Vòng thời gian kiên nhẫn quanh khách (aenhatrang report #51) -->
+            <svg class="patience-ring-svg" viewBox="0 0 52 52" aria-hidden="true">
+              <circle class="ring-track" cx="26" cy="26" r="22" />
+              <circle class="ring-fill ${patienceColorClass}" cx="26" cy="26" r="22"
+                      stroke-dasharray="138.23"
+                      stroke-dashoffset="${(138.23 * (1 - patiencePercent / 100)).toFixed(1)}" />
+            </svg>
             ${actorHtml}
             <div class="char-shadow"></div>
-            <div class="stardew-emote-bubble" title="Cảm xúc">${isAngry ? '💢' : patienceColorClass === 'low' ? '💦' : (ord.isVip ? '❤️' : '✨')}</div>
+            <div class="stardew-emote-bubble" title="Cảm xúc">${isAngry ? '💢' : patienceColorClass === 'low' ? '💦' : (ord.isVip ? `<img src="${ASSETS.icons.heart}" class="emote-pixel-img" alt="VIP" />` : (patienceColorClass === 'mid' ? '💡' : `<img src="${ASSETS.icons.sparkle}" class="emote-pixel-img" alt="✨" />`))}</div>
           </div>
           <div class="cust-info-col">
             <div class="cust-name-row">
               <span class="cust-name">${visual.name}</span>
-              <span class="mood-indicator">${isAngry ? '💢' : patienceColorClass === 'low' ? '🥺' : (ord.isVip ? '👑' : '✨')}</span>
+              <span class="mood-indicator">${isAngry ? '💢' : patienceColorClass === 'low' ? '🥺' : (ord.isVip ? `<img src="${ASSETS.icons.heart}" class="badge-pixel-star-xs" alt="" />` : `<img src="${ASSETS.icons.sparkle}" class="badge-pixel-star-xs" alt="" />`)}</span>
             </div>
             <div class="cust-badges-row">
               ${queueBadge}
-              ${ord.isVip ? '<span class="cust-badge vip-gold-badge">👑 KHÁCH SỘP</span>' : ''}
+              ${ord.isVip ? `<span class="cust-badge vip-gold-badge"><img src="${ASSETS.icons.star}" class="badge-pixel-star-xs" alt="" /> KHÁCH SỘP</span>` : ''}
               <span class="cust-badge ${visual.badgeClass}">${visual.badge}</span>
               ${ord.personalityLabel ? `<span class="cust-badge trait-badge" title="${escapeHtml(ord.personalityDesc || '')}">${escapeHtml(ord.personalityLabel)}</span>` : ''}
             </div>
@@ -714,11 +740,11 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         <div class="cust-card-actions">
           ${hasMatchInTray ? `
             <button class="btn-serve-cust" data-order-id="${ord.id}" title="Khay đã có món, lên món ngay cho khách này">
-              🛎️ LÊN MÓN
+              <img src="${ASSETS.icons.bell}" class="btn-pixel-icon-sm" alt="" /> LÊN MÓN
             </button>
           ` : ''}
           <button class="btn-cancel-order" data-order-id="${ord.id}" title="Hết món/nguyên liệu, hủy đơn và xin lỗi khách">
-            🙏 Hết món · Xin lỗi
+            <img src="${ASSETS.icons.trash}" class="btn-pixel-icon-sm" alt="" /> Hết món · Xin lỗi
           </button>
         </div>
       </div>
@@ -825,10 +851,11 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       <!-- HUD Time & Sài Gòn Ambience -->
       <div class="kitchen-hud">
         <div class="clock">
-          <span>🕒 Giờ mở bán: <b>${formattedTime}</b></span>
+          <img src="${ASSETS.icons.clock}" class="hud-pixel-icon" alt="" />
+          <span>Giờ mở bán: <b>${formattedTime}</b></span>
         </div>
-        ${rush ? '<span class="rush-badge">🔥 CA CAO ĐIỂM!</span>' : `<span class="session-ambience">${timePeriodLabel}</span>`}
-        ${state.secretSauceDay?.buffActive ? '<span class="sauce-buff-hud-badge" title="Sốt Bí Truyền đang kích hoạt: +3k tip mỗi đơn!">🍲✨ Sốt Vàng</span>' : ''}
+        ${rush ? `<span class="rush-badge"><img src="${ASSETS.icons.fireRush}" class="hud-pixel-icon" alt="" /> CA CAO ĐIỂM!</span>` : `<span class="session-ambience">${timePeriodLabel}</span>`}
+        ${state.secretSauceDay?.buffActive ? `<span class="sauce-buff-hud-badge" title="Sốt Bí Truyền đang kích hoạt: +3k tip mỗi đơn!"><img src="${ASSETS.icons.sauce}" class="hud-pixel-icon" alt="" /> Sốt Vàng</span>` : ''}
         <div class="hud-actions">
           <button id="btn-toggle-fast" class="btn-sm btn-toggle-fast">
             ${session.isFastForward ? '⏩ Tua x2' : '▶️ 1x'}
@@ -861,11 +888,19 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <!-- Real Cast Iron Fryer Card (Bếp Chiên Ngập Dầu Chợ Lớn) -->
           <div class="fryer-card">
             <div class="fryer-header">
-              <span>🍳 Bếp Chiên</span>
-              <div class="oil-status">
-                <span class="oil-dot ${oilCondition}"></span>
-                <span class="oil-status-label">${oilLabel}</span>
+              <div class="fryer-title-row">
+                <span class="fryer-title">
+                  <img src="${ASSETS.icons.bell}" class="pixel-card-title-icon" alt="" /> Bếp Chiên
+                </span>
+                <div class="oil-status">
+                  <span class="oil-dot ${oilCondition}"></span>
+                  <span class="oil-status-label">${oilLabel}</span>
+                </div>
               </div>
+              <button id="btn-change-oil" class="oil-change-btn ${oilCondition === 'dirty' ? 'dirty-alert' : ''}" title="Thay chảo dầu mới (150.000đ)">
+                <img src="${ASSETS.icons.oilCan}" class="btn-pixel-icon-xs" alt="" />
+                <span>Thay dầu 150k</span>
+              </button>
             </div>
 
             <!-- The Boiling Pot with Real Food Asset -->
@@ -914,26 +949,25 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             <!-- Kệ Topping & Nguyên Liệu Tươi (Food Shelf / Topping Rack như Mì Cay Bà Tám) -->
             <div class="prep-baskets-section">
               <div class="prep-baskets-header">
-                <span class="prep-baskets-title">🧺 Khay Sơ Chế</span>
-                <button id="btn-change-oil" class="oil-change-btn">🛢️ Thay dầu 150k</button>
+                <span class="prep-baskets-title">
+                  <img src="${ASSETS.icons.inventory}" class="pixel-section-icon" alt="" /> Khay Sơ Chế
+                </span>
               </div>
               ${renderPrepStation(state)}
               <!-- Hai chai tương xịt lên món trong khay -->
               <div class="food-shelf-grid prep-bottles">
                 <!-- Slot 4: Chai Tương Cà -->
                 <button id="btn-squeeze-ketchup" class="shelf-tile condiment ketchup" title="Xịt Tương Cà đỏ tươi thơm ngọt lên món (+Tip & Hương vị)">
-                  <div class="shelf-badge sauce">🍅 +Tip</div>
+                  <div class="shelf-badge sauce">+Tip</div>
                   <img src="${ASSETS.kitchen.bottleKetchup}" alt="Tương Cà" class="shelf-img bottle" />
                   <span class="shelf-label">Tương Cà</span>
-                  <span class="shelf-sub">Chua Ngọt</span>
                 </button>
 
                 <!-- Slot 5: Chai Tương Ớt -->
                 <button id="btn-squeeze-chili" class="shelf-tile condiment chili" title="Xịt Tương Ớt cay nồng giòn rụm lên món (+Tip & Hương vị)">
-                  <div class="shelf-badge sauce">🌶️ +Tip</div>
+                  <div class="shelf-badge sauce">+Tip</div>
                   <img src="${ASSETS.kitchen.bottleChili}" alt="Tương Ớt" class="shelf-img bottle" />
                   <span class="shelf-label">Tương Ớt</span>
-                  <span class="shelf-sub">Cay Nồng</span>
                 </button>
               </div>
             </div>
@@ -942,7 +976,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <!-- Tray & Assemble Card (Quầy Giữ Nhiệt Giòn Tan) -->
           <div class="assemble-card">
             <div class="tray-title">
-              <span>🍱 Khay (${tray.length}/${cookingEngine.getTraySize()})</span>
+              <span><img src="${ASSETS.icons.book}" class="pixel-section-icon" alt="" /> Khay (${tray.length}/${cookingEngine.getTraySize()})</span>
             </div>
 
             <div class="tray-slots">
@@ -952,7 +986,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             <!-- Quầy Máy Rót Nước Đa Vị & Hiệu Ứng Đổ Đầy Cốc Nước -->
             <div class="fountain-station">
               <div class="fountain-header">
-                <span class="fountain-title">🥤 Máy Rót Nước</span>
+                <span class="fountain-title"><img src="${ASSETS.food.soda}" class="pixel-section-icon" alt="" /> Máy Rót Nước</span>
                 <span class="fountain-stock">Kho: <b>${drinkStock}</b></span>
               </div>
 
@@ -1007,7 +1041,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
 
             <!-- Serve Button -->
             <button id="btn-serve-order" class="btn-serve" ${session.orders.length === 0 || tray.length === 0 ? 'disabled' : ''}>
-              🛎️ KENG! LÊN MÓN (SERVE)
+              <img src="${ASSETS.icons.bell}" class="btn-pixel-icon-lg" alt="" /> KENG! LÊN MÓN (SERVE)
             </button>
           </div>
         </div>

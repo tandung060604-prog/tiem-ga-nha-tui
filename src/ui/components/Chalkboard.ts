@@ -16,7 +16,7 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
     <div class="board">
       <div class="board-top-banner">
         <span class="bistro-badge">
-          <span class="bistro-fire">🍗</span> KOREAN CHICKEN BISTRO
+          <img src="${ASSETS.icons.fireRush}" class="board-pixel-icon-xs" alt="" /> KOREAN CHICKEN BISTRO
         </span>
         <img class="board-neon-sticker" src="${ASSETS.ui.stickerNeon}" alt="치킨" />
       </div>
@@ -24,24 +24,24 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
       <div class="board-header">
         <div class="board-title-box">
           <span class="board-kicker">KẾ HOẠCH HÔM NAY</span>
-          <h2>📋 Ngày ${state.day} · ${weekdayOf(state.day)}</h2>
+          <h2><img src="${ASSETS.icons.book}" class="board-pixel-icon-sm" alt="" /> Ngày ${state.day} · ${weekdayOf(state.day)}</h2>
         </div>
         <span class="weather-badge">${currentEventTitle}${isWeekend(state.day) ? ' · 🎉 Cuối tuần đông khách' : ''}</span>
       </div>
 
       <div class="board-goal deposit-card ${deposit.ready ? 'is-ready' : ''}">
         <div class="goal-info">
-          <span class="goal-chapter-label">🎯 Chương ${currentChapter.number}: ${currentChapter.title}</span>
+          <span class="goal-chapter-label"><img src="${ASSETS.icons.upgrade}" class="board-pixel-icon-xs" alt="" /> Chương ${currentChapter.number}: ${currentChapter.title}</span>
           <span class="goal-money-val">${vnd(state.money)} / ${vnd(deposit.required)} <b class="goal-pct">(${progressPercent}%)</b></span>
         </div>
         <div class="goal-bar deposit-progress">
           <div class="goal-bar-fill" style="width: ${progressPercent}%;"></div>
         </div>
         ${deposit.isFinal ? (finaleReady(state) ? `
-          <button id="btn-finale" class="btn-sm primary">🏆 Dự lễ trao giải Gà Vàng</button>
+          <button id="btn-finale" class="btn-sm primary"><img src="${ASSETS.icons.star}" class="btn-pixel-icon-xs" alt="" /> Dự lễ trao giải Gà Vàng</button>
         ` : '') : `
           <button id="btn-deposit" class="btn-sm ${deposit.ready ? 'primary' : ''}" ${deposit.ready ? '' : 'disabled'}>
-            🔑 Đặt cọc ${vnd(deposit.cost)} → ${nextChapter?.title ?? 'chương mới'} (giữ lại ${vnd(deposit.required - deposit.cost)} vốn)
+            <img src="${ASSETS.icons.lock}" class="btn-pixel-icon-xs" alt="" /> Đặt cọc ${vnd(deposit.cost)} → ${nextChapter?.title ?? 'chương mới'} (giữ lại ${vnd(deposit.required - deposit.cost)} vốn)
           </button>
           ${deposit.ready ? '' : `<small class="deposit-hint">Cần ${deposit.moneyOk ? '' : `quỹ ${vnd(deposit.required)}`}${!deposit.moneyOk && !deposit.starsOk ? ' và ' : ''}${deposit.starsOk ? '' : `${deposit.starsNeeded.toFixed(1)} sao (hiện ${state.ratings.overall.toFixed(1)})`}</small>`}
         `}
@@ -56,16 +56,16 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
         </div>
         <div class="board-btns">
           <button id="btn-secret-sauce" class="btn-sm btn-sauce-card ${state.secretSauceDay?.buffActive ? 'is-active' : ''}" title="Pha nồi sốt bí truyền nhận Buff Vàng (+3k tip & +0.25★ Hương vị)">
-            🍲 ${state.secretSauceDay?.buffActive ? '✨ Sốt Thần Thánh' : 'Nấu Sốt Bí Truyền'}
+            <img src="${ASSETS.icons.sauce}" class="btn-pixel-icon-sm" alt="" /> ${state.secretSauceDay?.buffActive ? '✨ Sốt Thần Thánh' : 'Nấu Sốt Bí Truyền'}
           </button>
           <button id="btn-open-bunny-notes" class="btn-sm btn-bunny-card">
-            🐰 Thỏ Cam
+            <img src="${ASSETS.ui.bunnyNote}" class="btn-pixel-icon-sm" alt="" /> Thỏ Cam
           </button>
           <button id="btn-open-incidents" class="btn-sm btn-incident-card">
-            🎭 Sổ Tay Hẻm (${state.seenIncidentIds?.length ?? 0}/25)
+            <img src="${ASSETS.icons.reviews}" class="btn-pixel-icon-sm" alt="" /> Sổ Tay Hẻm (${state.seenIncidentIds?.length ?? 0}/25)
           </button>
           <button id="btn-read-story" class="btn-sm primary btn-story-card">
-            📖 Truyện Hẻm 1102
+            <img src="${ASSETS.icons.book}" class="btn-pixel-icon-sm" alt="" /> Truyện Hẻm 1102
           </button>
         </div>
       </div>

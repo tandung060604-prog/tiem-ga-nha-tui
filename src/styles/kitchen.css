@@ -602,20 +602,22 @@
 #btn-change-oil {
   min-height: 44px;
   min-width: 44px;
-  border: 1.5px dashed var(--line);
-  background: rgba(255, 255, 255, 0.85);
-  color: #8b4513;
+  border: 1.5px solid #d4a373;
+  background: #fffbf0;
+  color: #78350f;
   border-radius: 6px;
   padding: 4px 8px;
   font-size: 0.68rem;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 4px;
   box-sizing: border-box;
   max-width: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .oil-change-btn:hover {
@@ -1065,11 +1067,9 @@
 
 .prep-baskets-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   gap: 4px;
-  flex-wrap: wrap;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 
 .prep-baskets-title {

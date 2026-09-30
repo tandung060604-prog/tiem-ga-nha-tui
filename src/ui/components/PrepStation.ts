@@ -25,7 +25,7 @@ function panHtml(slot: PrepSlotState, frying: boolean, activeAction: string | nu
       <button type="button" class="gn-pan" data-pan="${slot.pan}" data-state="locked" data-prep-lock="${slot.id}"
         aria-label="${label} — khóa: ${escapeHtml(slot.lock.label)}">
         ${lockArt}
-        <span class="gn-pan-lock" aria-hidden="true">🔒</span>
+        <span class="gn-pan-lock" aria-hidden="true"><img src="${ASSETS.icons.lock}" class="pixel-lock-img" alt="Khóa" /></span>
         <span class="gn-pan-lock-label">${escapeHtml(slot.lock.label)}</span>
         <span class="gn-pan-label">${label}</span>
       </button>`;
@@ -37,11 +37,15 @@ function panHtml(slot: PrepSlotState, frying: boolean, activeAction: string | nu
     : `<span class="gn-pan-emoji" aria-hidden="true">${slot.icon}</span>`;
   // Hàng dưới là đồ sống thả chảo: chảo đang bận thì chưa bấm được
   const busy = slot.row === 'bottom' && frying;
+  const isEmergencyChicken = slot.action === 'fry-chicken' && slot.stock === 0;
+  const badgeText = isEmergencyChicken ? '🛵 +5' : `${slot.stock}`;
+  const badgeTitle = isEmergencyChicken ? 'Hết gà! Chạm để gọi Bác Ba tiếp tế 5 gà tươi (50k)' : label;
+
   return `
-    <button type="button" id="btn-${slot.action}" class="gn-pan" data-pan="${slot.pan}" data-state="${slot.status}"
-      data-active="${activeAction === slot.action}" ${busy ? 'disabled' : ''} title="${label}">
+    <button type="button" id="btn-${slot.action}" class="gn-pan ${isEmergencyChicken ? 'pan-emergency-restock' : ''}" data-pan="${slot.pan}" data-state="${slot.status}"
+      data-active="${activeAction === slot.action}" ${busy ? 'disabled' : ''} title="${badgeTitle}">
       ${art}
-      <span class="gn-pan-badge">${slot.stock}</span>
+      <span class="gn-pan-badge ${isEmergencyChicken ? 'badge-restock-pulse' : ''}">${badgeText}</span>
       <span class="gn-pan-label">${label}</span>
     </button>`;
 }

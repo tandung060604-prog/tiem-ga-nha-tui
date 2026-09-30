@@ -751,23 +751,23 @@ class AppController {
     const tabsBarHtml = `
       <div class="tabs-bar">
         <button class="tab-btn ${this.activeTab === 'inventory' ? 'active' : ''}" data-tab="inventory">
-          <span class="tab-icon">📦</span>
+          <img src="${ASSETS.icons.inventory}" class="tab-pixel-icon" alt="" />
           <span>Kho hàng</span>
         </button>
         <button class="tab-btn ${this.activeTab === 'upgrades' ? 'active' : ''}" data-tab="upgrades">
-          <span class="tab-icon">🛠️</span>
+          <img src="${ASSETS.icons.upgrade}" class="tab-pixel-icon" alt="" />
           <span>Nâng cấp</span>
         </button>
         <button class="tab-btn ${this.activeTab === 'staff' ? 'active' : ''}" data-tab="staff">
-          <span class="tab-icon">👥</span>
+          <img src="${ASSETS.icons.staff}" class="tab-pixel-icon" alt="" />
           <span>Nhân viên</span>
         </button>
         <button class="tab-btn ${this.activeTab === 'reviews' ? 'active' : ''}" data-tab="reviews">
-          <span class="tab-icon">⭐</span>
+          <img src="${ASSETS.icons.reviews}" class="tab-pixel-icon" alt="" />
           <span>Đánh giá (${state.ratings.overall.toFixed(1)}★ · ${state.totalReviewsCount ?? state.recentReviews.length})</span>
         </button>
         <button class="tab-btn ${this.activeTab === 'menu' ? 'active' : ''}" data-tab="menu">
-          <span class="tab-icon">📖</span>
+          <img src="${ASSETS.icons.book}" class="tab-pixel-icon" alt="" />
           <span>Sổ tay</span>
         </button>
       </div>
@@ -1471,6 +1471,27 @@ class AppController {
           return;
         }
         if (!this.useIngredients([...recipe.stock])) {
+          // Cứu hộ khẩn cấp khi hết gà giữa ca bán (Tham khảo aenhatrang.com report #48 & #21: Chờ Cô Chôm / Cứu hộ hết hàng)
+          if (action === 'fry-chicken') {
+            const curState = stateManager.getState();
+            if (curState.money >= 50000 || curState.money < 10000) {
+              const deductCost = curState.money >= 50000 ? 50000 : 0;
+              stateManager.update(draft => {
+                draft.money -= deductCost;
+                const chicken = draft.inventory.chicken_meat;
+                if (chicken) addStock(chicken, 5, 10000, 0);
+              });
+              audio.playCash();
+              this.showToast(deductCost > 0 
+                ? '🛵 Bác Ba tiếp tế khẩn cấp: +5 Gà Tươi (-50.000đ)! 🍗' 
+                : '❤️ Bác Ba tương trợ khẩn cấp: Cho mượn tạm 5 miếng gà tươi! 🍗');
+              if (this.useIngredients([...recipe.stock])) {
+                session.totalFriedCount += 1;
+                cookingEngine.startFrying(recipe.type);
+                break;
+              }
+            }
+          }
           this.showToast(`Hết nguyên liệu cho ${FRY_LOOK[itemId]?.name ?? 'món này'}! Vào Kho hàng để nhập thêm.`);
           return;
         }

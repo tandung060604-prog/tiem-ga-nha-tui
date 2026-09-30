@@ -201,6 +201,31 @@ export const ASSETS = {
     stickerDaisy: url('assets/ui/sticker_daisy.png'),
     landingVnBg: url('assets/ui/landing_vn_bg_clean.jpg'),
     bannerStardewChicken: url('assets/ui/banner_stardew_chicken.png')
+  },
+  icons: {
+    book: url('assets/icons/icon_book.png'),
+    clock: url('assets/icons/icon_clock.png'),
+    fireRush: url('assets/icons/icon_fire_rush.png'),
+    inventory: url('assets/icons/icon_inventory.png'),
+    lock: url('assets/icons/icon_lock.png'),
+    money: url('assets/icons/icon_money.png'),
+    reviews: url('assets/icons/icon_reviews.png'),
+    settings: url('assets/icons/icon_settings.png'),
+    share: url('assets/icons/icon_share.png'),
+    soundOn: url('assets/icons/icon_sound_on.png'),
+    soundOff: url('assets/icons/icon_sound_off.png'),
+    staff: url('assets/icons/icon_staff.png'),
+    star: url('assets/icons/icon_star.png'),
+    starEmpty: url('assets/icons/icon_star_empty.png'),
+    upgrade: url('assets/icons/icon_upgrade.png'),
+    bell: url('assets/icons/icon_bell.png'),
+    heart: url('assets/icons/icon_heart.png'),
+    oilCan: url('assets/icons/icon_oil_can.png'),
+    sauce: url('assets/icons/icon_sauce.png'),
+    scooter: url('assets/icons/icon_scooter.png'),
+    trash: url('assets/icons/icon_trash.png'),
+    sparkle: url('assets/icons/icon_sparkle.png'),
+    broom: url('assets/icons/icon_broom.png')
   }
 } as const;
 
