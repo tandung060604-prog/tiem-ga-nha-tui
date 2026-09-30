@@ -52,41 +52,44 @@ export function renderIntroCinematicModal(): string {
 
   return `
     <div id="intro-cinematic-overlay" class="intro-cinematic-overlay" role="dialog" aria-modal="true" aria-label="Video mở màn 3D Pixel Tiệm Gà Nhà Tui">
-      <div class="intro-cinematic-card stardew-box">
-        <!-- Header gỗ cổ điển -->
-        <div class="intro-card-header">
-          <div class="intro-title-badge">
-            <span class="veo3-badge">3D VOXEL VEO 3</span>
-            <span>KHỞI ĐẦU NGÀY MỚI RỰC RỠ</span>
-          </div>
-          <button id="btn-intro-skip-top" class="btn-intro-skip-corner" title="Bỏ qua video">Bỏ qua ✕</button>
-        </div>
-
-        <!-- Khung chiếu phim 3D Voxel Pixel Diorama -->
+      <div class="intro-cinematic-card">
+        <!-- Khung chiếu video lấp kín 100% màn hình điện thoại (Edge-to-Edge Fullscreen Viewport) -->
         <div class="intro-screen-viewport" id="intro-3d-viewport">
           <div class="intro-cinematic-stage" id="intro-3d-stage">
-            <video id="intro-video-element" class="intro-cinematic-video" playsinline muted autoplay loop poster="${poster}" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+            <video id="intro-video-element" class="intro-cinematic-video" playsinline muted autoplay loop poster="${poster}" preload="auto">
               <source src="${videoSrc}" type="video/mp4" />
             </video>
             <img src="${poster}" alt="Góc phố Hẻm 1102 3D Pixel Diorama buổi sớm náo nhiệt" class="intro-cinematic-img animate-voxel-3d" id="intro-cinematic-img" />
             
-            <!-- Lớp ánh sáng thể tích Ray-Tracing & Đèn lồng -->
+            <!-- Lớp ánh sáng thể tích Ray-Tracing & Đèn lồng điện ảnh -->
             <div class="raytraced-light-cone"></div>
             <div class="lantern-glow"></div>
             
-            <!-- Hạt khói thể tích & Đốm dầu sôi 3D -->
+            <!-- Hạt khói thể tích & Đốm dầu sôi 3D bay bổng -->
             <div class="steam-particle sp-1"></div>
             <div class="steam-particle sp-2"></div>
             <div class="steam-particle sp-3"></div>
             <div class="gold-sparkle-3d gs-1"></div>
             <div class="gold-sparkle-3d gs-2"></div>
           </div>
+        </div>
 
-          <!-- Huy hiệu công nghệ 3D góc trên -->
-          <div class="intro-engine-pill">
-            <span class="pill-dot"></span> 3D PIXEL DIORAMA · 12s CINEMATIC
+        <!-- Floating Top Bar: Header nổi ở đỉnh màn hình (Bán trong suốt mờ ảo) -->
+        <div class="intro-card-header">
+          <div class="intro-title-badge">
+            <span class="veo3-badge">3D VOXEL VEO 3</span>
+            <span class="intro-title-text">HẺM 1102 · KHỞI ĐẦU NGÀY MỚI</span>
           </div>
+          <button id="btn-intro-skip-top" class="btn-intro-skip-corner" title="Vào game ngay">Bỏ qua ✕</button>
+        </div>
 
+        <!-- Huy hiệu công nghệ 3D góc trên -->
+        <div class="intro-engine-pill">
+          <span class="pill-dot"></span> 3D PIXEL DIORAMA · 12s CINEMATIC
+        </div>
+
+        <!-- Floating Bottom Container: Cụm điều khiển và phụ đề Bác Ba nổi ở đáy màn hình -->
+        <div class="intro-card-footer">
           <!-- Thanh Timeline Tiến Trình Video 10-15s -->
           <div class="intro-video-timeline">
             <div class="timeline-meta">
@@ -109,10 +112,8 @@ export function renderIntroCinematicModal(): string {
               "${INTRO_VOICEOVER_PHASES[0]?.text ?? ''}"
             </p>
           </div>
-        </div>
 
-        <!-- Thanh hành động chân trang -->
-        <div class="intro-card-footer">
+          <!-- Thanh tùy chọn phụ: Không hiện lại & Xem lại -->
           <div class="intro-footer-top-row">
             <label class="intro-skip-toggle">
               <input type="checkbox" id="chk-never-show-intro" />
@@ -122,6 +123,7 @@ export function renderIntroCinematicModal(): string {
             <button id="btn-intro-replay" class="btn-replay-pixel" title="Phát lại từ đầu">↺ Xem lại</button>
           </div>
 
+          <!-- Nút bấm Hero Bắt Đầu Vào Tiệm Gà -->
           <div class="intro-actions-row">
             <button id="btn-intro-start-game" class="btn-hero-pixel start-game-btn">
               <span class="btn-shine"></span>
@@ -165,25 +167,33 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
   const videoEl = document.getElementById('intro-video-element') as HTMLVideoElement | null;
   const imgEl = document.getElementById('intro-cinematic-img') as HTMLImageElement | null;
 
-  if (videoEl && imgEl) {
-    videoEl.oncanplay = () => {
+  if (videoEl) {
+    const startPlayback = () => {
       videoEl.style.display = 'block';
-      imgEl.style.display = 'none';
+      if (imgEl) imgEl.style.display = 'none';
       videoEl.play().catch(() => {});
     };
+
+    if (videoEl.readyState >= 2) {
+      startPlayback();
+    } else {
+      videoEl.oncanplay = startPlayback;
+      videoEl.onloadeddata = startPlayback;
+    }
+
     videoEl.onerror = () => {
       videoEl.style.display = 'none';
-      imgEl.style.display = 'block';
+      if (imgEl) imgEl.style.display = 'block';
     };
   }
 
-  // Hiệu ứng tương tác 3D Parallax Tilt khi rê chuột / chạm
+  // Hiệu ứng tương tác 3D Parallax Tilt khi rê chuột / chạm nhẹ
   if (viewport && stage) {
     const handleMove = (clientX: number, clientY: number) => {
       const rect = viewport.getBoundingClientRect();
       const x = (clientX - rect.left) / rect.width - 0.5;
       const y = (clientY - rect.top) / rect.height - 0.5;
-      stage.style.transform = `rotateY(${x * 12}deg) rotateX(${-y * 10}deg) scale(1.03)`;
+      stage.style.transform = `rotateY(${x * 8}deg) rotateX(${-y * 6}deg) scale(1.02)`;
     };
 
     viewport.addEventListener('pointermove', (e: PointerEvent) => {
@@ -195,7 +205,7 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
     });
   }
 
-  // Cập nhật timeline 12s đồng bộ
+  // Cập nhật timeline 12s đồng bộ với video
   const updateTimeline = (now: number) => {
     if (isClosed) return;
     const elapsed = Math.min((now - startTime) / 1000, INTRO_DURATION_SECONDS);
@@ -231,6 +241,10 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
   // Nút xem lại video
   document.getElementById('btn-intro-replay')?.addEventListener('click', () => {
     startTime = performance.now();
+    if (videoEl) {
+      videoEl.currentTime = 0;
+      videoEl.play().catch(() => {});
+    }
     if (animationTimerId) cancelAnimationFrame(animationTimerId);
     animationTimerId = requestAnimationFrame(updateTimeline);
   });
@@ -247,12 +261,12 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
       } catch {}
     }
 
-    // Hiệu ứng chuyển cảnh màn hình (Fade out & Flash golden transition)
+    // Hiệu ứng chuyển cảnh màn hình mượt mà (Fade out & Flash golden transition)
     overlay.classList.add('fade-out-screen');
     setTimeout(() => {
       overlay.remove();
       options.onComplete();
-    }, 450);
+    }, 400);
   };
 
   document.getElementById('btn-intro-start-game')?.addEventListener('click', closeAndProceed);
