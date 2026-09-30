@@ -21,25 +21,59 @@ export interface TutorialHint {
 
 export const TUTORIAL_TEXT: Record<TutorialStep, Omit<TutorialHint, 'step'>> = {
   'intro': {
-    text: 'Con ơi, khách đầu tiên tới rồi kìa! Nhìn thẻ khách để biết họ gọi gì. Bác đứng đây chỉ con từng bước, đừng lo — lúc bác nói thì khách đứng chờ, không ai bỏ về đâu.',
-    target: '.customer-card', button: 'Dạ, con làm liền!'
+    text: 'Mèn đét ơi con ơi! Khách mở hàng đầu tiên ghé tiệm rồi kìa! Nhìn kỹ thẻ khách coi người ta thèm món chi nghen. Bác Ba đứng kế bên chỉ cho con từng đường đi nước bước, lúc bác dặn thì khách đứng chờ hổng có bỏ về đâu, an tâm mần ăn nghen!',
+    target: '.customer-card', button: 'Dạ Bác Ba, con làm liền!'
   },
-  'fry-chicken': { text: 'Khách gọi gà. Bấm "+ Gà Rán" để thả một miếng vào chảo nè.', target: '#btn-fry-chicken' },
-  'fry-fries': { text: 'Khách gọi khoai. Bấm "+ Khoai" để thả khoai vô chảo.', target: '#btn-fry-fries' },
-  'fry-popcorn': { text: 'Khách gọi Gà Viên Popcorn! Bấm khay "Gà Viên" trên quầy inox để thả mẻ gà viên vào chảo chiên nha con.', target: '#btn-fry-popcorn' },
-  'season-spicy': { text: 'Khách gọi Cánh Gà Sốt Cay! Con hãy chạm khay "Sốt Yangnyeom" trên quầy inox để ướp sốt trước khi thả gà vào chảo nè.', target: '#btn-season-spicy' },
-  'season-honey': { text: 'Khách gọi Gà Sốt Bơ Tỏi! Con hãy chạm khay "Sốt Bơ Tỏi" trên quầy inox để ướp sốt trước khi thả gà vào chảo nè.', target: '#btn-season-honey' },
-  'drink': { text: 'Nước ngọt thì khỏi chiên: chạm vòi máy nước bác chỉ sáng, máy tự rót đúng loại khách còn thiếu vô khay liền.', target: '#btn-add-drink' },
-  'scoop': { text: 'Củ cải muối thì khỏi chiên: chạm khay củ cải vàng trên quầy inox để múc một phần vô khay. Ăn gà kèm củ cải cho đỡ ngấy, khách khen ngon lắm!', target: '#btn-scoop-danmuji' },
-  'wait': { text: 'Canh thanh đo nha. Còn ở vùng SỐNG thì chưa được nhấc — đợi kim chạy tới vùng VÀNG GIÒN.', target: '.cook-gauge-container' },
-  'lift': { text: 'VÀNG GIÒN rồi! Chạm vô chảo để nhấc ngay, để lâu là cháy đó con!', target: '#btn-fry-pot' },
-  'discard-raw': { text: 'Miếng này còn sống, khách không ăn đâu. Chạm vô món trong khay để bỏ, rồi chiên mẻ khác.', target: '.tray-item' },
-  'serve': { text: 'Đủ món rồi! Bấm "KENG! LÊN MÓN" để giao cho khách.', target: '#btn-serve-order' },
+  'fry-chicken': { text: 'Khách gọi gà giòn nè con! Bấm nút "+ Gà Rán" trên khay inox đặng thả một miếng đùi vô chảo gang sôi sùng sục nghen.', target: '#btn-fry-chicken' },
+  'fry-fries': { text: 'Khách hảo khoai lắc kìa! Bấm khay "+ Khoai" thả một mẻ khoai tây vô chảo chiên cho vàng ươm đi con.', target: '#btn-fry-fries' },
+  'fry-popcorn': { text: 'Khách gọi Gà Viên Popcorn giòn rụm! Bấm khay "Gà Viên" trên quầy inox thả vô chảo chiên liền tay nghen con.', target: '#btn-fry-popcorn' },
+  'season-spicy': { text: 'Khách khoái ăn cay xé lưỡi! Chạm khay "Sốt Yangnyeom" trên quầy inox ướp đẫm sốt đỏ au rồi mới thả gà vô chảo nghen!', target: '#btn-season-spicy' },
+  'season-honey': { text: 'Khách gọi Gà Sốt Bơ Tỏi thơm lừng! Chạm thau "Sốt Bơ Tỏi" trên quầy inox ướp đều miếng gà trước khi chiên nghen con.', target: '#btn-season-honey' },
+  'drink': { text: 'Nước ngọt giải khát thì khỏi cần chiên chi cho cực: chạm vô vòi máy nước ngọt, máy nó tự rót cái ào đúng ly khách gọi vô khay liền á!', target: '#btn-add-drink' },
+  'scoop': { text: 'Củ cải muối vàng giòn rụm thì khỏi chiên: chạm khay củ cải múc một chén vô khay cho khách ăn kèm đỡ ngấy, bảo đảm mê mệt!', target: '#btn-scoop-danmuji' },
+  'wait': { text: 'Canh chừng cây kim đo nha con! Còn nằm bên vùng SỐNG là chưa chín đâu, ráng đợi kim chạy vô vùng VÀNG GIÒN (PERFECT) nghen!', target: '.cook-gauge-container' },
+  'lift': { text: 'VÀNG GIÒN RỤM RỒI ĐA! Chạm lẹ vô chảo nhấc lên liền con ơi, trễ một nhịp là nó khét lẹt đắng nghét uổng công dữ lắm nghen!', target: '#btn-fry-pot' },
+  'discard-raw': { text: 'Trời đất coi kìa, vớt sớm quá gà còn đỏ au sống nhăn răng! Chạm vô món trong khay đổ bỏ đi con, rồi chiên lại mẻ khác bù cho khách nghen.', target: '.tray-item' },
+  'serve': { text: 'Đủ bộ món ngon lành cành đào rồi! Bấm nút "KENG! LÊN MÓN" bưng ra trao tận tay khách đặng lấy tiền tươi và sao uy tín nè!', target: '#btn-serve-order' },
   'done': {
-    text: 'Giỏi lắm con! Cứ vậy mà làm: nhìn món khách gọi → chiên → nhấc lúc vàng giòn → lên món. Khách chờ lâu là quạu bỏ về đó. Giờ bác để con tự bán nha!',
-    target: null, button: 'Cảm ơn Bác Ba!'
+    text: 'Mèn ơi giỏi dữ hôn! Cứ nhịp nhàng vầy nghen: ngó đơn khách → chiên đúng độ → nhấc lúc vàng giòn → keng lên món. Đừng để khách đợi lâu kẻo người ta quạu bỏ về. Giờ Bác Ba để con làm chủ tiệm nghen!',
+    target: null, button: 'Dạ, con cảm ơn Bác Ba nhiều nghen!'
   }
 };
+
+export interface BacBaGameTip {
+  id: string;
+  trigger: 'oil_dirty' | 'perfect_streak' | 'low_patience' | 'out_of_chicken' | 'general';
+  text: string;
+}
+
+export const BAC_BA_GAME_TIPS: BacBaGameTip[] = [
+  {
+    id: 'tip_oil',
+    trigger: 'oil_dirty',
+    text: 'Bác Ba nhắc nhỏ: Chảo dầu đen khét rồi đó con! Bấm "Thay dầu 150k" liền đi kẻo công an ghé hốt phạt tội vệ sinh nghen!'
+  },
+  {
+    id: 'tip_streak',
+    trigger: 'perfect_streak',
+    text: 'Bác Ba khen ngợi: Mèn ơi chuỗi PERFECT đỉnh chóp dữ bay! Ráng giữ tay nghề vàng giòn đặng khách bo thêm tiền tip rủng rỉnh nghen!'
+  },
+  {
+    id: 'tip_patience',
+    trigger: 'low_patience',
+    text: 'Bác Ba dặn khẩn: Khách đằng kia vòng thời gian đỏ lòm sắp quạu rồi kìa con! Ưu tiên lên món cho người ta trước lẹ lẹ!'
+  },
+  {
+    id: 'tip_stock',
+    trigger: 'out_of_chicken',
+    text: 'Bác Ba tiếp tế: Hết thịt gà rồi hả con? Chạm nút "🛵 Tiếp tế +5" trên khay, bác chạy xe máy qua chở gà tươi qua cứu liền!'
+  },
+  {
+    id: 'tip_general',
+    trigger: 'general',
+    text: 'Bác Ba mách nước: Bán đồ ăn quan trọng nhất là cái tâm. Gà giòn, dầu sạch thì khách quen tự khắc rủ bạn bè tới nườm nượp!'
+  }
+];
 
 export interface TutorialState {
   introSeen: boolean;

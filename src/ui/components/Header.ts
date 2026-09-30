@@ -23,6 +23,9 @@ export function renderHeader(state: GameState, _onOpenSettings?: () => void): st
       <button id="btn-changelog-toggle" class="h-btn" aria-label="Bảng tin" title="Xem bản cập nhật">
         <img src="${ASSETS.icons.book}" class="h-pixel-icon" alt="Bảng tin" />
       </button>
+      <button id="btn-bacba-manual" class="h-btn" aria-label="Cẩm nang Bác Ba" title="Cẩm nang Bác Ba (Cách chơi)">
+        <img src="${ASSETS.bacba.front}" class="h-pixel-icon" style="border-radius: 4px; object-fit: cover;" alt="Bác Ba" />
+      </button>
       <div class="h-day-box">
         <b>Ngày ${state.day}</b>
         <small>${phaseLabel}</small>
@@ -54,7 +57,8 @@ export function bindHeaderEvents(
   _state: GameState, 
   onRefresh: () => void, 
   onOpenSettings: () => void,
-  onOpenChangelog?: () => void
+  onOpenChangelog?: () => void,
+  onOpenBacBaManual?: () => void
 ) {
   const audioBtn = document.getElementById('btn-audio-toggle');
   if (audioBtn) {
@@ -77,6 +81,14 @@ export function bindHeaderEvents(
     changelogBtn.onclick = () => {
       audio.playPop();
       onOpenChangelog();
+    };
+  }
+
+  const bacbaBtn = document.getElementById('btn-bacba-manual');
+  if (bacbaBtn && onOpenBacBaManual) {
+    bacbaBtn.onclick = () => {
+      audio.playPop();
+      onOpenBacBaManual();
     };
   }
 }

@@ -202,6 +202,10 @@ export const ASSETS = {
     landingVnBg: url('assets/ui/landing_vn_bg_clean.jpg'),
     bannerStardewChicken: url('assets/ui/banner_stardew_chicken.png')
   },
+  intro: {
+    poster: url('assets/intro/veo_intro_cinematic.jpg'),
+    video: url('assets/intro/intro_video.mp4')
+  },
   icons: {
     book: url('assets/icons/icon_book.png'),
     clock: url('assets/icons/icon_clock.png'),

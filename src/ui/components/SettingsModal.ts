@@ -104,10 +104,20 @@ export function renderSettingsModal(state: GameState): string {
         <textarea id="save-code-box" rows="3" placeholder="Dán mã sao lưu (TGNT1.…) vào đây rồi bấm Khôi phục" style="width: 100%; box-sizing: border-box; margin-top: 8px; font-size: 16px; border: 2px solid var(--line); border-radius: 10px; padding: 8px; font-family: monospace;"></textarea>
       </div>
 
+      <!-- Bac Ba Manual & Intro Cinematic -->
+      <div style="border-top: 1px dashed var(--line); padding-top: 10px; display: flex; flex-direction: column; gap: 6px;">
+        <button id="btn-settings-manual" class="btn-sm" style="width: 100%; padding: 8px; font-weight: 800; background: linear-gradient(135deg, #dcfce7, #bbf7d0); border: 1.5px solid #22c55e; color: #14532d; border-radius: 8px;">
+          📖 Cẩm Nang Bác Ba Truyền Nghề (Cách Chơi)
+        </button>
+        <button id="btn-settings-intro" class="btn-sm" style="width: 100%; padding: 8px; font-weight: 800; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border: 1.5px solid #6366f1; color: #312e81; border-radius: 8px;">
+          🎬 Xem Lại Video Mở Màn AI (Intro Cinematic)
+        </button>
+      </div>
+
       <!-- Version Changelog Dashboard -->
       <div style="border-top: 1px dashed var(--line); padding-top: 10px; text-align: center;">
         <button id="btn-settings-changelog" class="btn-sm" style="width: 100%; padding: 8px; font-weight: 800; background: linear-gradient(135deg, #fef3c7, #fde68a); border-color: #f59e0b; color: #92400e;">
-          📜 Nhật Ký Cập Nhật Phiên Bản (v2.1.0)
+          📜 Nhật Ký Cập Nhật Phiên Bản (v2.2.0)
         </button>
       </div>
 

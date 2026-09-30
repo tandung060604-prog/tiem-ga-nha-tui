@@ -691,3 +691,13 @@
   - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 61.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `200` ngày chơi
 ---
+
+### 🐞 [11:01:25 30/9/2026] (via Jev MCP) UI Deadlock after Hot Reload at Day 22 due to Intro Cinematic & Prep Loading overlays
+- **Triệu chứng:** Server responded with 500 status on module reload, followed by 'Cảnh báo UI Deadlock: Hệ thống đứng yên > 25s tại ngày 22 (src/ui/SellingView.ts)'.
+- **Vị trí:** `scripts/overnight-browser-monkey.mjs, src/ui/components/IntroCinematicModal.ts, src/ui/components/PrepLoadingModal.ts` 
+- **Đánh giá Jev (511ms):**
+  - **Mức độ (Severity):** `p0_blocker` (Độ tin cậy: 76.0%)
+  - **Nguyên nhân gốc (Root Cause):** `ui_modal_stack` (Độ tin cậy: 71.0%)
+  - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 92.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---

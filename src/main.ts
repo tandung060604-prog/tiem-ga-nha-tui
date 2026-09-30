@@ -18,6 +18,9 @@ import { isTriggered, depositStatus, depositForNextChapter, CHAPTER_PRICE_STEP }
 
 // UI Components
 import { renderHeader, bindHeaderEvents } from './ui/components/Header';
+import { openIntroCinematicModal } from './ui/components/IntroCinematicModal';
+import { showPrepLoadingModal } from './ui/components/PrepLoadingModal';
+import { openBacBaManualModal } from './ui/components/BacBaManualModal';
 import { renderChalkboard } from './ui/components/Chalkboard';
 import { renderInventoryTab, bindInventoryEvents } from './ui/components/InventoryTab';
 import { renderUpgradesTab, bindUpgradesEvents } from './ui/components/UpgradesTab';
@@ -163,7 +166,11 @@ class AppController {
       };
     }
 
-    this.showTitleScreen();
+    openIntroCinematicModal({
+      onComplete: () => {
+        this.showTitleScreen();
+      }
+    });
   }
 
   private titleDismissed = false;
@@ -227,6 +234,25 @@ class AppController {
       changelogBtn.onclick = (e) => {
         e.stopPropagation();
         this.openUpdateDashboardModal();
+      };
+    }
+
+    const introVideoBtn = document.getElementById('btn-title-intro-video');
+    if (introVideoBtn) {
+      introVideoBtn.onclick = (e) => {
+        e.stopPropagation();
+        openIntroCinematicModal({
+          forceShow: true,
+          onComplete: () => {}
+        });
+      };
+    }
+
+    const bacbaManualBtn = document.getElementById('btn-title-bacba-manual');
+    if (bacbaManualBtn) {
+      bacbaManualBtn.onclick = (e) => {
+        e.stopPropagation();
+        openBacBaManualModal();
       };
     }
 
@@ -719,7 +745,8 @@ class AppController {
         state,
         () => this.render(),
         () => this.openSettings(),
-        () => this.openUpdateDashboardModal()
+        () => this.openUpdateDashboardModal(),
+        () => openBacBaManualModal()
       );
     }
 
@@ -980,9 +1007,13 @@ class AppController {
           }
         }
 
-        audio.playPerfect();
-        this.showToast('Quán chính thức mở cửa! Chúc buôn may bán đắt nha! 🎊');
-        this.setPhase('selling');
+        showPrepLoadingModal({
+          onComplete: () => {
+            audio.playPerfect();
+            this.showToast('Quán chính thức mở cửa! Chúc buôn may bán đắt nha! 🎊');
+            this.setPhase('selling');
+          }
+        });
       };
     }
   }
@@ -2530,6 +2561,20 @@ class AppController {
     if (changelogSettingsBtn) {
       changelogSettingsBtn.onclick = () => {
         this.openUpdateDashboardModal();
+      };
+    }
+
+    const manualSettingsBtn = document.getElementById('btn-settings-manual');
+    if (manualSettingsBtn) {
+      manualSettingsBtn.onclick = () => {
+        openBacBaManualModal();
+      };
+    }
+
+    const introSettingsBtn = document.getElementById('btn-settings-intro');
+    if (introSettingsBtn) {
+      introSettingsBtn.onclick = () => {
+        openIntroCinematicModal({ forceShow: true, onComplete: () => {} });
       };
     }
 

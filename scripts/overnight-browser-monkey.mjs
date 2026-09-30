@@ -148,6 +148,14 @@ class OvernightMonkey {
   }
 
   async dismissTitleScreen(page) {
+    // 0a. Bỏ qua Video Intro Cinematic nếu có
+    const introBtn = page.locator('#btn-intro-start-game, #btn-intro-skip-top');
+    if (await introBtn.first().isVisible({ timeout: 1500 }).catch(() => false)) {
+      log(`🎬 Đóng Video Mở Màn AI (#btn-intro-start-game)...`);
+      await introBtn.first().click({ force: true });
+      await sleep(400);
+    }
+
     const playBtn = page.locator('#btn-title-play');
     if (await playBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
       log(`👉 Chạm bắt đầu ở Title Screen...`);
@@ -174,6 +182,33 @@ class OvernightMonkey {
 
   async performChaosStep(page) {
     // A. XỬ LÝ CÁC MODAL & MÀN HÌNH ĐẶC BIỆT (ƯU TIÊN SỐ 1 ĐỂ KHÔNG BỊ BLOCKED)
+    // 0a. Video Mở Màn AI (Intro Cinematic Modal)
+    const introBtn = page.locator('#btn-intro-start-game, #btn-intro-skip-top');
+    if (await introBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`🎬 Đóng Video Mở Màn AI (#btn-intro-start-game)...`);
+      await introBtn.first().click({ force: true });
+      await sleep(300);
+      return true;
+    }
+
+    // 0b. Cẩm Nang Bác Ba (Bac Ba Manual Modal)
+    const manualBtn = page.locator('#btn-close-bacba-manual, #btn-bacba-understood');
+    if (await manualBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`📖 Đóng Cẩm Nang Bác Ba...`);
+      await manualBtn.first().click({ force: true });
+      await sleep(300);
+      return true;
+    }
+
+    // 0c. Màn hình Loading Bày Thực Phẩm (Prep Loading Overlay)
+    const prepLoading = page.locator('#prep-loading-overlay');
+    if (await prepLoading.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`⏳ Đang bày thực phẩm... chạm qua nhanh...`);
+      await prepLoading.first().click({ force: true }).catch(() => {});
+      await sleep(300);
+      return true;
+    }
+
     // 0. Màn hình chính Title Screen (khi reload trang, hot reload hoặc mới vào lại)
     const titlePlayBtn = page.locator('#btn-title-play');
     if (await titlePlayBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
@@ -569,6 +604,15 @@ class OvernightMonkey {
   async emergencyRecover(page) {
     // Đóng tất cả các modal đang bị kẹt hoặc tự bấm tiếp tục
     await page.evaluate(() => {
+      const introBtn = document.querySelector('#btn-intro-start-game, #btn-intro-skip-top');
+      if (introBtn instanceof HTMLElement) { introBtn.click(); return; }
+
+      const prepLoading = document.getElementById('prep-loading-overlay');
+      if (prepLoading instanceof HTMLElement) { prepLoading.remove(); return; }
+
+      const manualClose = document.querySelector('#btn-close-bacba-manual, #btn-bacba-understood');
+      if (manualClose instanceof HTMLElement) { manualClose.click(); return; }
+
       const titleBtn = document.getElementById('btn-title-play');
       if (titleBtn instanceof HTMLElement) { titleBtn.click(); return; }
 
