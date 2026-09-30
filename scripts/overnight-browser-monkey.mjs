@@ -666,6 +666,12 @@ class OvernightMonkey {
       const titleBtn = document.getElementById('btn-title-play');
       if (titleBtn instanceof HTMLElement) { titleBtn.click(); return; }
 
+      const confirmNameBtn = document.getElementById('btn-confirm-shop-name');
+      if (confirmNameBtn instanceof HTMLElement) { confirmNameBtn.click(); return; }
+
+      const welcomeStartBtn = document.getElementById('btn-welcome-start');
+      if (welcomeStartBtn instanceof HTMLElement) { welcomeStartBtn.click(); return; }
+
       const nextDayBtn = document.querySelector('#btn-start-next-day, #btn-summary-next-day');
       if (nextDayBtn instanceof HTMLElement) { nextDayBtn.click(); return; }
 

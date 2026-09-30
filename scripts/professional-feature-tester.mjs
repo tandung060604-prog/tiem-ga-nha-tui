@@ -43,11 +43,16 @@ class ProfessionalQATester {
 
   async ensurePrepPhase() {
     await this.page.evaluate(() => {
-      // Đóng mọi modal đang mở
+      // Đóng mọi modal và overlay đang mở
       window.__app?.closeModal?.();
+      document.getElementById('intro-cinematic-overlay')?.remove();
       document.getElementById('prep-loading-overlay')?.remove();
       document.getElementById('sauce-minigame-modal')?.remove();
       document.getElementById('oil-filter-minigame-modal')?.remove();
+      document.getElementById('shop-name-modal')?.remove();
+      document.getElementById('welcome-modal')?.remove();
+      document.getElementById('tutorial-spotlight-layer')?.remove();
+      document.getElementById('tutorial-banner-container')?.remove();
 
       const s = window.__stateManager?.getState();
       if (s) {
@@ -137,10 +142,15 @@ class ProfessionalQATester {
 
   async setupInitialGame() {
     console.log('\n--- BƯỚC 0: VÀO GAME & THIẾT LẬP BAN ĐẦU ---');
-    // Đóng Intro Video nếu có (hỗ trợ chạm màn hình bất kỳ)
-    const introBtn = this.page.locator('#btn-intro-start-game, #btn-intro-skip-top, .intro-tap-prompt, #intro-cinematic-overlay, #intro-tap-prompt');
-    if (await introBtn.first().isVisible({ timeout: 2000 }).catch(() => false)) {
-      await introBtn.first().click({ force: true });
+    // Đóng Intro Video nếu có: ưu tiên click vào thanh tap prompt để vào game ngay
+    const tapPrompt = this.page.locator('#intro-tap-prompt, .intro-tap-prompt');
+    if (await tapPrompt.first().isVisible({ timeout: 2000 }).catch(() => false)) {
+      await tapPrompt.first().click({ force: true });
+      await sleep(500);
+    }
+    const introOverlay = this.page.locator('#intro-cinematic-overlay');
+    if (await introOverlay.isVisible({ timeout: 500 }).catch(() => false)) {
+      await introOverlay.click({ force: true });
       await sleep(400);
     }
 
