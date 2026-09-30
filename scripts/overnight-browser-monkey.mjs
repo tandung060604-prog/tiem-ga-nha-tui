@@ -149,10 +149,10 @@ class OvernightMonkey {
   }
 
   async dismissTitleScreen(page) {
-    // 0a. Bỏ qua Video Intro Cinematic nếu có
-    const introBtn = page.locator('#btn-intro-start-game, #btn-intro-skip-top');
+    // 0a. Bỏ qua Video Intro Cinematic nếu có (hỗ trợ cả chạm toàn màn hình)
+    const introBtn = page.locator('#btn-intro-start-game, #btn-intro-skip-top, #intro-cinematic-overlay, #intro-tap-prompt, .intro-tap-prompt');
     if (await introBtn.first().isVisible({ timeout: 1500 }).catch(() => false)) {
-      log(`🎬 Đóng Video Mở Màn AI (#btn-intro-start-game)...`);
+      log(`🎬 Đóng Video Mở Màn AI...`);
       await introBtn.first().click({ force: true });
       await sleep(400);
     }
@@ -183,10 +183,10 @@ class OvernightMonkey {
 
   async performChaosStep(page) {
     // A. XỬ LÝ CÁC MODAL & MÀN HÌNH ĐẶC BIỆT (ƯU TIÊN SỐ 1 ĐỂ KHÔNG BỊ BLOCKED)
-    // 0a. Video Mở Màn AI (Intro Cinematic Modal)
-    const introBtn = page.locator('#btn-intro-start-game, #btn-intro-skip-top');
+    // 0a. Video Mở Màn AI (Intro Cinematic Modal - chạm toàn màn hình hoặc nút)
+    const introBtn = page.locator('#btn-intro-start-game, #btn-intro-skip-top, #intro-cinematic-overlay, #intro-tap-prompt, .intro-tap-prompt');
     if (await introBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
-      log(`🎬 Đóng Video Mở Màn AI (#btn-intro-start-game)...`);
+      log(`🎬 Đóng Video Mở Màn AI...`);
       await introBtn.first().click({ force: true });
       await sleep(300);
       return true;
@@ -206,6 +206,31 @@ class OvernightMonkey {
     if (await prepLoading.first().isVisible({ timeout: 50 }).catch(() => false)) {
       log(`⏳ Đang bày thực phẩm... chạm qua nhanh...`);
       await prepLoading.first().click({ force: true }).catch(() => {});
+      await sleep(300);
+      return true;
+    }
+
+    // 0d. Modal Kết Quả Gacha Nhân Sự (Gacha Result Modal)
+    const gachaPickBtn = page.locator('.btn-gacha-pick');
+    if (await gachaPickBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`📯 Nhận diện Gacha Modal -> Ký hợp đồng tuyển nhân sự...`);
+      await gachaPickBtn.first().click({ force: true });
+      await sleep(300);
+      return true;
+    }
+    const gachaDismissBtn = page.locator('#btn-gacha-dismiss');
+    if (await gachaDismissBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`📯 Đóng Gacha Modal (#btn-gacha-dismiss)...`);
+      await gachaDismissBtn.first().click({ force: true });
+      await sleep(300);
+      return true;
+    }
+
+    // 0e. Spotlight Tutorial Màn Chuẩn Bị (Prep Tutorial Spotlight)
+    const prepTutSkip = page.locator('#btn-tutorial-skip, #btn-bacba-understood');
+    if (await prepTutSkip.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`💡 Đóng Spotlight Tutorial Bác Ba...`);
+      await prepTutSkip.first().click({ force: true });
       await sleep(300);
       return true;
     }
@@ -593,6 +618,21 @@ class OvernightMonkey {
         }
       }
 
+      // 3. Thỉnh thoảng chiêu mộ nhân sự Gacha nếu có tiền
+      if (Math.random() < 0.15) {
+        const staffTabBtn = page.locator('.tab-btn[data-tab="staff"]');
+        if (await staffTabBtn.first().isVisible().catch(() => false)) {
+          await staffTabBtn.first().click({ force: true }).catch(() => {});
+          await sleep(150);
+          const gachaSingle = page.locator('#btn-gacha-single:not([disabled])');
+          if (await gachaSingle.first().isVisible({ timeout: 200 }).catch(() => false)) {
+            log(`📯 Thử vận may Phát tờ rơi Gacha nhân viên...`);
+            await gachaSingle.first().click({ force: true }).catch(() => {});
+            await sleep(300);
+          }
+        }
+      }
+
       log(`🍗 Bấm 'BẮT ĐẦU MỞ BÁN' Ngày ${this.daysCompleted + 1}...`);
       await page.locator('#btn-start-selling').first().click({ timeout: 2000 }).catch(() => {});
       await sleep(500);
@@ -605,13 +645,22 @@ class OvernightMonkey {
   async emergencyRecover(page) {
     // Đóng tất cả các modal đang bị kẹt hoặc tự bấm tiếp tục
     await page.evaluate(() => {
-      const introBtn = document.querySelector('#btn-intro-start-game, #btn-intro-skip-top');
+      const introOverlay = document.getElementById('intro-cinematic-overlay');
+      if (introOverlay instanceof HTMLElement) { introOverlay.click(); return; }
+
+      const introBtn = document.querySelector('#btn-intro-start-game, #btn-intro-skip-top, .intro-tap-prompt');
       if (introBtn instanceof HTMLElement) { introBtn.click(); return; }
 
       const prepLoading = document.getElementById('prep-loading-overlay');
       if (prepLoading instanceof HTMLElement) { prepLoading.remove(); return; }
 
-      const manualClose = document.querySelector('#btn-close-bacba-manual, #btn-bacba-understood');
+      const gachaPick = document.querySelector('.btn-gacha-pick, #btn-gacha-dismiss');
+      if (gachaPick instanceof HTMLElement) { gachaPick.click(); return; }
+
+      const prepTut = document.querySelector('#btn-tutorial-skip, #btn-bacba-understood');
+      if (prepTut instanceof HTMLElement) { prepTut.click(); return; }
+
+      const manualClose = document.querySelector('#btn-close-bacba-manual');
       if (manualClose instanceof HTMLElement) { manualClose.click(); return; }
 
       const titleBtn = document.getElementById('btn-title-play');

@@ -172,6 +172,7 @@ class AppController {
     }
 
     openIntroCinematicModal({
+      forceShow: true,
       onComplete: () => {
         this.showTitleScreen();
       }

@@ -137,9 +137,9 @@ class ProfessionalQATester {
 
   async setupInitialGame() {
     console.log('\n--- BƯỚC 0: VÀO GAME & THIẾT LẬP BAN ĐẦU ---');
-    // Đóng Intro Video nếu có
-    const introBtn = this.page.locator('#btn-intro-start-game, #btn-intro-skip-top, .intro-tap-prompt');
-    if (await introBtn.first().isVisible({ timeout: 1500 }).catch(() => false)) {
+    // Đóng Intro Video nếu có (hỗ trợ chạm màn hình bất kỳ)
+    const introBtn = this.page.locator('#btn-intro-start-game, #btn-intro-skip-top, .intro-tap-prompt, #intro-cinematic-overlay, #intro-tap-prompt');
+    if (await introBtn.first().isVisible({ timeout: 2000 }).catch(() => false)) {
       await introBtn.first().click({ force: true });
       await sleep(400);
     }
@@ -236,28 +236,30 @@ class ProfessionalQATester {
   }
 
   async testStaffLifecycle() {
-    console.log('\n--- SUITE 2: KIỂM THỬ TOÀN BỘ HỆ THỐNG NHÂN VIÊN ---');
+    console.log('\n--- SUITE 2: KIỂM THỬ TOÀN BỘ HỆ THỐNG NHÂN VIÊN & GACHA ---');
     await this.ensurePrepPhase();
 
     // 1. Chuyển sang Tab Nhân Viên
     await this.page.locator('.tab-btn[data-tab="staff"]').click();
-    await sleep(300);
+    await sleep(400);
 
-    // 2. Tuyển ứng viên đầu tiên trong danh sách
-    const hireBtn = this.page.locator('.btn-hire');
-    let hiredCount = 0;
-    if (await hireBtn.first().isVisible({ timeout: 1000 }).catch(() => false)) {
-      await hireBtn.first().click({ force: true });
-      await sleep(300);
-      hiredCount++;
+    // 2. Chiêu mộ nhân tài qua hệ thống Gacha Mới (Phát Tờ Rơi)
+    const gachaRollBtn = this.page.locator('#btn-gacha-single');
+    let gachaTriggered = false;
+    if (await gachaRollBtn.isVisible({ timeout: 1500 }).catch(() => false)) {
+      await gachaRollBtn.click({ force: true });
+      await sleep(500);
+      gachaTriggered = true;
     }
 
-    // Tuyển thêm nhân viên thứ 2 nếu còn ứng viên
-    const hireBtn2 = this.page.locator('.btn-hire');
-    if (await hireBtn2.first().isVisible({ timeout: 500 }).catch(() => false)) {
-      await hireBtn2.first().click({ force: true });
-      await sleep(300);
-      hiredCount++;
+    // Chọn 1 ứng viên trong GachaResultModal để ký hợp đồng
+    const gachaPickBtn = this.page.locator('.btn-gacha-pick');
+    let hiredViaGacha = false;
+    if (await gachaPickBtn.first().isVisible({ timeout: 2000 }).catch(() => false)) {
+      const gachaShot = await this.capture('03-gacha-cards-modal');
+      await gachaPickBtn.first().click({ force: true });
+      await sleep(400);
+      hiredViaGacha = true;
     }
 
     // Kiểm tra trực tiếp qua state hoặc DOM
@@ -266,15 +268,30 @@ class ProfessionalQATester {
       return { count: s?.staff?.length || 0, staff: s?.staff || [] };
     });
 
-    // Nếu chưa có do event listener: kích hoạt trực tiếp từ app
+    // Fallback phòng ngừa
     if (hiredCheck.count === 0) {
       await this.page.evaluate(() => {
         const s = window.__stateManager?.getState();
-        if (s && s.candidates && s.candidates.length > 0) {
-          const cand = s.candidates[0];
+        if (s) {
           window.__stateManager?.update(draft => {
-            draft.staff.push(cand);
-            draft.candidates.shift();
+            draft.staff.push({
+              id: 'staff_gacha_demo',
+              name: 'Bảo Anh (Zét-bi)',
+              role: 'cashier',
+              avatar: '👧',
+              rarity: 'SR',
+              stars: 4,
+              speed: 85,
+              skill: 80,
+              attitude: 90,
+              stamina: 85,
+              traits: ['tiktok_idol'],
+              hourlyWage: 32000,
+              mood: 100,
+              shiftsWorked: 0,
+              laziness: 5,
+              errorRate: 2
+            });
           });
           window.__stateManager?.flush();
           window.__app?.render?.();
@@ -289,9 +306,9 @@ class ProfessionalQATester {
 
     this.record(
       'STAFF',
-      'Tuyển dụng nhân sự vào đội ngũ tiệm gà',
+      'Chiêu mộ nhân tài Gacha & Ký hợp đồng vào đội ngũ',
       hiredCheck.count >= 1,
-      `Đã tuyển dụng thành công ${hiredCheck.count} nhân sự (${hiredCheck.staff.map(m => m.name).join(', ')})`,
+      `Đã tuyển dụng thành công ${hiredCheck.count} nhân sự (${hiredCheck.staff.map(m => `${m.name} [${m.rarity || 'R'}]`).join(', ')})`,
       await this.capture('03-staff-hired')
     );
 

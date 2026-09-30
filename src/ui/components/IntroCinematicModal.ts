@@ -1,6 +1,4 @@
 import { ASSETS } from '../../content/assets';
-
-const STORAGE_KEY = 'tiem_ga_skip_intro_video';
 export const INTRO_DURATION_SECONDS = 12;
 
 export interface IntroCinematicOptions {
@@ -9,14 +7,7 @@ export interface IntroCinematicOptions {
 }
 
 export function shouldShowIntroVideo(): boolean {
-  try {
-    if (typeof navigator !== 'undefined' && /HeadlessChrome/.test(navigator.userAgent)) {
-      return false;
-    }
-    return localStorage.getItem(STORAGE_KEY) !== 'true';
-  } catch {
-    return true;
-  }
+  return true; // Luôn hiển thị video mở màn khi bật app
 }
 
 export const INTRO_VOICEOVER_PHASES = [
@@ -112,18 +103,32 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
   const imgEl = document.getElementById('intro-cinematic-img') as HTMLImageElement | null;
 
   if (videoEl) {
+    videoEl.muted = true;
+    videoEl.defaultMuted = true;
+    videoEl.setAttribute('muted', '');
+    videoEl.setAttribute('playsinline', '');
+    videoEl.setAttribute('webkit-playsinline', '');
+    videoEl.setAttribute('autoplay', '');
+    videoEl.setAttribute('loop', '');
+
     const startPlayback = () => {
       videoEl.style.display = 'block';
       if (imgEl) imgEl.style.display = 'none';
-      videoEl.play().catch(() => {});
+      const playPromise = videoEl.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn('Autoplay waiting for gesture:', err);
+        });
+      }
     };
 
-    if (videoEl.readyState >= 2) {
-      startPlayback();
-    } else {
-      videoEl.oncanplay = startPlayback;
-      videoEl.onloadeddata = startPlayback;
-    }
+    startPlayback();
+    videoEl.addEventListener('canplay', startPlayback);
+    videoEl.addEventListener('loadeddata', startPlayback);
+    videoEl.addEventListener('playing', () => {
+      videoEl.style.display = 'block';
+      if (imgEl) imgEl.style.display = 'none';
+    });
 
     videoEl.onended = () => {
       videoEl.currentTime = 0;
@@ -160,12 +165,16 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
 
     window.removeEventListener('keydown', handleKeyDown);
 
+    if (videoEl) {
+      try { videoEl.pause(); } catch {}
+    }
+
     // Hiệu ứng chuyển cảnh màn hình mượt mà (Fade out & Flash golden transition)
     overlay.classList.add('fade-out-screen');
     setTimeout(() => {
       overlay.remove();
       options.onComplete();
-    }, 380);
+    }, 350);
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
@@ -176,4 +185,5 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
 
   window.addEventListener('keydown', handleKeyDown);
   overlay.addEventListener('click', closeAndProceed);
+  overlay.addEventListener('pointerdown', closeAndProceed, { passive: true });
 }
