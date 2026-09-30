@@ -155,3 +155,88 @@ export function tutorialHint(step: TutorialStep): TutorialHint {
 export function shouldRunTutorial(state: { day: number; tutorialDone?: boolean }): boolean {
   return state.day === 1 && !state.tutorialDone;
 }
+
+// ==========================================================================
+// PREP TUTORIAL: HƯỚNG DẪN MÀN CHUẨN BỊ (MUA BÀN, NÂNG CẤP, KHO, NHÂN VIÊN, SỔ TAY...)
+// ==========================================================================
+
+export type PrepTutorialStep =
+  | 'prep-welcome'
+  | 'prep-inventory'
+  | 'prep-upgrades'
+  | 'prep-staff'
+  | 'prep-reviews'
+  | 'prep-menu'
+  | 'prep-start';
+
+export interface PrepTutorialHint {
+  step: PrepTutorialStep;
+  text: string;
+  target: string | null;
+  button?: string;
+  tabToSwitch?: 'inventory' | 'upgrades' | 'staff' | 'reviews' | 'menu';
+}
+
+export const PREP_TUTORIAL_STEPS: PrepTutorialStep[] = [
+  'prep-welcome',
+  'prep-inventory',
+  'prep-upgrades',
+  'prep-staff',
+  'prep-reviews',
+  'prep-menu',
+  'prep-start'
+];
+
+export const PREP_TUTORIAL_TEXT: Record<PrepTutorialStep, Omit<PrepTutorialHint, 'step'>> = {
+  'prep-welcome': {
+    text: 'Mèn đét ơi mừng con khai trương tiệm gà mới nghen! Bác Ba đứng đây chỉ con từ A tới Z: cách mua thịt gà trữ kho, sắm thêm bàn ghế cho khách ngồi, nâng cấp chảo xịn, mướn nhân viên với coi nhật ký đánh giá của thực khách nè!',
+    target: '.chalkboard',
+    button: 'Dạ, Bác Ba chỉ con với!'
+  },
+  'prep-inventory': {
+    text: 'Trước hết là Kho Hàng! Muốn bán gà thì trong kho phải có đùi gà tươi, khoai tây, dầu ăn nghen con. Chạm vô tab "Kho hàng" này, bấm nút "+5" hoặc "+10" mua đủ thịt gà trữ sẵn trước giờ mở bán nè!',
+    target: '.tab-btn[data-tab="inventory"]',
+    button: 'Dạ, để con vô xem kho!',
+    tabToSwitch: 'inventory'
+  },
+  'prep-upgrades': {
+    text: 'Đây là chỗ sắm Bàn Ghế với Nâng Cấp nè con! Tab "Nâng cấp" này cho con mua thêm 4 bộ bàn gỗ sạch đẹp cho khách ngồi ăn (+5% giá bán, quầy rộng thêm 1 ô khay ra món), sắm chảo chiên tự động, bảng hiệu với máy lọc dầu xịn sò!',
+    target: '.tab-btn[data-tab="upgrades"]',
+    button: 'Dạ, để con qua xem bàn ghế!',
+    tabToSwitch: 'upgrades'
+  },
+  'prep-staff': {
+    text: 'Một mình mần hổng xuể đâu con! Tab "Nhân viên" này cho con mướn Bé Linh phụ lau dọn bàn ghế giữ vệ sinh, chú Khang thợ chiên hay chú Tư bảo vệ giữ xe cho khách an tâm ăn uống nghen!',
+    target: '.tab-btn[data-tab="staff"]',
+    button: 'Dạ, có người phụ đỡ cực!',
+    tabToSwitch: 'staff'
+  },
+  'prep-reviews': {
+    text: 'Buôn bán là phải lắng nghe chòm xóm! Tab "Đánh giá" này lưu lại nhật ký review của thực khách Sài Gòn. Con nhớ vô trả lời review đặng kéo thêm sao uy tín với Tình Hẻm nghen!',
+    target: '.tab-btn[data-tab="reviews"]',
+    button: 'Dạ con nhớ rồi!',
+    tabToSwitch: 'reviews'
+  },
+  'prep-menu': {
+    text: 'Tab "Sổ tay" này ghi lại nhật ký công thức món gà và giá bán từng món. Đừng nâng giá quá cao kẻo cả hẻm bàn tán quán chặt chém nghen con ơi!',
+    target: '.tab-btn[data-tab="menu"]',
+    button: 'Dạ Bác Ba!',
+    tabToSwitch: 'menu'
+  },
+  'prep-start': {
+    text: 'Tươm tất hết rồi đó con ơi! Giờ con bấm cái nút bự "🍗 BẮT ĐẦU MỞ BÁN" này đặng mở cửa đón khách vô ăn gà nghen. Chúc tiệm mình khai trương hồng phát rực rỡ!',
+    target: '#btn-start-selling',
+    button: '🔥 MỞ CỬA BÁN LIỀN!'
+  }
+};
+
+export function prepTutorialHint(step: PrepTutorialStep): PrepTutorialHint {
+  return { step, ...PREP_TUTORIAL_TEXT[step] };
+}
+
+export function shouldRunPrepTutorial(state: { day: number; prepTutorialDone?: boolean }): boolean {
+  if (typeof navigator !== 'undefined' && /HeadlessChrome/.test(navigator.userAgent)) {
+    return false;
+  }
+  return state.day === 1 && !state.prepTutorialDone;
+}

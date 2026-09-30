@@ -37,7 +37,10 @@ import { DRINK_RECIPES, TIMER_RECIPES, timerPhase, TimerStationId, AssemblyId, D
 import { PREP_LAYOUT, prepLock } from './core/prepStation';
 import { showPrepPopover } from './ui/components/PrepStation';
 import { staffEffects, tickStaff, fryingItemId, traySizeFor, hasAutoWork, missingItems, FRY_RECIPES, FRY_LOOK } from './core/staff';
-import { TutorialState, tutorialStep, tutorialHint, shouldRunTutorial, BAC_BA_GAME_TIPS } from './core/tutorial';
+import {
+  TutorialState, tutorialStep, tutorialHint, shouldRunTutorial, BAC_BA_GAME_TIPS,
+  shouldRunPrepTutorial, prepTutorialHint, PREP_TUTORIAL_STEPS, PrepTutorialStep
+} from './core/tutorial';
 import { syncTutorialLayer } from './ui/components/TutorialLayer';
 import { weeklyWrapped } from './core/wrapped';
 import { drawWrapped, shareWrapped, shareImage } from './ui/components/WrappedCard';
@@ -118,6 +121,7 @@ class AppController {
   private sellingStructureKey = '';
   private expectedCustomers = 0;
   private shownBacBaTipsThisSession = new Set<string>();
+  private prepTutorialStep: PrepTutorialStep | null = null;
 
   constructor() {
     if (import.meta.env?.DEV) {
@@ -197,6 +201,7 @@ class AppController {
       audio.playPerfect();
       // Tiệm mới: chủ tiệm tự đặt tên quán trước, rồi mới tới lời chào
       if (fresh || !hasProgress) setTimeout(() => this.openShopNameDialog(() => this.openWelcomeDialog()), 250);
+      else this.render();
     };
 
     document.getElementById('btn-title-play')!.onclick = () => start(false);
@@ -341,6 +346,7 @@ class AppController {
       startBtn.onclick = () => {
         audio.playPerfect();
         this.closeModal();
+        this.render();
       };
     }
   }
@@ -483,6 +489,9 @@ class AppController {
     this.incidentPausedSelling = false;
     const next = this.modalQueue.shift();
     if (next) setTimeout(() => this.whenModalFree(next), 250);
+    else if (stateManager.getState().phase === 'prep') {
+      this.updatePrepTutorial(stateManager.getState());
+    }
   }
 
   // Sự cố không được đè lên hộp thoại đang mở (lên chương, thư Thỏ Cam, truyện): xếp hàng chờ đóng
@@ -799,7 +808,11 @@ class AppController {
       this.sellingStructureKey = '';
       mainViewEl.innerHTML = this.renderPrepView(state);
       this.bindPrepEvents(state);
+      this.updatePrepTutorial(state);
     } else if (state.phase === 'selling' && this.sellingSession) {
+      if (this.prepTutorialStep) {
+        this.endPrepTutorial();
+      }
       document.body.classList.add('selling-mode');
       const key = sellingStructureKey(state, this.sellingSession);
       if (key !== this.sellingStructureKey) {
@@ -889,6 +902,13 @@ class AppController {
         if (tab) {
           this.activeTab = tab;
           audio.playPop();
+          if (this.prepTutorialStep) {
+            if (tab === 'inventory') this.prepTutorialStep = 'prep-inventory';
+            else if (tab === 'upgrades') this.prepTutorialStep = 'prep-upgrades';
+            else if (tab === 'staff') this.prepTutorialStep = 'prep-staff';
+            else if (tab === 'reviews') this.prepTutorialStep = 'prep-reviews';
+            else if (tab === 'menu') this.prepTutorialStep = 'prep-menu';
+          }
           this.render();
         }
       });
@@ -1049,6 +1069,9 @@ class AppController {
 
         showPrepLoadingModal({
           onComplete: () => {
+            if (this.prepTutorialStep) {
+              this.endPrepTutorial();
+            }
             audio.playPerfect();
             this.showToast('Quán chính thức mở cửa! Chúc buôn may bán đắt nha! 🎊');
             this.setPhase('selling');
@@ -1056,6 +1079,78 @@ class AppController {
         });
       };
     }
+  }
+
+  // --- PREP TUTORIAL (BÁC BA HƯỚNG DẪN MÀN CHUẨN BỊ) ---
+  private updatePrepTutorial(state: GameState) {
+    if (!this.titleDismissed || this.isModalOpen()) return;
+
+    if (!shouldRunPrepTutorial(state)) {
+      if (this.prepTutorialStep) {
+        this.endPrepTutorial();
+      }
+      return;
+    }
+
+    if (!this.prepTutorialStep) {
+      this.prepTutorialStep = 'prep-welcome';
+    }
+
+    const currentStep = this.prepTutorialStep;
+    const hint = prepTutorialHint(currentStep);
+
+    // Tự động chuyển tab tương ứng để rọi sáng đúng nút và hiển thị đúng tính năng (mua bàn, kho hàng, nhân viên...)
+    if (hint.tabToSwitch && this.activeTab !== hint.tabToSwitch) {
+      this.activeTab = hint.tabToSwitch;
+      const pane = document.querySelector('.prep-container .pane');
+      if (pane) {
+        switch (this.activeTab) {
+          case 'inventory': pane.innerHTML = renderInventoryTab(state); break;
+          case 'upgrades': pane.innerHTML = renderUpgradesTab(state); break;
+          case 'staff': pane.innerHTML = renderStaffTab(state); break;
+          case 'reviews': pane.innerHTML = renderReviewsTab(state); break;
+          case 'menu': pane.innerHTML = renderMenuTab(state); break;
+        }
+      }
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        const tab = btn.getAttribute('data-tab');
+        btn.classList.toggle('active', tab === this.activeTab);
+      });
+    }
+
+    syncTutorialLayer(hint, {
+      onButton: () => this.advancePrepTutorial(),
+      onSkip: () => this.endPrepTutorial()
+    });
+  }
+
+  private advancePrepTutorial() {
+    if (!this.prepTutorialStep) return;
+    const idx = PREP_TUTORIAL_STEPS.indexOf(this.prepTutorialStep);
+    if (idx >= 0 && idx < PREP_TUTORIAL_STEPS.length - 1) {
+      const nextStep = PREP_TUTORIAL_STEPS[idx + 1];
+      if (nextStep) {
+        this.prepTutorialStep = nextStep;
+        const hint = prepTutorialHint(nextStep);
+        if (hint.tabToSwitch) {
+          this.activeTab = hint.tabToSwitch;
+        }
+        this.render();
+      }
+    } else {
+      this.endPrepTutorial();
+      const startBtn = document.getElementById('btn-start-selling');
+      if (startBtn) {
+        startBtn.click();
+      }
+    }
+  }
+
+  private endPrepTutorial() {
+    this.prepTutorialStep = null;
+    syncTutorialLayer(null, { onButton: () => {}, onSkip: () => {} });
+    stateManager.update(draft => { draft.prepTutorialDone = true; });
+    stateManager.flush();
   }
 
   // --- SELLING PHASE ---

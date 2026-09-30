@@ -31,17 +31,13 @@ describe('Bác Ba Miền Tây Tutorial & Tips', () => {
 });
 
 describe('Intro Cinematic Modal & Bac Ba Manual Modal UI', () => {
-  it('renderIntroCinematicModal tạo cấu trúc HTML hợp lệ có phong cách 3D Voxel và timeline 12s', () => {
+  it('renderIntroCinematicModal tạo cấu trúc HTML tối giản tràn viền màn dọc và có dòng chữ chạm vào màn hình', () => {
     const html = renderIntroCinematicModal();
     expect(html).toContain('intro-cinematic-overlay');
-    expect(html).toContain('3D VOXEL VEO 3');
     expect(html).toContain('intro-3d-viewport');
-    expect(html).toContain('intro-video-timeline');
-    expect(html).toContain('btn-intro-replay');
-    expect(html).toContain('BẮT ĐẦU VÀO TIỆM GÀ');
-    expect(html).toContain('Bỏ qua ✕');
-    expect(html).toContain('Bác Ba Nghệ Nhân:');
-    expect(html).toContain('Mèn đét ơi!');
+    expect(html).toContain('CHẠM VÀO MÀN HÌNH ĐỂ VÀO GAME');
+    expect(html).toContain('intro-video-element');
+    expect(html).toContain('loop');
   });
 
   it('INTRO_VOICEOVER_PHASES trải dài từ 0s tới 12-14s với đầy đủ 4 giai đoạn mở màn', () => {
@@ -58,5 +54,71 @@ describe('Intro Cinematic Modal & Bac Ba Manual Modal UI', () => {
     expect(html).toContain('3. Sốt Bí Truyền & Rót Nước Tự Động');
     expect(html).toContain('4. Hết Hàng Giữa Ca? Đừng Lo!');
     expect(html).toContain('DẠ CON HIỂU RỒI, CẢM ƠN BÁC BA!');
+  });
+});
+
+describe('Bác Ba Prep Screen Tutorial (Kho, Bàn Ghế, Nâng Cấp, Nhân Viên, Đánh Giá, Mở Bán)', () => {
+  it('đầy đủ 7 bước chuẩn bị với đúng target selector và hướng dẫn', async () => {
+    const { PREP_TUTORIAL_STEPS, PREP_TUTORIAL_TEXT, prepTutorialHint } = await import('../src/core/tutorial');
+    expect(PREP_TUTORIAL_STEPS).toEqual([
+      'prep-welcome',
+      'prep-inventory',
+      'prep-upgrades',
+      'prep-staff',
+      'prep-reviews',
+      'prep-menu',
+      'prep-start'
+    ]);
+
+    // Kiểm tra bước 1: Chào mừng
+    const welcome = prepTutorialHint('prep-welcome');
+    expect(welcome.text).toContain('Bác Ba đứng đây chỉ con từ A tới Z');
+    expect(welcome.target).toBeDefined();
+
+    // Kiểm tra bước 2: Kho hàng
+    const inv = prepTutorialHint('prep-inventory');
+    expect(inv.text).toContain('Kho Hàng');
+    expect(inv.target).toContain('data-tab="inventory"');
+    expect(inv.tabToSwitch).toBe('inventory');
+
+    // Kiểm tra bước 3: Nâng cấp bàn ghế
+    const upg = prepTutorialHint('prep-upgrades');
+    expect(upg.text).toContain('Bàn Ghế');
+    expect(upg.text).toContain('4 bộ bàn gỗ');
+    expect(upg.target).toContain('data-tab="upgrades"');
+    expect(upg.tabToSwitch).toBe('upgrades');
+
+    // Kiểm tra bước 4: Nhân viên
+    const staff = prepTutorialHint('prep-staff');
+    expect(staff.text).toContain('Bé Linh');
+    expect(staff.target).toContain('data-tab="staff"');
+    expect(staff.tabToSwitch).toBe('staff');
+
+    // Kiểm tra bước 5: Đánh giá review
+    const rev = prepTutorialHint('prep-reviews');
+    expect(rev.text).toContain('Đánh giá');
+    expect(rev.text).toContain('Tình Hẻm');
+    expect(rev.target).toContain('data-tab="reviews"');
+    expect(rev.tabToSwitch).toBe('reviews');
+
+    // Kiểm tra bước 6: Sổ tay
+    const menu = prepTutorialHint('prep-menu');
+    expect(menu.text).toContain('Sổ tay');
+    expect(menu.target).toContain('data-tab="menu"');
+    expect(menu.tabToSwitch).toBe('menu');
+
+    // Kiểm tra bước 7: Mở bán
+    const start = prepTutorialHint('prep-start');
+    expect(start.text).toContain('BẮT ĐẦU MỞ BÁN');
+    expect(start.target).toBe('#btn-start-selling');
+    expect(start.button).toContain('MỞ CỬA BÁN LIỀN');
+  });
+
+  it('shouldRunPrepTutorial chỉ chạy ở Ngày 1 khi chưa hoàn thành', async () => {
+    const { shouldRunPrepTutorial } = await import('../src/core/tutorial');
+    expect(shouldRunPrepTutorial({ day: 1, prepTutorialDone: false })).toBe(true);
+    expect(shouldRunPrepTutorial({ day: 1, prepTutorialDone: undefined })).toBe(true);
+    expect(shouldRunPrepTutorial({ day: 1, prepTutorialDone: true })).toBe(false);
+    expect(shouldRunPrepTutorial({ day: 2, prepTutorialDone: false })).toBe(false);
   });
 });

@@ -474,6 +474,7 @@ export interface GameState {
   integrity?: { tampered: boolean; reasons: string[] };
   pausedShift?: import('../core/sellingSim').ShiftSnapshot | null; // ca bán dở (thoát giữa ca)
   tutorialDone?: boolean;      // Bác Ba đã dẫn ca đầu (core/tutorial.ts)
+  prepTutorialDone?: boolean;  // Bác Ba đã hướng dẫn màn Chuẩn Bị đầu ngày (kho, bàn ghế, nâng cấp, review)
   todayOilCost?: number;       // tiền thay dầu trong ngày (đã trừ ví) → ghi vào sổ lúc đóng cửa
   adoptedPets?: ('pet_01_dog_vang' | 'pet_02_cat_muop')[]; // Thú cưng đã nhận nuôi (Chó Cỏ, Mèo Mướp)
   pestIncidentsCount?: number; // Số lần xuất hiện chuột cống bếp

@@ -13,7 +13,7 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
   const vnd = (n: number) => n.toLocaleString('vi-VN') + 'đ';
 
   return `
-    <div class="board">
+    <div class="board chalkboard">
       <div class="board-top-banner">
         <span class="bistro-badge">
           <img src="${ASSETS.icons.fireRush}" class="board-pixel-icon-xs" alt="" /> KOREAN CHICKEN BISTRO

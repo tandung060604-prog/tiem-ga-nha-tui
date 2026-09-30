@@ -1,4 +1,4 @@
-import { TutorialHint } from '../../core/tutorial';
+import { TutorialHint, PrepTutorialHint } from '../../core/tutorial';
 import { ASSETS } from '../../content/assets';
 
 // Bong bóng lời Bác Ba + Hiệu ứng Spotlight Highlight (chiếu sáng nút mục tiêu, làm tối xung quanh).
@@ -86,7 +86,7 @@ function removeTrackingListeners() {
 
 export interface TutorialActions { onButton: () => void; onSkip: () => void }
 
-export function syncTutorialLayer(hint: TutorialHint | null, actions: TutorialActions) {
+export function syncTutorialLayer(hint: TutorialHint | PrepTutorialHint | null, actions: TutorialActions) {
   // Gỡ class highlight khỏi các nút cũ
   document.querySelectorAll(`.${TARGET_CLASS}`).forEach(el => {
     if (!hint?.target || !el.matches(hint.target)) el.classList.remove(TARGET_CLASS);
