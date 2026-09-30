@@ -1496,7 +1496,6 @@ body.selling-mode .toast {
   pointer-events: auto;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-}
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
