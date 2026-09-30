@@ -10,3 +10,4 @@ assets-src/scratch/
 assets-original/
 logs/
 *.code-workspace
+scratch/

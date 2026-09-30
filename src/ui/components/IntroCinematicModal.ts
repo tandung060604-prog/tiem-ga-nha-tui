@@ -48,6 +48,7 @@ export const INTRO_VOICEOVER_PHASES = [
 
 export function renderIntroCinematicModal(): string {
   const poster = ASSETS.intro.poster;
+  const videoSrc = ASSETS.intro.video;
 
   return `
     <div id="intro-cinematic-overlay" class="intro-cinematic-overlay" role="dialog" aria-modal="true" aria-label="Video mở màn 3D Pixel Tiệm Gà Nhà Tui">
@@ -64,6 +65,9 @@ export function renderIntroCinematicModal(): string {
         <!-- Khung chiếu phim 3D Voxel Pixel Diorama -->
         <div class="intro-screen-viewport" id="intro-3d-viewport">
           <div class="intro-cinematic-stage" id="intro-3d-stage">
+            <video id="intro-video-element" class="intro-cinematic-video" playsinline muted autoplay loop poster="${poster}" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+              <source src="${videoSrc}" type="video/mp4" />
+            </video>
             <img src="${poster}" alt="Góc phố Hẻm 1102 3D Pixel Diorama buổi sớm náo nhiệt" class="intro-cinematic-img animate-voxel-3d" id="intro-cinematic-img" />
             
             <!-- Lớp ánh sáng thể tích Ray-Tracing & Đèn lồng -->
@@ -76,34 +80,34 @@ export function renderIntroCinematicModal(): string {
             <div class="steam-particle sp-3"></div>
             <div class="gold-sparkle-3d gs-1"></div>
             <div class="gold-sparkle-3d gs-2"></div>
+          </div>
 
-            <!-- Huy hiệu công nghệ 3D góc trên -->
-            <div class="intro-engine-pill">
-              <span class="pill-dot"></span> 3D PIXEL DIORAMA · 12s CINEMATIC
-            </div>
+          <!-- Huy hiệu công nghệ 3D góc trên -->
+          <div class="intro-engine-pill">
+            <span class="pill-dot"></span> 3D PIXEL DIORAMA · 12s CINEMATIC
+          </div>
 
-            <!-- Thanh Timeline Tiến Trình Video 10-15s -->
-            <div class="intro-video-timeline">
-              <div class="timeline-meta">
-                <span id="intro-timer-label" class="timer-label">00:00</span>
-                <span class="timer-total">/ 00:12</span>
-                <span id="intro-phase-tag" class="timeline-phase-tag">Hẻm Phố Bình Minh</span>
-              </div>
-              <div class="timeline-track">
-                <div id="intro-timeline-bar" class="timeline-fill" style="width: 0%;"></div>
-              </div>
+          <!-- Thanh Timeline Tiến Trình Video 10-15s -->
+          <div class="intro-video-timeline">
+            <div class="timeline-meta">
+              <span id="intro-timer-label" class="timer-label">00:00</span>
+              <span class="timer-total">/ 00:12</span>
+              <span id="intro-phase-tag" class="timeline-phase-tag">Hẻm Phố Bình Minh</span>
             </div>
+            <div class="timeline-track">
+              <div id="intro-timeline-bar" class="timeline-fill" style="width: 0%;"></div>
+            </div>
+          </div>
 
-            <!-- Dòng chữ phụ đề điện ảnh Miền Tây Bác Ba -->
-            <div class="intro-subtitle-box">
-              <div class="intro-speaker-tag">
-                <img src="${ASSETS.bacba.front}" class="speaker-avatar-pixel" alt="Bác Ba" />
-                <span>Bác Ba Nghệ Nhân:</span>
-              </div>
-              <p id="intro-subtitle-text" class="intro-subtitle-text">
-                "${INTRO_VOICEOVER_PHASES[0]?.text ?? ''}"
-              </p>
+          <!-- Dòng chữ phụ đề điện ảnh Miền Tây Bác Ba -->
+          <div class="intro-subtitle-box">
+            <div class="intro-speaker-tag">
+              <img src="${ASSETS.bacba.front}" class="speaker-avatar-pixel" alt="Bác Ba" />
+              <span>Bác Ba Nghệ Nhân:</span>
             </div>
+            <p id="intro-subtitle-text" class="intro-subtitle-text">
+              "${INTRO_VOICEOVER_PHASES[0]?.text ?? ''}"
+            </p>
           </div>
         </div>
 
@@ -158,6 +162,20 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
   const timerLabel = document.getElementById('intro-timer-label');
   const phaseTag = document.getElementById('intro-phase-tag');
   const subtitleText = document.getElementById('intro-subtitle-text');
+  const videoEl = document.getElementById('intro-video-element') as HTMLVideoElement | null;
+  const imgEl = document.getElementById('intro-cinematic-img') as HTMLImageElement | null;
+
+  if (videoEl && imgEl) {
+    videoEl.oncanplay = () => {
+      videoEl.style.display = 'block';
+      imgEl.style.display = 'none';
+      videoEl.play().catch(() => {});
+    };
+    videoEl.onerror = () => {
+      videoEl.style.display = 'none';
+      imgEl.style.display = 'block';
+    };
+  }
 
   // Hiệu ứng tương tác 3D Parallax Tilt khi rê chuột / chạm
   if (viewport && stage) {
