@@ -681,3 +681,13 @@
   - **Chiến lược Fix:** `defensive_nullcheck_fallback` (Độ tin cậy: 24.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
 ---
+
+### 🐞 [10:15:48 30/9/2026] (via Jev MCP) Overnight Monkey Test Loop on Oil Change and Playwright Timeout
+- **Triệu chứng:** Playwright locator.click timed out after 30000ms with 'waiting for element to be visible, enabled and stable - element is not stable'. In monkey test run, it logged '[10:07:46] 🛢️ Phát hiện dầu xuống cấp/bẩn -> Bấm THAY DẦU 150k...' over 150 times until timeout.
+- **Vị trí:** `scripts/overnight-browser-monkey.mjs, src/styles/pixel-theme.css, src/styles/kitchen.css` 
+- **Đánh giá Jev (553ms):**
+  - **Mức độ (Severity):** `p2_ui_friction` (Độ tin cậy: 74.0%)
+  - **Nguyên nhân gốc (Root Cause):** `state_lifecycle` (Độ tin cậy: 61.0%)
+  - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 61.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `200` ngày chơi
+---

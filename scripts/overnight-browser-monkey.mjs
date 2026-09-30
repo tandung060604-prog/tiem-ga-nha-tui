@@ -396,17 +396,42 @@ class OvernightMonkey {
       // 0. Thay dầu mới nếu dầu đã xuống cấp/bẩn hoặc đã rán nhiều mẻ (bảo vệ uy tín & tránh công an phạt)
       const oilBtn = page.locator('#btn-change-oil');
       const now = Date.now();
-      if (!this.lastOilAttempt || now - this.lastOilAttempt > 5000) {
+      if (!this.lastOilAttempt || now - this.lastOilAttempt > 8000) {
         if (await oilBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
           const shouldChangeOil = await page.evaluate(() => {
             const s = window.__stateManager?.getState();
-            return s && s.money >= 150000 && (s.oilCondition === 'dirty' || (s.oilBatchesCooked ?? 0) >= 5);
+            if (!s || s.money < 150000) return false;
+            // Chỉ thay khi dầu bẩn (tránh công an phạt và khách chê), hoặc dầu vàng vừa nhưng dư dả tiền (>350k)
+            return s.oilCondition === 'dirty' || (s.oilCondition === 'medium' && s.money >= 350000);
           }).catch(() => false);
 
           if (shouldChangeOil) {
             this.lastOilAttempt = now;
             log(`🛢️ Phát hiện dầu xuống cấp/bẩn -> Bấm THAY DẦU 150k...`);
-            await oilBtn.first().click({ force: true }).catch(() => {});
+            await oilBtn.first().click({ force: true, timeout: 1000 }).catch(() => {});
+            await sleep(150);
+
+            // Kiểm tra trạng thái: nếu chưa thay được, kích hoạt an toàn qua JS DOM click hoặc app action
+            const stillNeedsOil = await page.evaluate(() => {
+              const s = window.__stateManager?.getState();
+              return s && (s.oilCondition === 'dirty' || (s.oilCondition === 'medium' && s.money >= 350000));
+            }).catch(() => false);
+
+            if (stillNeedsOil) {
+              await page.evaluate(() => {
+                document.getElementById('btn-change-oil')?.click();
+                if (window.__app && typeof window.__app.runSellingAction === 'function') {
+                  window.__app.runSellingAction('change-oil');
+                }
+              }).catch(() => {});
+            }
+
+            const finalState = await page.evaluate(() => {
+              const s = window.__stateManager?.getState();
+              return s ? { cond: s.oilCondition, money: s.money } : null;
+            }).catch(() => null);
+
+            log(`🛢️ Trạng thái dầu sau khi xử lý: Dầu=${finalState?.cond ?? 'unknown'}, Tiền=${finalState?.money?.toLocaleString('vi-VN') ?? 'unknown'}đ`);
             await sleep(300);
             return true;
           }

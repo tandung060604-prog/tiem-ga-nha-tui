@@ -1089,8 +1089,8 @@ body.selling-mode .toast {
   animation: dirtyAlertPulse 0.8s infinite alternate;
 }
 @keyframes dirtyAlertPulse {
-  0% { transform: scale(1); box-shadow: 0 0 2px #ef4444; }
-  100% { transform: scale(1.04); box-shadow: 0 0 8px #ef4444; }
+  0% { box-shadow: 0 0 2px #ef4444; filter: brightness(1); }
+  100% { box-shadow: 0 0 8px #ef4444, inset 0 0 4px #fca5a5; filter: brightness(1.08); }
 }
 
 /* Kệ chai tương gọn gàng không chiếm chiều dọc */
