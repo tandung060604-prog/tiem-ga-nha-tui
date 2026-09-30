@@ -272,15 +272,21 @@ class OvernightMonkey {
       return true;
     }
 
-    // 8. Modal Sự Cố Hàng Ngày (Daily Incident)
-    const incidentChoice = page.locator('.btn-neutral-choice, .btn-incident-choice, .incident-btn, .btn-warm-choice, .btn-cream-choice');
-    if (await incidentChoice.first().isVisible({ timeout: 50 }).catch(() => false)) {
+    // 8a. Modal Xác Nhận & Kết Quả Sự Cố Hàng Ngày (Reaction / Continue)
+    const incidentAction = page.locator('#btn-incident-continue, #btn-incident-confirm-yes, .btn-reaction-continue');
+    if (await incidentAction.first().isVisible({ timeout: 60 }).catch(() => false)) {
+      log(`⚡ Bấm tiếp tục sự cố hàng ngày...`);
+      await incidentAction.first().click({ force: true });
+      await sleep(250);
+      return true;
+    }
+
+    // 8b. Modal Lựa Chọn Sự Cố Hàng Ngày (Daily Incident Choices)
+    const incidentChoice = page.locator('.incident-choice-btn:not([disabled]), .btn-neutral-choice:not([disabled]), .btn-security-choice:not([disabled]), .incident-btn');
+    if (await incidentChoice.first().isVisible({ timeout: 60 }).catch(() => false)) {
+      log(`⚡ Chọn phương án sự cố hàng ngày...`);
       await incidentChoice.first().click({ force: true });
-      await sleep(200);
-      const confirmYes = page.locator('#btn-incident-confirm-yes, #btn-incident-continue');
-      if (await confirmYes.isVisible({ timeout: 300 }).catch(() => false)) {
-        await confirmYes.click({ force: true });
-      }
+      await sleep(250);
       return true;
     }
 
@@ -421,45 +427,59 @@ class OvernightMonkey {
     }
 
     // C. PHA CHUẨN BỊ (PREPARATION SCREEN)
+    // Nếu đang có modal mở trên màn hình, không cố bấm vào màn hình chuẩn bị
+    const hasModal = await page.locator('#modal-container:not([hidden])').isVisible({ timeout: 40 }).catch(() => false);
+    if (hasModal) return false;
+
     const openBarBtn = page.locator('#btn-start-selling');
     if (await openBarBtn.first().isVisible({ timeout: 80 }).catch(() => false)) {
-      // 1. Mua nguyên liệu nếu thiếu (đặc biệt là thịt gà và bột chiên)
+      // 1. Luôn ưu tiên mở tab Kho hàng và nhập đủ nguyên liệu cốt lõi
       const invTabBtn = page.locator('.tab-btn[data-tab="inventory"]');
-      if (await invTabBtn.isVisible({ timeout: 40 }).catch(() => false)) {
-        await invTabBtn.click({ force: true }).catch(() => {});
-        await sleep(100);
+      if (await invTabBtn.first().isVisible({ timeout: 60 }).catch(() => false)) {
+        await invTabBtn.first().click({ force: true }).catch(() => {});
+        await sleep(150);
       }
 
+      // Nhập thịt gà tươi (+5 / +10)
       for (let i = 0; i < 3; i++) {
         const buyChickenBtn = page.locator('.btn-buy[data-id="chicken_meat"]:not([disabled])');
-        if (await buyChickenBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+        if (await buyChickenBtn.first().isVisible({ timeout: 200 }).catch(() => false)) {
           await buyChickenBtn.first().click({ force: true }).catch(() => {});
-          await sleep(60);
+          await sleep(100);
         }
       }
 
+      // Nhập bột chiên giòn
       const buyFlourBtn = page.locator('.btn-buy[data-id="flour"]:not([disabled])');
-      if (await buyFlourBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      if (await buyFlourBtn.first().isVisible({ timeout: 150 }).catch(() => false)) {
         await buyFlourBtn.first().click({ force: true }).catch(() => {});
-        await sleep(60);
+        await sleep(100);
+      }
+
+      // Nhập dầu chiên nếu có thể
+      const buyOilBtn = page.locator('.btn-buy[data-id="fry_oil"]:not([disabled])');
+      if (await buyOilBtn.first().isVisible({ timeout: 100 }).catch(() => false)) {
+        await buyOilBtn.first().click({ force: true }).catch(() => {});
+        await sleep(100);
       }
 
       // 2. Thỉnh thoảng nâng cấp quán
-      if (Math.random() < 0.2) {
+      if (Math.random() < 0.15) {
         const upgradeTabBtn = page.locator('.tab-btn[data-tab="upgrades"]');
-        if (await upgradeTabBtn.isVisible().catch(() => false)) {
-          await upgradeTabBtn.click({ force: true }).catch(() => {});
-          await sleep(100);
+        if (await upgradeTabBtn.first().isVisible().catch(() => false)) {
+          await upgradeTabBtn.first().click({ force: true }).catch(() => {});
+          await sleep(150);
           const buyUpgrade = page.locator('.btn-buy-upgrade:not([disabled])');
-          if (await buyUpgrade.first().isVisible().catch(() => false)) {
+          if (await buyUpgrade.first().isVisible({ timeout: 200 }).catch(() => false)) {
             await buyUpgrade.first().click({ force: true }).catch(() => {});
+            await sleep(100);
           }
         }
       }
 
       log(`🍗 Bấm 'BẮT ĐẦU MỞ BÁN' Ngày ${this.daysCompleted + 1}...`);
-      await page.locator('#btn-start-selling').first().click({ force: true, timeout: 2000 }).catch(() => {});
-      await sleep(400);
+      await page.locator('#btn-start-selling').first().click({ timeout: 2000 }).catch(() => {});
+      await sleep(500);
       return true;
     }
 
@@ -474,6 +494,11 @@ class OvernightMonkey {
 
       const nextDayBtn = document.querySelector('#btn-start-next-day, #btn-summary-next-day');
       if (nextDayBtn instanceof HTMLElement) { nextDayBtn.click(); return; }
+
+      const incidentButtons = document.querySelectorAll('#btn-incident-continue, #btn-incident-confirm-yes, .incident-choice-btn');
+      for (const b of incidentButtons) {
+        if (b instanceof HTMLElement) { b.click(); return; }
+      }
 
       const closeButtons = document.querySelectorAll('.dash-close-x, #btn-modal-close-icon, [id*="btn-close"], .btn-close, .modal-close');
       for (const btn of closeButtons) {

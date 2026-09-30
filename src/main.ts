@@ -38,6 +38,7 @@ import { TutorialState, tutorialStep, tutorialHint, shouldRunTutorial } from './
 import { syncTutorialLayer } from './ui/components/TutorialLayer';
 import { weeklyWrapped } from './core/wrapped';
 import { drawWrapped, shareWrapped, shareImage } from './ui/components/WrappedCard';
+import { addStock } from './core/inventory';
 
 import { squeezeCondiment, recordHelperFry, StationResult, scoopSide, changeOil, OIL_CHANGE_COST, startTimerStation, pullTimerStation, assembleAtCounter, makeDrink, creditSale, requestBaBaAid, eventForDay, createCustomerSource, useIngredients, recordFryerLift, checkPoliceOilInspection, PoliceInspectionResult, SAUCE_STOCK, serveFirstOrder, cancelAndApologizeOrder, applyBunnyReward, closeDay, DayResult, INSPECTION_FINE, BUNNY_VISIT_TIP, payWeeklyRent, applyGangsterThreat } from './core/day';
 import { upgradeEffects } from './core/upgrades';
@@ -936,15 +937,27 @@ class AppController {
     const startSellingBtn = document.getElementById('btn-start-selling');
     if (startSellingBtn) {
       startSellingBtn.onclick = () => {
-        // Kiểm tra nguyên liệu tối thiểu
-        const chickenStock = state.inventory.chicken_meat?.amount || 0;
+        // Kiểm tra nguyên liệu tối thiểu (luôn đọc từ stateManager thời gian thực)
+        const liveState = stateManager.getState();
+        const chickenStock = liveState.inventory.chicken_meat?.amount || 0;
         if (chickenStock < 2) {
-          const effects = upgradeEffects(state.upgrades);
-          const discount = Math.min(60, (effects.discountWholesale || 0) + (state.todayMarketDiscount || 0));
-          const unitCost = Math.round((state.inventory.chicken_meat?.cost || 14000) * (1 - discount / 100));
+          const effects = upgradeEffects(liveState.upgrades);
+          const discount = Math.min(60, (effects.discountWholesale || 0) + (liveState.todayMarketDiscount || 0));
+          const unitCost = Math.round((liveState.inventory.chicken_meat?.cost || 14000) * (1 - discount / 100));
           const minChickenPackCost = unitCost * 5;
 
-          if (state.money < minChickenPackCost) {
+          if (liveState.money >= minChickenPackCost) {
+            // Tự động nhập nhanh 5 miếng gà tươi để sẵn sàng mở bán
+            stateManager.update(draft => {
+              const target = draft.inventory.chicken_meat;
+              if (target && draft.money >= minChickenPackCost) {
+                draft.money -= minChickenPackCost;
+                addStock(target, 5, unitCost, effects.shelfLifeBonus);
+              }
+            });
+            audio.playCash();
+            this.showToast(`🍗 Tiệm đã tự động nhập 5 miếng gà tươi (-${minChickenPackCost.toLocaleString('vi-VN')}đ) để kịp giờ mở bán!`);
+          } else {
             // Tương trợ khu phố từ Bác Ba Tổ Trưởng nếu người chơi bị kẹt không đủ tiền mua gói gà tối thiểu
             let granted = false;
             stateManager.update(draft => { granted = requestBaBaAid(draft); });
@@ -955,12 +968,11 @@ class AppController {
               this.showToast(`❤️ Bác Ba tương trợ kịp thời (${freshStock >= 15 ? '15 miếng gà & 150k vốn' : '5 miếng gà cho mượn tạm'})! Mở bán được rồi con nhé!`);
             } else {
               this.showToast('Hết gà với hết vốn rồi… Bác Ba đã giúp một lần trong chương này rồi. Bán bớt đồ hoặc nhận thưởng Thỏ Cam đi con.');
+              this.activeTab = 'inventory';
+              this.render();
+              return;
             }
-            this.render();
-            return;
           }
-          this.showToast('Kho hết thịt gà rồi nè! Dzô tab Kho hàng nhập thêm đi con!');
-          return;
         }
 
         audio.playPerfect();

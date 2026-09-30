@@ -20,3 +20,23 @@
   - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 16.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
 ---
+
+### 🐞 [03:04:34 30/9/2026] Prep Phase Chicken Restock Loop
+- **Triệu chứng:** Monkey clicked start selling repeatedly because chicken stock was empty and inventory buy button had too short timeout
+- **Vị trí:** `src/main.ts and scripts/overnight-browser-monkey.mjs` 
+- **Đánh giá Jev (638ms):**
+  - **Mức độ (Severity):** `p0_blocker` (Độ tin cậy: 63.0%)
+  - **Nguyên nhân gốc (Root Cause):** `state_lifecycle` (Độ tin cậy: 83.0%)
+  - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 58.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `200` ngày chơi
+---
+
+### 🐞 [08:05:48 30/9/2026] Softlock tai Modal Ket Qua Su Co Hang Ngay (btn-incident-continue)
+- **Triệu chứng:** Sau khi chon su co dau ngay, modal ket qua reaction xuat hien voi nut #btn-incident-continue nhung khong co handler rieng tai top-level monkey loop va emergencyRecover khong co selector nay, dan den modal che toan man hinh va monkey bi ket vong lap bam Mo Ban
+- **Vị trí:** `scripts/overnight-browser-monkey.mjs` 
+- **Đánh giá Jev (462ms):**
+  - **Mức độ (Severity):** `p0_blocker` (Độ tin cậy: 94.0%)
+  - **Nguyên nhân gốc (Root Cause):** `ui_modal_stack` (Độ tin cậy: 94.0%)
+  - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 65.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---

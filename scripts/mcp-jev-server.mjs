@@ -178,6 +178,36 @@ const TOOLS = [
       required: ["text", "type"],
     },
   },
+  {
+    name: "jev_triage_bug",
+    description: "Triage and evaluate game bugs, determine severity, root cause category, fix strategy, and recommended compensation test days using TypeSafe AI Jev System 1.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        bugTitle: {
+          type: "string",
+          description: "Title of the bug or failure mode.",
+        },
+        symptom: {
+          type: "string",
+          description: "Observed symptom or error details.",
+        },
+        context: {
+          type: "string",
+          description: "Contextual game state details (e.g. day, screen, player actions).",
+        },
+        sourceFile: {
+          type: "string",
+          description: "Suspected or verified source file path.",
+        },
+        screenshot: {
+          type: "string",
+          description: "Optional screenshot path.",
+        },
+      },
+      required: ["bugTitle", "symptom"],
+    },
+  },
 ];
 
 server.setRequestHandler(ListToolsRequestSchema, async () => {
@@ -357,6 +387,93 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               null,
               2
             ),
+          },
+        ],
+      };
+    }
+
+    if (name === "jev_triage_bug") {
+      const { bugTitle, symptom, context, sourceFile, screenshot } = args;
+      const started = performance.now();
+      const res = await client.systemOne({
+        state: {
+          game: "Tiệm Gà Nhà Tui",
+          project: "Web Mobile Simulation / Stardew Valley Indie Pixel Style",
+          bugTitle,
+          symptom,
+          context: context || "",
+          sourceFile: sourceFile || "unknown",
+        },
+        questions: {
+          severity: choice("Mức độ nghiêm trọng của lỗi này đối với trải nghiệm người chơi?", {
+            p0_blocker: "P0 - Crash ứng dụng hoặc Softlock đứng máy, không thể tiếp tục chơi",
+            p1_economy_break: "P1 - Lỗi kinh tế/logic sai số, rò rỉ dữ liệu hoặc gian lận nghiêm trọng",
+            p2_ui_friction: "P2 - Kẹt modal hoặc giao diện khó thao tác nhưng có thể tự phục hồi",
+            p3_minor: "P3 - Lỗi hiển thị nhỏ, font chữ hoặc nhầm nhãn review không ảnh hưởng cốt lõi",
+          }),
+          rootCauseCategory: choice("Nguyên nhân gốc rễ chủ yếu nằm ở tầng kiến trúc nào?", {
+            state_lifecycle: "Vòng lặp trạng thái game (Day lifecycle, Page Reload / HMR, Lưu save)",
+            ui_modal_stack: "Quản lý ngăn xếp Modal / Overlay chưa đóng triệt để hoặc thiếu event listener",
+            economy_math: "Bất biến toán học kinh tế (tồn kho âm, thiếu tiền mua gói nguyên liệu, tính tip)",
+            content_mislabel: "Nội dung review / kịch bản thoại bị gán nhầm tiêu chí hoặc thiếu nhánh kết thúc",
+          }),
+          fixStrategy: choice("Chiến lược vá lỗi tối ưu và an toàn nhất?", {
+            defensive_nullcheck_fallback: "Bổ sung fallback phòng thủ, tự phục hồi khi gặp trạng thái bất thường",
+            contract_first_type_fix: "Điều chỉnh Data Contract / Types chuẩn hóa và cập nhật logic nguồn",
+            modal_queue_guard: "Bổ sung handler tự đóng / tiếp tục cho modal vào vòng lặp thao tác",
+          }),
+          compensationDays: score("Cần chạy bù bao nhiêu ngày mô phỏng test để xác nhận triệt để lỗi không tái diễn?", [
+            "50 ngày chơi",
+            "100 ngày chơi",
+            "200 ngày chơi",
+            "500 ngày chơi",
+            "1000 ngày chơi",
+          ]),
+        },
+      });
+
+      const latency = Math.round(performance.now() - started);
+      const compIndex = Math.min(4, Math.max(0, Math.round(res.answers.compensationDays.score)));
+      const compDaysMap = [50, 100, 200, 500, 1000];
+
+      const report = {
+        timestamp: new Date().toISOString(),
+        bugTitle,
+        symptom,
+        sourceFile,
+        screenshot,
+        latencyMs: latency,
+        jevDecisions: {
+          severity: res.answers.severity.choice,
+          severityConfidence: res.answers.severity.confidence,
+          rootCauseCategory: res.answers.rootCauseCategory.choice,
+          rootCauseConfidence: res.answers.rootCauseCategory.confidence,
+          fixStrategy: res.answers.fixStrategy.choice,
+          fixStrategyConfidence: res.answers.fixStrategy.confidence,
+          compensationDays: compDaysMap[compIndex],
+        },
+      };
+
+      // Append to docs/bao-cao/jev-bug-triage-report.md
+      const reportPath = path.resolve(projectRoot, "docs/bao-cao/jev-bug-triage-report.md");
+      const dir = path.dirname(reportPath);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+
+      const mdEntry = `\n### 🐞 [${new Date().toLocaleTimeString("vi-VN")} ${new Date().toLocaleDateString("vi-VN")}] (via Jev MCP) ${bugTitle}\n- **Triệu chứng:** ${symptom}\n- **Vị trí:** \`${sourceFile || "N/A"}\` ${screenshot ? `(Ảnh: \`${screenshot}\`)` : ""}\n- **Đánh giá Jev (${latency}ms):**\n  - **Mức độ (Severity):** \`${report.jevDecisions.severity}\` (Độ tin cậy: ${(report.jevDecisions.severityConfidence * 100).toFixed(1)}%)\n  - **Nguyên nhân gốc (Root Cause):** \`${report.jevDecisions.rootCauseCategory}\` (Độ tin cậy: ${(report.jevDecisions.rootCauseConfidence * 100).toFixed(1)}%)\n  - **Chiến lược Fix:** \`${report.jevDecisions.fixStrategy}\` (Độ tin cậy: ${(report.jevDecisions.fixStrategyConfidence * 100).toFixed(1)}%)\n  - **Số ngày chạy bù khuyến nghị (Dò bù):** \`${report.jevDecisions.compensationDays}\` ngày chơi\n---\n`;
+
+      let existing = "";
+      if (fs.existsSync(reportPath)) {
+        existing = fs.readFileSync(reportPath, "utf-8");
+      } else {
+        existing = "# NHẬT KÝ ĐÁNH GIÁ VÀ XỬ LÝ BUG BẰNG TYPESAFE AI JEV\n\n";
+      }
+      fs.writeFileSync(reportPath, existing + mdEntry, "utf-8");
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(report, null, 2),
           },
         ],
       };
