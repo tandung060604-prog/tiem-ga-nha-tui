@@ -20,6 +20,13 @@ describe('Bác Ba Miền Tây Tutorial & Tips', () => {
     expect(triggers).toContain('perfect_streak');
     expect(triggers).toContain('low_patience');
     expect(triggers).toContain('out_of_chicken');
+
+    const oilTip = BAC_BA_GAME_TIPS.find(t => t.trigger === 'oil_dirty');
+    expect(oilTip?.text).toContain('Thay dầu');
+    expect(oilTip?.text).toContain('công an');
+
+    const stockTip = BAC_BA_GAME_TIPS.find(t => t.trigger === 'out_of_chicken');
+    expect(stockTip?.text).toContain('Tiếp tế +5');
   });
 });
 

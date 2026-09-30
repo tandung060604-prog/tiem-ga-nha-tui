@@ -37,7 +37,7 @@ import { DRINK_RECIPES, TIMER_RECIPES, timerPhase, TimerStationId, AssemblyId, D
 import { PREP_LAYOUT, prepLock } from './core/prepStation';
 import { showPrepPopover } from './ui/components/PrepStation';
 import { staffEffects, tickStaff, fryingItemId, traySizeFor, hasAutoWork, missingItems, FRY_RECIPES, FRY_LOOK } from './core/staff';
-import { TutorialState, tutorialStep, tutorialHint, shouldRunTutorial } from './core/tutorial';
+import { TutorialState, tutorialStep, tutorialHint, shouldRunTutorial, BAC_BA_GAME_TIPS } from './core/tutorial';
 import { syncTutorialLayer } from './ui/components/TutorialLayer';
 import { weeklyWrapped } from './core/wrapped';
 import { drawWrapped, shareWrapped, shareImage } from './ui/components/WrappedCard';
@@ -117,6 +117,7 @@ class AppController {
   private lastHeaderHtml = '';
   private sellingStructureKey = '';
   private expectedCustomers = 0;
+  private shownBacBaTipsThisSession = new Set<string>();
 
   constructor() {
     if (import.meta.env?.DEV) {
@@ -386,6 +387,45 @@ class AppController {
     setTimeout(() => {
       toast.classList.remove('show');
     }, 2400);
+  }
+
+  public showBacBaTip(trigger: 'oil_dirty' | 'perfect_streak' | 'low_patience' | 'out_of_chicken' | 'general') {
+    if (this.shownBacBaTipsThisSession.has(trigger) || this.isModalOpen()) return;
+    const tip = BAC_BA_GAME_TIPS.find(t => t.trigger === trigger);
+    if (!tip) return;
+    this.shownBacBaTipsThisSession.add(trigger);
+
+    let banner = document.getElementById('bacba-tip-banner');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'bacba-tip-banner';
+      banner.className = 'bacba-tip-banner';
+      document.body.appendChild(banner);
+    }
+
+    banner.innerHTML = `
+      <img src="${ASSETS.bacba.front}" alt="Bác Ba" class="bacba-tip-banner-avatar" />
+      <div class="bacba-tip-banner-text">
+        <div class="bacba-tip-banner-title">👴 Bác Ba Nam Bộ mách nước</div>
+        <div class="bacba-tip-banner-body">${escapeHtml(tip.text)}</div>
+      </div>
+      <button class="bacba-tip-banner-close" aria-label="Đóng">✕</button>
+    `;
+
+    audio.playPop();
+    banner.classList.add('show');
+
+    const closeBtn = banner.querySelector('.bacba-tip-banner-close');
+    const closeFn = (e?: Event) => {
+      e?.stopPropagation();
+      banner?.classList.remove('show');
+    };
+    if (closeBtn) (closeBtn as HTMLElement).onclick = closeFn;
+    banner.onclick = closeFn;
+
+    setTimeout(() => {
+      banner?.classList.remove('show');
+    }, 5500);
   }
 
   public triggerDrinkPourAnimation(drinkType: DrinkId) {
@@ -1094,6 +1134,7 @@ class AppController {
   private startSellingPhase() {
     this.stopSellingPhase(); // đảm bảo không bao giờ có 2 vòng requestAnimationFrame song song
     this.sellingStructureKey = '';
+    this.shownBacBaTipsThisSession.clear();
     this.sellingSession = createSellingSession();
     cookingEngine.setFryRampBonus(upgradeEffects(stateManager.getState().upgrades).fryRampPct);
     cookingEngine.clearTray();
@@ -1222,6 +1263,20 @@ class AppController {
         this.whenModalFree(() => {
           if (stateManager.getState().phase === 'selling' && this.sellingSession) this.openDailyIncidentDialog(shiftIncident);
         });
+      }
+    }
+
+    // Bác Ba Live Tips mách nước trong ca bán
+    if (!session.tutorial && !this.isModalOpen()) {
+      const curState = stateManager.getState();
+      if (curState.oilCondition === 'dirty') {
+        this.showBacBaTip('oil_dirty');
+      } else if (session.perfectStreak >= 3) {
+        this.showBacBaTip('perfect_streak');
+      } else if (session.orders.some(o => (o.patienceCurrent / Math.max(1, o.patienceMax)) < 0.25)) {
+        this.showBacBaTip('low_patience');
+      } else if (session.gameHour >= 13 && session.gameHour <= 15 && this.shownBacBaTipsThisSession.size === 0) {
+        this.showBacBaTip('general');
       }
     }
 
@@ -1522,6 +1577,9 @@ class AppController {
                 break;
               }
             }
+          }
+          if (action === 'fry-chicken') {
+            this.showBacBaTip('out_of_chicken');
           }
           this.showToast(`Hết nguyên liệu cho ${FRY_LOOK[itemId]?.name ?? 'món này'}! Vào Kho hàng để nhập thêm.`);
           return;
