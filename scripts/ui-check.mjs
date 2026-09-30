@@ -61,6 +61,13 @@ for (const width of WIDTHS) {
 
   console.log(`[ui-check] Đang kiểm tra viewport ${width}px...`);
   await page.goto(TARGET);
+  // Đóng video mở màn nếu đang hiển thị
+  const introPrompt = page.locator('#intro-tap-prompt');
+  if (await introPrompt.isVisible({ timeout: 2500 }).catch(() => false)) {
+    console.log(`[ui-check ${width}px] Đóng video mở màn...`);
+    await introPrompt.click({ force: true }).catch(() => {});
+    await page.waitForTimeout(600);
+  }
   console.log(`[ui-check ${width}px] Bấm #btn-title-play...`);
   await page.locator('#btn-title-play').click(); // màn tiêu đề (chạm đầu tiên bật âm thanh iOS)
   console.log(`[ui-check ${width}px] Bấm #btn-confirm-shop-name...`);

@@ -44,10 +44,16 @@ export function renderIntroCinematicModal(): string {
   return `
     <div id="intro-cinematic-overlay" class="intro-cinematic-overlay intro-cinematic-minimal" role="dialog" aria-modal="true" aria-label="Video mở màn 3D Pixel Tiệm Gà Nhà Tui" tabindex="0">
       <div class="intro-cinematic-card">
+        <!-- Nút bật/tắt âm thanh video nổi bật ở góc trên bên phải -->
+        <button id="btn-intro-sound" class="btn-intro-sound" type="button" aria-label="Bật hoặc tắt âm thanh video" title="Bật/Tắt âm thanh">
+          <span class="intro-sound-icon" id="intro-sound-icon">🔊</span>
+          <span class="intro-sound-text" id="intro-sound-text">Bật tiếng</span>
+        </button>
+
         <!-- Khung chiếu video lấp kín 100% màn hình điện thoại dọc (Edge-to-Edge Portrait Fullscreen Viewport) -->
         <div class="intro-screen-viewport" id="intro-3d-viewport">
           <div class="intro-cinematic-stage" id="intro-3d-stage">
-            <video id="intro-video-element" class="intro-cinematic-video" playsinline muted autoplay loop poster="${poster}" preload="auto">
+            <video id="intro-video-element" class="intro-cinematic-video" playsinline autoplay loop poster="${poster}" preload="auto">
               <source src="${videoSrc}" type="video/mp4" />
             </video>
             <img src="${poster}" alt="Góc phố Hẻm 1102 3D Pixel Diorama buổi sớm náo nhiệt" class="intro-cinematic-img animate-voxel-3d" id="intro-cinematic-img" />
@@ -101,24 +107,53 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
   const stage = document.getElementById('intro-3d-stage');
   const videoEl = document.getElementById('intro-video-element') as HTMLVideoElement | null;
   const imgEl = document.getElementById('intro-cinematic-img') as HTMLImageElement | null;
+  const soundBtn = document.getElementById('btn-intro-sound');
+  const soundIcon = document.getElementById('intro-sound-icon');
+  const soundText = document.getElementById('intro-sound-text');
+
+  const updateSoundUI = (muted: boolean) => {
+    if (soundBtn) {
+      if (muted) {
+        soundBtn.classList.add('is-muted');
+        soundBtn.classList.remove('is-unmuted');
+        if (soundIcon) soundIcon.textContent = '🔇';
+        if (soundText) soundText.textContent = 'Chạm bật tiếng';
+      } else {
+        soundBtn.classList.remove('is-muted');
+        soundBtn.classList.add('is-unmuted');
+        if (soundIcon) soundIcon.textContent = '🔊';
+        if (soundText) soundText.textContent = 'Đang phát tiếng';
+      }
+    }
+  };
 
   if (videoEl) {
-    videoEl.muted = true;
-    videoEl.defaultMuted = true;
-    videoEl.setAttribute('muted', '');
     videoEl.setAttribute('playsinline', '');
     videoEl.setAttribute('webkit-playsinline', '');
     videoEl.setAttribute('autoplay', '');
     videoEl.setAttribute('loop', '');
+    videoEl.volume = 1.0;
 
     const startPlayback = () => {
       videoEl.style.display = 'block';
       if (imgEl) imgEl.style.display = 'none';
+
+      // Thử phát có âm thanh trước (Unmuted playback)
+      videoEl.muted = false;
       const playPromise = videoEl.play();
       if (playPromise !== undefined) {
-        playPromise.catch((err) => {
-          console.warn('Autoplay waiting for gesture:', err);
-        });
+        playPromise
+          .then(() => {
+            // Trình duyệt cho phép phát tiếng ngay lập tức!
+            updateSoundUI(false);
+          })
+          .catch(() => {
+            // Trình duyệt chặn autoplay có tiếng (chờ tương tác người dùng)
+            // -> Fallback sang muted autoplay để video vẫn chạy hình ảnh mượt mà
+            videoEl.muted = true;
+            updateSoundUI(true);
+            videoEl.play().catch(() => {});
+          });
       }
     };
 
@@ -140,6 +175,26 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
       if (imgEl) imgEl.style.display = 'block';
     };
   }
+
+  // Tương tác bật/tắt tiếng qua nút âm thanh
+  const toggleSound = (e: Event) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (!videoEl) return;
+
+    if (videoEl.muted) {
+      videoEl.muted = false;
+      videoEl.volume = 1.0;
+      videoEl.play().catch(() => {});
+      updateSoundUI(false);
+    } else {
+      videoEl.muted = true;
+      updateSoundUI(true);
+    }
+  };
+
+  soundBtn?.addEventListener('click', toggleSound);
+  soundBtn?.addEventListener('pointerdown', (e) => e.stopPropagation());
 
   // Hiệu ứng tương tác 3D Parallax Tilt nhẹ khi rê chuột / chạm
   if (viewport && stage) {
@@ -183,7 +238,31 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
     }
   };
 
+  const handleScreenInteraction = (e: MouseEvent | PointerEvent) => {
+    const target = e.target as HTMLElement | null;
+    if (target?.closest('#btn-intro-sound')) {
+      return; // Không đóng màn hình khi bấm nút âm thanh
+    }
+
+    // Nếu người chơi chạm vào thanh đáy "CHẠM VÀO MÀN HÌNH ĐỂ VÀO GAME": luôn vào game ngay
+    if (target?.closest('#intro-tap-prompt, .intro-tap-prompt-container')) {
+      closeAndProceed();
+      return;
+    }
+
+    // Nếu video đang bị tắt tiếng (do trình duyệt ép muted), chạm màn hình sẽ bật tiếng ngay lập tức!
+    if (videoEl && videoEl.muted) {
+      videoEl.muted = false;
+      videoEl.volume = 1.0;
+      videoEl.play().catch(() => {});
+      updateSoundUI(false);
+      return;
+    }
+
+    // Khi video đã có tiếng hoặc chạm tiếp: vào game
+    closeAndProceed();
+  };
+
   window.addEventListener('keydown', handleKeyDown);
-  overlay.addEventListener('click', closeAndProceed);
-  overlay.addEventListener('pointerdown', closeAndProceed, { passive: true });
+  overlay.addEventListener('click', handleScreenInteraction);
 }

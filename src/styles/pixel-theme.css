@@ -1404,6 +1404,64 @@ body.selling-mode .toast {
   box-shadow: 0 0 6px #22c55e;
 }
 
+/* Floating Sound Button (Bật/Tắt âm thanh video mở màn) */
+.btn-intro-sound {
+  position: absolute;
+  top: calc(14px + env(safe-area-inset-top, 0px));
+  right: 14px;
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: rgba(18, 10, 5, 0.82);
+  border: 1.5px solid rgba(254, 240, 138, 0.85);
+  border-radius: 20px;
+  color: #fef08a;
+  font-family: 'Silkscreen', 'Tiny5', 'Baloo 2', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
+}
+
+.btn-intro-sound:active {
+  transform: scale(0.94);
+}
+
+.btn-intro-sound.is-muted {
+  border-color: #f59e0b;
+  background: rgba(45, 18, 8, 0.9);
+  animation: soundMutedPulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes soundMutedPulse {
+  0% {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 6px rgba(245, 158, 11, 0.4);
+    border-color: rgba(254, 240, 138, 0.6);
+  }
+  100% {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7), 0 0 14px rgba(251, 191, 36, 0.85);
+    border-color: #fde047;
+  }
+}
+
+.intro-sound-icon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.intro-sound-text {
+  text-shadow: 1px 1px 2px #000;
+}
+
 /* Floating Bottom Controls (Dòng chữ nhấp nháy chạm màn hình để vào game) */
 .intro-tap-prompt-container {
   position: absolute;
@@ -1435,6 +1493,10 @@ body.selling-mode .toast {
   text-shadow: 1px 1px 2px #000, 0 0 8px rgba(254, 240, 138, 0.6);
   animation: tapPromptPulse 1.4s ease-in-out infinite alternate;
   user-select: none;
+  pointer-events: auto;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
