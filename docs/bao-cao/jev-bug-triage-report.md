@@ -751,3 +751,23 @@
   - **Chiến lược Fix:** `defensive_nullcheck_fallback` (Độ tin cậy: 74.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
 ---
+
+### 🐞 [15:37:13 30/9/2026] (via Jev MCP) Defensive check cho inventory item batches khi dữ liệu bị sai lệch
+- **Triệu chứng:** TypeError: Cannot create property 'batches' on non-object in ensureBatches
+- **Vị trí:** `src/core/inventory.ts` 
+- **Đánh giá Jev (498ms):**
+  - **Mức độ (Severity):** `p0_blocker` (Độ tin cậy: 77.0%)
+  - **Nguyên nhân gốc (Root Cause):** `economy_math` (Độ tin cậy: 38.0%)
+  - **Chiến lược Fix:** `defensive_nullcheck_fallback` (Độ tin cậy: 89.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---
+
+### 🐞 [15:41:28 30/9/2026] (via Jev MCP) escapeHtml crash khi nhận undefined hoặc non-string trong render review
+- **Triệu chứng:** TypeError: Cannot read properties of undefined (reading 'replace') at escapeHtml
+- **Vị trí:** `src/ui/escapeHtml.ts` 
+- **Đánh giá Jev (535ms):**
+  - **Mức độ (Severity):** `p0_blocker` (Độ tin cậy: 99.0%)
+  - **Nguyên nhân gốc (Root Cause):** `content_mislabel` (Độ tin cậy: 78.0%)
+  - **Chiến lược Fix:** `defensive_nullcheck_fallback` (Độ tin cậy: 87.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---

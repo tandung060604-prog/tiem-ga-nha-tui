@@ -7,7 +7,10 @@ const ENTITIES: Record<string, string> = {
   "'": '&#39;'
 };
 
-export function escapeHtml(text: string): string {
+export function escapeHtml(text?: string | null): string {
+  if (typeof text !== 'string') {
+    return text === null || text === undefined ? '' : String(text);
+  }
   return text.replace(/[&<>"']/g, ch => ENTITIES[ch] ?? ch);
 }
 

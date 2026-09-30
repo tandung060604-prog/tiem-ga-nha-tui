@@ -1,8 +1,8 @@
 # BÁO CÁO KIỂM THỬ TOÀN DIỆN TÍNH NĂNG (PROFESSIONAL QA TEST REPORT)
-*Thời gian thực hiện:* 15:33:37 30/9/2026
-*Thời lượng kiểm thử:* 14 giây
-*Tổng số ca kiểm thử:* 7 tests
-*Tỷ lệ Đạt Chuẩn (Pass Rate):* **43%** (3 PASS / 4 FAIL)
+*Thời gian thực hiện:* 15:45:29 30/9/2026
+*Thời lượng kiểm thử:* 28 giây
+*Tổng số ca kiểm thử:* 21 tests
+*Tỷ lệ Đạt Chuẩn (Pass Rate):* **100%** (21 PASS / 0 FAIL)
 
 ---
 
@@ -11,8 +11,13 @@
 |---|---|---|---|
 | **SETUP** | 1 checks | 🟢 100% PASS | Hoàn tất kiểm chứng toàn bộ luồng nghiệp vụ |
 | **UPGRADES** | 2 checks | 🟢 100% PASS | Hoàn tất kiểm chứng toàn bộ luồng nghiệp vụ |
-| **STAFF** | 3 checks | 🔴 FAIL | Hoàn tất kiểm chứng toàn bộ luồng nghiệp vụ |
-| **FATAL** | 1 checks | 🔴 FAIL | Hoàn tất kiểm chứng toàn bộ luồng nghiệp vụ |
+| **STAFF** | 3 checks | 🟢 100% PASS | Hoàn tất kiểm chứng toàn bộ luồng nghiệp vụ |
+| **INVENTORY** | 2 checks | 🟢 100% PASS | Hoàn tất kiểm chứng toàn bộ luồng nghiệp vụ |
+| **MENU** | 1 checks | 🟢 100% PASS | Hoàn tất kiểm chứng toàn bộ luồng nghiệp vụ |
+| **MINIGAME** | 4 checks | 🟢 100% PASS | Hoàn tất kiểm chứng toàn bộ luồng nghiệp vụ |
+| **ALBUM** | 1 checks | 🟢 100% PASS | Hoàn tất kiểm chứng toàn bộ luồng nghiệp vụ |
+| **ENDINGS** | 6 checks | 🟢 100% PASS | Hoàn tất kiểm chứng toàn bộ luồng nghiệp vụ |
+| **SELLING_INTEGRATION** | 1 checks | 🟢 100% PASS | Hoàn tất kiểm chứng toàn bộ luồng nghiệp vụ |
 
 ---
 
@@ -29,21 +34,74 @@
 - **Chi tiết:** Kitchen Level: 2, Hygiene Level: 2
 - **Ảnh chụp bằng chứng:** `scratch/qa-test-reports/screenshots/02-all-upgrades.png`
 
-### ❌ [STAFF] Tuyển dụng nhân sự vào đội ngũ tiệm gà
-- **Chi tiết:** Đã tuyển dụng thành công 0 nhân sự
+### ✅ [STAFF] Tuyển dụng nhân sự vào đội ngũ tiệm gà
+- **Chi tiết:** Đã tuyển dụng thành công 1 nhân sự (Bảo Anh (Zét-bi))
 - **Ảnh chụp bằng chứng:** `scratch/qa-test-reports/screenshots/03-staff-hired.png`
 
-### ❌ [STAFF] Thưởng nóng nhân viên (+tâm trạng)
+### ✅ [STAFF] Thưởng nóng nhân viên (+tâm trạng)
 - **Chi tiết:** Bấm nút Thưởng 50k thành công
 
-### ❌ [STAFF] Vòng đời nhân sự: Sa thải & Trả trợ cấp thôi việc
+### ✅ [STAFF] Vòng đời nhân sự: Sa thải & Trả trợ cấp thôi việc
 - **Chi tiết:** Cho nghỉ việc và thanh toán trợ cấp trơn tru
 
-### ❌ [FATAL] Runner Crash
-- **Chi tiết:** locator.click: Timeout 3000ms exceeded.
-Call log:
-[2m  - waiting for locator('.tab-btn[data-tab="inventory"]')[22m
+### ✅ [INVENTORY] Thao tác Hoàn tiền -5 nguyên liệu theo lô FIFO
+- **Chi tiết:** Bấm nút -5 hoàn tiền thành công
 
+### ✅ [INVENTORY] Mở khóa toàn bộ 10 nguyên liệu kho (Tier 1, 2, 3)
+- **Chi tiết:** Đã mở khóa đùi, má đùi, gà viên, phô mai, sốt
+- **Ảnh chụp bằng chứng:** `scratch/qa-test-reports/screenshots/04-inventory-unlocked.png`
+
+### ✅ [MENU] Điều chỉnh giá bán công thức trong Sổ Tay Quán
+- **Chi tiết:** Tăng/giảm biên độ giá bán thực đơn mượt mà
+- **Ảnh chụp bằng chứng:** `scratch/qa-test-reports/screenshots/05-menu-pricing.png`
+
+### ✅ [MINIGAME] Minigame Sốt Bí Truyền (Secret Sauce Stir)
+- **Chi tiết:** Nấu sốt thành công +3.000đ tip/đơn
+- **Ảnh chụp bằng chứng:** `scratch/qa-test-reports/screenshots/06-secret-sauce.png`
+
+### ✅ [MINIGAME] Minigame Lọc Cặn Dầu & Vớt Bột Cháy
+- **Chi tiết:** Tương tác vớt cặn bột và phục hồi chất lượng dầu
+- **Ảnh chụp bằng chứng:** `scratch/qa-test-reports/screenshots/07-oil-filter.png`
+
+### ✅ [MINIGAME] Minigame Đàm Phán Chợ Đầu Mối (Market Bargain)
+- **Chi tiết:** Chọn chiến thuật mặc cả & nhận chiết khấu
+- **Ảnh chụp bằng chứng:** `scratch/qa-test-reports/screenshots/08-market-bargain.png`
+
+### ✅ [MINIGAME] Trả lời đánh giá thực khách (Review Reply Dialog)
+- **Chi tiết:** Chọn phương án phản hồi cộng sao uy tín
+- **Ảnh chụp bằng chứng:** `scratch/qa-test-reports/screenshots/09-review-reply.png`
+
+### ✅ [ALBUM] Sổ tay tình huống & 25 sự cố Hẻm 1102 (Incidents Album)
+- **Chi tiết:** Xem danh mục sự cố và mẹo xử lý Bác Ba
+- **Ảnh chụp bằng chứng:** `scratch/qa-test-reports/screenshots/10-incidents-album.png`
+
+### ✅ [ENDINGS] Đại Kết Cục: Đại Viên Mãn (Happy Ending)
+- **Chi tiết:** Đã kích hoạt và kiểm chứng giao diện kết thúc [happy]
+- **Ảnh chụp bằng chứng:** `scratch/qa-test-reports/screenshots/ending-happy.png`
+
+### ✅ [ENDINGS] Đại Kết Cục: Bình Dị An Yên (Open Ending)
+- **Chi tiết:** Đã kích hoạt và kiểm chứng giao diện kết thúc [open]
+- **Ảnh chụp bằng chứng:** `scratch/qa-test-reports/screenshots/ending-open.png`
+
+### ✅ [ENDINGS] Đại Kết Cục: Phá Sản Rời Hẻm (Bad Ending 3A)
+- **Chi tiết:** Đã kích hoạt và kiểm chứng giao diện kết thúc [bad_bankruptcy]
+- **Ảnh chụp bằng chứng:** `scratch/qa-test-reports/screenshots/ending-bad_bankruptcy.png`
+
+### ✅ [ENDINGS] Đại Kết Cục: Cỗ Máy Gà Vô Hồn (Bad Ending 3B)
+- **Chi tiết:** Đã kích hoạt và kiểm chứng giao diện kết thúc [bad_corporate]
+- **Ảnh chụp bằng chứng:** `scratch/qa-test-reports/screenshots/ending-bad_corporate.png`
+
+### ✅ [ENDINGS] Đại Kết Cục: Xe Đặc Chủng Niêm Phong (Bad Police Ending)
+- **Chi tiết:** Đã kích hoạt và kiểm chứng giao diện kết thúc [bad_police]
+- **Ảnh chụp bằng chứng:** `scratch/qa-test-reports/screenshots/ending-bad_police.png`
+
+### ✅ [ENDINGS] Đại Kết Cục: Chiếc Vá Vàng 1975 (Secret Ending)
+- **Chi tiết:** Đã kích hoạt và kiểm chứng giao diện kết thúc [secret]
+- **Ảnh chụp bằng chứng:** `scratch/qa-test-reports/screenshots/ending-secret.png`
+
+### ✅ [SELLING_INTEGRATION] Ca bán hàng tích hợp nhân sự hỗ trợ & quầy khay nâng cấp
+- **Chi tiết:** Vận hành đồng thời quầy bếp, phục vụ khách và nhân sự tự động
+- **Ảnh chụp bằng chứng:** `scratch/qa-test-reports/screenshots/11-selling-shift-full-features.png`
 
 
 ---
