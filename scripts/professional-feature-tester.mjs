@@ -262,6 +262,13 @@ class ProfessionalQATester {
       gachaTriggered = true;
     }
 
+    // Lật mở tất cả hồ sơ nếu có nút reveal all
+    const gachaRevealAll = this.page.locator('#btn-gacha-reveal-all');
+    if (await gachaRevealAll.first().isVisible({ timeout: 1500 }).catch(() => false)) {
+      await gachaRevealAll.first().click({ force: true });
+      await sleep(500);
+    }
+
     // Chọn 1 ứng viên trong GachaResultModal để ký hợp đồng
     const gachaPickBtn = this.page.locator('.btn-gacha-pick');
     let hiredViaGacha = false;

@@ -211,6 +211,13 @@ class OvernightMonkey {
     }
 
     // 0d. Modal Kết Quả Gacha Nhân Sự (Gacha Result Modal)
+    const gachaRevealAll = page.locator('#btn-gacha-reveal-all');
+    if (await gachaRevealAll.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`📯 Nhận diện Gacha Modal -> Bấm lật mở tất cả hồ sơ...`);
+      await gachaRevealAll.first().click({ force: true });
+      await sleep(400);
+      return true;
+    }
     const gachaPickBtn = page.locator('.btn-gacha-pick');
     if (await gachaPickBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
       log(`📯 Nhận diện Gacha Modal -> Ký hợp đồng tuyển nhân sự...`);
@@ -654,7 +661,7 @@ class OvernightMonkey {
       const prepLoading = document.getElementById('prep-loading-overlay');
       if (prepLoading instanceof HTMLElement) { prepLoading.remove(); return; }
 
-      const gachaPick = document.querySelector('.btn-gacha-pick, #btn-gacha-dismiss');
+      const gachaPick = document.querySelector('.btn-gacha-pick, #btn-gacha-dismiss, #btn-gacha-reveal-all');
       if (gachaPick instanceof HTMLElement) { gachaPick.click(); return; }
 
       const prepTut = document.querySelector('#btn-tutorial-skip, #btn-bacba-understood');
