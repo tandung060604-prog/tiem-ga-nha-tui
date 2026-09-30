@@ -122,6 +122,7 @@ class AppController {
   private expectedCustomers = 0;
   private shownBacBaTipsThisSession = new Set<string>();
   private prepTutorialStep: PrepTutorialStep | null = null;
+  private isNewShopFlow = false;
 
   constructor() {
     if (import.meta.env?.DEV) {
@@ -200,9 +201,14 @@ class AppController {
       }
       music.start('prep');
       audio.playPerfect();
-      // Tiệm mới: chủ tiệm tự đặt tên quán trước, rồi mới tới lời chào
-      if (fresh || !hasProgress) setTimeout(() => this.openShopNameDialog(() => this.openWelcomeDialog()), 250);
-      else this.render();
+      // Tiệm mới: chủ tiệm tự đặt tên quán trước, rồi mới tới lời chào mừng, rồi mới tới hướng dẫn
+      if (fresh || !hasProgress) {
+        this.isNewShopFlow = true;
+        this.render();
+        setTimeout(() => this.openShopNameDialog(() => this.openWelcomeDialog()), 150);
+      } else {
+        this.render();
+      }
     };
 
     document.getElementById('btn-title-play')!.onclick = () => start(false);
@@ -287,16 +293,30 @@ class AppController {
   private openShopNameDialog(onDone: () => void) {
     const current = stateManager.getState().shopName;
     this.openModal(`
-      <div class="shop-name-dialog" style="text-align: center; padding: 6px 4px;">
-        <div style="font-size: 2.6rem;">🏷️</div>
-        <h2 style="margin: 4px 0 6px; font-size: 1.35rem; color: var(--ink); font-weight: 800;">Đặt tên cho quán của bạn</h2>
-        <p style="margin: 0 0 12px; color: var(--soft); font-size: 0.85rem;">Tên này sẽ in trên biển hiệu, header và thẻ review chia sẻ.</p>
-        <input id="input-new-shop-name" type="text" maxlength="${SHOP_NAME_MAX}" value="${escapeHtml(current)}" autocomplete="off"
-          style="width: 100%; box-sizing: border-box; border: 2px solid var(--line); background: var(--bg); border-radius: 12px; padding: 12px; font-weight: 800; font-size: 16px; color: var(--ink); text-align: center;" />
-        <div class="shop-name-suggestions" style="display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 10px 0 14px;">
-          ${SHOP_NAME_SUGGESTIONS.map(n => `<button class="btn-sm shop-name-chip" data-name="${escapeHtml(n)}" style="min-height: 36px;">${escapeHtml(n)}</button>`).join('')}
+      <div class="onboarding-card shop-name-dialog">
+        <div class="onboarding-kicker">
+          <span>🏷️</span> BƯỚC 1: KHỞI NGHIỆP HẺM 1102
         </div>
-        <button id="btn-confirm-shop-name" class="btn-big-open" style="width: 100%; min-height: 52px;">🍗 Treo biển &amp; mở tiệm</button>
+        <h2 class="onboarding-title">Đặt Tên Cho Tiệm Gà Của Bạn</h2>
+        <p class="onboarding-desc">Tên quán sẽ in trên biển hiệu gỗ, hóa đơn, ca bán và review của thực khách Sài Gòn.</p>
+        
+        <div class="onboarding-input-wrap">
+          <input id="input-new-shop-name" class="onboarding-input" type="text" maxlength="${SHOP_NAME_MAX}" value="${escapeHtml(current)}" placeholder="Nhập tên quán của bạn..." autocomplete="off" />
+        </div>
+
+        <div class="onboarding-chips-box">
+          <div class="onboarding-chips-label">💡 Gợi ý tên hay cho tiệm:</div>
+          <div class="onboarding-chips-list">
+            ${SHOP_NAME_SUGGESTIONS.map(n => `<button class="onboarding-chip-btn shop-name-chip" type="button" data-name="${escapeHtml(n)}">${escapeHtml(n)}</button>`).join('')}
+          </div>
+        </div>
+
+        <button id="btn-confirm-shop-name" class="btn-title-hero onboarding-submit-btn" type="button" style="width: 100%; min-height: 50px;">
+          <span class="hero-btn-content">
+            <span class="hero-btn-icon">🍗</span>
+            <span class="hero-btn-text">TREO BIỂN &amp; TIẾP TỤC ➡️</span>
+          </span>
+        </button>
       </div>
     `);
     const input = document.getElementById('input-new-shop-name') as HTMLInputElement | null;
@@ -308,8 +328,9 @@ class AppController {
       stateManager.update(draft => { draft.shopName = name; });
       stateManager.flush();
       audio.playCash();
-      this.closeModal();
       this.showToast(`Biển hiệu "${name}" đã được treo! 🎉`);
+      // QUAN TRỌNG: Không gọi closeModal() giữa chừng để tránh rò rỉ kích hoạt nhầm tutorial.
+      // Chuyển thẳng sang WelcomeDialog (onDone())!
       onDone();
     };
     const btn = document.getElementById('btn-confirm-shop-name');
@@ -318,16 +339,49 @@ class AppController {
   }
 
   private openWelcomeDialog() {
+    const shopName = stateManager.getState().shopName;
     const welcomeHtml = `
-      <div style="text-align: center; padding: 6px 4px;">
-        <img src="${ASSETS.gabong.front}" alt="Gà Bông" width="120" height="120" style="display: block; margin: 0 auto 6px;" />
-        <h2 style="margin: 0 0 6px; font-size: 1.5rem; color: var(--ink); font-weight: 800;">Chào mừng tới ${escapeHtml(stateManager.getState().shopName)}!</h2>
-        <p style="color: var(--soft); font-size: 0.85rem; line-height: 1.45; margin: 0 0 14px;">
-          Hành trình của bạn bắt đầu từ chiếc xe đẩy gà rán đầu hẻm đơn sơ với số vốn <b>850.000đ</b>.<br/>
-          Hãy kiểm tra kho, canh chiên gà vàng giòn <b>Perfect</b> và gom đủ <b>5.000.000đ</b> để thuê mặt bằng tiệm trong hẻm nhé!
-        </p>
-        <button id="btn-welcome-start" class="btn-big-open" style="width: 100%; padding: 12px; font-size: 1.1rem; box-shadow: 0 4px 0 var(--red-dark);">
-          🍗 BẮT ĐẦU NGÀY 1 NGAY!
+      <div class="onboarding-card welcome-dialog">
+        <div class="onboarding-kicker">
+          <span>🎉</span> BƯỚC 2: KHAI TRƯƠNG HỒNG PHÁT
+        </div>
+
+        <div class="welcome-mascot-wrap">
+          <img src="${ASSETS.gabong.front}" alt="Gà Bông" class="welcome-mascot-img pixel-art" />
+        </div>
+
+        <div class="welcome-shop-banner">
+          <h2 class="welcome-shop-title">Chào mừng tới ${escapeHtml(shopName)}!</h2>
+        </div>
+
+        <div class="welcome-stat-grid">
+          <div class="welcome-stat-card">
+            <span class="welcome-stat-icon">💰</span>
+            <span class="welcome-stat-label">VỐN BAN ĐẦU</span>
+            <span class="welcome-stat-val val-green">850.000đ</span>
+          </div>
+          <div class="welcome-stat-card">
+            <span class="welcome-stat-icon">🛵</span>
+            <span class="welcome-stat-label">KHỞI ĐIỂM</span>
+            <span class="welcome-stat-val">Xe Đẩy Hẻm</span>
+          </div>
+          <div class="welcome-stat-card">
+            <span class="welcome-stat-icon">🏆</span>
+            <span class="welcome-stat-label">MỤC TIÊU LỚN</span>
+            <span class="welcome-stat-val val-gold">5.000.000đ</span>
+          </div>
+        </div>
+
+        <div class="welcome-guide-box">
+          <span class="welcome-guide-avatar">👴</span>
+          <p class="welcome-guide-text">Bác Ba đang đứng đợi con ở quầy để chỉ dẫn cách chiên gà vàng giòn <b>Perfect</b> và chuẩn bị kho hàng Ngày 1 nè!</p>
+        </div>
+
+        <button id="btn-welcome-start" class="btn-title-hero onboarding-submit-btn" type="button" style="width: 100%; min-height: 52px;">
+          <span class="hero-btn-content">
+            <span class="hero-btn-icon">🍗</span>
+            <span class="hero-btn-text">BẮT ĐẦU NGÀY 1 &amp; GẶP BÁC BA ➡️</span>
+          </span>
         </button>
       </div>
     `;
@@ -336,8 +390,10 @@ class AppController {
     if (startBtn) {
       startBtn.onclick = () => {
         audio.playPerfect();
-        this.closeModal();
-        this.render();
+        this.isNewShopFlow = false; // Kết thúc chu trình khởi nghiệp tiệm mới
+        this.closeModal();          // Đóng modal chào mừng
+        this.render();              // Cập nhật lại UI màn chuẩn bị
+        this.updatePrepTutorial(stateManager.getState()); // CHÍNH THỨC BẮT ĐẦU ĐOẠN HƯỚNG DẪN BÁC BA!
       };
     }
   }
@@ -1074,7 +1130,7 @@ class AppController {
 
   // --- PREP TUTORIAL (BÁC BA HƯỚNG DẪN MÀN CHUẨN BỊ) ---
   private updatePrepTutorial(state: GameState) {
-    if (!this.titleDismissed || this.isModalOpen()) return;
+    if (!this.titleDismissed || this.isModalOpen() || this.isNewShopFlow) return;
 
     if (!shouldRunPrepTutorial(state)) {
       if (this.prepTutorialStep) {
