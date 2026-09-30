@@ -771,3 +771,13 @@
   - **Chiến lược Fix:** `defensive_nullcheck_fallback` (Độ tin cậy: 87.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
 ---
+
+### 🐞 [17:02:39 30/9/2026] (via Jev MCP) Vite HMR Transient 500 Network Error during live code editing
+- **Triệu chứng:** Vite dev server responded with status 500 briefly during active file write before HMR recompilation finished.
+- **Vị trí:** `scripts/overnight-browser-monkey.mjs` 
+- **Đánh giá Jev (583ms):**
+  - **Mức độ (Severity):** `p3_minor` (Độ tin cậy: 94.0%)
+  - **Nguyên nhân gốc (Root Cause):** `state_lifecycle` (Độ tin cậy: 100.0%)
+  - **Chiến lược Fix:** `defensive_nullcheck_fallback` (Độ tin cậy: 84.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---

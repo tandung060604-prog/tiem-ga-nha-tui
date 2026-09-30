@@ -118,6 +118,10 @@ export function createInitialState(): GameState {
     totalReviewsCount: 0,
     secretSauceDay: null,
     todayOilFiltered: false,
+    staffGachaPity: 0,
+    staffGachaSsrPity: 0,
+    staffGachaTotalRolls: 0,
+    gachaPullsHistory: [],
     lifetimeStats: {
       totalFried: 0,
       totalBurnt: 0,

@@ -2780,5 +2780,6 @@ class AppController {
 
 // Khởi chạy game khi DOM sẵn sàng
 window.addEventListener('DOMContentLoaded', () => {
-  new AppController();
+  const app = new AppController();
+  (window as unknown as { __app: AppController }).__app = app;
 });

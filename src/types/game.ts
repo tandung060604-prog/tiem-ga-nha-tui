@@ -110,6 +110,8 @@ export interface UpgradeBranch {
 
 export type StaffRole = 'cashier' | 'cook' | 'waiter' | 'delivery' | 'manager' | 'security';
 
+export type StaffRarity = 'C' | 'R' | 'SR' | 'SSR';
+
 export interface StaffMember {
   id: string;
   name: string;
@@ -123,6 +125,15 @@ export interface StaffMember {
   hourlyWage: number;
   mood: number;     // 0-100
   shiftsWorked: number;
+  // Gacha System Attributes
+  rarity?: StaffRarity;     // C (Common), R (Rare), SR (Super Rare), SSR (Legendary)
+  stars?: number;           // 1★, 2★, 3★, 5★
+  title?: string;           // Danh xưng chuyên môn
+  laziness?: number;        // 0-100% (độ lười biếng / gián đoạn)
+  errorRate?: number;       // 0-100% (tỷ lệ sai sót / làm cháy / nhầm đơn)
+  passiveName?: string;     // Tên kỹ năng nội tại
+  passiveDesc?: string;     // Mô tả hiệu ứng nội tại
+  modelAsset?: string;      // Đường dẫn ảnh model nhân vật
 }
 
 export interface StarRating {
@@ -493,6 +504,11 @@ export interface GameState {
   todayMarketDiscount?: number;      // % giảm giá sỉ khi đi chợ trả giá hôm nay (0 -> 35%)
   todayMarketBargained?: boolean;    // Đã đi chợ đầu ngày hôm nay chưa
   deliveryRunnerDayCount?: number;   // Số đơn giao xa đã xử lý hôm nay (tối đa 2 đơn/ngày)
+  // Staff Gacha Recruitment
+  staffGachaPity?: number;           // Số roll liên tiếp chưa ra SR/SSR (Soft pity 10)
+  staffGachaSsrPity?: number;        // Số roll liên tiếp chưa ra SSR (Hard pity 50)
+  staffGachaTotalRolls?: number;     // Tổng số lượt gacha đã roll
+  gachaPullsHistory?: string[];      // Lịch sử ID các nhân viên đã roll gần nhất
 }
 
 export interface BargainWholesaler {
