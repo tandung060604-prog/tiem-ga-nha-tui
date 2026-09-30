@@ -2,7 +2,6 @@ import { GameState } from '../../types/game';
 import { ASSETS } from '../../content/assets';
 import { escapeHtml } from '../escapeHtml';
 import { audio } from '../../core/audio';
-import { CURRENT_GAME_VERSION } from '../../content/changelog';
 
 const OWNER_QUOTES = [
   'Tiệm Gà Nhà Tui xin chào bạn! Gà vàng giòn rụm đang chờ nè! 🍗✨',
@@ -75,34 +74,30 @@ export function renderTitleScreen(state: GameState, hasProgress: boolean, musicO
             </span>
           </button>
 
-          <!-- Secondary Control Buttons -->
-          <div class="title-controls-row">
-            <button id="btn-title-intro-video" class="btn-control-pill" aria-label="Xem video mở màn AI">
-              <span class="control-icon">🎬</span>
-              <span class="control-text">Video Mở Màn</span>
+          ${hasProgress ? `
+            <!-- Nút Chơi Lại Game toàn chiều ngang, chữ to rõ không bao giờ bị cắt -->
+            <button id="btn-title-new" class="btn-title-replay" aria-label="Chơi lại game từ đầu">
+              <span class="replay-btn-icon">🔄</span>
+              <span class="replay-btn-text">CHƠI LẠI GAME TỪ ĐẦU</span>
+            </button>
+          ` : ''}
+
+          <!-- Hàng 3 nút tiện ích tinh gọn -->
+          <div class="title-utilities-row">
+            <button id="btn-title-bacba-manual" class="btn-utility-pill" aria-label="Cẩm nang Bác Ba">
+              <span class="u-icon">📖</span>
+              <span class="u-text">Cẩm Nang</span>
             </button>
 
-            <button id="btn-title-bacba-manual" class="btn-control-pill" aria-label="Cẩm nang Bác Ba">
-              <span class="control-icon">📖</span>
-              <span class="control-text">Cẩm Nang Bác Ba</span>
+            <button id="btn-title-music" class="btn-utility-pill" aria-label="Bật tắt nhạc nền">
+              <span class="u-icon">${musicOn ? '🎵' : '🔇'}</span>
+              <span class="u-text">${musicOn ? 'Nhạc Bật' : 'Nhạc Tắt'}</span>
             </button>
 
-            <button id="btn-title-changelog" class="btn-control-pill" aria-label="Xem bản cập nhật">
-              <span class="control-icon">📜</span>
-              <span class="control-text">Bản Cập Nhật ${CURRENT_GAME_VERSION}</span>
+            <button id="btn-title-changelog" class="btn-utility-pill" aria-label="Xem bản cập nhật">
+              <span class="u-icon">📜</span>
+              <span class="u-text">Cập Nhật</span>
             </button>
-
-            <button id="btn-title-music" class="btn-control-pill" aria-label="Bật tắt nhạc nền">
-              <span class="control-icon">${musicOn ? '🎵' : '🔇'}</span>
-              <span class="control-text">${musicOn ? 'Nhạc nền: Bật' : 'Nhạc nền: Tắt'}</span>
-            </button>
-
-            ${hasProgress ? `
-              <button id="btn-title-new" class="btn-control-pill" aria-label="Chơi lại từ đầu">
-                <span class="control-icon">🔄</span>
-                <span class="control-text">Chơi lại từ đầu</span>
-              </button>
-            ` : ''}
           </div>
         </div>
       </footer>

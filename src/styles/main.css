@@ -2321,24 +2321,27 @@ body.selling-mode .toast.show {
   align-items: center;
   width: 100%;
   max-width: 420px;
-  padding: 0 16px calc(18px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  padding: 0 12px calc(14px + env(safe-area-inset-bottom));
 }
 
 .title-action-deck {
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   background: linear-gradient(180deg, rgba(35, 17, 9, 0.88) 0%, rgba(20, 9, 4, 0.95) 100%);
   border: 2px solid rgba(244, 162, 97, 0.55);
-  border-radius: 24px;
+  border-radius: 20px;
   box-shadow: 
     0 12px 36px rgba(0, 0, 0, 0.7),
     0 0 24px rgba(217, 37, 52, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  padding: 14px 16px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
 }
 
@@ -2430,38 +2433,93 @@ body.selling-mode .toast.show {
   font-size: 1.25rem;
 }
 
-/* Secondary Control Buttons */
-.title-controls-row {
-  display: flex;
-  gap: 8px;
+/* Nút Chơi Lại Game toàn chiều ngang (không bao giờ bị che khuất hoặc cắt chữ) */
+.btn-title-replay {
   width: 100%;
+  min-height: 42px;
+  background: rgba(136, 19, 28, 0.45);
+  border: 1.5px solid rgba(248, 113, 113, 0.7);
+  border-radius: 12px;
+  color: #fee2e2;
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.btn-control-pill {
+.btn-title-replay:active {
+  background: rgba(185, 28, 28, 0.75);
+  transform: translateY(2px);
+}
+
+.replay-btn-icon {
+  font-size: 1rem;
+}
+
+.replay-btn-text {
+  font-size: inherit;
+  white-space: nowrap;
+}
+
+/* Hàng 3 nút tiện ích tinh gọn cân đối */
+.title-utilities-row {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.btn-utility-pill {
   flex: 1;
-  min-height: 44px;
+  min-width: 0;
+  box-sizing: border-box;
+  min-height: 38px;
   background: rgba(255, 255, 255, 0.11);
-  border: 1.5px solid rgba(255, 255, 255, 0.22);
-  border-radius: 12px;
+  border: 1.2px solid rgba(255, 255, 255, 0.22);
+  border-radius: 10px;
   color: #ffeedd;
   font-family: var(--font-display);
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
+  padding: 4px 6px;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   cursor: pointer;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
   transition: background 0.15s ease, transform 0.1s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.btn-control-pill:active {
+.btn-utility-pill:active {
   background: rgba(255, 255, 255, 0.22);
-  transform: translateY(2px);
+  transform: translateY(1px);
+}
+
+.u-icon {
+  font-size: 0.88rem;
+  flex-shrink: 0;
+}
+
+.u-text {
+  font-size: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .control-icon {

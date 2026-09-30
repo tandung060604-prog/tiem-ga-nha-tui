@@ -244,16 +244,6 @@ class AppController {
       };
     }
 
-    const introVideoBtn = document.getElementById('btn-title-intro-video');
-    if (introVideoBtn) {
-      introVideoBtn.onclick = (e) => {
-        e.stopPropagation();
-        openIntroCinematicModal({
-          forceShow: true,
-          onComplete: () => {}
-        });
-      };
-    }
 
     const bacbaManualBtn = document.getElementById('btn-title-bacba-manual');
     if (bacbaManualBtn) {

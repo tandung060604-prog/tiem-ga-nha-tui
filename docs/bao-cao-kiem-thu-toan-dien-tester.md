@@ -1,6 +1,6 @@
 # BÁO CÁO KIỂM THỬ TOÀN DIỆN TÍNH NĂNG (PROFESSIONAL QA TEST REPORT)
-*Thời gian thực hiện:* 19:53:21 30/9/2026
-*Thời lượng kiểm thử:* 63 giây
+*Thời gian thực hiện:* 19:57:42 30/9/2026
+*Thời lượng kiểm thử:* 60 giây
 *Tổng số ca kiểm thử:* 21 tests
 *Tỷ lệ Đạt Chuẩn (Pass Rate):* **100%** (21 PASS / 0 FAIL)
 
@@ -35,7 +35,7 @@
 - **Ảnh chụp bằng chứng:** `scratch/qa-test-reports/screenshots/02-all-upgrades.png`
 
 ### ✅ [STAFF] Chiêu mộ nhân tài Gacha & Ký hợp đồng vào đội ngũ
-- **Chi tiết:** Đã tuyển dụng thành công 1 nhân sự (Bác Sáu Lò [R])
+- **Chi tiết:** Đã tuyển dụng thành công 1 nhân sự (Hoàng Nam [C])
 - **Ảnh chụp bằng chứng:** `scratch/qa-test-reports/screenshots/03-staff-hired.png`
 
 ### ✅ [STAFF] Thưởng nóng nhân viên (+tâm trạng)
