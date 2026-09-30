@@ -1732,7 +1732,7 @@ class AppController {
           return;
         }
         if (!this.useIngredients([...recipe.stock])) {
-          // Cứu hộ khẩn cấp khi hết gà giữa ca bán (Tham khảo aenhatrang.com report #48 & #21: Chờ Cô Chôm / Cứu hộ hết hàng)
+          // Cứu hộ khẩn cấp khi hết gà/bột giữa ca bán (Tham khảo aenhatrang.com report #48 & #21: Chờ Cô Chôm / Cứu hộ hết hàng)
           if (action === 'fry-chicken') {
             const curState = stateManager.getState();
             if (curState.money >= 50000 || curState.money < 10000) {
@@ -1740,12 +1740,14 @@ class AppController {
               stateManager.update(draft => {
                 draft.money -= deductCost;
                 const chicken = draft.inventory.chicken_meat;
-                if (chicken) addStock(chicken, 5, 10000, 0);
+                if (chicken && chicken.amount < 5) addStock(chicken, 5, 10000, 0);
+                const flour = draft.inventory.flour;
+                if (flour && flour.amount < 5) addStock(flour, 5, 5000, 0);
               });
               audio.playCash();
               this.showToast(deductCost > 0 
-                ? '🛵 Bác Ba tiếp tế khẩn cấp: +5 Gà Tươi (-50.000đ)! 🍗' 
-                : '❤️ Bác Ba tương trợ khẩn cấp: Cho mượn tạm 5 miếng gà tươi! 🍗');
+                ? '🛵 Bác Ba tiếp tế khẩn cấp: Gà tươi & Bột chiên (-50.000đ)! 🍗' 
+                : '❤️ Bác Ba tương trợ khẩn cấp: Cho mượn tạm gà tươi & bột chiên! 🍗');
               if (this.useIngredients([...recipe.stock])) {
                 session.totalFriedCount += 1;
                 cookingEngine.startFrying(recipe.type);

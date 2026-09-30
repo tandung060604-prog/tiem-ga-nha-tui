@@ -781,3 +781,13 @@
   - **Chiến lược Fix:** `defensive_nullcheck_fallback` (Độ tin cậy: 84.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
 ---
+
+### 🐞 [02:52:54 1/10/2026] (via Jev MCP) UI Deadlock tại Ngày 28 khi hết bột/nước và Vite HMR reload
+- **Triệu chứng:** Hệ thống đứng yên > 25s tại ngày 28 do không thể chiên gà (thiếu bột) hoặc rót nước (thiếu nước ngọt), trong khi nút Hết món xin lỗi phụ thuộc random 15%.
+- **Vị trí:** `scripts/overnight-browser-monkey.mjs` (Ảnh: `logs/screenshots/deadlock-day-28-1790790429151.png`)
+- **Đánh giá Jev (526ms):**
+  - **Mức độ (Severity):** `p0_blocker` (Độ tin cậy: 38.0%)
+  - **Nguyên nhân gốc (Root Cause):** `state_lifecycle` (Độ tin cậy: 98.0%)
+  - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 25.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---

@@ -562,10 +562,10 @@ class OvernightMonkey {
         }
       }
 
-      // 8. Nếu khách chờ quá lâu hoặc thiếu món, hủy đơn để khách mới vào
-      if (Math.random() < 0.15) {
-        const cancelBtn = page.locator('.btn-cancel-order');
-        if (await cancelBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
+      // 8. Nếu khách chờ quá lâu hoặc thiếu món, hủy đơn để khách mới vào (tránh kẹt ca bán khi cạn nguyên liệu)
+      const cancelBtn = page.locator('.btn-cancel-order');
+      if (await cancelBtn.first().isVisible({ timeout: 40 }).catch(() => false)) {
+        if (Math.random() < 0.35) {
           await cancelBtn.first().click({ force: true }).catch(() => {});
           return true;
         }
@@ -650,47 +650,54 @@ class OvernightMonkey {
   }
 
   async emergencyRecover(page) {
-    // Đóng tất cả các modal đang bị kẹt hoặc tự bấm tiếp tục
+    // Đóng tất cả các modal đang bị kẹt hoặc tự bấm tiếp tục (không return sớm để dọn sạch toàn bộ stack)
     await page.evaluate(() => {
       const introOverlay = document.getElementById('intro-cinematic-overlay');
-      if (introOverlay instanceof HTMLElement) { introOverlay.click(); return; }
+      if (introOverlay instanceof HTMLElement) {
+        introOverlay.click();
+        const tapPrompt = introOverlay.querySelector('#intro-tap-prompt, .intro-tap-prompt');
+        if (tapPrompt instanceof HTMLElement) tapPrompt.click();
+      }
 
       const introBtn = document.querySelector('#btn-intro-start-game, #btn-intro-skip-top, .intro-tap-prompt');
-      if (introBtn instanceof HTMLElement) { introBtn.click(); return; }
+      if (introBtn instanceof HTMLElement) introBtn.click();
 
       const prepLoading = document.getElementById('prep-loading-overlay');
-      if (prepLoading instanceof HTMLElement) { prepLoading.remove(); return; }
+      if (prepLoading instanceof HTMLElement) prepLoading.remove();
 
-      const gachaPick = document.querySelector('.btn-gacha-pick, #btn-gacha-dismiss, #btn-gacha-reveal-all');
-      if (gachaPick instanceof HTMLElement) { gachaPick.click(); return; }
+      const gachaReveal = document.getElementById('btn-gacha-reveal-all');
+      if (gachaReveal instanceof HTMLElement) gachaReveal.click();
+
+      const gachaPick = document.querySelector('.btn-gacha-pick, #btn-gacha-dismiss');
+      if (gachaPick instanceof HTMLElement) gachaPick.click();
 
       const prepTut = document.querySelector('#btn-tutorial-skip, #btn-bacba-understood');
-      if (prepTut instanceof HTMLElement) { prepTut.click(); return; }
+      if (prepTut instanceof HTMLElement) prepTut.click();
 
       const manualClose = document.querySelector('#btn-close-bacba-manual');
-      if (manualClose instanceof HTMLElement) { manualClose.click(); return; }
+      if (manualClose instanceof HTMLElement) manualClose.click();
 
       const titleBtn = document.getElementById('btn-title-play');
-      if (titleBtn instanceof HTMLElement) { titleBtn.click(); return; }
+      if (titleBtn instanceof HTMLElement) titleBtn.click();
 
       const confirmNameBtn = document.getElementById('btn-confirm-shop-name');
-      if (confirmNameBtn instanceof HTMLElement) { confirmNameBtn.click(); return; }
+      if (confirmNameBtn instanceof HTMLElement) confirmNameBtn.click();
 
       const welcomeStartBtn = document.getElementById('btn-welcome-start');
-      if (welcomeStartBtn instanceof HTMLElement) { welcomeStartBtn.click(); return; }
+      if (welcomeStartBtn instanceof HTMLElement) welcomeStartBtn.click();
 
       const nextDayBtn = document.querySelector('#btn-start-next-day, #btn-summary-next-day');
-      if (nextDayBtn instanceof HTMLElement) { nextDayBtn.click(); return; }
+      if (nextDayBtn instanceof HTMLElement) nextDayBtn.click();
 
       const incidentButtons = document.querySelectorAll('#btn-incident-continue, #btn-incident-confirm-yes, .incident-choice-btn, #btn-police-confirm');
       for (const b of incidentButtons) {
-        if (b instanceof HTMLElement) { b.click(); return; }
+        if (b instanceof HTMLElement) b.click();
       }
 
       const restartBtn = document.getElementById('btn-restart-game');
-      if (restartBtn instanceof HTMLElement) { restartBtn.click(); return; }
+      if (restartBtn instanceof HTMLElement) restartBtn.click();
       const confirmOkBtn = document.getElementById('btn-confirm-ok');
-      if (confirmOkBtn instanceof HTMLElement) { confirmOkBtn.click(); return; }
+      if (confirmOkBtn instanceof HTMLElement) confirmOkBtn.click();
 
       const closeButtons = document.querySelectorAll('.dash-close-x, #btn-modal-close-icon, [id*="btn-close"], .btn-close, .modal-close');
       for (const btn of closeButtons) {
@@ -704,6 +711,12 @@ class OvernightMonkey {
       for (const cb of cancelBtns) {
         if (cb instanceof HTMLElement) cb.click();
       }
+
+      const serveBtn = document.querySelector('.btn-serve-cust, #btn-serve-order');
+      if (serveBtn instanceof HTMLElement && !serveBtn.hasAttribute('disabled')) serveBtn.click();
+
+      const potEl = document.getElementById('btn-fry-pot');
+      if (potEl instanceof HTMLElement) potEl.click();
     }).catch(() => {});
   }
 
