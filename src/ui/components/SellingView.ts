@@ -1097,22 +1097,86 @@ function renderStationStrip(state: GameState, session: SellingSession): string {
 }
 
 // ---------------------------------------------------------------------------
-// Dải nhân viên: phụ bếp đang chiên gì, có phục vụ tự lên món không (luật ở core/staff.ts)
+// Dải nhân viên: hiển thị trực quan toàn bộ đội ngũ nhân sự trực chiến và trạng thái realtime
 // ---------------------------------------------------------------------------
 function staffStripKey(state: GameState, session: SellingSession): string {
-  return state.staff.map(m => m.id).join(',') + '|' + (session.helpers ?? []).map(h => h?.menuItemId ?? '-').join(',');
+  return state.staff.map(m => `${m.id}-${m.mood}`).join(',') + '|' + (session.helpers ?? []).map(h => h?.menuItemId ?? '-').join(',');
 }
 
 function renderStaffStrip(state: GameState, session: SellingSession): string {
   if (state.staff.length === 0) return '';
   const eff = staffEffects(state.staff, session.gameHour);
-  const chips = eff.cooks.map((c, i) => {
-    const slot = session.helpers?.[i];
-    const what = slot ? `${FRY_ICON[slot.menuItemId] ?? '🍗'} <small class="helper-progress" data-helper="${i}"></small>` : 'đang rảnh';
-    return `<span class="staff-chip${slot ? ' busy' : ''}">👨‍🍳 ${c.name.split(' ')[0]}: ${what}</span>`;
+  let cookIndex = 0;
+
+  const chips = state.staff.map(member => {
+    const roleIconMap: Record<string, string> = {
+      cook: '👨‍🍳',
+      waiter: '🧹',
+      cashier: '💰',
+      delivery: '🛵',
+      manager: '👔',
+      security: '🛡️'
+    };
+    const roleIcon = roleIconMap[member.role] || '👤';
+    const modelSrc = member.modelAsset || `/assets/staff/${member.id}.png`;
+    const shortName = member.name.split(' ')[0] || member.name;
+    const rarityClass = member.rarity ? `rarity-${member.rarity}` : '';
+
+    let actionHtml = '';
+    let isBusy = false;
+
+    if (member.role === 'cook') {
+      const slot = session.helpers?.[cookIndex];
+      if (slot) {
+        isBusy = true;
+        const fryIcon = FRY_ICON[slot.menuItemId] ?? '🍗';
+        actionHtml = `<span class="staff-action busy">${fryIcon} Chiên <b class="helper-progress" data-helper="${cookIndex}">0%</b></span>`;
+      } else {
+        actionHtml = `<span class="staff-action idle">Chờ chảo</span>`;
+      }
+      cookIndex++;
+    } else if (member.role === 'waiter') {
+      actionHtml = `<span class="staff-action waiter">Rót nước & dọn khay</span>`;
+    } else if (member.role === 'cashier') {
+      actionHtml = `<span class="staff-action cashier">Tươi cười (+Tip)</span>`;
+    } else if (member.role === 'delivery') {
+      actionHtml = `<span class="staff-action delivery">Giảm phí App</span>`;
+    } else if (member.role === 'manager') {
+      actionHtml = `<span class="staff-action manager">+20% Tốc độ</span>`;
+    } else if (member.role === 'security') {
+      actionHtml = `<span class="staff-action security">Canh xe an toàn</span>`;
+    }
+
+    return `
+      <div class="staff-chip ${isBusy ? 'busy' : ''} ${rarityClass}" title="${member.name} (${member.title || member.role})">
+        <div class="staff-chip-avatar">
+          <img src="${modelSrc}" alt="${member.name}" class="staff-chip-img" onerror="this.onerror=null;this.parentElement.innerHTML='${roleIcon}';"/>
+        </div>
+        <div class="staff-chip-info">
+          <span class="staff-chip-name">${shortName}</span>
+          ${actionHtml}
+        </div>
+      </div>
+    `;
   });
-  if (eff.waiterServeMs !== null) chips.push('<span class="staff-chip">🧹 Phục vụ rót nước & lên món</span>');
+
+  // Nếu có robot chiên từ Bếp cấp 6
+  const robot = eff.cooks.find(c => c.staffId === 'robot');
+  if (robot) {
+    const slot = session.helpers?.[cookIndex];
+    chips.push(`
+      <div class="staff-chip ${slot ? 'busy' : ''} rarity-SSR" title="Robot Chiên Tự Động">
+        <div class="staff-chip-avatar">🤖</div>
+        <div class="staff-chip-info">
+          <span class="staff-chip-name">Robot</span>
+          ${slot ? `<span class="staff-action busy">🍗 <b class="helper-progress" data-helper="${cookIndex}">0%</b></span>` : '<span class="staff-action idle">Chờ mẻ</span>'}
+        </div>
+      </div>
+    `);
+  }
+
   if (chips.length === 0) return '';
   return `<div class="staff-strip">${chips.join('')}</div>`;
 }
+
 const FRY_ICON: Record<string, string> = { crispy_chicken: '🍗', spicy_chicken: '🌶️', honey_garlic_chicken: '🍯', shake_fries: '🍟', popcorn_chicken: '🍿' };

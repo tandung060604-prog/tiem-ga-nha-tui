@@ -2030,9 +2030,21 @@ class AppController {
       spaceLevel
     }) : null;
 
+    // Hiệu ứng thực tế của Thu Ngân (Cashier): Khách vui vẻ tặng thêm tip nóng (1.000đ - 3.000đ/đơn)
+    const cashierBonus = curState.staff
+      .filter(m => m.role === 'cashier' && m.mood > 25)
+      .reduce((sum, c) => {
+        const p = (c.skill / 100) * (0.6 + 0.4 * c.mood / 100);
+        return sum + Math.round(1500 * p);
+      }, 0);
+    const finalTip = tip + (order.personality !== 'frugal' && !order.isBunny ? cashierBonus : 0);
+
     let policeInsp: PoliceInspectionResult | null = null;
     stateManager.update(draft => {
-      creditSale(draft, paid, tip);
+      creditSale(draft, paid, finalTip);
+      if (finalTip > tip && this.sellingSession) {
+        this.sellingSession.tips += (finalTip - tip);
+      }
       if (order.isBunny) letter = applyBunnyReward(draft, order);
       if (review) {
         ReviewsEngine.applyRealtimeReview(draft, review);

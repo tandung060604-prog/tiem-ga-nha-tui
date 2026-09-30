@@ -1895,36 +1895,131 @@
 
 .staff-strip {
   display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 6px;
   margin: 6px 0;
   width: 100%;
   box-sizing: border-box;
+  padding: 4px 2px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.staff-strip::-webkit-scrollbar {
+  display: none;
 }
 
 .staff-chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  background: #fdf5ea;
-  border: 1.5px solid #e8d5be;
-  border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 750;
-  color: #5c3924;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  gap: 6px;
+  padding: 3px 8px 3px 4px;
+  background: #2b1810;
+  border: 1.5px solid #854d0e;
+  border-radius: 8px;
+  color: #fef08a;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+  flex-shrink: 0;
+  transition: transform 0.1s ease;
+}
+
+.staff-chip:active {
+  transform: scale(0.97);
 }
 
 .staff-chip.busy {
-  background: #fff3e0;
-  border-color: #ff9800;
-  color: #b25900;
+  background: #3b1a0a;
+  border-color: #f97316;
+  box-shadow: 0 0 6px rgba(249, 115, 22, 0.4);
+}
+
+.staff-chip.rarity-R {
+  border-color: #38bdf8;
+}
+
+.staff-chip.rarity-SR {
+  border-color: #c084fc;
+}
+
+.staff-chip.rarity-SSR {
+  border-color: #facc15;
+  box-shadow: 0 0 8px rgba(250, 204, 21, 0.6);
+  background: linear-gradient(135deg, #422006 0%, #2b1810 100%);
+}
+
+.staff-chip-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: #180d07;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.staff-chip-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+.staff-chip-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.staff-chip-name {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.staff-action {
+  font-size: 0.60rem;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #cbd5e1;
+}
+
+.staff-action.busy {
+  color: #fb923c;
+}
+
+.staff-action.idle {
+  color: #94a3b8;
+}
+
+.staff-action.waiter {
+  color: #67e8f9;
+}
+
+.staff-action.cashier {
+  color: #4ade80;
+}
+
+.staff-action.delivery {
+  color: #fcd34d;
+}
+
+.staff-action.manager {
+  color: #f472b6;
+}
+
+.staff-action.security {
+  color: #60a5fa;
 }
 
 .helper-progress {
-  font-weight: 800;
-  color: #d84315;
+  font-weight: 900;
+  color: #ef4444;
 }
 
 /* ==========================================================================

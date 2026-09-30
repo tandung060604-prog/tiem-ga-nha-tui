@@ -129,16 +129,16 @@ describe('Staff Gacha System - Comprehensive Tests', () => {
     expect(ssrRate).toBeLessThan(0.035);
   });
 
-  it('thực hiện 1 Roll (Phát tờ rơi - 40.000đ): ra 3 ứng viên để chọn 1, trừ tiền chuẩn', () => {
+  it('thực hiện 1 Roll (Phát tờ rơi - 200.000đ): ra 3 ứng viên để chọn 1, trừ tiền chuẩn', () => {
     const state = createInitialState();
-    state.money = 100000;
+    state.money = 500000;
 
     const roll = performGachaRollSingle(state);
     expect(roll.success).toBe(true);
     expect(roll.result).toBeDefined();
     expect(roll.result?.candidates.length).toBe(3);
     expect(roll.result?.cost).toBe(GACHA_PRICES.SINGLE_ROLL);
-    expect(state.money).toBe(100000 - 40000);
+    expect(state.money).toBe(500000 - 200000);
     expect(state.staffGachaTotalRolls).toBe(1);
 
     // Chọn 1 ứng viên ký hợp đồng
@@ -149,16 +149,16 @@ describe('Staff Gacha System - Comprehensive Tests', () => {
     expect(state.staff[0].name).toBe(chosenCandidate.name);
   });
 
-  it('thực hiện 10 Roll (Đăng tin sàn lớn - 360.000đ): ra 10 ứng viên (có ít nhất 1 SR+), chọn 1', () => {
+  it('thực hiện 10 Roll (Đăng tin sàn lớn - 1.800.000đ): ra 10 ứng viên (có ít nhất 1 SR+), chọn 1', () => {
     const state = createInitialState();
-    state.money = 500000;
+    state.money = 2500000;
 
     const roll = performGachaRollTen(state);
     expect(roll.success).toBe(true);
     expect(roll.result).toBeDefined();
     expect(roll.result?.candidates.length).toBe(10);
     expect(roll.result?.cost).toBe(GACHA_PRICES.TEN_ROLL);
-    expect(state.money).toBe(500000 - 360000);
+    expect(state.money).toBe(2500000 - 1800000);
     expect(state.staffGachaTotalRolls).toBe(10);
 
     // Cam kết có ít nhất 1 SR hoặc SSR trong 10 roll
@@ -175,14 +175,14 @@ describe('Staff Gacha System - Comprehensive Tests', () => {
 
   it('báo lỗi khi không đủ tiền roll gacha', () => {
     const state = createInitialState();
-    state.money = 10000; // chỉ có 10k không đủ 40k
+    state.money = 50000; // chỉ có 50k không đủ 200k
 
     const singleRoll = performGachaRollSingle(state);
     expect(singleRoll.success).toBe(false);
-    expect(singleRoll.error).toContain('Không đủ 40.000đ');
+    expect(singleRoll.error).toContain('Không đủ 200.000đ');
 
     const tenRoll = performGachaRollTen(state);
     expect(tenRoll.success).toBe(false);
-    expect(tenRoll.error).toContain('Không đủ 360.000đ');
+    expect(tenRoll.error).toContain('Không đủ 1.800.000đ');
   });
 });

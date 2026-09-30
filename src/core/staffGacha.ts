@@ -2,8 +2,8 @@ import { GameState, StaffRarity, StaffRole } from '../types/game';
 import { GachaStaffCandidate, getStaffPoolByRarity } from '../content/gachaStaffPool';
 
 export const GACHA_PRICES = {
-  SINGLE_ROLL: 40000,    // 40.000đ (Phát tờ rơi tuyển dụng - Ra 3 ứng viên chọn 1)
-  TEN_ROLL: 360000       // 360.000đ (Đăng tin sàn tuyển dụng lớn - Ra 10 ứng viên chọn 1, bảo hiểm 1 SR+)
+  SINGLE_ROLL: 200000,   // 200.000đ (x5: Phát tờ rơi tuyển dụng - Ra 3 ứng viên chọn 1)
+  TEN_ROLL: 1800000      // 1.800.000đ (x5: Đăng tin sàn tuyển dụng VIP - Ra 10 ứng viên chọn 1, bảo hiểm 1 SR+)
 };
 
 export const GACHA_RATES = {
@@ -130,7 +130,7 @@ export function performGachaRollSingle(
   customRand?: () => number
 ): { success: boolean; result?: GachaRollResult; error?: string } {
   if (state.money < GACHA_PRICES.SINGLE_ROLL) {
-    return { success: false, error: 'Không đủ 40.000đ để phát tờ rơi tuyển dụng!' };
+    return { success: false, error: 'Không đủ 200.000đ để phát tờ rơi tuyển dụng!' };
   }
 
   let softPity = state.staffGachaPity || 0;
@@ -188,7 +188,7 @@ export function performGachaRollTen(
   customRand?: () => number
 ): { success: boolean; result?: GachaRollResult; error?: string } {
   if (state.money < GACHA_PRICES.TEN_ROLL) {
-    return { success: false, error: 'Không đủ 360.000đ để đăng tin sàn tuyển dụng lớn!' };
+    return { success: false, error: 'Không đủ 1.800.000đ để đăng tin sàn tuyển dụng lớn!' };
   }
 
   let softPity = state.staffGachaPity || 0;
