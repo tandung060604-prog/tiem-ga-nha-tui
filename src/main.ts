@@ -72,6 +72,24 @@ import confetti from 'canvas-confetti';
 
 type TabId = 'inventory' | 'upgrades' | 'staff' | 'reviews' | 'menu';
 
+/**
+ * Cập nhật màu sắc thanh trạng thái trình duyệt (Status Bar / Chrome) trên di động
+ * Đảm bảo 100% không bao giờ xuất hiện viền trắng đối lập, đạt chuẩn tràn viền edge-to-edge
+ */
+export function updateThemeColor(color: string) {
+  try {
+    const metaList = document.querySelectorAll('meta[name="theme-color"]');
+    if (metaList.length > 0) {
+      metaList.forEach(m => ((m as HTMLMetaElement).content = color));
+    } else {
+      const meta = document.createElement('meta');
+      meta.name = 'theme-color';
+      meta.content = color;
+      document.head.appendChild(meta);
+    }
+  } catch {}
+}
+
 const SELLING_ACTIONS = [
   'toggle-fast', 'fry-chicken', 'fry-fries', 'fry-popcorn', 'fry-thigh', 'fry-cheese',
   'add-drink', 'pour-coca', 'pour-7up', 'pour-fanta', 'squeeze-ketchup', 'squeeze-chili',
@@ -172,6 +190,7 @@ class AppController {
       };
     }
 
+    updateThemeColor('#000000');
     openIntroCinematicModal({
       forceShow: true,
       onComplete: () => {
@@ -183,6 +202,7 @@ class AppController {
   private titleDismissed = false;
 
   private showTitleScreen() {
+    updateThemeColor('#1a0c06');
     const state = stateManager.getState();
     const hasProgress = state.day > 1 || state.dayHistory.length > 0 || !!state.pausedShift;
     document.getElementById('title-screen')?.remove();
@@ -191,6 +211,7 @@ class AppController {
 
     const start = (fresh: boolean) => {
       // Vào game trước, âm thanh sau: máy không có Web Audio cũng không bị kẹt ở màn tiêu đề
+      updateThemeColor('#5a3018');
       this.titleDismissed = true;
       document.getElementById('title-screen')?.remove();
       music.unlock();             // chạm đầu tiên: được phép bật âm thanh trên iOS
@@ -829,6 +850,9 @@ class AppController {
   }
 
   public render() {
+    if (this.titleDismissed) {
+      updateThemeColor('#5a3018');
+    }
     const state = stateManager.getState();
 
     // 1. Render Header (chỉ khi nội dung đổi, để nút header không bị thay mỗi frame)

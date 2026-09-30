@@ -2149,14 +2149,7 @@ body.selling-mode .toast.show {
 }
 
 .title-awning {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: calc(14px + env(safe-area-inset-top));
-  background: repeating-linear-gradient(90deg, #d92534 0 26px, #fff7ea 26px 52px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
-  z-index: 20;
+  display: none;
 }
 
 /* Grand Opening Game Title Banner */

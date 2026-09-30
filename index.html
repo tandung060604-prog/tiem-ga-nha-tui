@@ -3,22 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="color-scheme" content="only light">
+  <meta name="color-scheme" content="dark light">
   <title>Tiệm Gà Nhà Tui - Game Quản Lý Tiệm Gà Rán</title>
-  <meta name="theme-color" content="#fdf3e4">
+  <meta name="theme-color" content="#1a0c06" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#1a0c06">
   <link rel="icon" type="image/png" href="icons/icon-192.png">
-  <!-- iOS: thêm vào Màn hình chính → mở toàn màn như app -->
+  <!-- iOS: thêm vào Màn hình chính → mở toàn màn như app tràn viền -->
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icons/icon-180.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Tiệm Gà">
   <meta name="format-detection" content="telephone=no">
   <!-- Nền tảng chạm cho iOS Safari (đặt ở đây để áp dụng trước mọi CSS khác) -->
   <style id="ios-base">
     html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-    html, body { overscroll-behavior: none; }
+    html, body {
+      overscroll-behavior: none;
+      overscroll-behavior-y: none;
+      background-color: #1a0c06 !important;
+      background: #1a0c06 !important;
+    }
     body { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
     button, [role="button"], .tray-item, .customer-card, .fry-pot { touch-action: manipulation; -webkit-user-select: none; user-select: none; }
     input, textarea { font-size: 16px; } /* < 16px: Safari tự phóng to khi gõ */

@@ -11,7 +11,7 @@ html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  background-color: #2b1810;
+  background-color: #1a0c06 !important;
 }
 
 /* Ensure ALL pixel sprites stay ultra crisp with no anti-aliased blur */
@@ -86,10 +86,7 @@ p, span, div, b, small, button, input, select, textarea,
 }
 
 .title-awning {
-  height: calc(16px + env(safe-area-inset-top)) !important;
-  background: repeating-linear-gradient(90deg, #d92534 0 16px, #faeed1 16px 32px) !important;
-  border-bottom: 2px solid #2b1810 !important;
-  box-shadow: 0 4px 0 #1a0c06 !important;
+  display: none !important;
 }
 
 /* Title Screen Dark Vignette & Background Overlay */
@@ -272,6 +269,18 @@ p, span, div, b, small, button, input, select, textarea,
   align-items: center !important;
   gap: 6px !important;
   min-height: 52px !important;
+  position: relative !important;
+}
+
+.header::before {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 300px !important;
+  background: #5a3018 !important;
+  pointer-events: none !important;
 }
 
 .h-l {

@@ -175,7 +175,8 @@
 
 html {
   height: 100%;
-  background: var(--bg);
+  background: #1a0c06;
+  background-color: #1a0c06 !important;
   color: var(--ink);
   font-family: var(--font-display);
   -webkit-tap-highlight-color: transparent;
@@ -189,7 +190,8 @@ body {
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--bg);
+  background: #1a0c06;
+  background-color: #1a0c06 !important;
   color: var(--ink);
   overflow-x: hidden;
 }
