@@ -385,6 +385,44 @@ p, span, div, b, small, button, input, select, textarea,
   box-shadow: inset 1px 1px 0 #c49654, 0 1px 0 #1a0c06 !important;
 }
 
+@media (max-width: 390px) {
+  .header {
+    padding: calc(var(--safe-top) + 4px) 5px 4px !important;
+    gap: 4px !important;
+  }
+  .h-btn {
+    width: 25px !important;
+    height: 25px !important;
+    font-size: 0.8rem !important;
+  }
+  .h-btn .h-pixel-icon {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  .h-l {
+    gap: 2.5px !important;
+  }
+  .h-day-box b {
+    font-size: 0.88rem !important;
+  }
+  .h-day-box small {
+    font-size: 0.7rem !important;
+  }
+  .h-m .money {
+    font-size: 0.84rem !important;
+  }
+  .h-m .store-badge {
+    font-size: 0.72rem !important;
+    padding: 0 4px !important;
+  }
+  .h-r b {
+    font-size: 0.92rem !important;
+  }
+  .h-r small {
+    font-size: 0.7rem !important;
+  }
+}
+
 /* Awning Strip */
 .awning {
   height: 16px !important;

@@ -279,6 +279,7 @@ export function foodImage(menuItemId: string, quality: QualityRating): string | 
     case 'sundae_icecream':
       return ASSETS.food.sundaeIcecream;
     case 'family_bucket':
+    case 'combo_duo':
       return ASSETS.food.familyBucket;
     default:
       return null;

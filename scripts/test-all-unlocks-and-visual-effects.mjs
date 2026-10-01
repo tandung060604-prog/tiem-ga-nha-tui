@@ -407,7 +407,7 @@ async function runQaSuite() {
       console.log(`    🧑‍🍳 Số nhân viên đang túc trực: ${staffAvatars} người`);
 
       // Kiểm tra khay ra món
-      const traySlotsCount = await page.locator('.tray-slot').count();
+      const traySlotsCount = await page.locator('.tray-slots > div').count();
       console.log(`    🍱 Số ô khay ra món (mở rộng tối đa): ${traySlotsCount} ô`);
 
       // Chụp ảnh giao diện ca bán
