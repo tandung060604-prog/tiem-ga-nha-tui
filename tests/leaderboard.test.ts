@@ -73,8 +73,7 @@ describe('Hệ Thống Bảng Xếp Hạng Đua Top 4 Người Chơi (Leaderboar
     await syncToLeaderboard(state2);
 
     const result = await fetchLeaderboard('usr_player_alpha', 'money');
-    expect(result.success).toBe(true);
-    expect(result.entries.length).toBeGreaterThanOrEqual(4); // Có ít nhất 4 dòng (2 người chơi + quán mẫu)
+    expect(result.entries.length).toBe(2); // 100% người chơi thật, không chèn quán ảo
 
     // Người nhiều tiền hơn phải đứng trước
     const betaIdx = result.entries.findIndex(e => e.userId === 'usr_player_beta');

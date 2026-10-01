@@ -39,7 +39,7 @@ export function renderLeaderboardModal(
           <span style="font-size: 1.35rem;">🏆</span>
           <div>
             <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #3d2314; font-family: var(--font-heading); letter-spacing: 0.5px;">BẢNG XẾP HẠNG HẺM 1102</h3>
-            <div style="font-size: 0.72rem; color: #7c4f32; font-weight: 600;">Đua Top 4 Tiệm Gà · Tự động đồng bộ Đám Mây</div>
+            <div style="font-size: 0.72rem; color: #7c4f32; font-weight: 600;">Đua Top 4 Tiệm Gà (100% Người Thật) · Đồng bộ Đám Mây</div>
           </div>
         </div>
         <button id="btn-close-leaderboard" style="border: 0; background: none; font-size: 1.35rem; cursor: pointer; color: #7c4f32; line-height: 1; padding: 4px;">✕</button>
@@ -109,10 +109,17 @@ export function renderLeaderboardModal(
         }).join('')}
       </div>
 
+      ${entries.length > 0 && entries.length < 4 ? `
+        <div style="background: #fef3c7; border: 1px dashed #f59e0b; border-radius: 8px; padding: 6px 10px; font-size: 0.72rem; color: #92400e; font-weight: 700; text-align: center;">
+          🍗 Đang có <b>${entries.length}/4</b> tiệm người thật trên bảng. Hãy rủ thêm bạn bè cùng mở tiệm đua top!
+        </div>
+      ` : ''}
+
       <!-- Info Footer -->
       <div style="background: #f1f5f9; border-radius: 10px; padding: 8px 10px; font-size: 0.72rem; color: #475569; line-height: 1.45;">
-        💡 <b>Cơ chế đua Top</b>: Dữ liệu tự đồng bộ khi kết thúc ngày hoặc chuyển chương. Khi bạn bấm <i>"Chơi lại từ đầu"</i>, hồ sơ cũ sẽ tự động bị xóa khỏi BXH để mở đường cho tài khoản mới!
+        💡 <b>Cơ chế đua Top</b>: Bảng xếp hạng 100% người thật. Dữ liệu tự đồng bộ khi kết thúc ngày hoặc chuyển chương. Khi bạn bấm <i>"Chơi lại từ đầu"</i>, hồ sơ cũ sẽ tự động bị xóa khỏi BXH để mở đường cho tài khoản mới!
       </div>
+
 
       <!-- Action Buttons -->
       <div style="display: flex; gap: 8px; justify-content: space-between; margin-top: 2px;">

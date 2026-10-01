@@ -84,40 +84,11 @@ export function saveLocalLeaderboardCache(cache: Record<string, LeaderboardEntry
 }
 
 /**
- * 3 Quán Gà Cư Dân Hẻm 1102 mẫu để bảng xếp hạng luôn sống động khi mới mở
+ * Danh sách quán mẫu: ĐÃ XÓA BỎ HOÀN TOÀN MOCK DATA THEO YÊU CẦU CỦA NGƯỜI CHƠI
+ * Bảng xếp hạng giờ đây hiển thị 100% NGƯỜI CHƠI THẬT.
  */
-export const DEFAULT_PEER_STORES: LeaderboardEntry[] = [
-  {
-    userId: 'bot_chu_nam',
-    shopName: 'Gà Cay Chú Nam 67',
-    day: 78,
-    money: 89500000,
-    chapter: 3,
-    overallRating: 4.6,
-    totalFried: 1450,
-    updatedAt: Date.now() - 3600000 * 2
-  },
-  {
-    userId: 'bot_be_na',
-    shopName: 'Gà Giòn Bé Na Xinh',
-    day: 52,
-    money: 42300000,
-    chapter: 2,
-    overallRating: 4.4,
-    totalFried: 890,
-    updatedAt: Date.now() - 3600000 * 5
-  },
-  {
-    userId: 'bot_co_sau',
-    shopName: 'Tiệm Bác Ba Chiên Giòn',
-    day: 110,
-    money: 215000000,
-    chapter: 4,
-    overallRating: 4.85,
-    totalFried: 2800,
-    updatedAt: Date.now() - 3600000 * 12
-  }
-];
+export const DEFAULT_PEER_STORES: LeaderboardEntry[] = [];
+
 
 // Cooldown và Backoff để tránh spam network và tôn trọng rate limit API
 let lastCloudSyncTime = 0;
@@ -236,16 +207,21 @@ export async function fetchLeaderboard(
     }
   }
 
-  // 2. Nếu danh sách người chơi thực tế ít hơn 4 (nhóm chưa đủ 4 người),
-  // bổ sung các quán mẫu của Hẻm 1102 để bảng xếp hạng đủ 4 dòng đẹp mắt
-  const allEntries: LeaderboardEntry[] = Object.values(entriesMap);
-  if (allEntries.length < 4) {
-    for (const peer of DEFAULT_PEER_STORES) {
-      if (!entriesMap[peer.userId]) {
-        allEntries.push(peer);
-      }
+  // 2. Dọn sạch bot cũ khỏi cache nếu còn sót lại (đảm bảo 100% người thật)
+  let hadBots = false;
+  for (const k of Object.keys(entriesMap)) {
+    if (k.startsWith('bot_')) {
+      delete entriesMap[k];
+      hadBots = true;
     }
   }
+  if (hadBots) {
+    saveLocalLeaderboardCache(entriesMap);
+  }
+
+  // 3. Chỉ sử dụng 100% người chơi thật (không bù quán ảo)
+  const allEntries: LeaderboardEntry[] = Object.values(entriesMap);
+
 
   // 3. Đánh dấu isSelf và sắp xếp
   const processed = allEntries.map(e => ({
