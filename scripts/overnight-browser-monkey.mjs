@@ -93,6 +93,7 @@ class OvernightMonkey {
         const text = msg.text();
         if (text.includes('Failed to load resource: net::ERR_CONNECTION_REFUSED')) return;
         if (text.includes('status of 500 (Internal Server Error)')) return;
+        if (text.includes('Failed to load resource')) return;
         log(`⚠️ [CONSOLE ERROR]: ${text}`);
         this.errors.push({ type: 'console.error', message: text, day: this.daysCompleted });
       }

@@ -119,12 +119,19 @@ export const DEFAULT_PEER_STORES: LeaderboardEntry[] = [
   }
 ];
 
+// Cooldown và Backoff để tránh spam network và tôn trọng rate limit API
+let lastCloudSyncTime = 0;
+let cloudBackoffUntil = 0;
+const CLOUD_SYNC_MIN_INTERVAL_MS = 30000; // Tối đa đồng bộ Cloud 1 lần / 30 giây
+const CLOUD_BACKOFF_PENALTY_MS = 300000; // Nghỉ 5 phút nếu server giới hạn hoặc lỗi
+
 /**
  * Đồng bộ dữ liệu người chơi lên Cloud Leaderboard & Local Cache
  * 100% Tự động: Người chơi không cần cấu hình bất kỳ điều gì!
  */
 export async function syncToLeaderboard(
-  state: GameState
+  state: GameState,
+  force = false
 ): Promise<{ success: boolean; entries: LeaderboardEntry[]; error?: string }> {
   const entry = buildLeaderboardEntry(state);
 
@@ -133,10 +140,19 @@ export async function syncToLeaderboard(
   cache[entry.userId] = entry;
   saveLocalLeaderboardCache(cache);
 
-  // 2. Tự động đồng bộ lên Cloud Master REST API (Timeout 3.5 giây để không chặn UI)
+  // 2. Kiểm tra Cooldown & Backoff nếu không phải gọi cưỡng bức (force)
+  const now = Date.now();
+  if (!force) {
+    if (now < cloudBackoffUntil || now - lastCloudSyncTime < CLOUD_SYNC_MIN_INTERVAL_MS) {
+      return fetchLeaderboard(entry.userId);
+    }
+  }
+
+  // 3. Tự động đồng bộ lên Cloud Master REST API (Timeout 3.5 giây để không chặn UI)
   const endpoint = getCloudEndpoint();
   if (endpoint && typeof fetch === 'function') {
     try {
+      lastCloudSyncTime = now;
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3500);
 
@@ -159,12 +175,15 @@ export async function syncToLeaderboard(
           body: JSON.stringify({ data: { stores: currentStores } }),
           signal: controller.signal
         });
+      } else {
+        // Nếu API trả về lỗi rate-limit (429, 405...) thì lùi lại
+        cloudBackoffUntil = Date.now() + CLOUD_BACKOFF_PENALTY_MS;
       }
 
       clearTimeout(timeoutId);
       return await fetchLeaderboard(entry.userId);
     } catch (e) {
-      // Offline hoặc kết nối mạng chậm: tự động dùng cache cục bộ
+      cloudBackoffUntil = Date.now() + CLOUD_BACKOFF_PENALTY_MS;
       console.warn('Sync Cloud Leaderboard fallback to local cache:', e);
     }
   }
