@@ -16,7 +16,7 @@ export function renderStaffTab(state: GameState): string {
   // Danh sách nhân viên đang làm việc
   const staffRows = state.staff.map((member, idx) => {
     const roleInfo = STAFF_ROLES_INFO[member.role];
-    const traitInfo = STAFF_TRAITS.find(t => member.traits.includes(t.id));
+    const traitInfo = STAFF_TRAITS.find(t => (member.traits ?? []).includes(t.id));
     const rarityClass = member.rarity ? `rarity-${member.rarity}` : '';
     const starsHtml = member.stars ? ('★'.repeat(member.stars) + '☆'.repeat(5 - member.stars)) : '';
     const modelSrc = member.modelAsset || `/assets/staff/${member.id}.png`;
@@ -35,7 +35,7 @@ export function renderStaffTab(state: GameState): string {
           </div>
           ${member.title ? `<div class="staff-sub-title">"${member.title}" · <span class="gacha-stars-mini">${starsHtml}</span></div>` : ''}
           <div class="item-sub">
-            Lương: <b>${member.hourlyWage.toLocaleString('vi-VN')}đ/h</b> · Tâm trạng: <b>${member.mood}%</b>
+            Lương: <b>${(member.hourlyWage ?? (member as any).salary ?? 25000).toLocaleString('vi-VN')}đ/h</b> · Tâm trạng: <b>${member.mood}%</b>
           </div>
           <div class="staff-stats">
             ⚡ Tốc độ: <b>${member.speed}</b> | 🎯 Tay nghề: <b>${member.skill}</b>

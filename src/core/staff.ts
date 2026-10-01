@@ -116,7 +116,7 @@ const managerBoost = (staff: readonly StaffMember[]) => (staff.some(m => m.role 
 // Sức làm việc 0..~1,2: chỉ số × tâm trạng (tâm trạng 0% còn 60% sức) × quản lý
 const power = (m: StaffMember, stat: 'speed' | 'skill' | 'attitude', boost: number) =>
   (m[stat] / 100) * (0.6 + 0.4 * m.mood / 100) * boost;
-const has = (m: StaffMember, trait: string) => m.traits.includes(trait);
+const has = (m: StaffMember, trait: string) => (m.traits ?? []).includes(trait);
 
 export function staffEffects(staff: readonly StaffMember[], gameHour = 12, upgrades?: Upgrades): StaffEffects {
   const boost = managerBoost(staff);
