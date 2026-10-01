@@ -67,7 +67,14 @@ import { getTodayWholesaler, executeBargain, BargainTactic } from './core/market
 import { renderMarketBargainModal } from './ui/components/MarketBargainModal';
 import { DeliveryRunnerEngine, DeliveryRunState } from './core/deliveryRunner';
 import { renderDeliveryPromptModal, renderDeliveryRunnerGame, renderDeliveryResultModal } from './ui/components/DeliveryRunnerModal';
-import { syncToLeaderboard, fetchLeaderboard, removeFromLeaderboard } from './core/leaderboard';
+import {
+  syncToLeaderboard,
+  fetchLeaderboard,
+  removeFromLeaderboard,
+  getCurrentRoomId,
+  setCurrentRoomId,
+  generateRoomId
+} from './core/leaderboard';
 import { renderLeaderboardModal } from './ui/components/LeaderboardModal';
 import type { DailyIncident, DeliveryRunResult } from './types/game';
 import confetti from 'canvas-confetti';
@@ -153,6 +160,24 @@ class AppController {
   }
 
   private init() {
+    // Kiểm tra tham số room từ liên kết mời hoặc mã QR
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const roomParam = urlParams.get('room') || urlParams.get('lobby');
+      if (roomParam) {
+        const cleanRoom = roomParam.trim().toUpperCase();
+        if (cleanRoom) {
+          setCurrentRoomId(cleanRoom);
+          const st = stateManager.getState();
+          st.roomId = cleanRoom;
+          stateManager.saveState();
+          setTimeout(() => {
+            this.showToast(`🍗 Bạn đã tham gia Phòng Đua Top: ${cleanRoom}!`);
+          }, 1200);
+        }
+      }
+    } catch {}
+
     // Có ca bán dở (thoát app giữa ca) thì giữ nguyên, tiếp tục sau khi chạm "Chơi tiếp" ở màn tiêu đề
 
     // Pick today's random event based on day
@@ -2904,18 +2929,29 @@ class AppController {
     }
   }
 
-  // --- LEADERBOARD MODAL ---
-  public async openLeaderboard(sortBy: 'money' | 'day' = 'money') {
+  // --- LOBBY & LEADERBOARD MODAL ---
+  public async openLeaderboard(
+    sortBy: 'money' | 'day' = 'money',
+    activeTab: 'lobby' | 'qr' = 'lobby'
+  ) {
     audio.playPop();
     const state = stateManager.getState();
     const currentUserId = state.userId;
+    const currentRoomId = state.roomId || getCurrentRoomId();
 
     // 1. Tự động đồng bộ bản ghi của mình trước khi mở bảng
     void syncToLeaderboard(state);
 
     // 2. Tải danh sách bảng xếp hạng (từ cloud hoặc cache)
-    const result = await fetchLeaderboard(currentUserId, sortBy);
-    const html = renderLeaderboardModal(result.entries, currentUserId, sortBy, result.isOffline);
+    const result = await fetchLeaderboard(currentUserId, sortBy, currentRoomId);
+    const html = renderLeaderboardModal(
+      result.entries,
+      currentUserId,
+      sortBy,
+      result.isOffline,
+      result.roomId,
+      activeTab
+    );
     this.openModal(html);
 
     // 3. Bind events
@@ -2925,11 +2961,100 @@ class AppController {
     const closeBtn2 = document.getElementById('btn-close-leaderboard-btn');
     if (closeBtn2) closeBtn2.onclick = () => this.closeModal();
 
+    // Chuyển tab: Lobby 4 Người VS Mã QR
+    const tabLobby = document.getElementById('tab-nav-lobby');
+    if (tabLobby) {
+      tabLobby.onclick = () => {
+        audio.playPop();
+        void this.openLeaderboard(sortBy, 'lobby');
+      };
+    }
+
+    const tabQr = document.getElementById('tab-nav-qr');
+    if (tabQr) {
+      tabQr.onclick = () => {
+        audio.playPop();
+        void this.openLeaderboard(sortBy, 'qr');
+      };
+    }
+
+    const openQrBtn = document.getElementById('btn-open-qr-tab');
+    if (openQrBtn) {
+      openQrBtn.onclick = () => {
+        audio.playPop();
+        void this.openLeaderboard(sortBy, 'qr');
+      };
+    }
+
+    // Các nút mời nhanh trên từng slot trống
+    const quickInviteBtns = document.querySelectorAll('.btn-quick-invite-qr');
+    quickInviteBtns.forEach(btn => {
+      (btn as HTMLElement).onclick = (e) => {
+        e.stopPropagation();
+        audio.playPop();
+        void this.openLeaderboard(sortBy, 'qr');
+      };
+    });
+
+    // Sao chép link mời
+    const copyBtn = document.getElementById('btn-copy-invite-link');
+    if (copyBtn) {
+      copyBtn.onclick = async () => {
+        const linkInput = document.getElementById('input-invite-link') as HTMLInputElement;
+        const linkToCopy = linkInput ? linkInput.value : window.location.href;
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(linkToCopy);
+          } else if (linkInput) {
+            linkInput.select();
+            document.execCommand('copy');
+          }
+          audio.playCash();
+          this.showToast('📋 Đã sao chép link mời! Gửi Zalo/Messenger cho bạn bè ngay!');
+        } catch {
+          this.showToast('📋 Vui lòng sao chép link trong ô bên cạnh!');
+        }
+      };
+    }
+
+    // Vào phòng tùy chỉnh
+    const joinRoomBtn = document.getElementById('btn-join-custom-room');
+    if (joinRoomBtn) {
+      joinRoomBtn.onclick = () => {
+        const roomInput = document.getElementById('input-custom-room') as HTMLInputElement;
+        const targetRoom = (roomInput?.value || '').trim().toUpperCase();
+        if (!targetRoom) {
+          this.showToast('Vui lòng nhập mã phòng!');
+          return;
+        }
+        audio.playCash();
+        setCurrentRoomId(targetRoom);
+        state.roomId = targetRoom;
+        stateManager.saveState();
+        this.showToast(`🍗 Đã chuyển sang Phòng: ${targetRoom}!`);
+        void this.openLeaderboard(sortBy, 'lobby');
+      };
+    }
+
+    // Tạo phòng ngẫu nhiên mới
+    const createRandomBtn = document.getElementById('btn-create-random-room');
+    if (createRandomBtn) {
+      createRandomBtn.onclick = () => {
+        const newRoom = generateRoomId();
+        audio.playCash();
+        setCurrentRoomId(newRoom);
+        state.roomId = newRoom;
+        stateManager.saveState();
+        this.showToast(`🎲 Đã tạo Phòng Mới: ${newRoom}!`);
+        void this.openLeaderboard(sortBy, 'qr');
+      };
+    }
+
     const sortMoneyBtn = document.getElementById('btn-sort-money');
     if (sortMoneyBtn) {
       sortMoneyBtn.onclick = () => {
         audio.playPop();
-        void this.openLeaderboard('money');
+        void this.openLeaderboard('money', activeTab);
       };
     }
 
@@ -2937,7 +3062,7 @@ class AppController {
     if (sortDayBtn) {
       sortDayBtn.onclick = () => {
         audio.playPop();
-        void this.openLeaderboard('day');
+        void this.openLeaderboard('day', activeTab);
       };
     }
 
@@ -2945,11 +3070,12 @@ class AppController {
     if (refreshBtn) {
       refreshBtn.onclick = async () => {
         audio.playCash();
-        this.showToast('Đang kết nối làm mới Bảng Xếp Hạng... 🔄');
-        await this.openLeaderboard(sortBy);
+        this.showToast('Đang kết nối làm mới Lobby... 🔄');
+        await this.openLeaderboard(sortBy, activeTab);
       };
     }
   }
+
 }
 
 // Khởi chạy game khi DOM sẵn sàng

@@ -440,6 +440,7 @@ export interface GameState {
   money: number;
   shopName: string;
   userId?: string;
+  roomId?: string;
   currentChapter: number;
   isFastForward: boolean;
   soundEnabled: boolean;
@@ -580,6 +581,7 @@ export interface SecretSauceDayState {
 
 export interface LeaderboardEntry {
   userId: string;
+  roomId?: string;
   shopName: string;
   day: number;
   money: number;

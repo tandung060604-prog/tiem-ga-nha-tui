@@ -2,6 +2,8 @@ import { GameState, LeaderboardEntry } from '../types/game';
 
 export const LEADERBOARD_STORAGE_KEY = 'tiem_ga_nha_tui_leaderboard_cache';
 export const CLOUD_ENDPOINT_KEY = 'tiem_ga_cloud_rtdb_url';
+export const ROOM_STORAGE_KEY = 'tiem_ga_current_room_id';
+export const DEFAULT_ROOM_ID = 'HEM1102';
 
 // Master Cloud Endpoint chạy trên hạ tầng REST API đám mây công khai (Zero-Config)
 // Bất kỳ ai mở game trên bất kỳ điện thoại/máy tính nào đều tự động đồng bộ chung vào đây
@@ -16,6 +18,74 @@ export function generateUniqueUserId(): string {
   const time = Date.now().toString(36);
   const rand = Math.random().toString(36).substring(2, 8);
   return `usr_${time}_${rand}`;
+}
+
+/**
+ * Lấy mã phòng hiện tại (ưu tiên URL param ?room=..., sau đó đến localStorage, mặc định HEM1102)
+ */
+export function getCurrentRoomId(): string {
+  if (typeof window !== 'undefined' && window.location) {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const fromUrl = params.get('room') || params.get('lobby');
+      if (fromUrl) {
+        const clean = fromUrl.trim().toUpperCase();
+        if (clean) {
+          if (typeof localStorage !== 'undefined') {
+            localStorage.setItem(ROOM_STORAGE_KEY, clean);
+          }
+          return clean;
+        }
+      }
+    } catch {}
+  }
+  if (typeof localStorage === 'undefined') return DEFAULT_ROOM_ID;
+  return localStorage.getItem(ROOM_STORAGE_KEY) || DEFAULT_ROOM_ID;
+}
+
+/**
+ * Cập nhật mã phòng mới
+ */
+export function setCurrentRoomId(roomId: string): void {
+  if (typeof localStorage === 'undefined') return;
+  const clean = (roomId || '').trim().toUpperCase();
+  if (clean) {
+    localStorage.setItem(ROOM_STORAGE_KEY, clean);
+  } else {
+    localStorage.setItem(ROOM_STORAGE_KEY, DEFAULT_ROOM_ID);
+  }
+}
+
+/**
+ * Sinh mã phòng ngẫu nhiên 4 ký tự ngắn gọn dễ đọc (ví dụ: GA88, VANG, LOB9)
+ */
+export function generateRoomId(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let res = '';
+  for (let i = 0; i < 4; i++) {
+    res += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return `GA_${res}`;
+}
+
+/**
+ * Tạo URL liên kết mời bạn bè tham gia phòng
+ */
+export function getInviteUrl(roomId?: string): string {
+  const rId = (roomId || getCurrentRoomId()).toUpperCase();
+  if (typeof window !== 'undefined' && window.location) {
+    const origin = window.location.origin;
+    const pathname = window.location.pathname;
+    return `${origin}${pathname}?room=${encodeURIComponent(rId)}`;
+  }
+  return `https://tandung060604-prog.github.io/tiem-ga-nha-tui/?room=${encodeURIComponent(rId)}`;
+}
+
+/**
+ * Tạo link ảnh QR code chuẩn tông màu Stardew Valley (Nâu gỗ trên nền kem)
+ */
+export function getQrCodeUrl(inviteUrl: string): string {
+  return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(inviteUrl)}&color=5a3018&bgcolor=faeed1&margin=1`;
 }
 
 /**
@@ -45,6 +115,7 @@ export function setCloudEndpoint(url: string): void {
 export function buildLeaderboardEntry(state: GameState): LeaderboardEntry {
   return {
     userId: state.userId || 'unknown_user',
+    roomId: (state.roomId || getCurrentRoomId()).toUpperCase(),
     shopName: state.shopName || 'Tiệm Gà Nhà Tui',
     day: state.day || 1,
     money: state.money || 0,
@@ -54,6 +125,7 @@ export function buildLeaderboardEntry(state: GameState): LeaderboardEntry {
     updatedAt: Date.now()
   };
 }
+
 
 /**
  * Lấy dữ liệu Leaderboard từ bộ nhớ đệm Local Storage
@@ -105,9 +177,13 @@ export async function syncToLeaderboard(
   force = false
 ): Promise<{ success: boolean; entries: LeaderboardEntry[]; error?: string }> {
   const entry = buildLeaderboardEntry(state);
+  const targetRoom = (entry.roomId || DEFAULT_ROOM_ID).toUpperCase();
+  const entryKey = `${targetRoom}__${entry.userId}`;
 
   // 1. Luôn cập nhật Local Cache ngay lập tức
   const cache = getLocalLeaderboardCache();
+  cache[entryKey] = entry;
+  // Tương thích ngược: lưu cả key userId cũ
   cache[entry.userId] = entry;
   saveLocalLeaderboardCache(cache);
 
@@ -115,7 +191,7 @@ export async function syncToLeaderboard(
   const now = Date.now();
   if (!force) {
     if (now < cloudBackoffUntil || now - lastCloudSyncTime < CLOUD_SYNC_MIN_INTERVAL_MS) {
-      return fetchLeaderboard(entry.userId);
+      return fetchLeaderboard(entry.userId, 'money', targetRoom);
     }
   }
 
@@ -137,7 +213,7 @@ export async function syncToLeaderboard(
       if (getRes.ok) {
         const json = await getRes.json();
         const currentStores: Record<string, LeaderboardEntry> = (json.data && json.data.stores) || {};
-        currentStores[entry.userId] = entry;
+        currentStores[entryKey] = entry;
 
         // Cập nhật lên Cloud Master qua PATCH
         await fetch(endpoint, {
@@ -152,26 +228,28 @@ export async function syncToLeaderboard(
       }
 
       clearTimeout(timeoutId);
-      return await fetchLeaderboard(entry.userId);
+      return await fetchLeaderboard(entry.userId, 'money', targetRoom);
     } catch (e) {
       cloudBackoffUntil = Date.now() + CLOUD_BACKOFF_PENALTY_MS;
       console.warn('Sync Cloud Leaderboard fallback to local cache:', e);
     }
   }
 
-  return fetchLeaderboard(entry.userId);
+  return fetchLeaderboard(entry.userId, 'money', targetRoom);
 }
 
 /**
  * Lấy danh sách bảng xếp hạng từ Cloud (hoặc Local Cache nếu offline)
- * Tự động đồng bộ giữa các máy điện thoại khác nhau
+ * Tự động đồng bộ giữa các máy điện thoại khác nhau theo từng Lobby Room
  */
 export async function fetchLeaderboard(
   currentUserId?: string,
-  sortBy: 'money' | 'day' = 'money'
-): Promise<{ success: boolean; entries: LeaderboardEntry[]; error?: string; isOffline?: boolean }> {
+  sortBy: 'money' | 'day' = 'money',
+  roomId?: string
+): Promise<{ success: boolean; entries: LeaderboardEntry[]; error?: string; isOffline?: boolean; roomId: string }> {
   let entriesMap: Record<string, LeaderboardEntry> = { ...getLocalLeaderboardCache() };
   let isOffline = true;
+  const targetRoom = (roomId || getCurrentRoomId()).toUpperCase();
 
   // 1. Thử lấy dữ liệu mới nhất từ Cloud qua REST API
   const endpoint = getCloudEndpoint();
@@ -219,11 +297,23 @@ export async function fetchLeaderboard(
     saveLocalLeaderboardCache(entriesMap);
   }
 
-  // 3. Chỉ sử dụng 100% người chơi thật (không bù quán ảo)
-  const allEntries: LeaderboardEntry[] = Object.values(entriesMap);
+  // 3. Khử trùng lặp userId và lọc đúng Lobby Room hiện tại
+  const uniqueUsers: Record<string, LeaderboardEntry> = {};
+  for (const entry of Object.values(entriesMap)) {
+    if (!entry || !entry.userId) continue;
+    const entryRoom = (entry.roomId || DEFAULT_ROOM_ID).toUpperCase();
+    if (entryRoom === targetRoom) {
+      // Nếu có nhiều bản ghi của cùng userId, lấy bản ghi có updatedAt mới nhất
+      const existing = uniqueUsers[entry.userId];
+      if (!existing || (entry.updatedAt || 0) >= (existing.updatedAt || 0)) {
+        uniqueUsers[entry.userId] = entry;
+      }
+    }
+  }
 
+  const allEntries: LeaderboardEntry[] = Object.values(uniqueUsers);
 
-  // 3. Đánh dấu isSelf và sắp xếp
+  // 4. Đánh dấu isSelf và sắp xếp
   const processed = allEntries.map(e => ({
     ...e,
     isSelf: currentUserId ? e.userId === currentUserId : false
@@ -238,7 +328,8 @@ export async function fetchLeaderboard(
   return {
     success: true,
     entries: processed,
-    isOffline
+    isOffline,
+    roomId: targetRoom
   };
 }
 
@@ -246,11 +337,15 @@ export async function fetchLeaderboard(
  * Xóa người chơi khỏi Bảng Xếp Hạng khi bấm "Chơi Lại Từ Đầu"
  * (Tự động xóa khỏi Cloud Master REST API và xóa khỏi Local Storage Cache)
  */
-export async function removeFromLeaderboard(userId: string): Promise<{ success: boolean }> {
+export async function removeFromLeaderboard(userId: string, roomId?: string): Promise<{ success: boolean }> {
   if (!userId) return { success: true };
+
+  const targetRoom = (roomId || getCurrentRoomId()).toUpperCase();
+  const entryKey = `${targetRoom}__${userId}`;
 
   // 1. Xóa khỏi Local Cache ngay lập tức
   const cache = getLocalLeaderboardCache();
+  delete cache[entryKey];
   delete cache[userId];
   saveLocalLeaderboardCache(cache);
 
@@ -270,6 +365,7 @@ export async function removeFromLeaderboard(userId: string): Promise<{ success: 
       if (getRes.ok) {
         const json = await getRes.json();
         const currentStores: Record<string, LeaderboardEntry> = (json.data && json.data.stores) || {};
+        delete currentStores[entryKey];
         delete currentStores[userId];
 
         await fetch(endpoint, {
@@ -288,4 +384,5 @@ export async function removeFromLeaderboard(userId: string): Promise<{ success: 
 
   return { success: true };
 }
+
 

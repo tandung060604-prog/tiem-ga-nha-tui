@@ -19,6 +19,7 @@ export function createInitialState(): GameState {
     money: 850000, // Tiền vốn khởi đầu cho xe đẩy chương 1
     shopName: 'Tiệm Gà Nhà Tui',
     userId: generateUniqueUserId(),
+    roomId: 'HEM1102',
     currentChapter: 1,
     isFastForward: false,
     soundEnabled: true,
@@ -162,6 +163,9 @@ export function migrateSave(raw: unknown): { state: GameState; repaired: string[
   const defaults = createInitialState();
   if (!state.userId || typeof state.userId !== 'string') {
     state.userId = generateUniqueUserId();
+  }
+  if (!state.roomId || typeof state.roomId !== 'string') {
+    state.roomId = 'HEM1102';
   }
   // Save từ trước khi có hướng dẫn: đã qua ngày 1 thì coi như đã học, không bật lại
   if (typeof src.tutorialDone !== 'boolean') state.tutorialDone = typeof src.day === 'number' && src.day > 1;
