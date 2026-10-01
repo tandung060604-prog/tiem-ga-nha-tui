@@ -5,6 +5,105 @@ import { getInviteUrl, getQrCodeUrl } from '../../core/leaderboard';
 
 const vnd = (n: number) => n.toLocaleString('vi-VN') + 'đ';
 
+const getRankBadge = (rank: number) => {
+  switch (rank) {
+    case 1:
+      return `<span style="font-size: 1.35rem; filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.4));" title="Quán Quân">🥇</span>`;
+    case 2:
+      return `<span style="font-size: 1.25rem; filter: drop-shadow(0 2px 4px rgba(148, 163, 184, 0.4));" title="Á Quân">🥈</span>`;
+    case 3:
+      return `<span style="font-size: 1.15rem; filter: drop-shadow(0 2px 4px rgba(217, 119, 6, 0.4));" title="Quý Quân">🥉</span>`;
+    default:
+      return `<span style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #e2e8f0; color: #475569; font-weight: 800; font-size: 0.85rem; border: 1px solid #cbd5e1;">${rank}</span>`;
+  }
+};
+
+const getRankBg = (rank: number, isSelf: boolean) => {
+  if (isSelf) return 'background: #fff8e1; border: 2px solid #f59e0b; box-shadow: 0 3px 8px rgba(245, 158, 11, 0.25);';
+  if (rank === 1) return 'background: #fffdf5; border: 2px solid #fbbf24; box-shadow: 0 2px 6px rgba(251, 191, 36, 0.2);';
+  if (rank === 2) return 'background: #f8fafc; border: 1.5px solid #cbd5e1;';
+  if (rank === 3) return 'background: #fdfbf7; border: 1.5px solid #d97706;';
+  return 'background: #ffffff; border: 1px solid #e2e8f0;';
+};
+
+/**
+ * Render danh sách 4 Slots cho Lobby (dùng cho cả lần đầu và khi Auto-Polling cập nhật mượt mà)
+ */
+export function renderLobbySlotsHtml(
+  entries: LeaderboardEntry[],
+  currentUserId?: string
+): string {
+  const slots: (LeaderboardEntry | null)[] = [null, null, null, null];
+  for (let i = 0; i < 4; i++) {
+    if (i < entries.length) {
+      slots[i] = entries[i] ?? null;
+    }
+  }
+
+  return slots.map((entry, index) => {
+    const rank = index + 1;
+    if (entry) {
+      const isSelf = Boolean(entry.isSelf || (currentUserId && entry.userId === currentUserId));
+      const chapterData = CHAPTERS.find(c => c.number === entry.chapter) || CHAPTERS[0];
+      const isHost = rank === 1;
+
+      return `
+        <div class="lobby-player-slot" data-user-id="${escapeHtml(entry.userId)}" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; ${getRankBg(rank, isSelf)} transition: transform 0.15s ease;">
+          <div style="display: flex; align-items: center; justify-content: center; min-width: 32px;">
+            ${getRankBadge(rank)}
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 2px; flex-wrap: wrap;">
+              <b style="font-size: 0.92rem; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 145px;">
+                ${escapeHtml(entry.shopName)}
+              </b>
+              ${isSelf ? `
+                <span style="background: #f59e0b; color: #fff; font-size: 0.65rem; font-weight: 800; padding: 1px 5px; border-radius: 5px; letter-spacing: 0.5px;">BẠN</span>
+              ` : ''}
+              ${isHost ? `
+                <span style="background: #e11d48; color: #fff; font-size: 0.62rem; font-weight: 800; padding: 1px 5px; border-radius: 5px;" title="Người vào trước / Đang dẫn đầu">👑 CHỦ PHÒNG</span>
+              ` : ''}
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 0.73rem; color: var(--soft);">
+              <span>📅 Ngày ${entry.day}</span>
+              <span>•</span>
+              <span>Chương ${entry.chapter}: ${chapterData?.title || 'Khởi đầu'}</span>
+              <span>•</span>
+              <span>⭐ ${(entry.overallRating || 4.0).toFixed(1)}</span>
+            </div>
+          </div>
+          <div style="text-align: right; min-width: 85px;">
+            <div style="font-weight: 800; font-size: 0.95rem; color: #b45309;">
+              ${vnd(entry.money)}
+            </div>
+            <div style="font-size: 0.68rem; color: var(--soft);">
+              🍗 ${entry.totalFried} mẻ gà
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      // Slot còn trống (Chờ người chơi quét mã QR)
+      return `
+        <div class="empty-lobby-slot" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.45); border: 2px dashed #c49a6c;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: #e2e8f0; color: #94a3b8; font-weight: 800; font-size: 0.85rem;">
+              ${rank}
+            </span>
+            <div>
+              <div style="font-weight: 700; font-size: 0.82rem; color: #8c6239;">Slot ${rank}: Đang chờ bạn bè...</div>
+              <div style="font-size: 0.68rem; color: #a17852;">Quét mã QR để cùng vào phòng này</div>
+            </div>
+          </div>
+          <button class="btn-sm btn-quick-invite-qr" style="padding: 4px 10px; font-size: 0.72rem; font-weight: 800; border-radius: 6px; background: #fff; border: 1.5px solid #d4a373; color: #7c4f32; cursor: pointer;">
+            📱 Mời QR
+          </button>
+        </div>
+      `;
+    }
+  }).join('');
+}
+
 export function renderLeaderboardModal(
   entries: LeaderboardEntry[],
   currentUserId?: string,
@@ -15,35 +114,7 @@ export function renderLeaderboardModal(
 ): string {
   const inviteUrl = getInviteUrl(roomId);
   const qrCodeUrl = getQrCodeUrl(inviteUrl);
-
-  const getRankBadge = (rank: number) => {
-    switch (rank) {
-      case 1:
-        return `<span style="font-size: 1.35rem; filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.4));" title="Quán Quân">🥇</span>`;
-      case 2:
-        return `<span style="font-size: 1.25rem; filter: drop-shadow(0 2px 4px rgba(148, 163, 184, 0.4));" title="Á Quân">🥈</span>`;
-      case 3:
-        return `<span style="font-size: 1.15rem; filter: drop-shadow(0 2px 4px rgba(217, 119, 6, 0.4));" title="Quý Quân">🥉</span>`;
-      default:
-        return `<span style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #e2e8f0; color: #475569; font-weight: 800; font-size: 0.85rem; border: 1px solid #cbd5e1;">${rank}</span>`;
-    }
-  };
-
-  const getRankBg = (rank: number, isSelf: boolean) => {
-    if (isSelf) return 'background: #fff8e1; border: 2px solid #f59e0b; box-shadow: 0 3px 8px rgba(245, 158, 11, 0.25);';
-    if (rank === 1) return 'background: #fffdf5; border: 2px solid #fbbf24; box-shadow: 0 2px 6px rgba(251, 191, 36, 0.2);';
-    if (rank === 2) return 'background: #f8fafc; border: 1.5px solid #cbd5e1;';
-    if (rank === 3) return 'background: #fdfbf7; border: 1.5px solid #d97706;';
-    return 'background: #ffffff; border: 1px solid #e2e8f0;';
-  };
-
-  // Chuẩn bị danh sách 4 Slots cho Lobby
-  const slots: (LeaderboardEntry | null)[] = [null, null, null, null];
-  for (let i = 0; i < 4; i++) {
-    if (i < entries.length) {
-      slots[i] = entries[i] ?? null;
-    }
-  }
+  const slotsHtml = renderLobbySlotsHtml(entries, currentUserId);
 
   return `
     <div class="leaderboard-modal-box" style="text-align: left; display: flex; flex-direction: column; gap: 10px; max-width: 430px; width: 100%; margin: 0 auto; background: #faeed1; padding: 14px 16px; border-radius: 12px; border: 3px solid #5a3018; box-shadow: inset 2px 2px 0 #f7d046, inset -2px -2px 0 #2b1810, 0 8px 24px rgba(0,0,0,0.35);">
@@ -54,7 +125,7 @@ export function renderLeaderboardModal(
           <div>
             <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #3d2314; font-family: var(--font-heading); letter-spacing: 0.5px;">LOBBY ĐUA TOP 4 NGƯỜI</h3>
             <div style="display: flex; align-items: center; gap: 6px; font-size: 0.72rem; color: #7c4f32; font-weight: 700;">
-              <span>Mã Phòng: <b style="color: #b45309; background: #fff3cd; padding: 1px 6px; border-radius: 4px; border: 1px solid #f59e0b;">${escapeHtml(roomId)}</b></span>
+              <span>Mã Phòng: <b id="lobby-room-code-badge" style="color: #b45309; background: #fff3cd; padding: 1px 6px; border-radius: 4px; border: 1px solid #f59e0b;">${escapeHtml(roomId)}</b></span>
               <span>•</span>
               <span>100% Người Thật</span>
             </div>
@@ -66,7 +137,7 @@ export function renderLeaderboardModal(
       <!-- Navigation Tabs: Lobby 4 Người VS Mã QR Mời Bạn -->
       <div style="display: flex; gap: 6px; background: #ebd5b3; padding: 3px; border-radius: 10px; border: 1.5px solid #c49a6c;">
         <button id="tab-nav-lobby" class="btn-sm ${activeTab === 'lobby' ? 'primary' : ''}" style="flex: 1; min-height: 34px; font-weight: 800; font-size: 0.78rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 4px;">
-          👥 4 Vị Trí Lobby (${entries.length}/4)
+          👥 4 Vị Trí Lobby (<span id="lobby-player-count">${entries.length}</span>/4)
         </button>
         <button id="tab-nav-qr" class="btn-sm ${activeTab === 'qr' ? 'primary' : ''}" style="flex: 1; min-height: 34px; font-weight: 800; font-size: 0.78rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 4px;">
           📱 Mã QR Mời Bạn
@@ -78,8 +149,8 @@ export function renderLeaderboardModal(
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
           <div style="display: flex; align-items: center; gap: 6px;">
             <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${isOffline ? '#f59e0b' : '#10b981'}; box-shadow: 0 0 6px ${isOffline ? '#f59e0b' : '#10b981'};"></span>
-            <span style="font-size: 0.75rem; font-weight: 700; color: ${isOffline ? '#b45309' : '#047857'};">
-              ${isOffline ? 'Bộ nhớ đệm (Đang Offline)' : 'Đám mây kết nối (Realtime)'}
+            <span id="lobby-sync-status-text" style="font-size: 0.75rem; font-weight: 700; color: ${isOffline ? '#b45309' : '#047857'};">
+              ${isOffline ? 'Bộ nhớ đệm (Đang Offline)' : 'Đám mây kết nối (Live 4s)'}
             </span>
           </div>
           <div style="display: flex; gap: 4px;">
@@ -92,70 +163,9 @@ export function renderLeaderboardModal(
           </div>
         </div>
 
-        <!-- 4 Lobby Slots -->
-        <div style="display: flex; flex-direction: column; gap: 8px; max-height: 330px; overflow-y: auto; padding-right: 2px;">
-          ${slots.map((entry, index) => {
-            const rank = index + 1;
-            if (entry) {
-              const isSelf = Boolean(entry.isSelf || (currentUserId && entry.userId === currentUserId));
-              const chapterData = CHAPTERS.find(c => c.number === entry.chapter) || CHAPTERS[0];
-              const isHost = rank === 1;
-
-              return `
-                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; ${getRankBg(rank, isSelf)} transition: transform 0.15s ease;">
-                  <div style="display: flex; align-items: center; justify-content: center; min-width: 32px;">
-                    ${getRankBadge(rank)}
-                  </div>
-                  <div style="flex: 1; min-width: 0;">
-                    <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 2px; flex-wrap: wrap;">
-                      <b style="font-size: 0.92rem; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 145px;">
-                        ${escapeHtml(entry.shopName)}
-                      </b>
-                      ${isSelf ? `
-                        <span style="background: #f59e0b; color: #fff; font-size: 0.65rem; font-weight: 800; padding: 1px 5px; border-radius: 5px; letter-spacing: 0.5px;">BẠN</span>
-                      ` : ''}
-                      ${isHost ? `
-                        <span style="background: #e11d48; color: #fff; font-size: 0.62rem; font-weight: 800; padding: 1px 5px; border-radius: 5px;" title="Người vào trước / Đang dẫn đầu">👑 CHỦ PHÒNG</span>
-                      ` : ''}
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 6px; font-size: 0.73rem; color: var(--soft);">
-                      <span>📅 Ngày ${entry.day}</span>
-                      <span>•</span>
-                      <span>Chương ${entry.chapter}: ${chapterData?.title || 'Khởi đầu'}</span>
-                      <span>•</span>
-                      <span>⭐ ${(entry.overallRating || 4.0).toFixed(1)}</span>
-                    </div>
-                  </div>
-                  <div style="text-align: right; min-width: 85px;">
-                    <div style="font-weight: 800; font-size: 0.95rem; color: #b45309;">
-                      ${vnd(entry.money)}
-                    </div>
-                    <div style="font-size: 0.68rem; color: var(--soft);">
-                      🍗 ${entry.totalFried} mẻ gà
-                    </div>
-                  </div>
-                </div>
-              `;
-            } else {
-              // Slot còn trống (Chờ người chơi quét mã QR)
-              return `
-                <div class="empty-lobby-slot" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.45); border: 2px dashed #c49a6c;">
-                  <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: #e2e8f0; color: #94a3b8; font-weight: 800; font-size: 0.85rem;">
-                      ${rank}
-                    </span>
-                    <div>
-                      <div style="font-weight: 700; font-size: 0.82rem; color: #8c6239;">Slot ${rank}: Đang chờ bạn bè...</div>
-                      <div style="font-size: 0.68rem; color: #a17852;">Quét mã QR để cùng vào phòng này</div>
-                    </div>
-                  </div>
-                  <button class="btn-sm btn-quick-invite-qr" style="padding: 4px 10px; font-size: 0.72rem; font-weight: 800; border-radius: 6px; background: #fff; border: 1.5px solid #d4a373; color: #7c4f32; cursor: pointer;">
-                    📱 Mời QR
-                  </button>
-                </div>
-              `;
-            }
-          }).join('')}
+        <!-- 4 Lobby Slots (Hỗ trợ Live Update Realtime) -->
+        <div id="lobby-slots-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 330px; overflow-y: auto; padding-right: 2px;">
+          ${slotsHtml}
         </div>
 
         <!-- Banner Mời Bạn Nhanh -->

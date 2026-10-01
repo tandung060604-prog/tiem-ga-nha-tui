@@ -133,7 +133,8 @@ export type TickEvent =
 // Trả về thời gian game (ms) đã trôi trong frame này, để caller cập nhật chảo chiên cùng nhịp.
 export function gameDeltaMs(session: SellingSession, realDtMs: number): number {
   const dt = Math.min(Math.max(realDtMs, 0), MAX_FRAME_MS);
-  return session.isPaused ? 0 : dt * (session.isFastForward ? FAST_FORWARD : 1);
+  const devSpeed = (typeof window !== 'undefined' && (window as any).__DEV_SPEED__) ? Math.max(1, Number((window as any).__DEV_SPEED__)) : 1;
+  return session.isPaused ? 0 : dt * (session.isFastForward ? FAST_FORWARD : 1) * devSpeed;
 }
 
 export function tickSelling(session: SellingSession, gameDt: number, ctx: TickContext): TickEvent[] {

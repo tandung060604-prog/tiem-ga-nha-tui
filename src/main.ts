@@ -75,7 +75,7 @@ import {
   setCurrentRoomId,
   generateRoomId
 } from './core/leaderboard';
-import { renderLeaderboardModal } from './ui/components/LeaderboardModal';
+import { renderLeaderboardModal, renderLobbySlotsHtml } from './ui/components/LeaderboardModal';
 import type { DailyIncident, DeliveryRunResult } from './types/game';
 import confetti from 'canvas-confetti';
 
@@ -150,6 +150,8 @@ class AppController {
   private shownBacBaTipsThisSession = new Set<string>();
   private prepTutorialStep: PrepTutorialStep | null = null;
   private isNewShopFlow = false;
+  private leaderboardPollTimer: number | null = null;
+  private lastLobbyEntriesCount: number = 0;
 
   constructor() {
     if (import.meta.env?.DEV) {
@@ -582,6 +584,10 @@ class AppController {
   }
 
   public closeModal() {
+    if (this.leaderboardPollTimer !== null) {
+      window.clearInterval(this.leaderboardPollTimer);
+      this.leaderboardPollTimer = null;
+    }
     stopNarration();
     const overlay = document.getElementById('modal-container');
     const modalContent = document.getElementById('modal-content');
@@ -2409,7 +2415,7 @@ class AppController {
   }
 
   // --- FINISH DAY & SUMMARY ---
-  private finishDay() {
+  public finishDay() {
     if (this.tutorial) this.endTutorial();
     this.stopSellingPhase();
     this.lastShiftSnapshotAt = 0;
@@ -2692,7 +2698,7 @@ class AppController {
   }
 
   // Chuyển sang ngày mới (tách ra để dùng chung)
-  private proceedToNextDay() {
+  public proceedToNextDay() {
     this.closeModal();
     const currentEnding = evaluateEnding(stateManager.getState());
     if (currentEnding) {
@@ -2934,6 +2940,10 @@ class AppController {
     sortBy: 'money' | 'day' = 'money',
     activeTab: 'lobby' | 'qr' = 'lobby'
   ) {
+    if (this.leaderboardPollTimer !== null) {
+      window.clearInterval(this.leaderboardPollTimer);
+      this.leaderboardPollTimer = null;
+    }
     audio.playPop();
     const state = stateManager.getState();
     const currentUserId = state.userId;
@@ -3074,6 +3084,62 @@ class AppController {
         await this.openLeaderboard(sortBy, activeTab);
       };
     }
+
+    // 4. Kích hoạt Realtime Auto-Polling khi tab là 'lobby'
+    this.lastLobbyEntriesCount = result.entries.length;
+    if (activeTab === 'lobby') {
+      this.leaderboardPollTimer = window.setInterval(async () => {
+        const overlay = document.getElementById('modal-container');
+        const container = document.getElementById('lobby-slots-container');
+        if (!overlay || overlay.hasAttribute('hidden') || !container) {
+          if (this.leaderboardPollTimer !== null) {
+            window.clearInterval(this.leaderboardPollTimer);
+            this.leaderboardPollTimer = null;
+          }
+          return;
+        }
+
+        try {
+          const fresh = await fetchLeaderboard(currentUserId, sortBy, currentRoomId);
+          const targetContainer = document.getElementById('lobby-slots-container');
+          if (!targetContainer) return;
+
+          const prevCount = this.lastLobbyEntriesCount;
+          const newCount = fresh.entries.length;
+
+          targetContainer.innerHTML = renderLobbySlotsHtml(fresh.entries, currentUserId);
+
+          // Cập nhật số người trên tab
+          const countBadge = document.getElementById('lobby-player-count');
+          if (countBadge) countBadge.textContent = String(newCount);
+
+          // Gắn lại sự kiện cho các nút mời nhanh trên slot trống
+          targetContainer.querySelectorAll('.btn-quick-invite-qr').forEach(b => {
+            (b as HTMLElement).onclick = (e) => {
+              e.stopPropagation();
+              audio.playPop();
+              void this.openLeaderboard(sortBy, 'qr');
+            };
+          });
+
+          // Hiệu ứng pháo hoa khi có người chơi mới vừa quét QR vào phòng!
+          if (newCount > prevCount) {
+            this.lastLobbyEntriesCount = newCount;
+            audio.playCash();
+            confetti({
+              particleCount: 50,
+              spread: 70,
+              origin: { y: 0.6 }
+            });
+            const newest = fresh.entries[fresh.entries.length - 1];
+            const name = newest?.shopName || 'Bạn bè';
+            this.showToast(`🎉 ${name} vừa quét QR gia nhập phòng!`);
+          } else {
+            this.lastLobbyEntriesCount = newCount;
+          }
+        } catch {}
+      }, 4000);
+    }
   }
 
 }
@@ -3082,4 +3148,6 @@ class AppController {
 window.addEventListener('DOMContentLoaded', () => {
   const app = new AppController();
   (window as unknown as { __app: AppController }).__app = app;
+  (window as unknown as { __stateManager: unknown }).__stateManager = stateManager;
+  (window as unknown as { syncToLeaderboard: unknown }).syncToLeaderboard = syncToLeaderboard;
 });

@@ -174,4 +174,44 @@ describe('Hệ Thống Lobby Đua Top 4 Người Chơi & Mã QR Mời Bạn', ()
     setCloudEndpoint('');
     expect(getCloudEndpoint()).toBe(DEFAULT_CLOUD_RTDB_URL);
   });
+
+  it('8. renderLobbySlotsHtml render chính xác các vị trí và slot chờ trống cho Auto-Polling', async () => {
+    const { renderLobbySlotsHtml } = await import('../src/ui/components/LeaderboardModal');
+    const mockEntries = [
+      {
+        userId: 'usr_p1',
+        shopName: 'Tiệm Bạn A',
+        day: 10,
+        money: 15000000,
+        chapter: 2,
+        overallRating: 4.8,
+        totalFried: 45,
+        updatedAt: Date.now(),
+        isSelf: true
+      },
+      {
+        userId: 'usr_p2',
+        shopName: 'Tiệm Bạn B',
+        day: 8,
+        money: 8500000,
+        chapter: 1,
+        overallRating: 4.5,
+        totalFried: 30,
+        updatedAt: Date.now(),
+        isSelf: false
+      }
+    ];
+
+    const html = renderLobbySlotsHtml(mockEntries as any, 'usr_p1');
+    // Có thẻ của bạn A (Chủ phòng và Bạn)
+    expect(html).toContain('Tiệm Bạn A');
+    expect(html).toContain('👑 CHỦ PHÒNG');
+    expect(html).toContain('BẠN');
+    // Có thẻ của bạn B
+    expect(html).toContain('Tiệm Bạn B');
+    // Có 2 slot trống đang chờ bạn bè quét QR
+    expect(html).toContain('Slot 3: Đang chờ bạn bè...');
+    expect(html).toContain('Slot 4: Đang chờ bạn bè...');
+    expect(html).toContain('📱 Mời QR');
+  });
 });
