@@ -4,6 +4,7 @@ import { weekdayOf, isWeekend } from '../../core/clock';
 import { currentChapterData, chapterProgress, depositStatus } from '../../core/progression';
 import { finaleReady } from '../../content/endings';
 import { ASSETS } from '../../content/assets';
+import { DAILY_INCIDENTS } from '../../content/dailyIncidents';
 
 export function renderChalkboard(state: GameState, currentEventTitle: string = 'Trời Nắng Ráo'): string {
   const currentChapter = currentChapterData(state);
@@ -67,7 +68,7 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
             <img src="${ASSETS.ui.bunnyNote}" class="btn-pixel-icon-sm" alt="" /> Thỏ Cam
           </button>
           <button id="btn-open-incidents" class="btn-sm btn-incident-card">
-            <img src="${ASSETS.icons.reviews}" class="btn-pixel-icon-sm" alt="" /> Sổ Tay Hẻm (${state.seenIncidentIds?.length ?? 0}/25)
+            <img src="${ASSETS.icons.reviews}" class="btn-pixel-icon-sm" alt="" /> Sổ Tay Hẻm (${state.seenIncidentIds?.length ?? 0}/${DAILY_INCIDENTS.length})
           </button>
           <button id="btn-read-story" class="btn-sm primary btn-story-card">
             <img src="${ASSETS.icons.book}" class="btn-pixel-icon-sm" alt="" /> Truyện Hẻm 1102

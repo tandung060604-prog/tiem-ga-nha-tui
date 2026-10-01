@@ -1,17 +1,19 @@
 import { DailyIncident, NonEmpty } from '../types/game';
+import { EXPANDED_DAILY_INCIDENTS } from './dailyIncidentsExpanded';
 
 /**
- * 25 SỰ KIỆN TÌNH HUỐNG HẺM 1102 (ĐỜI THƯỜNG & BẮT TREND)
- * Phân tầng theo 4 Giai Đoạn Tiến Độ:
+ * HỆ THỐNG 78 SỰ KIỆN TÌNH HUỐNG & QUIZ HẺM 1102 (ĐỜI THƯỜNG, DRAMA & BẮT TREND)
+ * Phân tầng theo 5 Giai Đoạn Tiến Độ:
  *  - Giai đoạn 1 (Chương 1, Ngày 2–7): Xe Đẩy Vỉa Hè Mộc Mạc
  *  - Giai đoạn 2 (Chương 2, Ngày 8–18): Căn Nhà Số 14 Trong Hẻm & Khách Trẻ
  *  - Giai đoạn 3 (Chương 3, Ngày 19–35): Mặt Tiền Phố Lớn & Đối Thủ Cạnh Tranh
- *  - Giai đoạn 4 (Chương 4–5, Ngày 36+): Đế Chế Bistro & Thử Thách Bản Lĩnh Triệu Đô
+ *  - Giai đoạn 4 (Chương 4, Ngày 36–60): Cuộc Chiến MegaChicken & Bản Lĩnh Triệu Đô
+ *  - Giai đoạn 5 (Chương 5, Ngày 61–120+): Đế Chế Bistro & Cúp Gà Vàng Sài Gòn
  */
 const BASE = import.meta.env?.BASE_URL ?? '/';
 const charImg = (name: string) => `${BASE}assets/characters/${name}`;
 
-export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
+export const BASE_DAILY_INCIDENTS: DailyIncident[] = [
   // =========================================================================
   // GIAI ĐOẠN 1: KHỞI NGHIỆP XE ĐẨY VỈA HÈ (CHƯƠNG 1, NGÀY 2 - 7)
   // =========================================================================
@@ -1714,6 +1716,12 @@ export const SPECIAL_ANIMAL_INCIDENTS: DailyIncident[] = [
   }
 ];
 
+export const DAILY_INCIDENTS: NonEmpty<DailyIncident> = [
+  ...BASE_DAILY_INCIDENTS,
+  ...SPECIAL_ANIMAL_INCIDENTS,
+  ...EXPANDED_DAILY_INCIDENTS
+] as unknown as NonEmpty<DailyIncident>;
+
 export function getIncidentById(id: string): DailyIncident | undefined {
-  return DAILY_INCIDENTS.find(inc => inc.id === id) ?? SPECIAL_ANIMAL_INCIDENTS.find(inc => inc.id === id);
+  return DAILY_INCIDENTS.find(inc => inc.id === id);
 }

@@ -155,7 +155,9 @@ export function tickSelling(session: SellingSession, gameDt: number, ctx: TickCo
     // khách đứng sau (i = 1, 2...) thấy có người trước nên kiên nhẫn chờ hơn
     const queueFactor = i === 0 ? 1.0 : i === 1 ? 0.65 : 0.45;
     const traitFactor = order.personality === 'impatient' ? 1.35 : order.personality === 'easygoing' ? 0.75 : 1.0;
-    order.patienceCurrent -= (gameDt / 1000) * queueFactor * traitFactor;
+    const devSpeed = (typeof window !== 'undefined' && (window as any).__DEV_SPEED__) ? Math.max(1, Number((window as any).__DEV_SPEED__)) : 1;
+    const effectivePatienceDt = devSpeed > 1 ? (gameDt / devSpeed) : gameDt;
+    order.patienceCurrent -= (effectivePatienceDt / 1000) * queueFactor * traitFactor;
 
     if (order.patienceCurrent > 0) {
       stillWaiting.push(order);

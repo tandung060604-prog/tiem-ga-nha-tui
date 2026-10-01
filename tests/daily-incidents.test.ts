@@ -18,8 +18,8 @@ describe('Hệ Thống 25 Sự Kiện Hài Hước Bắt Trend & Quyết Định
   });
 
   describe('1. Ngân hàng 25 Sự Kiện (Content Integrity)', () => {
-    it('Phải có ít nhất 25 sự kiện hài hước & đời sống hẻm', () => {
-      expect(DAILY_INCIDENTS.length).toBeGreaterThanOrEqual(25);
+    it('Phải có ít nhất 75 sự kiện kịch tính, phong phú trải đều 5 chương', () => {
+      expect(DAILY_INCIDENTS.length).toBeGreaterThanOrEqual(75);
     });
 
     it('Mỗi sự kiện phải có đầy đủ thuộc tính, lời thoại và ít nhất 2 lựa chọn', () => {
@@ -203,9 +203,10 @@ describe('Hệ Thống 25 Sự Kiện Hài Hước Bắt Trend & Quyết Định
       state.seenIncidentIds = DAILY_INCIDENTS.slice(0, DAILY_INCIDENTS.length - 1).map(i => i.id);
       const remainingId = DAILY_INCIDENTS[DAILY_INCIDENTS.length - 1].id;
 
-      // Chương 5, Ngày 50 để mở khóa toàn bộ
+      // Chương 5, Ngày 120, 5 sao để mở khóa toàn bộ tất cả sự kiện
       state.currentChapter = 5;
-      state.day = 50;
+      state.day = 120;
+      state.ratings = { taste: 5, speed: 5, hygiene: 5, space: 5, pricing: 5, overall: 5 };
 
       const picked = pickDailyIncident(state, 'any');
       expect(picked?.id).toBe(remainingId);
@@ -250,6 +251,61 @@ describe('Hệ Thống 25 Sự Kiện Hài Hước Bắt Trend & Quyết Định
       expect(html).toContain('Tình Huống Bí Ẩn');
       expect(html).toContain('Bé Mèo Mướp Con');
       expect(html).toContain('Xử lý thành công');
+    });
+  });
+
+  describe('6. Kiểm định 50 Sự Kiện Quiz Tình Huống Mở Rộng (Expanded Incidents)', () => {
+    it('Tập sự kiện mở rộng phải có đúng 50 tình huống kịch tính', async () => {
+      const { EXPANDED_DAILY_INCIDENTS } = await import('../src/content/dailyIncidentsExpanded');
+      expect(EXPANDED_DAILY_INCIDENTS.length).toBe(50);
+    });
+
+    it('50 sự kiện mới phân bổ cân bằng trải dài qua cả 5 Chương', async () => {
+      const { EXPANDED_DAILY_INCIDENTS } = await import('../src/content/dailyIncidentsExpanded');
+      const chapterCounts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+      
+      for (const inc of EXPANDED_DAILY_INCIDENTS) {
+        const ch = inc.minChapter ?? 1;
+        chapterCounts[ch] = (chapterCounts[ch] ?? 0) + 1;
+      }
+
+      // Mỗi chương từ 1 đến 5 phải có ít nhất 9 sự kiện mới
+      expect(chapterCounts[1]).toBeGreaterThanOrEqual(9);
+      expect(chapterCounts[2]).toBeGreaterThanOrEqual(9);
+      expect(chapterCounts[3]).toBeGreaterThanOrEqual(9);
+      expect(chapterCounts[4]).toBeGreaterThanOrEqual(9);
+      expect(chapterCounts[5]).toBeGreaterThanOrEqual(9);
+    });
+
+    it('Giải quyết sự kiện mới ảnh hưởng đúng Karma và tài chính', () => {
+      const rainIncident = getIncidentById('inc_quiz_01_rain_tarp');
+      expect(rainIncident).toBeDefined();
+
+      const choice = rainIncident!.choices.find(c => c.id === 'tarp_invite_neighbors');
+      expect(choice).toBeDefined();
+
+      const initialCommunity = state.karma?.community ?? 50;
+      const res = resolveIncidentChoice(state, rainIncident!, choice!);
+
+      expect(res.succeeded).toBe(true);
+      expect(res.reactionTitle).toContain('Mái Hiên Ấm Áp');
+      expect(state.karma.community).toBe(initialCommunity + (choice!.karmaDelta.community ?? 0));
+    });
+
+    it('Trận chung kết Cúp Gà Vàng Day 110 trao cúp và tăng mạnh Karma', () => {
+      const finalIncident = getIncidentById('inc_quiz_50_master_fried_chicken_championship');
+      expect(finalIncident).toBeDefined();
+      expect(finalIncident?.minDay).toBe(110);
+      expect(finalIncident?.requiredStars).toBe(4.8);
+
+      const winChoice = finalIncident!.choices.find(c => c.id === 'champion_master_creation');
+      expect(winChoice).toBeDefined();
+      expect(winChoice?.moneyDelta).toBe(10000000);
+
+      const res = resolveIncidentChoice(state, finalIncident!, winChoice!);
+      expect(res.succeeded).toBe(true);
+      expect(res.reactionTitle).toContain('Đăng Quang');
+      expect(state.money).toBe(createInitialState().money + 10000000);
     });
   });
 });
