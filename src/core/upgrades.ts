@@ -1,4 +1,5 @@
 import { UpgradeBranch } from '../types/game';
+import { INITIAL_UPGRADES } from '../content/upgrades';
 
 // Tác dụng thật của nâng cấp. Mỗi chỉ số trong một nhánh lấy mức CAO NHẤT trong các cấp đã mua
 // (thiết bị mới thay thiết bị cũ, không cộng dồn), rồi cộng giữa các nhánh.
@@ -21,14 +22,26 @@ export interface UpgradeEffects {
   hygieneBoost: number;    // Vệ sinh: tăng tốc độ tích lũy sao Vệ Sinh
 }
 
-type Upgrades = { [id: string]: UpgradeBranch };
+type Upgrades = { [id: string]: UpgradeBranch | number };
 
-function bestOwned(branch: UpgradeBranch | undefined, stat: keyof UpgradeBranch['tiers'][number]['bonus']): number {
-  if (!branch) return 0;
-  return branch.tiers
-    .filter(t => t.level <= branch.currentLevel)
+function getLevel(branch: UpgradeBranch | number | undefined): number {
+  if (typeof branch === 'number') return branch;
+  return branch?.currentLevel ?? 1;
+}
+
+function bestOwned(branch: UpgradeBranch | number | undefined, stat: keyof UpgradeBranch['tiers'][number]['bonus'], branchId?: string): number {
+  if (branch === undefined || branch === null) return 0;
+  const level = getLevel(branch);
+  const tiers = (typeof branch === 'object' && Array.isArray(branch?.tiers))
+    ? branch.tiers
+    : (branchId && INITIAL_UPGRADES[branchId]?.tiers)
+      ? INITIAL_UPGRADES[branchId].tiers
+      : [];
+  if (!tiers.length) return 0;
+  return tiers
+    .filter(t => t.level <= level)
     .reduce((best, t) => {
-      const val = t.bonus[stat];
+      const val = t.bonus?.[stat];
       return Math.max(best, typeof val === 'number' ? val : val ? 1 : 0);
     }, 0);
 }
@@ -63,25 +76,25 @@ export function upgradeEffects(upgrades?: Upgrades | null): UpgradeEffects {
   }
   const { kitchen, space, operations, marketing, storage, service, hygiene } = upgrades;
 
-  const autoDrink = (service?.currentLevel ?? 1) >= 3;
-  const pestImmunity = (hygiene?.currentLevel ?? 1) >= 4;
+  const autoDrink = getLevel(service) >= 3;
+  const pestImmunity = getLevel(hygiene) >= 4;
 
   return {
-    fryRampPct: bestOwned(kitchen, 'speed'),
-    tastePct: bestOwned(kitchen, 'taste'),
-    oilLifePct: bestOwned(hygiene, 'hygiene'),
-    patiencePct: bestOwned(operations, 'speed'),
-    customersPct: bestOwned(marketing, 'customers'),
-    autoLift: (kitchen?.currentLevel ?? 1) >= AUTO_LIFT_KITCHEN_LEVEL,
-    pricePremiumPct: Math.min(MAX_PRICE_PREMIUM_PCT, Math.round(bestOwned(space, 'space') / 3)),
-    traySlots: Math.min(3, capacitySlots(bestOwned(space, 'capacity'))),
-    selfServe: (operations?.currentLevel ?? 1) >= SELF_SERVE_OPERATIONS_LEVEL,
-    ownDeliveryApp: (operations?.currentLevel ?? 1) >= 5,
-    shelfLifeBonus: bestOwned(storage, 'shelfLife'),
-    discountWholesale: Math.min(30, bestOwned(storage, 'discount')),
-    sauceTipBonus: bestOwned(service, 'sauceTip'),
+    fryRampPct: bestOwned(kitchen, 'speed', 'kitchen'),
+    tastePct: bestOwned(kitchen, 'taste', 'kitchen'),
+    oilLifePct: bestOwned(hygiene, 'hygiene', 'hygiene'),
+    patiencePct: bestOwned(operations, 'speed', 'operations'),
+    customersPct: bestOwned(marketing, 'customers', 'marketing'),
+    autoLift: getLevel(kitchen) >= AUTO_LIFT_KITCHEN_LEVEL,
+    pricePremiumPct: Math.min(MAX_PRICE_PREMIUM_PCT, Math.round(bestOwned(space, 'space', 'space') / 3)),
+    traySlots: Math.min(3, capacitySlots(bestOwned(space, 'capacity', 'space'))),
+    selfServe: getLevel(operations) >= SELF_SERVE_OPERATIONS_LEVEL,
+    ownDeliveryApp: getLevel(operations) >= 5,
+    shelfLifeBonus: bestOwned(storage, 'shelfLife', 'storage'),
+    discountWholesale: Math.min(30, bestOwned(storage, 'discount', 'storage')),
+    sauceTipBonus: bestOwned(service, 'sauceTip', 'service'),
     autoDrink,
     pestImmunity,
-    hygieneBoost: bestOwned(hygiene, 'hygiene')
+    hygieneBoost: bestOwned(hygiene, 'hygiene', 'hygiene')
   };
 }

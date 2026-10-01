@@ -2096,7 +2096,7 @@ class AppController {
   }
 
   // --- MINIGAME CHỢ ĐẦU MỐI CHỢ LỚN (ĐÀM PHÁN GIÁ SỈ) ---
-  private openMarketBargainModal() {
+  public openMarketBargainModal() {
     const state = stateManager.getState();
     const wholesaler = getTodayWholesaler(state.day);
     audio.playPop();

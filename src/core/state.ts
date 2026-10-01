@@ -205,11 +205,12 @@ export function migrateSave(raw: unknown): { state: GameState; repaired: string[
   // Nâng cấp: bổ sung các nhánh mới (kho lạnh, dịch vụ, vệ sinh) và cập nhật tiers mới nhất
   for (const [id, branch] of Object.entries(defaults.upgrades)) {
     const saved = state.upgrades[id];
-    if (!saved) {
-      state.upgrades[id] = branch;
+    if (!saved || typeof saved !== 'object') {
+      const level = typeof saved === 'number' ? saved : branch.currentLevel;
+      state.upgrades[id] = { ...branch, currentLevel: level };
       repaired.push(`upgrades.${id}`);
     } else {
-      saved.tiers = branch.tiers;
+      if (!Array.isArray(saved.tiers)) saved.tiers = branch.tiers;
       saved.name = branch.name;
       saved.icon = branch.icon;
     }
