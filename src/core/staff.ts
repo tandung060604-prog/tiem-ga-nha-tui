@@ -110,6 +110,9 @@ export interface StaffEffects {
   hygienePerDay: number;
   customersPct: number;
   hasSecurity: boolean;
+  dineInTipBonus: number;       // Thưởng tip tại quán nhờ Phục Vụ & Bảo Vệ (%)
+  expressDeliveryBonus: number; // Thưởng đơn giao hỏa tốc nhờ Shipper + App riêng (đ)
+  upsellChance: number;         // Tỷ lệ Thu Ngân upsell thành công (0-1)
 }
 
 const managerBoost = (staff: readonly StaffMember[]) => (staff.some(m => m.role === 'manager') ? 1.2 : 1);
@@ -134,11 +137,11 @@ export function staffEffects(staff: readonly StaffMember[], gameHour = 12, upgra
         name: m.name,
         cycleMs: Math.round(Math.max(3500, 8000 - 5000 * power(m, 'speed', boost)) / nightOwl / kitchenSpeed),
         perfectChance: Math.min(0.95, 0.3 + 0.6 * power(m, 'skill', boost)),
-        burntChance: has(m, 'clumsy') ? 0.1 : 0.03
+        burntChance: up?.autoLift ? 0 : (has(m, 'clumsy') ? 0.1 : 0.03) // Bếp tự động bảo vệ gà không bao giờ cháy
       };
     });
 
-  // Dây chuyền chiên tự động (Bếp cấp 6): một giỏ robot chạy riêng, không cần người đứng
+  // Dây chuyền chiên tự động (Bếp cấp 3): một giỏ robot chạy riêng, không cần người đứng
   if (up?.autoLift) {
     cooks.push({ staffId: 'robot', name: 'Robot Dây Chuyền', cycleMs: Math.round(ROBOT_CYCLE_MS / kitchenSpeed), perfectChance: 0.95, burntChance: 0 });
   }
@@ -146,19 +149,59 @@ export function staffEffects(staff: readonly StaffMember[], gameHour = 12, upgra
   const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
   const waiters = ofRole('waiter');
   const drivers = ofRole('delivery');
+  const cashiers = ofRole('cashier');
   const fastestWaiter = Math.max(0, ...waiters.map(m => power(m, 'speed', boost)));
+  const hasSec = staff.some(m => m.role === 'security' && m.mood > 20);
+
+  // Kiosk tự order (Vận hành cấp 3): khách mang về tự lấy món, phục vụ tại bàn tập trung hơn:
+  // Nếu có cả phục vụ và kiosk: tốc độ phục vụ x1.5 (giảm waiterServeMs xuống chỉ còn 500ms - 1.5s!)
+  const waiterServeMs = waiters.length
+    ? Math.round(Math.max(500, (2600 - 1600 * fastestWaiter) / (up?.selfServe ? 1.5 : 1)))
+    : up?.selfServe ? SELF_SERVE_MS : null;
+
+  // Thu ngân giúp khách tại quán kiên nhẫn hơn & có tỷ lệ gợi ý món (upsell)
+  const walkInPatiencePct = Math.min(45, sum(cashiers.map(m => 25 * power(m, 'attitude', boost))));
+  const upsellChance = Math.min(0.35, sum(cashiers.map(m => 0.20 * power(m, 'skill', boost))));
+
+  // Shipper giúp khách app kiên nhẫn hơn
+  const deliveryPatiencePct = Math.min(50, sum(drivers.map(m => 35 * power(m, 'speed', boost))));
+
+  // App giao hàng riêng (Vận hành cấp 3): không mất hoa hồng sàn
+  const commissionRate = up?.ownDeliveryApp
+    ? 0
+    : BASE_APP_COMMISSION * (1 - Math.min(0.65, sum(drivers.map(m => 0.55 * power(m, 'skill', boost)))));
+
+  // Hiệp đồng App riêng + Shipper: mở tuyến giao hỏa tốc Hẻm 1102, cộng thẳng tiền thưởng hỏa tốc
+  const expressDeliveryBonus = up?.ownDeliveryApp && drivers.length > 0
+    ? Math.round(sum(drivers.map(m => 10000 + 5000 * power(m, 'speed', boost))))
+    : 0;
+
+  // Phục Vụ + Bảo Vệ giúp tăng tiền Tip tại quán (Dine-in Tip Bonus)
+  const dineInTipBonus = Math.min(30, sum(waiters.map(m => 12 * power(m, 'attitude', boost)))) + (hasSec ? 15 : 0);
+
+  // Vệ sinh tích lũy mỗi ngày
+  const hygienePerDay = Math.min(0.15, sum(waiters.map(m => 0.08 * power(m, 'attitude', boost))));
+
+  // Lượng khách ghé quán: Idol TikTok (+15%), Nghiện Threads (+8%), Bảo Vệ đón khách (+10%)
+  const customersPct = Math.min(
+    35,
+    staff.filter(m => has(m, 'tiktok_idol')).length * 15 +
+    staff.filter(m => has(m, 'phone_addict')).length * 8 +
+    (hasSec ? 10 : 0)
+  );
 
   return {
     cooks,
-    walkInPatiencePct: Math.min(40, sum(ofRole('cashier').map(m => 25 * power(m, 'attitude', boost)))),
-    deliveryPatiencePct: Math.min(50, sum(drivers.map(m => 35 * power(m, 'speed', boost)))),
-    // App giao hàng riêng (Vận hành cấp 5): không mất hoa hồng app ngoài
-    commissionRate: up?.ownDeliveryApp ? 0 : BASE_APP_COMMISSION * (1 - Math.min(0.6, sum(drivers.map(m => 0.5 * power(m, 'skill', boost))))),
-    // Kiosk tự order (Vận hành cấp 4): khách tự lấy món như có phục vụ (chậm hơn phục vụ giỏi)
-    waiterServeMs: waiters.length ? Math.round(Math.max(600, 2600 - 1600 * fastestWaiter)) : up?.selfServe ? SELF_SERVE_MS : null,
-    hygienePerDay: Math.min(0.12, sum(waiters.map(m => 0.06 * power(m, 'attitude', boost)))),
-    customersPct: Math.min(30, staff.filter(m => has(m, 'tiktok_idol')).length * 15),
-    hasSecurity: staff.some(m => m.role === 'security' && m.mood > 20)
+    walkInPatiencePct,
+    deliveryPatiencePct,
+    commissionRate,
+    waiterServeMs,
+    hygienePerDay,
+    customersPct,
+    hasSecurity: hasSec,
+    dineInTipBonus,
+    expressDeliveryBonus,
+    upsellChance
   };
 }
 
@@ -174,17 +217,19 @@ export function describeStaffEffect(member: StaffMember, team: readonly StaffMem
     case 'cook': {
       const c = eff.cooks.find(x => x.staffId === member.id);
       return c
-        ? `Tự chiên 1 mẻ mỗi ${(c.cycleMs / 1000).toFixed(1)}s · ${pct(c.perfectChance)} ra Perfect`
+        ? `Tự chiên 1 mẻ mỗi ${(c.cycleMs / 1000).toFixed(1)}s · ${pct(c.perfectChance)} ra Perfect · Hóa giải kiểm tra ATTP`
         : `Chỉ ${MAX_HELPER_FRYERS} phụ bếp giỏi nhất được đứng chảo`;
     }
     case 'waiter':
-      return `Rót nước, tự lên món sau ${((eff.waiterServeMs ?? 0) / 1000).toFixed(1)}s khi khay đủ · +${eff.hygienePerDay.toFixed(2)} Vệ sinh/ngày`;
+      return `Rót nước, tự lên món sau ${((eff.waiterServeMs ?? 0) / 1000).toFixed(1)}s khi khay đủ · +${eff.hygienePerDay.toFixed(2)}⭐ Vệ sinh · +${Math.round(eff.dineInTipBonus)}% Tip tại bàn`;
     case 'cashier':
-      return `Khách tại quán chờ lâu hơn ${Math.round(eff.walkInPatiencePct)}%`;
+      return `Khách tại quán chờ lâu hơn ${Math.round(eff.walkInPatiencePct)}% · Gợi ý thêm món (+${Math.round(eff.upsellChance * 100)}% upsell) · Hóa giải tiền giả/tranh chấp`;
     case 'delivery':
-      return `Khách app chờ lâu hơn ${Math.round(eff.deliveryPatiencePct)}% · hoa hồng app ${(eff.commissionRate * 100).toFixed(1)}%`;
+      return eff.expressDeliveryBonus > 0
+        ? `Giao hỏa tốc độc quyền (+${eff.expressDeliveryBonus.toLocaleString('vi-VN')}đ/đơn app) · Khách app chờ lâu hơn ${Math.round(eff.deliveryPatiencePct)}%`
+        : `Khách app chờ lâu hơn ${Math.round(eff.deliveryPatiencePct)}% · Hoa hồng app ${(eff.commissionRate * 100).toFixed(1)}% · Hóa giải mưa bão/tắc đường`;
     case 'manager':
-      return 'Cả đội +20% hiệu suất · tâm trạng giảm chậm một nửa';
+      return 'Cả đội +20% hiệu suất · tâm trạng giảm chậm một nửa · hóa giải khủng hoảng truyền thông & thanh tra';
     case 'security':
       return 'Bảo vệ an ninh, trông xe an toàn · tóm gọn 100% trộm cắp, quỵt nợ & đối thủ phá hoại';
   }

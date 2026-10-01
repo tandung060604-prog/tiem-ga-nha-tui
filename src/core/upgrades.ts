@@ -46,8 +46,8 @@ function bestOwned(branch: UpgradeBranch | number | undefined, stat: keyof Upgra
     }, 0);
 }
 
-export const AUTO_LIFT_KITCHEN_LEVEL = 6;
-export const SELF_SERVE_OPERATIONS_LEVEL = 4;
+export const AUTO_LIFT_KITCHEN_LEVEL = 3;
+export const SELF_SERVE_OPERATIONS_LEVEL = 3;
 export const MAX_PRICE_PREMIUM_PCT = 30;
 
 // capacity 2 → +1 ô, 4 → +2, 12 → +3 (cấp 1 miễn phí không có capacity → khay gốc 4 ô)
@@ -76,8 +76,9 @@ export function upgradeEffects(upgrades?: Upgrades | null): UpgradeEffects {
   }
   const { kitchen, space, operations, marketing, storage, service, hygiene } = upgrades;
 
-  const autoDrink = getLevel(service) >= 3;
-  const pestImmunity = getLevel(hygiene) >= 4;
+  const autoDrink = getLevel(service) >= 2;
+  const pestImmunity = getLevel(hygiene) >= 3;
+  const ownDeliveryApp = getLevel(operations) >= 3;
 
   return {
     fryRampPct: bestOwned(kitchen, 'speed', 'kitchen'),
@@ -89,7 +90,7 @@ export function upgradeEffects(upgrades?: Upgrades | null): UpgradeEffects {
     pricePremiumPct: Math.min(MAX_PRICE_PREMIUM_PCT, Math.round(bestOwned(space, 'space', 'space') / 3)),
     traySlots: Math.min(3, capacitySlots(bestOwned(space, 'capacity', 'space'))),
     selfServe: getLevel(operations) >= SELF_SERVE_OPERATIONS_LEVEL,
-    ownDeliveryApp: getLevel(operations) >= 5,
+    ownDeliveryApp,
     shelfLifeBonus: bestOwned(storage, 'shelfLife', 'storage'),
     discountWholesale: Math.min(30, bestOwned(storage, 'discount', 'storage')),
     sauceTipBonus: bestOwned(service, 'sauceTip', 'service'),

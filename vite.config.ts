@@ -30,6 +30,9 @@ export default defineConfig({
           if (id.includes('src/content/changelog')) {
             return 'content-changelog';
           }
+          if (id.includes('src/content/characterNarrative')) {
+            return 'content-character-narrative';
+          }
         }
       }
     }

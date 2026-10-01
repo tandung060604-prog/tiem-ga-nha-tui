@@ -45,18 +45,18 @@ describe('tác dụng nâng cấp (core/upgrades)', () => {
   });
 
   it('mỗi nhánh lấy mức cao nhất đã mua, không cộng dồn các cấp', () => {
-    const e = upgradeEffects(withLevels({ kitchen: 4, marketing: 3 }).upgrades);
-    expect(e.fryRampPct).toBe(50);   // max(35, 50)
-    expect(e.tastePct).toBe(35);     // max(25, 35)
-    expect(e.customersPct).toBe(35); // marketing cấp 3
+    const e = upgradeEffects(withLevels({ kitchen: 2, marketing: 2 }).upgrades);
+    expect(e.fryRampPct).toBe(40);   // kitchen cấp 2
+    expect(e.tastePct).toBe(35);     // kitchen cấp 2
+    expect(e.customersPct).toBe(35); // marketing cấp 2
   });
 
   it('quán đẹp / nổi tiếng → khách trả thêm (cộng giữa các nhánh, trần 30%); giá đơn hàng tăng theo', () => {
     expect(upgradeEffects(withLevels({}).upgrades).pricePremiumPct).toBe(0);
-    expect(upgradeEffects(withLevels({ space: 3 }).upgrades).pricePremiumPct).toBe(10);
-    expect(upgradeEffects(withLevels({ space: 5, kitchen: 6, marketing: 5 }).upgrades).pricePremiumPct).toBe(30);
+    expect(upgradeEffects(withLevels({ space: 2 }).upgrades).pricePremiumPct).toBe(15);
+    expect(upgradeEffects(withLevels({ space: 3, kitchen: 3, marketing: 3 }).upgrades).pricePremiumPct).toBe(30);
     const plain = withLevels({});
-    const fancy = withLevels({ space: 3 });
+    const fancy = withLevels({ space: 2 });
     seedRandom(9);
     const a = OrdersEngine.generateOrder(plain);
     seedRandom(9);
@@ -67,15 +67,15 @@ describe('tác dụng nâng cấp (core/upgrades)', () => {
   it('sức chứa: thêm ô khay (trần +3, tổng khay tối đa 7); cấp 1 miễn phí không thêm gì', () => {
     expect(upgradeEffects(withLevels({}).upgrades).traySlots).toBe(0);
     expect(upgradeEffects(withLevels({ space: 2 }).upgrades).traySlots).toBe(1);
-    expect(upgradeEffects(withLevels({ space: 5, operations: 4 }).upgrades).traySlots).toBe(3);
-    const s = withLevels({ space: 5, operations: 4 });
+    expect(upgradeEffects(withLevels({ space: 3, operations: 3 }).upgrades).traySlots).toBe(3);
+    const s = withLevels({ space: 3, operations: 3 });
     s.staff = [{ ...INITIAL_CANDIDATES[1]! }, { ...INITIAL_CANDIDATES[2]! }];
     expect(traySizeFor(s)).toBe(7);
   });
 
   it('kiosk tự order: khách tự nhận món dù chưa có phục vụ', () => {
-    expect(upgradeEffects(withLevels({ operations: 3 }).upgrades).selfServe).toBe(false);
-    const eff = staffEffects([], 12, withLevels({ operations: 4 }).upgrades);
+    expect(upgradeEffects(withLevels({ operations: 2 }).upgrades).selfServe).toBe(false);
+    const eff = staffEffects([], 12, withLevels({ operations: 3 }).upgrades);
     expect(eff.waiterServeMs).not.toBeNull();
   });
 
@@ -95,18 +95,18 @@ describe('tác dụng nâng cấp (core/upgrades)', () => {
     seedRandom(7);
     const plain = OrdersEngine.generateOrder(withLevels({}));
     seedRandom(7);
-    const kiosk = OrdersEngine.generateOrder(withLevels({ operations: 4 }));
+    const kiosk = OrdersEngine.generateOrder(withLevels({ operations: 3 }));
     expect(kiosk.patienceMax).toBeGreaterThan(plain.patienceMax);
   });
 
   it('marketing: thêm khách mỗi ngày', () => {
-    expect(EconomyEngine.calculateDailyCustomerCount(withLevels({ marketing: 5 })))
+    expect(EconomyEngine.calculateDailyCustomerCount(withLevels({ marketing: 3 })))
       .toBeGreaterThan(EconomyEngine.calculateDailyCustomerCount(withLevels({})));
   });
 
-  it('dây chuyền cấp 6 tự nhấc giỏ ở giữa vùng Perfect', () => {
-    expect(upgradeEffects(withLevels({ kitchen: 5 }).upgrades).autoLift).toBe(false);
-    expect(upgradeEffects(withLevels({ kitchen: 6 }).upgrades).autoLift).toBe(true);
+  it('dây chuyền cấp 3 tự nhấc giỏ ở giữa vùng Perfect', () => {
+    expect(upgradeEffects(withLevels({ kitchen: 2 }).upgrades).autoLift).toBe(false);
+    expect(upgradeEffects(withLevels({ kitchen: 3 }).upgrades).autoLift).toBe(true);
     expect(CookingEngine.qualityAt(CookingEngine.AUTO_LIFT_AT)).toBe('perfect');
   });
 });

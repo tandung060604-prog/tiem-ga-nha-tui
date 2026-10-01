@@ -202,6 +202,18 @@ export const EXPANDED_DAILY_INCIDENTS: DailyIncident[] = [
     unlockHint: 'Mở khóa ở Ngày 3: Sự cố nhiệt độ thử thách lương tâm người thợ chiên.',
     choices: [
       {
+        id: 'burnt_cook_master_trim',
+        label: '👨‍🍳 Phụ Bếp tay nghề cao biến tấu thành Gà Xé Sốt Cay',
+        subDesc: '👨‍🍳 Phụ Bếp lóc phần xém, xào sốt cay đậm đà bán sạch trong 10 phút, gỡ lại +75k!',
+        kicker: '👨‍🍳 BIẾN TẤU TAY NGHỀ BẾP',
+        requiresRole: 'cook',
+        requiresRoleDesc: '🔒 Tuyển Phụ Bếp tại tab Nhân viên để tận dụng tay nghề biến tấu',
+        karmaDelta: { craftsmanship: 25, ambition: 15 },
+        moneyDelta: 75000,
+        reactionTitle: 'Tuyệt Kỹ Biến Tấu Của Phụ Bếp!',
+        reactionNarrative: 'Khang nhanh tay lóc phần xém ngoài, xé nhỏ thịt đùi mọng nước rồi đảo chảo cùng sốt tương ớt tỏi cay nồng. Món "Gà Xé Cay Cay" thơm lừng bốc khói, khách ăn tại quán tranh nhau gọi thêm hết sạch trong chớp mắt!'
+      },
+      {
         id: 'burnt_discard_pride',
         label: 'Hủy bỏ dứt khoát, dạy nhân viên về chữ Tín của nghề',
         subDesc: 'Chấp nhận mất 50k vốn nguyên liệu, không để một miếng gà lỗi đến tay khách',
@@ -374,12 +386,14 @@ export const EXPANDED_DAILY_INCIDENTS: DailyIncident[] = [
       {
         id: 'drunk_call_security',
         label: 'Nhờ chú Tư dân phòng hỗ trợ đưa chú về tận nhà an toàn',
-        subDesc: 'An toàn trật tự cho quán, gia đình chú mừng rỡ vì chú không gặp nạn',
+        subDesc: '👮 Chú Tư dìu về tận nhà: An toàn trật tự cho quán, gia đình mừng rỡ tặng 50k!',
         kicker: '👮 DÂN PHÒNG HỖ TRỢ',
-        karmaDelta: { community: 20, ambition: 10 },
-        moneyDelta: 0,
-        reactionTitle: 'Hành Trình Về Nhà Bình An',
-        reactionNarrative: 'Chú Tư dân phòng chở chú Hùng về nhà an toàn. Vợ chú cảm kích chạy sang tiệm gà cảm ơn rối rít vì quán đã giúp đỡ người chồng say xỉn.'
+        requiresRole: 'security',
+        requiresRoleDesc: '🔒 Cần tuyển Chú Tư Bảo Vệ tại tab Nhân viên để dìu về an toàn',
+        karmaDelta: { community: 25, ambition: 10 },
+        moneyDelta: 50000,
+        reactionTitle: 'Hành Trình Về Nhà Bình An!',
+        reactionNarrative: 'Chú Tư Bảo Vệ dìu chú Hùng về nhà an toàn. Vợ chú cảm kích chạy sang tiệm gà cảm ơn rối rít và gửi biếu 50k tiền cảm ơn vì quán đã giúp đỡ người chồng say xỉn an toàn!'
       },
       {
         id: 'drunk_splash_water',
@@ -468,6 +482,18 @@ export const EXPANDED_DAILY_INCIDENTS: DailyIncident[] = [
     rarity: 'common',
     unlockHint: 'Mở khóa ở Ngày 6: Chiếc xe đạp ba bánh va phải dây điện tủ mát.',
     choices: [
+      {
+        id: 'soda_waiter_clean_rescue',
+        label: '🧹 Phục Vụ nhanh nhẹn đỡ bé dậy và lau dọn sàn sạch bóng',
+        subDesc: '🧹 Phục Vụ chuyên nghiệp xử lý trong 1 phút: Giữ trọn lon nước, khách khen ngợi nức nở!',
+        kicker: '🧹 PHỤC VỤ CHUYÊN NGHIỆP',
+        requiresRole: 'waiter',
+        requiresRoleDesc: '🔒 Tuyển Phục Vụ tại tab Nhân viên để dọn dẹp vệ sinh thần tốc',
+        karmaDelta: { craftsmanship: 20, community: 20 },
+        moneyDelta: 0,
+        reactionTitle: 'Phục Vụ Nhanh Tay Bảo Vệ Quán!',
+        reactionNarrative: 'Bạn Phục Vụ nhanh như sóc đỡ bé Bơ dậy, phủi sạch bụi và dán băng cá nhân cho bé, tay kia thoăn thoắt thu gom các lon nước lau khô ráo. Khách xung quanh khen ngợi tiệm có đội ngũ nhân viên quá chu đáo và chuyên nghiệp!'
+      },
       {
         id: 'soda_comfort_kid',
         label: 'Đỡ bé dậy bôi thuốc đỏ xước đầu gối, gom lon cất lại',
@@ -686,13 +712,15 @@ export const EXPANDED_DAILY_INCIDENTS: DailyIncident[] = [
     choices: [
       {
         id: 'mixup_emergency_resend',
-        label: 'Làm hỏa tốc 2 phần mới tinh, cử nhân viên chạy xe giao đền tận nơi',
-        subDesc: 'Tốn 80k bù lỗ, hai vị khách cảm phục sự chịu trách nhiệm của tiệm gà',
-        kicker: '🚀 CHỊU TRÁCH NHIỆM 100%',
-        karmaDelta: { craftsmanship: 25, community: 15 },
-        moneyDelta: -80000,
-        reactionTitle: 'Biến Khủng Hoảng Thành Lòng Tin',
-        reactionNarrative: 'Nhận được phần gà nóng hổi giao đền tận cửa kèm bức thư tay xin lỗi chân thành, khách hàng không những không giận mà còn lên hội nhóm ẩm thực khen ngợi cách ứng xử của quán!'
+        label: '🛵 Cử Shipper nhà phóng hỏa tốc giao đền tận nơi',
+        subDesc: '🛵 Shipper ruột phóng tắt qua hẻm: Giao kịp trong 10 phút, khách cảm kích tip nóng +50k!',
+        kicker: '🛵 SHIPPER GIAO HỎA TỐC',
+        requiresRole: 'delivery',
+        requiresRoleDesc: '🔒 Cần tuyển Shipper tại tab Nhân viên để kích hoạt giao đền hỏa tốc',
+        karmaDelta: { craftsmanship: 25, community: 20 },
+        moneyDelta: 50000,
+        reactionTitle: 'Shipper Giao Hỏa Tốc Cứu Nguy Thần Kỳ!',
+        reactionNarrative: 'Shipper tiệm bạn nhận hộp gà nóng hổi, luồn lách qua các con hẻm giao đền tận cửa kèm lời xin lỗi chân thành. Khách hàng ngỡ ngàng vì tốc độ quá nhanh, không những không giận mà còn tip nóng 50k và lên mạng khen ngợi hết lời!'
       },
       {
         id: 'mixup_split_cost_shipper',

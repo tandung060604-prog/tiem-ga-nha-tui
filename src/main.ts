@@ -93,7 +93,25 @@ import {
   renderThiefCaughtModal,
   renderThiefEscapedModal
 } from './ui/components/ThiefMinigameModal';
-import type { DailyIncident, DeliveryRunResult, CarePackageType, ThiefEncounter } from './types/game';
+import {
+  getNextAvailableCharacterEpisode,
+  resolveCharacterChoice
+} from './core/characterNarrativeEngine';
+import {
+  renderCharacterEpisodeModal,
+  renderCharacterEpisodeReactionModal
+} from './ui/components/CharacterStoryModal';
+import { renderNightRadioModal } from './ui/components/NightRadioModal';
+import { getTonightRadioBroadcast } from './content/nightRadio';
+import { getUnlockedCurios } from './content/curiosAndRelics';
+import { getUnlockedSignatureDishes } from './content/signatureStoryDishes';
+import {
+  petThePet,
+  upgradePetPatio,
+  checkDogGuardBonus
+} from './core/petPatioSystem';
+import { renderPetPatioModal } from './ui/components/PetPatioComponent';
+import type { DailyIncident, DeliveryRunResult, CarePackageType, ThiefEncounter, CharacterEpisode } from './types/game';
 import confetti from 'canvas-confetti';
 
 type TabId = 'inventory' | 'upgrades' | 'staff' | 'reviews' | 'menu';
@@ -934,6 +952,127 @@ class AppController {
     });
   }
 
+  // --- BIÊN NIÊN KÝ PHÂN NHÁNH TUYẾN NHÂN VẬT HẺM 1102 (EPISODIC CHARACTER ARCS) ---
+  public openCharacterEpisodeModal(episode: CharacterEpisode) {
+    const state = stateManager.getState();
+    const html = renderCharacterEpisodeModal(state, episode);
+    this.openModal(html);
+
+    const closeBtn = document.getElementById('btn-close-char-story');
+    if (closeBtn) {
+      closeBtn.onclick = () => {
+        audio.playPop();
+        this.closeModal();
+      };
+    }
+
+    const choiceBtns = document.querySelectorAll('.btn-char-story-choice');
+    choiceBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const choiceId = (e.currentTarget as HTMLElement).getAttribute('data-choice-id');
+        if (choiceId) {
+          audio.playCash();
+          const { choice } = resolveCharacterChoice(stateManager.getState(), episode.id, choiceId);
+          
+          // Tự động kiểm tra và mở khóa kỷ vật & món ăn kỷ niệm mới
+          const currentState = stateManager.getState();
+          const unlockedCurios = getUnlockedCurios(currentState);
+          currentState.unlockedCurioIds = unlockedCurios.map(c => c.id);
+          const unlockedDishes = getUnlockedSignatureDishes(currentState);
+          currentState.customSignatureDishesUnlocked = unlockedDishes.map(d => d.id);
+          stateManager.saveState();
+
+          confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+          this.openModal(renderCharacterEpisodeReactionModal(episode, choice));
+
+          const finishBtn = document.getElementById('btn-finish-char-reaction') || document.getElementById('btn-dismiss-char-reaction');
+          if (finishBtn) {
+            finishBtn.onclick = () => {
+              audio.playPop();
+              this.closeModal();
+              this.render();
+            };
+          }
+        }
+      });
+    });
+  }
+
+  // --- BẢN TIN PHÁT THANH ĐÊM SÀI GÒN (FM 99.9 MHz) ---
+  public openNightRadioModal() {
+    const state = stateManager.getState();
+    const broadcast = getTonightRadioBroadcast(state);
+    if (!broadcast) return;
+
+    audio.playPop();
+    const html = renderNightRadioModal(state, broadcast);
+    this.openModal(html);
+
+    const closeBtn = document.getElementById('btn-close-night-radio');
+    if (closeBtn) {
+      closeBtn.onclick = () => {
+        audio.playPop();
+        this.closeModal();
+      };
+    }
+  }
+
+  // --- GÓC THÚ CƯNG HIÊN QUÁN (PET SANCTUARY & PATIO) ---
+  public openPetPatioModal() {
+    audio.playPop();
+    const state = stateManager.getState();
+    const html = renderPetPatioModal(state);
+    this.openModal(html);
+
+    const closeBtn = document.getElementById('btn-close-pet-patio');
+    if (closeBtn) {
+      closeBtn.onclick = () => {
+        audio.playPop();
+        this.closeModal();
+      };
+    }
+
+    // Tương tác vuốt ve từng bé thú cưng
+    const petBtns = document.querySelectorAll('.btn-pet-action');
+    petBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const petId = (e.currentTarget as HTMLElement).getAttribute('data-pet-id') as 'pet_01_dog_vang' | 'pet_02_cat_muop';
+        if (petId) {
+          const res = petThePet(stateManager.getState(), petId);
+          if (res.success) {
+            audio.playCash();
+            confetti({ particleCount: 30, spread: 50, origin: { y: 0.6 } });
+            this.showToast(res.message);
+          } else {
+            audio.playPop();
+            this.showToast(res.message);
+          }
+          stateManager.saveState();
+          this.openPetPatioModal(); // Re-render modal với trạng thái mới
+        }
+      });
+    });
+
+    // Nâng cấp hiên nhà
+    const upgradeBtn = document.getElementById('btn-upgrade-pet-patio');
+    if (upgradeBtn) {
+      upgradeBtn.onclick = () => {
+        const res = upgradePetPatio(stateManager.getState());
+        if (res.success) {
+          audio.playCash();
+          confetti({ particleCount: 60, spread: 70, origin: { y: 0.5 } });
+          this.showToast(`🎉 ${res.message}`);
+          stateManager.saveState();
+          this.render(); // Cập nhật số tiền trên header
+          this.openPetPatioModal();
+        } else {
+          audio.playBurnt();
+          this.showToast(`⚠️ ${res.message}`);
+        }
+      };
+    }
+  }
+
   // --- TÊN TRỘM ĐÓNG GIẢ & BẢO VỆ PHÁ ÁN (JEV-POWERED) ---
   private tickThief(session: SellingSession, gameDt: number) {
     if (this.isModalOpen()) return;
@@ -950,6 +1089,15 @@ class AppController {
         const maxTables = stateManager.getState().upgrades.space?.currentLevel ?? 1;
         const encounter = createThiefEncounter(String(Date.now()), maxTables);
         session.activeThief = encounter;
+
+        // Chó Vàng trợ chiến báo động sớm
+        const dogBonus = checkDogGuardBonus(stateManager.getState());
+        if (dogBonus.hasDogBonus) {
+          encounter.timeRemaining += dogBonus.extraSeconds;
+          encounter.initialTime += dogBonus.extraSeconds;
+          audio.playPop();
+          this.showToast(dogBonus.alertText);
+        }
 
         const sec = checkSecurityStaff(stateManager.getState());
         if (sec.hasSecurity) {
@@ -1157,6 +1305,29 @@ class AppController {
 
   // --- PREPARATION PHASE ---
   private renderPrepView(state: GameState): string {
+    const nextEpisode = getNextAvailableCharacterEpisode(state);
+    const storyBannerHtml = nextEpisode ? `
+      <div id="btn-open-char-story" class="char-story-banner" style="background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2.5px solid #d97706; border-radius: 12px; padding: 10px 14px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.25);">
+        <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+          <img src="${nextEpisode.avatar}" alt="" style="width: 44px; height: 44px; border-radius: 50%; border: 2px solid #b45309; object-fit: cover; background: #fff;" />
+          <div style="min-width: 0;">
+            <div style="font-size: 0.68rem; font-weight: 800; color: #b45309; text-transform: uppercase;">
+              📖 KÝ SỰ HẺM 1102 • ${escapeHtml(nextEpisode.characterName)}
+            </div>
+            <div style="font-size: 0.84rem; font-weight: 900; color: #451a03; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              ${escapeHtml(nextEpisode.title)}
+            </div>
+            <div style="font-size: 0.68rem; color: #78350f;">
+              Bấm vào để lắng nghe tâm sự & đưa ra lựa chọn phân nhánh!
+            </div>
+          </div>
+        </div>
+        <button class="btn-sm" style="background: #b45309; color: #fff; border: none; font-size: 0.75rem; font-weight: 800; padding: 7px 12px; border-radius: 8px; flex-shrink: 0; pointer-events: none; box-shadow: 0 2px 6px rgba(180, 83, 9, 0.3);">
+          Lắng Nghe ✨
+        </button>
+      </div>
+    ` : '';
+
     const chalkboardHtml = renderChalkboard(state, this.currentEvent.title);
 
     const tabsBarHtml = `
@@ -1213,6 +1384,7 @@ class AppController {
 
     return `
       <div class="prep-container">
+        ${storyBannerHtml}
         ${chalkboardHtml}
         ${tabsBarHtml}
         <div class="pane">
@@ -1224,6 +1396,15 @@ class AppController {
   }
 
   private bindPrepEvents(state: GameState) {
+    // Ký sự cư dân Hẻm 1102
+    const storyBannerBtn = document.getElementById('btn-open-char-story');
+    if (storyBannerBtn) {
+      storyBannerBtn.onclick = () => {
+        audio.playPop();
+        const ep = getNextAvailableCharacterEpisode(state);
+        if (ep) this.openCharacterEpisodeModal(ep);
+      };
+    }
     // Tab switching
     const tabBtns = document.querySelectorAll('.tab-btn');
     tabBtns.forEach(btn => {
@@ -1331,6 +1512,22 @@ class AppController {
       openMemoriesBtn.onclick = () => {
         audio.playPop();
         this.openMemoriesAlbumModal('residents', 'all');
+      };
+    }
+
+    const openNightRadioBtn = document.getElementById('btn-open-night-radio');
+    if (openNightRadioBtn) {
+      openNightRadioBtn.onclick = () => {
+        audio.playPop();
+        this.openNightRadioModal();
+      };
+    }
+
+    const openPetPatioBtn = document.getElementById('btn-open-pet-patio');
+    if (openPetPatioBtn) {
+      openPetPatioBtn.onclick = () => {
+        audio.playPop();
+        this.openPetPatioModal();
       };
     }
 

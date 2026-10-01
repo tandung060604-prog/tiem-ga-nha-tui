@@ -1,5 +1,14 @@
-import { DailyIncident, GameState, IncidentChoice } from '../../types/game';
-import { hasSecurityStaff } from '../../core/dailyIncidentsEngine';
+import { DailyIncident, GameState, IncidentChoice, StaffRole } from '../../types/game';
+import { hasSecurityStaff, hasStaffRole } from '../../core/dailyIncidentsEngine';
+
+const ROLE_LABELS: Record<StaffRole, { name: string; icon: string }> = {
+  cashier: { name: 'Thu Ngân', icon: '💁' },
+  cook: { name: 'Phụ Bếp', icon: '👨‍🍳' },
+  waiter: { name: 'Phục Vụ', icon: '🧹' },
+  delivery: { name: 'Shipper', icon: '🛵' },
+  manager: { name: 'Quản Lý', icon: '👔' },
+  security: { name: 'Bảo Vệ', icon: '👮' }
+};
 
 export function renderIncidentPrompt(
   incident: DailyIncident,
@@ -8,13 +17,13 @@ export function renderIncidentPrompt(
   const hasSec = hasSecurityStaff(state);
 
   const choicesHtml = incident.choices.map((choice: IncidentChoice) => {
-    const isSecOnly = choice.requiresSecurity === true;
-    const canChoose = !isSecOnly || hasSec;
+    const isSecOnly = choice.requiresSecurity === true || choice.requiresRole === 'security';
+    const hasRequiredRole = choice.requiresRole ? hasStaffRole(state, choice.requiresRole) : true;
+    const canChoose = (!choice.requiresSecurity || hasSec) && hasRequiredRole;
 
-    // Nút sự kiện: Các lựa chọn bình thường có màu sắc đồng đều, trung lập (btn-neutral-choice),
-    // không có nút nào nổi bật gây hiểu nhầm là bắt buộc phải chọn.
+    // Nút sự kiện: Các lựa chọn bình thường có màu sắc đồng đều, trung lập (btn-neutral-choice)
     let btnThemeClass = 'btn-neutral-choice';
-    if (isSecOnly) {
+    if (isSecOnly || choice.requiresRole) {
       btnThemeClass = canChoose ? 'btn-security-choice' : 'btn-locked-choice';
     }
 
@@ -25,6 +34,21 @@ export function renderIncidentPrompt(
         subText = '🔒 Cần tuyển Chú Tư Giữ Xe tại tab Nhân viên mới xài được nè';
       } else if (!subText.includes('Bảo Vệ') && !subText.includes('Chú Tư')) {
         subText = `👮 Có Chú Tư Bảo Vệ canh chừng: 100% bình yên`;
+      }
+    } else if (choice.requiresRole) {
+      const rInfo = ROLE_LABELS[choice.requiresRole];
+      if (!hasRequiredRole) {
+        subText = choice.requiresRoleDesc || `🔒 Cần tuyển ${rInfo?.name ?? 'Nhân Viên'} tại tab Nhân viên mới kích hoạt được`;
+      } else if (!subText.includes(rInfo?.name ?? '')) {
+        subText = `${rInfo?.icon ?? '✨'} Có ${rInfo?.name ?? 'Nhân Viên'} chuyên trách giải quyết: 100% an tâm`;
+      }
+    } else if (choice.mitigatedByRoles && choice.mitigatedByRoles.length > 0) {
+      const activeMitigator = choice.mitigatedByRoles.find(r => hasStaffRole(state, r));
+      if (activeMitigator) {
+        const rInfo = ROLE_LABELS[activeMitigator];
+        subText = `🛡️ Có ${rInfo?.name ?? 'Nhân Viên'} hỗ trợ: 100% hóa giải rủi ro!`;
+      } else if (choice.riskRate && choice.riskRate > 0 && !subText.toLowerCase().includes('hên xui')) {
+        subText = `hên xui: ${subText}`;
       }
     } else if (choice.riskRate && choice.riskRate > 0) {
       if (!subText.toLowerCase().includes('hên xui')) {

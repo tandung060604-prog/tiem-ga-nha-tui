@@ -56,7 +56,7 @@ export const STAFF_TRAITS = [
   {
     id: 'phone_addict',
     name: 'Nghiện Threads',
-    desc: 'Cập nhật drama cực nhanh, phản hồi review cho khách cực mặn.',
+    desc: 'Đăng bài meme hút khách (+8% khách ghé quán mỗi ngày), phản hồi review cho khách cực mặn.',
     icon: '💬'
   },
   {

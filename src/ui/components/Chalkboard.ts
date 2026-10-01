@@ -5,6 +5,7 @@ import { currentChapterData, chapterProgress, depositStatus } from '../../core/p
 import { finaleReady } from '../../content/endings';
 import { ASSETS } from '../../content/assets';
 import { DAILY_INCIDENTS } from '../../content/dailyIncidents';
+import { getWeatherForDay } from '../../content/saigonWeather';
 
 export function renderChalkboard(state: GameState, currentEventTitle: string = 'Trời Nắng Ráo'): string {
   const currentChapter = currentChapterData(state);
@@ -12,6 +13,7 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
   const deposit = depositStatus(state);
   const progressPercent = Math.round(chapterProgress(state) * 100);
   const vnd = (n: number) => n.toLocaleString('vi-VN') + 'đ';
+  const weather = getWeatherForDay(state.day);
 
   return `
     <div class="board chalkboard">
@@ -27,7 +29,7 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
           <span class="board-kicker">KẾ HOẠCH HÔM NAY</span>
           <h2><img src="${ASSETS.icons.book}" class="board-pixel-icon-sm" alt="" /> Ngày ${state.day} · ${weekdayOf(state.day)}</h2>
         </div>
-        <span class="weather-badge">${currentEventTitle}${isWeekend(state.day) ? ' · 🎉 Cuối tuần đông khách' : ''}</span>
+        <span class="weather-badge" title="${weather.flavorQuote}">${weather.icon} ${weather.name} · ${currentEventTitle}${isWeekend(state.day) ? ' · 🎉 Cuối tuần' : ''}</span>
       </div>
 
       <div class="board-goal deposit-card ${deposit.ready ? 'is-ready' : ''}">
@@ -70,8 +72,14 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
           <button id="btn-open-incidents" class="btn-sm btn-incident-card">
             <img src="${ASSETS.icons.reviews}" class="btn-pixel-icon-sm" alt="" /> Sổ Tay Hẻm (${state.seenIncidentIds?.length ?? 0}/${DAILY_INCIDENTS.length})
           </button>
-          <button id="btn-open-memories" class="btn-sm" style="background: #fef9c3; border: 1.5px solid #ca8a04; color: #854d0e; font-weight: 800;" title="Sổ Tay Kỷ Niệm: 36 Cư Dân, 6 Kết Cục & Thư Thỏ Cam">
+          <button id="btn-open-memories" class="btn-sm" style="background: #fef9c3; border: 1.5px solid #ca8a04; color: #854d0e; font-weight: 800;" title="Sổ Tay Kỷ Niệm: 36 Cư Dân, Tủ Kỷ Vật & 6 Kết Cục">
             📖 Kỷ Niệm Hẻm
+          </button>
+          <button id="btn-open-pet-patio" class="btn-sm" style="background: #fdf2f8; border: 1.5px solid #ec4899; color: #9d174d; font-weight: 800;" title="Góc Thú Cưng Hiên Quán (Cậu Vàng & Bé Mướp)">
+            🐾 Thú Cưng
+          </button>
+          <button id="btn-open-night-radio" class="btn-sm" style="background: #2b1d0c; border: 1.5px solid #854d0e; color: #fde047; font-weight: 800;" title="Đài Phát Thanh Đêm Sài Gòn (FM 99.9 MHz)">
+            📻 Đài Đêm
           </button>
           <button id="btn-read-story" class="btn-sm primary btn-story-card">
             <img src="${ASSETS.icons.book}" class="btn-pixel-icon-sm" alt="" /> Truyện Hẻm 1102

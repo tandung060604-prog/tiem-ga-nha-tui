@@ -57,9 +57,9 @@ describe('Đảm bảo nội tại các nhánh nâng cấp không bị trùng l�
 
     // Test kitchen tác động fryRampPct, tastePct
     const kState = createInitialState();
-    kState.upgrades.kitchen!.currentLevel = 4;
+    kState.upgrades.kitchen!.currentLevel = 2;
     const kEffects = upgradeEffects(kState.upgrades);
-    expect(kEffects.fryRampPct).toBe(50);
+    expect(kEffects.fryRampPct).toBe(40);
     expect(kEffects.tastePct).toBe(35);
     expect(kEffects.customersPct).toBe(0);
     expect(kEffects.pricePremiumPct).toBe(0);
@@ -67,7 +67,7 @@ describe('Đảm bảo nội tại các nhánh nâng cấp không bị trùng l�
 
     // Test marketing tác động DUY NHẤT customersPct
     const mState = createInitialState();
-    mState.upgrades.marketing!.currentLevel = 3;
+    mState.upgrades.marketing!.currentLevel = 2;
     const mEffects = upgradeEffects(mState.upgrades);
     expect(mEffects.customersPct).toBe(35);
     expect(mEffects.pricePremiumPct).toBe(0);
@@ -75,15 +75,15 @@ describe('Đảm bảo nội tại các nhánh nâng cấp không bị trùng l�
 
     // Test space tác động DUY NHẤT pricePremiumPct và traySlots
     const sState = createInitialState();
-    sState.upgrades.space!.currentLevel = 3;
+    sState.upgrades.space!.currentLevel = 2;
     const sEffects = upgradeEffects(sState.upgrades);
-    expect(sEffects.pricePremiumPct).toBe(10);
-    expect(sEffects.traySlots).toBe(2);
+    expect(sEffects.pricePremiumPct).toBe(15);
+    expect(sEffects.traySlots).toBe(1);
     expect(sEffects.customersPct).toBe(0);
 
     // Test storage tác động DUY NHẤT shelfLifeBonus và discountWholesale
     const stState = createInitialState();
-    stState.upgrades.storage!.currentLevel = 4;
+    stState.upgrades.storage!.currentLevel = 2;
     const stEffects = upgradeEffects(stState.upgrades);
     expect(stEffects.shelfLifeBonus).toBe(3);
     expect(stEffects.discountWholesale).toBe(10);
@@ -91,26 +91,26 @@ describe('Đảm bảo nội tại các nhánh nâng cấp không bị trùng l�
 
     // Test hygiene tác động DUY NHẤT oilLifePct, hygieneBoost, pestImmunity
     const hState = createInitialState();
-    hState.upgrades.hygiene!.currentLevel = 4;
+    hState.upgrades.hygiene!.currentLevel = 3;
     const hEffects = upgradeEffects(hState.upgrades);
-    expect(hEffects.oilLifePct).toBe(60);
+    expect(hEffects.oilLifePct).toBe(100);
     expect(hEffects.pestImmunity).toBe(true);
     expect(hEffects.pricePremiumPct).toBe(0);
 
     // Test service tác động DUY NHẤT sauceTipBonus và autoDrink
     const svState = createInitialState();
-    svState.upgrades.service!.currentLevel = 4;
+    svState.upgrades.service!.currentLevel = 2;
     const svEffects = upgradeEffects(svState.upgrades);
-    expect(svEffects.sauceTipBonus).toBe(5000);
+    expect(svEffects.sauceTipBonus).toBe(4000);
     expect(svEffects.autoDrink).toBe(true);
     expect(svEffects.traySlots).toBe(0);
     expect(svEffects.patiencePct).toBe(0);
 
     // Test operations tác động DUY NHẤT patiencePct, selfServe, ownDeliveryApp
     const opState = createInitialState();
-    opState.upgrades.operations!.currentLevel = 5;
+    opState.upgrades.operations!.currentLevel = 3;
     const opEffects = upgradeEffects(opState.upgrades);
-    expect(opEffects.patiencePct).toBe(60);
+    expect(opEffects.patiencePct).toBe(70);
     expect(opEffects.selfServe).toBe(true);
     expect(opEffects.ownDeliveryApp).toBe(true);
     expect(opEffects.customersPct).toBe(0);

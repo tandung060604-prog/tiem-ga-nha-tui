@@ -525,6 +525,14 @@ export interface GameState {
     totalEscaped: number;
     totalFinesPaid: number;
   };
+  characterStoryState?: CharacterStoryState;
+  unlockedCurioIds?: string[];
+  residentAffinityLevels?: Record<string, number>; // characterId -> rank (1-5)
+  lastRadioBroadcastDay?: number;
+  heardRadioBroadcastIds?: string[];
+  customSignatureDishesUnlocked?: string[];
+  todayWeather?: SaigonWeatherId;
+  petPatio?: PetPatioState;
 }
 
 export interface BargainWholesaler {
@@ -673,4 +681,157 @@ export interface ThiefShiftState {
   caughtCountToday: number;
   escapedCountToday: number;
 }
+
+// --- HỆ THỐNG BIÊN NIÊN KÝ PHÂN NHÁNH TUYẾN NHÂN VẬT HẺM 1102 (EPISODIC CHARACTER ARCS) ---
+export interface CharacterStoryChoice {
+  id: string;
+  label: string;
+  kicker: string;
+  reactionDialogue: string;
+  causalityNotice?: string;
+  karmaEffect?: {
+    community?: number;
+    craftsmanship?: number;
+    ambition?: number;
+  };
+  rewardMoney?: number;
+  rewardReputation?: number;
+  recipeHint?: string;
+  setsFlag?: string; // Cờ nhân quả kích hoạt nhánh cho các tập sau
+}
+
+export interface CharacterDialogueLine {
+  speaker: string;
+  text: string;
+  avatar?: string;
+  mood?: 'normal' | 'happy' | 'sad' | 'tense' | 'touched';
+}
+
+export interface CharacterEpisode {
+  id: string;
+  characterId: string;
+  characterName: string;
+  characterRole: string;
+  avatar: string;
+  episodeIndex: number;
+  title: string;
+  subtitle: string;
+  unlockDay: number;
+  unlockChapter?: number;
+  prerequisiteEpisodeId?: string;
+  prerequisiteFlags?: string[];
+  narrativeIntro: string;
+  dialogueLines: CharacterDialogueLine[];
+  dilemmaPrompt: string;
+  choices: CharacterStoryChoice[];
+  summaryNote: string; // Bản tóm tắt lưu vào Sổ Ký Ức
+}
+
+export interface CharacterProgress {
+  characterId: string;
+  currentEpisodeIndex: number;
+  completedEpisodeIds: string[];
+  chosenOptionIds: Record<string, string>; // episodeId -> choiceId
+  causalityFlags: string[];
+}
+
+export interface CharacterStoryState {
+  characterProgress: Record<string, CharacterProgress>;
+  pendingEpisodeId: string | null;
+  readEpisodeHistory: { episodeId: string; choiceId: string; day: number }[];
+}
+
+// --- TỦ KỶ VẬT & HIỆN VẬT LỊCH SỬ HẺM 1102 (CURIOS & HISTORICAL RELICS) ---
+export interface CurioRelic {
+  id: string;
+  name: string;
+  sourceCharacter: string;
+  icon: string;
+  chapter: number;
+  unlockedByFlag: string; // Kích hoạt khi GameState có cờ này
+  loreDescription: string;
+  flavorQuote: string;
+  passiveBuffText?: string;
+}
+
+// --- HỒ SƠ CƯ DÂN & CẤP ĐỘ THÂN THIẾT (RESIDENT AFFINITY DOSSIER) ---
+export interface ResidentAffinity {
+  characterId: string;
+  name: string;
+  roleTitle: string;
+  avatar: string;
+  rank: 1 | 2 | 3 | 4 | 5;
+  rankTitle: string; // 'Người Lạ' | 'Khách Quen' | 'Bạn Hữu' | 'Tri Kỷ' | 'Gia Đình Hẻm'
+  favoriteDish: string;
+  secretBio: string;
+  unlockedAtEpisodeCount: number;
+  specialPerkDesc?: string;
+}
+
+// --- BẢN TIN PHÁT THANH ĐÊM SÀI GÒN (LATE NIGHT RADIO CASSETTE) ---
+export interface NightRadioBroadcast {
+  id: string;
+  chapter: number;
+  dayMin: number;
+  dayMax: number;
+  channelName: string;
+  headline: string;
+  audioTranscript: string;
+  weatherCondition: string;
+  streetRumor: string;
+  requiredFlag?: string;
+}
+
+// --- MÓN ĂN KỶ NIỆM GẮN LIỀN CỐT TRUYỆN (SIGNATURE STORY DISHES) ---
+export interface SignatureStoryDish {
+  id: string;
+  name: string;
+  storyContext: string;
+  associatedCharacter: string;
+  recipeDescription: string;
+  priceBonusPercent: number; // Tăng giá bán +15% - +30%
+  unlockedByFlag: string;
+}
+
+// --- HỆ THỐNG THỜI TIẾT SÀI GÒN ĐỘNG (DYNAMIC SAIGON WEATHER) ---
+export type SaigonWeatherId =
+  | 'sunny_hot'       // ☀️ Nắng Gắt Chang Chang (Trưa Sài Gòn 36°C)
+  | 'sudden_rain'     // 🌧️ Mưa Rào Trú Chân (Chợt đến chợt đi)
+  | 'cool_breeze'     // 🍃 Gió Chiều Mát Rượi (Tan tầm lộng gió)
+  | 'thunderstorm'    // ⛈️ Giông Bão Sấm Sét (Đại hồng thủy ngập hẻm)
+  | 'golden_sunset';  // 🌅 Chiều Nắng Vàng Hẻm (Ấm áp, thơ mộng)
+
+export interface SaigonWeather {
+  id: SaigonWeatherId;
+  name: string;
+  icon: string;
+  badgeText: string;
+  flavorQuote: string;
+  dineInMultiplier: number;       // Hệ số khách ăn tại bàn (Mưa rào: 1.35)
+  deliveryMultiplier: number;     // Hệ số khách gọi ship online (Nắng gắt / Giông bão: 1.5)
+  walkupDrinkMultiplier: number;  // Hệ số khách mua nước giải khát (Nắng gắt: 1.8)
+  oilHeatModifier: number;        // Gia tốc độ nóng của chảo dầu (+0.15 khi nắng)
+  patienceModifier: number;       // Độ kiên nhẫn của khách (+1.15 khi mát)
+  bgAtmosphereClass: string;      // Class CSS tạo hiệu ứng bầu không khí
+}
+
+// --- GÓC THÚ CƯNG HIÊN QUÁN (PET SANCTUARY & PATIO) ---
+export interface PetPatioMember {
+  id: 'pet_01_dog_vang' | 'pet_02_cat_muop';
+  name: string;
+  type: 'dog' | 'cat';
+  avatar: string;
+  happiness: number;              // 0 - 100
+  pettedToday: boolean;
+  statusText: string;             // Ví dụ: "Đang phe phẩy đuôi nằm đón nắng"
+  perkDescription: string;        // Chó Vàng: Sủa báo động trộm trước 3s / Mèo: Bắt chuột cống 100%
+}
+
+export interface PetPatioState {
+  unlocked: boolean;
+  patioLevel: number;             // 1: Góc nệm cói, 2: Chòi gỗ vintage, 3: Biệt thự thú cưng Hẻm 1102
+  pets: PetPatioMember[];
+  lastPettedDay?: number;
+}
+
 

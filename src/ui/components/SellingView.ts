@@ -8,6 +8,8 @@ import { TIMER_RECIPES, TimerStationId, timerPhase, DRINK_RECIPES, DrinkId, ASSE
 import { stationOpen, perfectTip } from '../../core/day';
 import { escapeHtml } from '../escapeHtml';
 import { renderPrepStation, prepStationKey } from './PrepStation';
+import { getWeatherForDay } from '../../content/saigonWeather';
+import { renderWeatherAtmosphereStrip } from './WeatherAtmosphere';
 
 export type { SellingSession };
 
@@ -900,6 +902,9 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           </button>
         </div>
       </div>
+
+      <!-- DẢI BẦU KHÔNG KHÍ THỜI TIẾT SÀI GÒN ĐỘNG -->
+      ${renderWeatherAtmosphereStrip(getWeatherForDay(state.day))}
 
       <!-- THIEF ALERT BANNER (Tên Trộm Đang Rình Mò Trong Quán) -->
       ${session.activeThief && !session.activeThief.isCaught && !session.activeThief.isEscaped ? `

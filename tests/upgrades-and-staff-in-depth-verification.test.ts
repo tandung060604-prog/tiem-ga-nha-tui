@@ -32,23 +32,23 @@ const makeStaff = (role: StaffMember['role'], extra: Partial<StaffMember> = {}):
 });
 
 describe('1. KIỂM THỬ THỰC TẾ: CÁC NÂNG CẤP (UPGRADES) CÓ TÁC DỤNG THẬT 100%', () => {
-  it('Nhánh Bếp (Kitchen): tăng tốc chiên và kích hoạt Robot tự động nhấc giỏ ở cấp 6', () => {
+  it('Nhánh Bếp (Kitchen): tăng tốc chiên và kích hoạt Robot tự động nhấc giỏ ở cấp 3', () => {
     const state = createInitialState();
     expect(upgradeEffects(state.upgrades).autoLift).toBe(false);
     expect(upgradeEffects(state.upgrades).fryRampPct).toBe(0);
 
-    // Mua bếp cấp 3: tăng tốc chiên
-    state.upgrades.kitchen.currentLevel = 3;
-    const effLv3 = upgradeEffects(state.upgrades);
-    expect(effLv3.fryRampPct).toBe(35);
-    expect(effLv3.tastePct).toBe(25);
+    // Mua bếp cấp 2: tăng tốc chiên
+    state.upgrades.kitchen.currentLevel = 2;
+    const effLv2 = upgradeEffects(state.upgrades);
+    expect(effLv2.fryRampPct).toBe(40);
+    expect(effLv2.tastePct).toBe(35);
 
-    // Mua bếp cấp 6: Dây chuyền chiên tự động Robot
+    // Mua bếp cấp 3: Dây chuyền chiên tự động Robot
     state.upgrades.kitchen.currentLevel = AUTO_LIFT_KITCHEN_LEVEL;
-    const effLv6 = upgradeEffects(state.upgrades);
-    expect(effLv6.autoLift).toBe(true);
+    const effLv3 = upgradeEffects(state.upgrades);
+    expect(effLv3.autoLift).toBe(true);
 
-    // Kiểm tra trong ca bán: có Bếp cấp 6 thì Robot xuất hiện trong danh sách cooks tự động
+    // Kiểm tra trong ca bán: có Bếp cấp 3 thì Robot xuất hiện trong danh sách cooks tự động
     const teamEff = staffEffects([], 12, state.upgrades);
     expect(teamEff.cooks.some(c => c.staffId === 'robot')).toBe(true);
     const robot = teamEff.cooks.find(c => c.staffId === 'robot')!;
@@ -64,15 +64,16 @@ describe('1. KIỂM THỬ THỰC TẾ: CÁC NÂNG CẤP (UPGRADES) CÓ TÁC DỤ
     expect(upgradeEffects(plainState.upgrades).pricePremiumPct).toBe(0);
     expect(traySizeFor(plainState)).toBe(4);
 
-    // Nâng cấp Không gian cấp 2: mở rộng thêm 1 ô khay
+    // Nâng cấp Không gian cấp 2: mở rộng thêm 1 ô khay (5 ô) và phụ thu 15%
     upgradedState.upgrades.space.currentLevel = 2;
     expect(upgradeEffects(upgradedState.upgrades).traySlots).toBe(1);
     expect(traySizeFor(upgradedState)).toBe(5);
+    expect(upgradeEffects(upgradedState.upgrades).pricePremiumPct).toBe(15);
 
-    // Nâng cấp Không gian cấp 4 (Quán gỗ sạch đẹp): thêm 2 ô khay và phụ thu 10%
-    upgradedState.upgrades.space.currentLevel = 4;
-    expect(traySizeFor(upgradedState)).toBe(6);
-    expect(upgradeEffects(upgradedState.upgrades).pricePremiumPct).toBe(20);
+    // Nâng cấp Không gian cấp 3 (K-Bistro sang trọng): thêm 3 ô khay (7 ô) và phụ thu 30%
+    upgradedState.upgrades.space.currentLevel = 3;
+    expect(traySizeFor(upgradedState)).toBe(7);
+    expect(upgradeEffects(upgradedState.upgrades).pricePremiumPct).toBe(30);
 
     // Kiểm chứng đơn hàng: đơn hàng ở quán có bàn ghế đẹp có tổng giá tiền cao hơn quán trơn
     seedRandom(42);
@@ -85,19 +86,15 @@ describe('1. KIỂM THỬ THỰC TẾ: CÁC NÂNG CẤP (UPGRADES) CÓ TÁC DỤ
   it('Nhánh Vận Hành (Operations): Kiosk tự phục vụ (Self-serve) và App giao hàng riêng (0% hoa hồng)', () => {
     const state = createInitialState();
 
-    // Mua Vận hành cấp 4: Kiosk tự order & tự lấy món
+    // Mua Vận hành cấp 3: Kiosk tự order & App giao hàng riêng
     state.upgrades.operations.currentLevel = SELF_SERVE_OPERATIONS_LEVEL;
     const effKiosk = upgradeEffects(state.upgrades);
     expect(effKiosk.selfServe).toBe(true);
+    expect(effKiosk.ownDeliveryApp).toBe(true);
 
     // Dù quán chưa thuê phục vụ nào, khách vẫn tự lấy món sau 2000ms
     const teamEffWithoutWaiter = staffEffects([], 12, state.upgrades);
     expect(teamEffWithoutWaiter.waiterServeMs).toBe(2000);
-
-    // Mua Vận hành cấp 5: App giao hàng riêng
-    state.upgrades.operations.currentLevel = 5;
-    const effApp = upgradeEffects(state.upgrades);
-    expect(effApp.ownDeliveryApp).toBe(true);
 
     // Hoa hồng sàn giao hàng giảm từ 22% về đúng 0% tròn trĩnh!
     const staffEffWithApp = staffEffects([], 12, state.upgrades);
@@ -109,10 +106,10 @@ describe('1. KIỂM THỬ THỰC TẾ: CÁC NÂNG CẤP (UPGRADES) CÓ TÁC DỤ
     baseState.currentChapter = 2;
     const baseCustomers = EconomyEngine.calculateDailyCustomerCount(baseState);
 
-    // Nâng cấp Marketing cấp 3 (+35% lưu lượng khách)
+    // Nâng cấp Marketing cấp 2 (+35% lưu lượng khách)
     const marketingState = createInitialState();
     marketingState.currentChapter = 2;
-    marketingState.upgrades.marketing.currentLevel = 3;
+    marketingState.upgrades.marketing.currentLevel = 2;
     const boostedCustomers = EconomyEngine.calculateDailyCustomerCount(marketingState);
 
     expect(boostedCustomers).toBeGreaterThan(baseCustomers);
@@ -129,8 +126,8 @@ describe('1. KIỂM THỬ THỰC TẾ: CÁC NÂNG CẤP (UPGRADES) CÓ TÁC DỤ
 
   it('Nhánh Dịch Vụ & Vệ Sinh: Thưởng Tip tương sốt, Máy rót nước tự động, Miễn nhiễm chuột cống', () => {
     const state = createInitialState();
-    state.upgrades.service.currentLevel = 3;
-    state.upgrades.hygiene.currentLevel = 4;
+    state.upgrades.service.currentLevel = 2;
+    state.upgrades.hygiene.currentLevel = 3;
     const eff = upgradeEffects(state.upgrades);
 
     expect(eff.autoDrink).toBe(true);      // Tự rót nước ngọt

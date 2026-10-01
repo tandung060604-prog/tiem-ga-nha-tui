@@ -1,4 +1,4 @@
-import { DailyIncident, GameState, IncidentChoice } from '../types/game';
+import { DailyIncident, GameState, IncidentChoice, StaffRole } from '../types/game';
 import { DAILY_INCIDENTS } from '../content/dailyIncidents';
 import { applyKarmaChange } from '../content/endings';
 import { pick, random } from './rng';
@@ -23,6 +23,13 @@ export interface IncidentResolutionResult {
  */
 export function hasSecurityStaff(state: GameState): boolean {
   return state.staff.some(m => m.role === 'security' && m.mood > 20);
+}
+
+/**
+ * Kiểm tra xem quán hiện tại có nhân viên đảm nhận vai trò chỉ định đang làm việc (tâm trạng > 20%) không.
+ */
+export function hasStaffRole(state: GameState, role: StaffRole): boolean {
+  return (state.staff ?? []).some(m => m.role === role && m.mood > 20);
 }
 
 export const INCIDENT_COOLDOWN_DAYS = 6; // Tuyệt đối không lặp lại sự kiện trong vòng 6 ngày
@@ -80,7 +87,7 @@ export function pickDailyIncident(
 
 /**
  * Xử lý lựa chọn của người chơi trong sự kiện:
- * - Ẩn điểm số, tính toán kết quả câu chuyện dựa trên may rủi và sự hiện diện của Bảo Vệ.
+ * - Ẩn điểm số, tính toán kết quả câu chuyện dựa trên may rủi và sự hiện diện của Bảo Vệ / Nhân viên chuyên trách.
  * - Áp dụng cập nhật Karma và Tài chính vào GameState.
  */
 export function resolveIncidentChoice(
@@ -94,23 +101,27 @@ export function resolveIncidentChoice(
   const upEffects = upgradeEffects(draft.upgrades ?? {});
   const isPest = incident.id.includes('pest') || incident.id.includes('rat') || incident.id.includes('fly');
 
+  // Kiểm tra vai trò nhân viên có thể hóa giải rủi ro
+  const isMitigated = (choice.mitigatedByRoles ?? []).some(role => hasStaffRole(draft, role));
+
   let succeeded = true;
 
-  // Nếu là sự cố côn trùng/chuột và có miễn nhiễm vệ sinh (pestImmunity) hoặc có Mèo Mướp
-  if (isPest && (upEffects.pestImmunity || hasCat)) {
+  // 1. Nếu lựa chọn bắt buộc có nhân sự chuyên trách
+  if (choice.requiresRole && !hasStaffRole(draft, choice.requiresRole)) {
+    succeeded = false;
+  } else if (choice.requiresSecurity && !hasSec) {
+    succeeded = false;
+  } else if (isPest && (upEffects.pestImmunity || hasCat)) {
+    // Nếu là sự cố côn trùng/chuột và có miễn nhiễm vệ sinh (pestImmunity) hoặc có Mèo Mướp
     succeeded = true;
   } else {
-    // Nếu lựa chọn có rủi ro và không có bảo vệ
-    if (choice.riskRate && choice.riskRate > 0 && !hasSec) {
+    // 2. Tính toán rủi ro: Nếu có bảo vệ (với sự cố an ninh) hoặc có nhân viên chuyên trách hóa giải (isMitigated) -> 100% an toàn
+    const isSafe = (incident.isSecurityRisk && hasSec) || isMitigated;
+    if (choice.riskRate && choice.riskRate > 0 && !isSafe) {
       const roll = random();
       if (roll < choice.riskRate) {
         succeeded = false;
       }
-    }
-
-    // Nếu lựa chọn bắt buộc có bảo vệ mà quán lại không có (fallback phòng vệ)
-    if (choice.requiresSecurity && !hasSec) {
-      succeeded = false;
     }
   }
 

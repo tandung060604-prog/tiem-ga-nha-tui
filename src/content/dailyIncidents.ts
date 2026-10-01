@@ -592,6 +592,18 @@ export const BASE_DAILY_INCIDENTS: DailyIncident[] = [
     unlockHint: 'Mở khóa ở Chương 2 (Ngày 10): Cạm bẫy thanh toán thời đại chuyển khoản số.',
     choices: [
       {
+        id: 'fake_cashier_audit',
+        label: '💁 Thu Ngân check biến động số dư tức thì trên POS',
+        subDesc: '💁 Thu Ngân đối soát chuẩn xác: Nhắc khách hiện rõ bill giả, nhận đủ 150k + 20k tip!',
+        kicker: '💁 THU NGÂN ĐỐI SOÁT',
+        requiresRole: 'cashier',
+        requiresRoleDesc: '🔒 Cần tuyển Thu Ngân tại tab Nhân viên để kiểm soát thanh toán tức thì',
+        karmaDelta: { craftsmanship: 15, ambition: 10 },
+        moneyDelta: 170000,
+        reactionTitle: 'Thu Ngân Đối Soát Bắt Thóp Bill Giả!',
+        reactionNarrative: 'Thu Ngân liếc qua màn hình là biết ngay ảnh chụp giả mạo: "Dạ anh ơi, app tiệm em tích hợp báo biến động số dư theo giây, chưa thấy nổ chuông ạ!". Thanh niên toát mồ hôi đành móc ví trả tiền mặt 150k và gửi thêm 20k tiền tip vì quá xấu hổ!'
+      },
+      {
         id: 'fake_sec_stop',
         label: 'Chú Bảo Vệ giữ đuôi xe, đợi tiền nổi',
         subDesc: '👮 Chú Tư chặn xe lịch thiệp: Bắt thóp ảnh fake, khách đành trả đủ 150k tiền mặt',
@@ -608,6 +620,7 @@ export const BASE_DAILY_INCIDENTS: DailyIncident[] = [
         subDesc: 'hên xui: ngân hàng nghẽn mạng tiền về sau, hoặc mất trắng đơn 150k',
         kicker: '⚠️ MAY RỦI THẢ TRÔI',
         riskRate: 0.65,
+        mitigatedByRoles: ['cashier', 'security'],
         karmaDelta: { community: 5, ambition: -10 },
         moneyDelta: -150000,
         reactionTitle: 'Khách Chuyển Thật Sự!',
@@ -827,6 +840,7 @@ export const BASE_DAILY_INCIDENTS: DailyIncident[] = [
         subDesc: 'hên xui: trộm giật mình quăng đoản chạy, hoặc bẻ khóa mất xe đền 500k',
         kicker: '⚠️ MAY RỦI NGẪU NHIÊN',
         riskRate: 0.55,
+        mitigatedByRoles: ['security'],
         karmaDelta: { community: -10, ambition: -10 },
         moneyDelta: -500000,
         reactionTitle: 'Kịp Thời Phát Giác!',
@@ -1192,6 +1206,18 @@ export const BASE_DAILY_INCIDENTS: DailyIncident[] = [
     unlockHint: 'Mở khóa ở Chương 3 (Ngày 28): Đòn bẩn phá hoại từ chuỗi gà đối thủ MegaChicken.',
     choices: [
       {
+        id: 'fly_cook_proof',
+        label: '👨‍🍳 Bếp Trưởng chứng minh dầu 180°C không để ruồi nguyên vẹn',
+        subDesc: '👨‍🍳 Bếp Trưởng đối chất khoa học: Gà chiên 180°C ruồi phải cháy đen, kẻ phá hoại chạy mất dạng',
+        kicker: '👨‍🍳 BẾP TRƯỞNG ĐỐI CHẤT',
+        requiresRole: 'cook',
+        requiresRoleDesc: '🔒 Cần tuyển Phụ Bếp tại tab Nhân viên để chứng minh nhiệt độ dầu',
+        karmaDelta: { craftsmanship: 20, ambition: 15 },
+        moneyDelta: 0,
+        reactionTitle: 'Tay Nghề Bếp Trưởng Lật Tẩy Kẻ Gian!',
+        reactionNarrative: 'Bếp trưởng bước ra gắp con ruồi lên cười nhạt: "Gà tiệm tôi chiên ngập dầu 180 độ C, ruồi rơi vào là cháy giòn tan thành tro. Con ruồi này cánh còn nguyên, ướt nhẹp nước lã!". Cả quán ồ lên vỗ tay tán thưởng, kẻ phá hoại ôm mặt tháo chạy!'
+      },
+      {
         id: 'fly_security_bust',
         label: 'Chú Bảo Vệ giữ tay, trích camera góc quán',
         subDesc: '👮 Chú Tư lật tẩy cảnh rút ruồi từ bao thuốc lá, kẻ phá hoại chạy mất dạng',
@@ -1208,6 +1234,7 @@ export const BASE_DAILY_INCIDENTS: DailyIncident[] = [
         subDesc: 'hên xui: êm ấm tạm thời, hoặc mất 200k mà vẫn bị chụp ảnh bôi nhọ',
         kicker: '💸 NGẬM BỒ HÒN LÀM NGỌT',
         riskRate: 0.8,
+        mitigatedByRoles: ['security', 'cook', 'manager'],
         karmaDelta: { ambition: -10, craftsmanship: -5 },
         moneyDelta: -200000,
         reactionTitle: 'Thiệt Đơn Thiệt Kép',
@@ -1251,6 +1278,18 @@ export const BASE_DAILY_INCIDENTS: DailyIncident[] = [
     rarity: 'epic',
     unlockHint: 'Mở khóa ở Chương 4: Bão truyền thông ác ý nhắm vào uy tín thương hiệu.',
     choices: [
+      {
+        id: 'rumor_manager_crisis_pr',
+        label: '👔 Quản Lý phát hành video quy trình chuẩn ISO & voucher',
+        subDesc: '👔 Quản lý xử lý khủng hoảng truyền thông 5 sao: Biến drama thành cơ hội viral (+50k doanh thu)!',
+        kicker: '👔 QUẢN LÝ XỬ LÝ KHỦNG HOẢNG',
+        requiresRole: 'manager',
+        requiresRoleDesc: '🔒 Cần tuyển Quản Lý Ca tại tab Nhân viên để xử lý truyền thông chuyên nghiệp',
+        karmaDelta: { craftsmanship: 20, ambition: 20, community: 15 },
+        moneyDelta: 50000,
+        reactionTitle: 'Quản Lý Biến Khủng Hoảng Thành Thắng Lợi!',
+        reactionNarrative: 'Quản Lý ca lập tức đăng video quy trình kiểm định que test dầu đạt chuẩn ISO, đồng thời mở tour tham quan gian bếp tặng voucher 50k. Drama lập tức bị đập tan, lượng khách kéo tới ủng hộ tăng vọt kỷ lục!'
+      },
       {
         id: 'rumor_livestream_oil',
         label: 'Livestream que đo dầu & quy trình sạch bóng',
@@ -1517,6 +1556,18 @@ export const BASE_DAILY_INCIDENTS: DailyIncident[] = [
     unlockHint: 'Mở khóa từ Chương 3 (Ngày 22): Tình người giữa cái nắng Sài Gòn và những con hẻm.',
     choices: [
       {
+        id: 'shipper_fellow_support',
+        label: '🛵 Shipper nhà nổ máy chạy giao giùm 1 đơn gấp cho bạn',
+        subDesc: '🛵 Tình đồng nghiệp shipper: Giao giùm đơn gấp, cả hội tài xế ưu tiên nhận đơn app cho tiệm!',
+        kicker: '🛵 CHIẾN HỮU ĐƯỜNG PHỐ',
+        requiresRole: 'delivery',
+        requiresRoleDesc: '🔒 Cần tuyển Shipper tại tab Nhân viên để kích hoạt tương trợ',
+        karmaDelta: { community: 40, craftsmanship: 15 },
+        moneyDelta: 0,
+        reactionTitle: 'Chiến Hữu Đường Phố Tương Trợ Đỉnh Cao!',
+        reactionNarrative: 'Shipper tiệm bạn nhảy lên xe nổ máy: "Để đó tui giao giùm ông 1 đơn gần đây cho, ông ngồi nghỉ uống nước đi!". Cả hội shipper công nghệ khu vực nghe tin đều cảm kích, từ đó về sau đơn app của tiệm luôn được tài xế nhận ngay sau 3 giây!'
+      },
+      {
         id: 'shipper_iced_tea_tools',
         label: 'Mời ly trà đá mát lạnh & chỉ tiệm Chú Tư vá xe nhanh',
         subDesc: 'Tốn 5k trà đá, shipper cảm kích đăng bài cảm ơn làm tiệm viral trên mạng xã hội',
@@ -1535,16 +1586,6 @@ export const BASE_DAILY_INCIDENTS: DailyIncident[] = [
         moneyDelta: 30000,
         reactionTitle: 'Vị Cứu Tinh Của Khách Ăn Gà',
         reactionNarrative: 'Vị khách đặt đơn Phố Cao khi nhận được hộp gà chiên nóng giòn của Tiệm Gà Nhà Tui ngạc nhiên vì quá ngon, liền nhắn hỏi địa chỉ tiệm để từ nay chuyển hẳn sang ăn gà của quán bạn!'
-      },
-      {
-        id: 'shipper_give_water_free',
-        label: 'Cho mượn cây bơm xe và bình nước lọc',
-        subDesc: 'Hỗ trợ chân tình bằng công cụ sẵn có của quán',
-        kicker: '💧 GIỌT NƯỚC MÁT LÀNH',
-        karmaDelta: { community: 20 },
-        moneyDelta: 0,
-        reactionTitle: 'Tiếp Sức Đường Dài',
-        reactionNarrative: 'Được uống ngụm nước mát và bơm căng bánh xe, bạn shipper cúi đầu cảm ơn rối rít rồi tiếp tục hành trình giao hàng mưu sinh.'
       }
     ]
   }

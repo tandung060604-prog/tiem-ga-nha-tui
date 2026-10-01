@@ -10,6 +10,7 @@ import { INITIAL_MENU } from '../content/menu';
 import { upgradeEffects } from './upgrades';
 import { random, weightedPick } from './rng';
 import { ASSETS } from '../content/assets';
+import { getWeatherForDay, SAIGON_WEATHERS } from '../content/saigonWeather';
 
 // Món khách được gọi = món có trạm trong bếp (đọc từ content, không từ save cũ).
 // Nước/sốt còn cần chương mở trạm: sốt mở từ chương 2.
