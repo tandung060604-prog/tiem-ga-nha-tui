@@ -802,6 +802,9 @@ export function closeDay(draft: GameState, session: SellingSession, event?: Game
   // === Dầu đen carry-over: đóng cửa lúc dầu dirty → phạt sao 2 ngày tiếp theo ===
   if (oil === 'dirty') {
     draft.dirtyOilPenaltyDays = 2;
+    draft.cleanOilStreakDays = 0;
+  } else if ((draft.dirtyOilPenaltyDays ?? 0) === 0 && (draft.dirtyOilViolations ?? 0) === 0) {
+    draft.cleanOilStreakDays = (draft.cleanOilStreakDays ?? 0) + 1;
   }
   // Trừ ngày phạt dầu đen (từ hôm trước): sao Vệ sinh & Hương vị bị giảm
   if ((draft.dirtyOilPenaltyDays ?? 0) > 0) {

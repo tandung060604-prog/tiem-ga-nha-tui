@@ -497,6 +497,7 @@ export interface GameState {
   dirtyOilPenaltyDays?: number;  // Số ngày còn bị phạt vì đóng cửa lúc dầu đen (giảm sao Vệ sinh + Hương vị)
   dirtyOilViolations?: number;   // Số lần bị công an / kiểm tra ATTP phát hiện xài dầu đen (1: cảnh cáo, 2: phạt 200k, 3: bắt đi tù)
   dirtyOilFryingCount?: number;  // Đếm số mẻ chiên liên tiếp trong dầu đen sì
+  cleanOilStreakDays?: number;   // Số ngày kinh doanh duy trì dầu sạch không vi phạm (cho bằng khen Dũng Sĩ Dầu Sạch)
   totalReviewsCount?: number;    // Tổng số lượt đánh giá đã nhận
   gangsterThreatDays?: number;   // Số ngày giang hồ gây khó (giảm 30% khách) do chưa trả tiền mặt bằng
   lastRentPaidWeek?: number;     // Tuần gần nhất đã trả tiền mặt bằng (tính theo day / 7)

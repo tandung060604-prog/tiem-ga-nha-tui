@@ -53,6 +53,13 @@ describe('Sprint 3: Sổ Tay Kỷ Niệm Hẻm 1102 (MemoriesAlbumModal)', () =>
     expect(html).toContain('✓ ĐÃ MỞ KHÓA');
     expect(html).toContain('🔒 CHƯA ĐẠT');
     expect(html).toContain('BẾP LỬA HẺM 1102');
+
+    // Kết cục chưa mở phải được ẩn đi, hiển thị dạng ??? bí ẩn
+    expect(html).toContain('??? (Chưa Mở Khóa)');
+    expect(html).toContain('VẬN MỆNH BÍ ẨN');
+    // Không làm lộ tiêu đề hay nội dung của kết cục chưa mở
+    expect(html).not.toContain('CÔNG AN NIÊM PHONG');
+    expect(html).not.toContain('PHÁ SẢN ĐẮNG CAY');
   });
 
   it('render tab bunny hiển thị 6 lá thư Thỏ Cam và phần thưởng', () => {

@@ -121,10 +121,17 @@ export function renderSettingsModal(state: GameState): string {
         </button>
       </div>
 
+      <!-- Shop Themes Customization -->
+      <div style="border-top: 1px dashed var(--line); padding-top: 10px; text-align: center;">
+        <button id="btn-settings-shop-themes" class="btn-sm" style="width: 100%; padding: 8px; font-weight: 800; background: linear-gradient(135deg, #fdf4ff, #fae8ff); border: 1.5px solid #c084fc; color: #6b21a8; border-radius: 8px; cursor: pointer;">
+          🏮 Đổi Biển Hiệu & Giao Diện Quán
+        </button>
+      </div>
+
       <!-- Story Ending Preview -->
       <div style="border-top: 1px dashed var(--line); padding-top: 10px; text-align: center;">
         <button id="btn-view-ending" class="btn-sm" style="width: 100%; padding: 8px; font-weight: 800; background: linear-gradient(135deg, #ffd166, #f4a261); border-color: #e76f51; color: #431407;">
-          🏆 Kết thúc đã đạt (${(state.achievedEndings ?? []).length}/5)
+          🏆 Kết thúc đã đạt (${(state.achievedEndings ?? []).length}/6)
         </button>
       </div>
 

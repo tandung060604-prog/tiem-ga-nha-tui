@@ -6,7 +6,7 @@ import { finaleReady } from '../../content/endings';
 import { ASSETS } from '../../content/assets';
 import { DAILY_INCIDENTS } from '../../content/dailyIncidents';
 import { getWeatherForDay } from '../../content/saigonWeather';
-import { getActiveShopTheme } from '../../content/shopThemes';
+import { getClaimableBadgesCount } from '../../core/achievementsEngine';
 
 export function renderChalkboard(state: GameState, currentEventTitle: string = 'Trời Nắng Ráo'): string {
   const currentChapter = currentChapterData(state);
@@ -15,20 +15,13 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
   const progressPercent = Math.round(chapterProgress(state) * 100);
   const vnd = (n: number) => n.toLocaleString('vi-VN') + 'đ';
   const weather = getWeatherForDay(state.day);
-  const activeTheme = getActiveShopTheme(state);
+  const day = state.day || 1;
+  const chapter = state.currentChapter || 1;
+  const claimableBadges = getClaimableBadgesCount(state);
+  const hasPet = (state.adoptedPets && state.adoptedPets.length > 0) || (state.petPatio?.pets?.some(p => p.happiness > 0) && day >= 4);
 
   return `
     <div class="board chalkboard">
-      <div id="btn-banner-shop-themes" class="vintage-signboard-banner" title="Bấm để đổi giao diện và biển hiệu vintage cho quán">
-        <div class="vintage-signboard-title">
-          <span>${activeTheme.icon}</span>
-          <span>${activeTheme.signboardTitle}</span>
-        </div>
-        <div class="vintage-signboard-sub">
-          <span>🎨 ${activeTheme.name}</span>
-        </div>
-      </div>
-
       <div class="board-header">
         <div class="board-title-box">
           <span class="board-kicker">KẾ HOẠCH HÔM NAY</span>
@@ -65,33 +58,50 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
           </div>
         </div>
         <div class="board-btns">
-          <button id="btn-weekly-quests" class="btn-sm" style="background: #fef3c7; border: 1.5px solid #d97706; color: #78350f; font-weight: 800;" title="Nhiệm vụ tuần nhận thưởng tiền mặt và danh hiệu">
-            📜 Thử Thách Tuần
-          </button>
-          <button id="btn-secret-sauce" class="btn-sm btn-sauce-card ${state.secretSauceDay?.buffActive ? 'is-active' : ''}" title="Pha nồi sốt bí truyền nhận Buff Vàng (+3k tip & +0.25★ Hương vị)">
-            <img src="${ASSETS.icons.sauce}" class="btn-pixel-icon-sm" alt="" /> ${state.secretSauceDay?.buffActive ? '✨ Sốt Thần Thánh' : 'Nấu Sốt Bí Truyền'}
-          </button>
+          <!-- Các tính năng cơ bản Ngày 1: Tinh gọn tối đa chống ngợp -->
           <button id="btn-open-incidents" class="btn-sm btn-incident-card" title="78 sự kiện drama xóm hẻm">
             <img src="${ASSETS.icons.reviews}" class="btn-pixel-icon-sm" alt="" /> Sổ Tay Hẻm (${state.seenIncidentIds?.length ?? 0}/${DAILY_INCIDENTS.length})
           </button>
           <button id="btn-open-memories" class="btn-sm" style="background: #fef9c3; border: 1.5px solid #ca8a04; color: #854d0e; font-weight: 800;" title="Sổ Tay Kỷ Niệm: 36 Cư Dân, Hồ Sơ Thân Thiết, Tủ Kỷ Vật, 6 Kết Cục & Thư Thỏ Cam">
             📖 Kỷ Niệm Hẻm
           </button>
-          <button id="btn-open-achievements" class="btn-sm" style="background: #fef08a; border: 1.5px solid #ca8a04; color: #854d0e; font-weight: 800;" title="Bức Tường Bằng Khen Tổ Dân Phố Hẻm 1102">
-            🏆 Bằng Khen
-          </button>
-          <button id="btn-open-pet-patio" class="btn-sm" style="background: #fdf2f8; border: 1.5px solid #ec4899; color: #9d174d; font-weight: 800;" title="Góc Thú Cưng Hiên Quán (Cậu Vàng & Bé Mướp)">
-            🐾 Thú Cưng
-          </button>
-          <button id="btn-open-night-radio" class="btn-sm" style="background: #2b1d0c; border: 1.5px solid #854d0e; color: #fde047; font-weight: 800;" title="Đài Phát Thanh Đêm Sài Gòn (FM 99.9 MHz)">
-            📻 Đài Đêm
-          </button>
-          <button id="btn-open-shop-themes" class="btn-sm" style="background: #fdf4ff; border: 1.5px solid #c084fc; color: #6b21a8; font-weight: 800;" title="Biển Hiệu Vintage & Đổi Giao Diện Quán">
-            🏮 Biển Hiệu Vintage
-          </button>
-          <button id="btn-open-endless-mode" class="btn-sm" style="background: #4c0519; border: 1.5px solid #f43f5e; color: #fecdd3; font-weight: 800;" title="Thử thách sinh tồn bếp dồn dập (Rush Hour Wave Survival)">
-            🌙 Ca Đêm Bất Tận
-          </button>
+
+          <!-- Progressive Disclosure: Mở dần tính năng theo ngày để tránh rối cho người mới -->
+          ${(day >= 2 || chapter >= 2) ? `
+            <button id="btn-secret-sauce" class="btn-sm btn-sauce-card ${state.secretSauceDay?.buffActive ? 'is-active' : ''}" title="Pha nồi sốt bí truyền nhận Buff Vàng (+3k tip & +0.25★ Hương vị)">
+              <img src="${ASSETS.icons.sauce}" class="btn-pixel-icon-sm" alt="" /> ${state.secretSauceDay?.buffActive ? '✨ Sốt Thần Thánh' : 'Nấu Sốt Bí Truyền'}
+            </button>
+            <button id="btn-open-achievements" class="btn-sm" style="background: #fef08a; border: 1.5px solid #ca8a04; color: #854d0e; font-weight: 800; position: relative;" title="Bức Tường Bằng Khen Tổ Dân Phố Hẻm 1102">
+              🏆 Bằng Khen ${claimableBadges > 0 ? `<span style="background: #dc2626; color: #fff; font-size: 0.6rem; padding: 1px 4px; border-radius: 6px; font-weight: 900; margin-left: 2px;">${claimableBadges}</span>` : ''}
+            </button>
+          ` : ''}
+
+          ${(day >= 3 || chapter >= 2) ? `
+            <button id="btn-weekly-quests" class="btn-sm" style="background: #fef3c7; border: 1.5px solid #d97706; color: #78350f; font-weight: 800;" title="Nhiệm vụ tuần nhận thưởng tiền mặt và danh hiệu">
+              📜 Thử Thách Tuần
+            </button>
+            <button id="btn-open-night-radio" class="btn-sm" style="background: #2b1d0c; border: 1.5px solid #854d0e; color: #fde047; font-weight: 800;" title="Đài Phát Thanh Đêm Sài Gòn (FM 99.9 MHz)">
+              📻 Đài Đêm
+            </button>
+          ` : ''}
+
+          ${hasPet ? `
+            <button id="btn-open-pet-patio" class="btn-sm" style="background: #fdf2f8; border: 1.5px solid #ec4899; color: #9d174d; font-weight: 800;" title="Góc Thú Cưng Hiên Quán (Cậu Vàng & Bé Mướp)">
+              🐾 Thú Cưng
+            </button>
+          ` : ''}
+
+          ${(day >= 4 || chapter >= 2) ? `
+            <button id="btn-open-endless-mode" class="btn-sm" style="background: #4c0519; border: 1.5px solid #f43f5e; color: #fecdd3; font-weight: 800;" title="Thử thách sinh tồn bếp dồn dập (Rush Hour Wave Survival)">
+              🌙 Ca Đêm Bất Tận
+            </button>
+          ` : ''}
+
+          ${(day >= 5 || chapter >= 2) ? `
+            <button id="btn-open-shop-themes" class="btn-sm" style="background: #fdf4ff; border: 1.5px solid #c084fc; color: #6b21a8; font-weight: 800;" title="Biển Hiệu Vintage & Đổi Giao Diện Quán">
+              🏮 Biển Hiệu Vintage
+            </button>
+          ` : ''}
         </div>
       </div>
     </div>

@@ -182,21 +182,25 @@ export function getBadgeCurrentProgress(badgeId: HeritageBadgeId, state: GameSta
     case 'badge_khac_tinh_toi_pham':
       return state.thiefStats?.totalCaught ?? 0;
 
-    case 'badge_dung_si_dau_sach':
-      // Dựa vào số ngày không bị phạt dầu đen
-      return Math.max(0, 5 - (state.dirtyOilPenaltyDays ?? 0));
+    case 'badge_dung_si_dau_sach': {
+      // Chỉ tính số ngày đã kinh doanh duy trì dầu sạch, không bị phạt dầu đen
+      if ((state.dirtyOilViolations ?? 0) > 0 || (state.dirtyOilPenaltyDays ?? 0) > 0) {
+        return 0;
+      }
+      return Math.min(5, state.cleanOilStreakDays ?? 0);
+    }
 
     case 'badge_to_dan_pho_nghia_tinh':
       return state.karma?.community ?? 50;
 
     case 'badge_bac_thay_gia_truyen':
-      return state.secretSauceDay?.success ? 1 : 0; // Tính cả lịch sử hoặc ngày thành công
+      return (state as any).totalSecretSauceSuccesses ?? (state.secretSauceDay?.success ? 1 : 0);
 
     case 'badge_vua_giao_hang':
-      return state.deliveryRunnerDayCount ?? 0;
+      return (state as any).totalDeliveriesCompleted ?? (state.deliveryRunnerDayCount ?? 0);
 
     case 'badge_nha_hao_tam':
-      return state.carePackagesSentDay ? 1 : 0;
+      return (state as any).totalCarePackagesSent ?? (state.carePackagesSentDay ? 1 : 0);
 
     case 'badge_ong_trum_gacha':
       return state.staff?.some(s => s.rarity === 'SSR') ? 1 : 0;
@@ -208,7 +212,7 @@ export function getBadgeCurrentProgress(badgeId: HeritageBadgeId, state: GameSta
       return state.lifetimeStats?.totalFried ?? 0;
 
     case 'badge_ban_than_thu_cung':
-      return state.petPatio?.pets.reduce((acc, p) => acc + (p.pettedToday ? 1 : 0), 0) ?? 0;
+      return (state.petPatio as any)?.totalPettedCount ?? (state.petPatio?.pets.reduce((acc, p) => acc + (p.pettedToday ? 1 : 0), 0) ?? 0);
 
     case 'badge_huyen_thoai_100_ngay':
       return state.day ?? 1;

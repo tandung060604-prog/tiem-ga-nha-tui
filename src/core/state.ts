@@ -146,6 +146,7 @@ export function createInitialState(): GameState {
     adoptedPets: [],
     pestIncidentsCount: 0,
     dirtyOilPenaltyDays: 0,
+    cleanOilStreakDays: 0,
     gangsterThreatDays: 0,
     lastRentPaidWeek: 0,
     incidentCooldowns: {},
@@ -291,6 +292,11 @@ export function migrateSave(raw: unknown): { state: GameState; repaired: string[
   if (!Array.isArray(state.claimedHeritageBadgeIds)) state.claimedHeritageBadgeIds = [];
   if (!Array.isArray(state.unlockedThemeIds)) state.unlockedThemeIds = ['default'];
   if (!state.activeShopTheme) state.activeShopTheme = 'default';
+  if (typeof state.cleanOilStreakDays !== 'number') {
+    state.cleanOilStreakDays = (state.dirtyOilViolations === 0 && (state.dirtyOilPenaltyDays ?? 0) === 0)
+      ? Math.max(0, (state.day ?? 1) - 1)
+      : 0;
+  }
 
   // Thoát giữa ca bán: có ảnh chụp ca của đúng ngày này → tiếp tục ca; không có → về pha Chuẩn bị
   const shift = state.pausedShift;

@@ -41,7 +41,7 @@ export function renderAchievementsWallModal(state: GameState, filterCategory: st
     const bgColor = isClaimed ? '#fffdf7' : isCompleted ? '#fefce8' : '#f8fafc';
 
     return `
-      <div class="heritage-badge-card" style="background: ${bgColor}; border: 2.5px solid ${borderColor}; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); position: relative; overflow: hidden;">
+      <div class="heritage-badge-card" style="flex-shrink: 0; background: ${bgColor}; border: 2.5px solid ${borderColor}; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); position: relative; overflow: hidden;">
         
         <!-- Dấu Mộc Đỏ Triện Tròn khi đã hoàn thành / đã nhận -->
         ${isCompleted ? `

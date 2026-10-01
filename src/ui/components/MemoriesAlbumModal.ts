@@ -37,19 +37,19 @@ export function renderMemoriesAlbumModal(
   const unlockedCurios = getUnlockedCurios(state);
 
   return `
-    <div id="modal-memories-album" class="modal-backdrop" style="display: flex; align-items: center; justify-content: center; z-index: 1050; padding: 10px;">
-      <div class="modal-box retro-card" style="width: 100%; max-width: 460px; max-height: 92vh; display: flex; flex-direction: column; background: #fdf3e4; border: 3px solid #5a3018; border-radius: 14px; box-shadow: 0 12px 35px rgba(0,0,0,0.55); overflow: hidden; position: relative;">
+    <div id="modal-memories-album" class="modal-backdrop" style="display: flex; align-items: center; justify-content: center; z-index: 1050; padding: 8px;">
+      <div class="modal-box retro-card" style="width: 100%; max-width: 440px; max-height: 90vh; display: flex; flex-direction: column; background: #fdf3e4; border: 3px solid #5a3018; border-radius: 14px; box-shadow: 0 12px 35px rgba(0,0,0,0.55); overflow: hidden; position: relative;">
         
         <!-- Header Modal -->
-        <div style="background: linear-gradient(135deg, #7c4f32, #5a3018); color: #fff; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #3c1d0f;">
+        <div style="background: linear-gradient(135deg, #7c4f32, #5a3018); color: #fff; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #3c1d0f;">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 1.4rem;">📖</span>
+            <span style="font-size: 1.3rem;">📖</span>
             <div>
-              <div style="font-size: 0.95rem; font-weight: 800; color: #fbbf24; text-shadow: 1px 1px #000;">
+              <div style="font-size: 0.92rem; font-weight: 800; color: #fbbf24; text-shadow: 1px 1px #000;">
                 SỔ TAY KỶ NIỆM HẺM 1102
               </div>
-              <div style="font-size: 0.68rem; color: #fde68a;">
-                Biên niên ký đời sống, tủ kỷ vật & 6 đại kết cục
+              <div style="font-size: 0.66rem; color: #fde68a;">
+                Biên niên ký cư dân, kỷ vật & 6 đại kết cục
               </div>
             </div>
           </div>
@@ -58,27 +58,27 @@ export function renderMemoriesAlbumModal(
           </button>
         </div>
 
-        <!-- 5 Tabs Điều Hướng Cuộn Ngang Siêu Mượt -->
-        <div style="display: flex; background: #e8d5b7; border-bottom: 2px solid #c49a6c; padding: 4px 6px; gap: 4px; overflow-x: auto; scrollbar-width: none;">
-          <button class="tab-memories-btn ${activeTab === 'residents' ? 'active' : ''}" data-tab="residents" style="flex-shrink: 0; padding: 6px 8px; font-size: 0.72rem; font-weight: 800; border-radius: 6px; border: 1.5px solid ${activeTab === 'residents' ? '#5a3018' : 'transparent'}; background: ${activeTab === 'residents' ? '#fff' : '#dfc7a5'}; color: ${activeTab === 'residents' ? '#5a3018' : '#78350f'}; cursor: pointer;">
+        <!-- 5 Tabs Điều Hướng Cuộn Ngang Siêu Mượt Cho Điện Thoại -->
+        <div style="display: flex; background: #e8d5b7; border-bottom: 2px solid #c49a6c; padding: 5px 6px; gap: 5px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;">
+          <button class="tab-memories-btn ${activeTab === 'residents' ? 'active' : ''}" data-tab="residents" style="flex-shrink: 0; min-height: 34px; padding: 5px 9px; font-size: 0.72rem; font-weight: 800; border-radius: 7px; border: 1.5px solid ${activeTab === 'residents' ? '#5a3018' : 'transparent'}; background: ${activeTab === 'residents' ? '#fff' : '#dfc7a5'}; color: ${activeTab === 'residents' ? '#5a3018' : '#78350f'}; cursor: pointer;">
             👥 Cư Dân (${unlockedResidents}/${totalResidents})
           </button>
-          <button class="tab-memories-btn ${activeTab === 'affinity' ? 'active' : ''}" data-tab="affinity" style="flex-shrink: 0; padding: 6px 8px; font-size: 0.72rem; font-weight: 800; border-radius: 6px; border: 1.5px solid ${activeTab === 'affinity' ? '#5a3018' : 'transparent'}; background: ${activeTab === 'affinity' ? '#fff' : '#dfc7a5'}; color: ${activeTab === 'affinity' ? '#5a3018' : '#78350f'}; cursor: pointer;">
+          <button class="tab-memories-btn ${activeTab === 'affinity' ? 'active' : ''}" data-tab="affinity" style="flex-shrink: 0; min-height: 34px; padding: 5px 9px; font-size: 0.72rem; font-weight: 800; border-radius: 7px; border: 1.5px solid ${activeTab === 'affinity' ? '#5a3018' : 'transparent'}; background: ${activeTab === 'affinity' ? '#fff' : '#dfc7a5'}; color: ${activeTab === 'affinity' ? '#5a3018' : '#78350f'}; cursor: pointer;">
             💖 Thân Thiết (Dossier)
           </button>
-          <button class="tab-memories-btn ${activeTab === 'curios' ? 'active' : ''}" data-tab="curios" style="flex-shrink: 0; padding: 6px 8px; font-size: 0.72rem; font-weight: 800; border-radius: 6px; border: 1.5px solid ${activeTab === 'curios' ? '#5a3018' : 'transparent'}; background: ${activeTab === 'curios' ? '#fff' : '#dfc7a5'}; color: ${activeTab === 'curios' ? '#5a3018' : '#78350f'}; cursor: pointer;">
+          <button class="tab-memories-btn ${activeTab === 'curios' ? 'active' : ''}" data-tab="curios" style="flex-shrink: 0; min-height: 34px; padding: 5px 9px; font-size: 0.72rem; font-weight: 800; border-radius: 7px; border: 1.5px solid ${activeTab === 'curios' ? '#5a3018' : 'transparent'}; background: ${activeTab === 'curios' ? '#fff' : '#dfc7a5'}; color: ${activeTab === 'curios' ? '#5a3018' : '#78350f'}; cursor: pointer;">
             🏺 Tủ Kỷ Vật (${unlockedCurios.length}/${CURIOS_AND_RELICS.length})
           </button>
-          <button class="tab-memories-btn ${activeTab === 'endings' ? 'active' : ''}" data-tab="endings" style="flex-shrink: 0; padding: 6px 8px; font-size: 0.72rem; font-weight: 800; border-radius: 6px; border: 1.5px solid ${activeTab === 'endings' ? '#5a3018' : 'transparent'}; background: ${activeTab === 'endings' ? '#fff' : '#dfc7a5'}; color: ${activeTab === 'endings' ? '#5a3018' : '#78350f'}; cursor: pointer;">
+          <button class="tab-memories-btn ${activeTab === 'endings' ? 'active' : ''}" data-tab="endings" style="flex-shrink: 0; min-height: 34px; padding: 5px 9px; font-size: 0.72rem; font-weight: 800; border-radius: 7px; border: 1.5px solid ${activeTab === 'endings' ? '#5a3018' : 'transparent'}; background: ${activeTab === 'endings' ? '#fff' : '#dfc7a5'}; color: ${activeTab === 'endings' ? '#5a3018' : '#78350f'}; cursor: pointer;">
             🏆 Kết Cục (${achievedEndings.size}/6)
           </button>
-          <button class="tab-memories-btn ${activeTab === 'bunny' ? 'active' : ''}" data-tab="bunny" style="flex-shrink: 0; padding: 6px 8px; font-size: 0.72rem; font-weight: 800; border-radius: 6px; border: 1.5px solid ${activeTab === 'bunny' ? '#5a3018' : 'transparent'}; background: ${activeTab === 'bunny' ? '#fff' : '#dfc7a5'}; color: ${activeTab === 'bunny' ? '#5a3018' : '#78350f'}; cursor: pointer;">
+          <button class="tab-memories-btn ${activeTab === 'bunny' ? 'active' : ''}" data-tab="bunny" style="flex-shrink: 0; min-height: 34px; padding: 5px 9px; font-size: 0.72rem; font-weight: 800; border-radius: 7px; border: 1.5px solid ${activeTab === 'bunny' ? '#5a3018' : 'transparent'}; background: ${activeTab === 'bunny' ? '#fff' : '#dfc7a5'}; color: ${activeTab === 'bunny' ? '#5a3018' : '#78350f'}; cursor: pointer;">
             💌 Thư Thỏ Cam (${receivedLetters.size}/6)
           </button>
         </div>
 
         <!-- Nội Dung Scroll Theo Tab -->
-        <div style="flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="flex: 1; overflow-y: auto; padding: 8px 10px; display: flex; flex-direction: column; gap: 8px; -webkit-overflow-scrolling: touch;">
           ${activeTab === 'residents' ? renderResidentsTab(state, categoryFilter) : ''}
           ${activeTab === 'affinity' ? renderAffinityTab(state) : ''}
           ${activeTab === 'curios' ? renderCuriosTab(state) : ''}
@@ -337,17 +337,39 @@ function renderEndingsTab(state: GameState): string {
   const cards = Object.values(STORY_ENDINGS).map(end => {
     const isUnlocked = achieved.has(end.id);
 
-    return `
-      <div style="background: ${isUnlocked ? '#fffbeb' : '#ffffff'}; border: 2px solid ${isUnlocked ? '#f59e0b' : '#d4a373'}; border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 3px 8px rgba(0,0,0,0.06); position: relative;">
-        ${isUnlocked ? `
-          <div style="position: absolute; top: 8px; right: 8px; background: #10b981; color: #fff; font-size: 0.65rem; font-weight: 800; padding: 2px 6px; border-radius: 10px;">
-            ✓ ĐÃ MỞ KHÓA
-          </div>
-        ` : `
-          <div style="position: absolute; top: 8px; right: 8px; background: #94a3b8; color: #fff; font-size: 0.65rem; font-weight: 800; padding: 2px 6px; border-radius: 10px;">
+    if (!isUnlocked) {
+      return `
+        <div style="background: #fdfaf6; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.04); position: relative; opacity: 0.88;">
+          <div style="position: absolute; top: 8px; right: 8px; background: #64748b; color: #fff; font-size: 0.65rem; font-weight: 800; padding: 2px 7px; border-radius: 10px;">
             🔒 CHƯA ĐẠT
           </div>
-        `}
+
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="width: 36px; height: 36px; border-radius: 8px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #94a3b8; border: 1px solid #cbd5e1;">
+              🔒
+            </div>
+            <div>
+              <div style="font-size: 0.68rem; color: #94a3b8; font-weight: 800; letter-spacing: 0.5px;">VẬN MỆNH BÍ ẨN</div>
+              <div style="font-size: 0.88rem; font-weight: 900; color: #475569;">??? (Chưa Mở Khóa)</div>
+            </div>
+          </div>
+
+          <div style="font-size: 0.7rem; color: #64748b; font-style: italic; background: #f8fafc; padding: 6px 8px; border-radius: 6px; line-height: 1.4;">
+            "Hồi kết này vẫn đang ẩn mình dưới bóng đèn phố đêm Hẻm 1102. Tương lai tiệm gà phụ thuộc vào từng quyết định của bạn."
+          </div>
+
+          <div style="background: #f1f5f9; border-radius: 6px; padding: 5px 8px; font-size: 0.68rem; color: #475569; display: flex; align-items: center; gap: 4px;">
+            <span>💡 <b>Gợi ý:</b> Tiếp tục kinh doanh và tạo dựng tình nghĩa với cư dân để khai mở.</span>
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <div style="background: #fffbeb; border: 2px solid #f59e0b; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 3px 8px rgba(0,0,0,0.06); position: relative;">
+        <div style="position: absolute; top: 8px; right: 8px; background: #10b981; color: #fff; font-size: 0.65rem; font-weight: 800; padding: 2px 6px; border-radius: 10px;">
+          ✓ ĐÃ MỞ KHÓA
+        </div>
 
         <div style="display: flex; align-items: center; gap: 8px;">
           <span style="font-size: 1.5rem;">${end.icon}</span>

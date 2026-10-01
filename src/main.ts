@@ -3521,6 +3521,14 @@ class AppController {
       };
     }
 
+    const shopThemesSettingsBtn = document.getElementById('btn-settings-shop-themes');
+    if (shopThemesSettingsBtn) {
+      shopThemesSettingsBtn.onclick = () => {
+        audio.playPop();
+        this.openShopThemeModal();
+      };
+    }
+
     const viewEndingBtn = document.getElementById('btn-view-ending');
     if (viewEndingBtn) {
       viewEndingBtn.onclick = () => {

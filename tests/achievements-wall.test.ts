@@ -48,13 +48,26 @@ describe('Heritage Badges & Wall of Fame System (Bằng Khen Tổ Dân Phố)', 
       expect(progComplete.percent).toBe(100);
     });
 
-    it('counts claimable badges correctly', () => {
-      const state = createInitialState();
-      state.lifetimeStats.perfectFriedCount = 60; // Badge 1 complete
-      state.thiefStats = { totalCaught: 4, totalEscaped: 0, totalFinesPaid: 0 }; // Badge 2 complete
+    it('counts claimable badges correctly and prevents false completions on Day 1', () => {
+      const freshState = createInitialState();
+      // Vào Ngày 1 chưa làm gì thì tuyệt đối không được có bằng khen nào hoàn thành trước
+      expect(getClaimableBadgesCount(freshState)).toBe(0);
 
-      const claimable = getClaimableBadgesCount(state);
-      expect(claimable).toBeGreaterThanOrEqual(2);
+      const cleanOilBadge = HERITAGE_BADGES.find(b => b.id === 'badge_dung_si_dau_sach')!;
+      const cleanOilProg = getBadgeProgress(cleanOilBadge, freshState);
+      expect(cleanOilProg.current).toBe(0);
+      expect(cleanOilProg.isCompleted).toBe(false);
+
+      // Đạt đủ 5 ngày sạch dầu
+      freshState.cleanOilStreakDays = 5;
+      expect(getBadgeProgress(cleanOilBadge, freshState).isCompleted).toBe(true);
+
+      // Thêm 2 badge khác hoàn thành
+      freshState.lifetimeStats.perfectFriedCount = 60; // Badge 1 complete
+      freshState.thiefStats = { totalCaught: 4, totalEscaped: 0, totalFinesPaid: 0 }; // Badge 2 complete
+
+      const claimable = getClaimableBadgesCount(freshState);
+      expect(claimable).toBeGreaterThanOrEqual(3);
     });
   });
 
