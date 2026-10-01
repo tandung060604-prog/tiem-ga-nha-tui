@@ -533,6 +533,10 @@ export interface GameState {
   customSignatureDishesUnlocked?: string[];
   todayWeather?: SaigonWeatherId;
   petPatio?: PetPatioState;
+  claimedHeritageBadgeIds?: string[];
+  unlockedThemeIds?: ShopThemeId[];
+  activeShopTheme?: ShopThemeId;
+  endlessRecord?: EndlessRunRecord;
 }
 
 export interface BargainWholesaler {
@@ -834,4 +838,84 @@ export interface PetPatioState {
   lastPettedDay?: number;
 }
 
+// --- BỨC TƯỜNG BẰNG KHEN TỔ DÂN PHỐ (SAIGON HERITAGE BADGES & WALL OF FAME) ---
+export type HeritageBadgeId =
+  | 'badge_ban_tay_vang'          // Chiên 50 mẻ Perfect
+  | 'badge_khac_tinh_toi_pham'    // Bắt sống tên trộm 3 lần
+  | 'badge_dung_si_dau_sach'      // Không dùng dầu đen liên tiếp 5 ngày
+  | 'badge_to_dan_pho_nghia_tinh' // Đạt 100 điểm Karma Community
+  | 'badge_bac_thay_gia_truyen'   // Pha chế thành công 5 nồi sốt bí truyền
+  | 'badge_vua_giao_hang'         // Hoàn thành 15 đơn Delivery Express
+  | 'badge_nha_hao_tam'           // Gửi 3 gói tiếp tế cho bạn bè trong Lobby
+  | 'badge_ong_trum_gacha'        // Chiêu mộ thành công ít nhất 1 nhân viên SSR
+  | 'badge_nha_su_hoc_hem'        // Đọc xong 10 tập Ký sự cư dân
+  | 'badge_dai_ban_doanh_ga'      // Phục vụ tổng cộng 250 lượt khách
+  | 'badge_ban_than_thu_cung'     // Chăm sóc vuốt ve thú cưng 5 ngày
+  | 'badge_huyen_thoai_100_ngay'; // Đạt cột mốc 100 ngày kinh doanh Sài Gòn
+
+export interface HeritageBadge {
+  id: HeritageBadgeId;
+  title: string;                  // Tên bằng khen: "Bàn Tay Vàng Làng Gà Rán"
+  kicker: string;                 // "TỔ DÂN PHỐ HẺM 1102 CHỨNG NHẬN"
+  icon: string;                   // Emoji hoặc icon mộc đỏ
+  category: 'cooking' | 'security' | 'community' | 'operations' | 'legend';
+  categoryLabel: string;          // "Nghệ Thuật Bếp" | "An Ninh Trật Tự" | "Tình Làng Nghĩa Xóm" | "Kinh Doanh" | "Huyền Thoại"
+  targetCount: number;
+  requirementDesc: string;        // "Chiên đạt 50 mẻ gà giòn Perfect"
+  rewardMoney: number;
+  rewardKarma?: {
+    community?: number;
+    craftsmanship?: number;
+    ambition?: number;
+  };
+  honorTitle: string;             // Danh hiệu: "Đệ Nhất Bếp Chiên Sài Gòn"
+  quote: string;                  // Lời khen tặng từ Bác Ba & Cư Dân
+}
+
+// --- TÙY BIẾN GIAO DIỆN QUÁN & BIỂN HIỆU VINTAGE (SHOP SKINS & THEMES) ---
+export type ShopThemeId = 'default' | 'saigon_90s' | 'tet_mai_vang' | 'neon_cho_lon';
+
+export interface ShopTheme {
+  id: ShopThemeId;
+  name: string;                    // Tên giao diện quán
+  signboardTitle: string;          // Dòng chữ trên biển hiệu: "TIỆM GÀ RÁN BÁC BA 1990", "VẠN SỰ NHƯ Ý - GÀ GIÒN PHÁT TÀI"...
+  signboardSubtitle: string;       // Phụ đề biển hiệu
+  icon: string;                    // Emoji đại diện
+  cssClass: string;                // Class gắn vào .app container (e.g. 'theme-saigon-90s')
+  desc: string;                    // Mô tả bầu không khí
+  unlockDay: number;               // Ngày tối thiểu được phép mua skin
+  unlockCost: number;              // Chi phí sơn sửa & làm biển hiệu mới (VNĐ)
+  atmosphereBuff: string;          // Hiệu ứng hỗ trợ không gian quán
+  accentColor: string;             // Màu chủ đạo (hex)
+  previewCardStyle: string;        // Inline CSS preview cho thẻ biển hiệu
+}
+
+// --- CHẾ ĐỘ CA ĐÊM BẤT TẬN (ENDLESS RUSH HOUR CHALLENGE) ---
+export interface EndlessWaveConfig {
+  wave: number;
+  customerCount: number;
+  orderComplexity: number;        // Số món tối đa mỗi đơn (1 - 4)
+  patienceMultiplier: number;     // 1.0 -> 0.6 (khách càng wave cao càng hối hả)
+  targetScore: number;
+}
+
+export interface EndlessRunRecord {
+  highScore: number;
+  highestWave: number;
+  totalCustomersServed: number;
+  totalPerfectServes: number;
+  totalRuns: number;
+  lastPlayedDay?: number;
+}
+
+export interface EndlessRunState {
+  currentWave: number;
+  score: number;
+  comboStreak: number;
+  customersServedThisWave: number;
+  customersFailedThisWave: number;
+  maxFailedAllowed: number;       // Số khách bỏ đi tối đa trong 1 wave trước khi Game Over
+  isGameOver: boolean;
+  totalMoneyEarned: number;
+}
 

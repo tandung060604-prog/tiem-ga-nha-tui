@@ -97,7 +97,7 @@ export function resolveIncidentChoice(
 ): IncidentResolutionResult {
   const hasDog = !!draft.adoptedPets?.includes('pet_01_dog_vang');
   const hasCat = !!draft.adoptedPets?.includes('pet_02_cat_muop');
-  const hasSec = hasSecurityStaff(draft) || (hasDog && incident.isSecurityRisk);
+  const hasSec = hasSecurityStaff(draft);
   const upEffects = upgradeEffects(draft.upgrades ?? {});
   const isPest = incident.id.includes('pest') || incident.id.includes('rat') || incident.id.includes('fly');
 
@@ -115,8 +115,8 @@ export function resolveIncidentChoice(
     // Nếu là sự cố côn trùng/chuột và có miễn nhiễm vệ sinh (pestImmunity) hoặc có Mèo Mướp
     succeeded = true;
   } else {
-    // 2. Tính toán rủi ro: Nếu có bảo vệ (với sự cố an ninh) hoặc có nhân viên chuyên trách hóa giải (isMitigated) -> 100% an toàn
-    const isSafe = (incident.isSecurityRisk && hasSec) || isMitigated;
+    // 2. Tính toán rủi ro: Nếu có bảo vệ hoặc chó canh gác (với sự cố an ninh) hoặc có nhân viên chuyên trách hóa giải (isMitigated) -> 100% an toàn
+    const isSafe = (incident.isSecurityRisk && (hasSec || hasDog)) || isMitigated;
     if (choice.riskRate && choice.riskRate > 0 && !isSafe) {
       const roll = random();
       if (roll < choice.riskRate) {

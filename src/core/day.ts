@@ -261,8 +261,13 @@ export type ServeResult =
   | { kind: 'wrong-item'; order: CustomerOrder; paid: number; tip: number; wrongItemName: string; requestedName: string; feedbackNotes?: string[] }
   | { kind: 'incomplete-finish'; order: CustomerOrder; paid: number; tip: number; missingItemIds: string[]; feedbackNotes?: string[] };
 
-// Tính toán tiền Tip linh hoạt dựa trên tính cách khách hàng, tốc độ phục vụ và độ ngon của món
-export function calculateCustomerTip(order: CustomerOrder, secretSauceBuff?: boolean): { tip: number; feedbackNotes: string[] } {
+// Tính toán tiền Tip linh hoạt dựa trên tính cách khách hàng, tốc độ phục vụ, độ ngon, Kỷ Vật và Món Ăn Kỷ Niệm
+export function calculateCustomerTip(
+  order: CustomerOrder,
+  secretSauceBuff?: boolean,
+  relics?: string[],
+  signatureDishes?: string[]
+): { tip: number; feedbackNotes: string[] } {
   const notes: string[] = [];
   const ratio = order.patienceMax > 0 ? order.patienceCurrent / order.patienceMax : 0.5;
   const isFast = ratio > 0.6;
@@ -299,17 +304,16 @@ export function calculateCustomerTip(order: CustomerOrder, secretSauceBuff?: boo
     return { tip: 0, feedbackNotes: notes };
   }
 
+  let baseTip = 0;
+
   // 2. Tài Xế / Shipper: Không tip, vội vã
   if (personality === 'driver') {
     if (isFast) notes.push('Cảm ơn quán giao nhanh kịp chuyến!');
     else if (!isMedium) notes.push('Càu nhàu vì trễ giờ cuốc xe');
-    return { tip: 0, feedbackNotes: notes };
+    baseTip = 0;
   }
-
-  let baseTip = 0;
-
   // 3. Khách Sộp (VIP Big Spender): Đại gia hào phóng, tip khủng
-  if (personality === 'vip_generous' || order.isVip) {
+  else if (personality === 'vip_generous' || order.isVip) {
     if (isFast) {
       baseTip = 45000;
       notes.push('👑✨ KHÁCH SỘP: Tip cực đậm "Khỏi thối nha em!" (+45k)');
@@ -328,11 +332,9 @@ export function calculateCustomerTip(order: CustomerOrder, secretSauceBuff?: boo
       baseTip = Math.max(5000, Math.round(baseTip * 0.5));
       notes.push('Khách sộp nhắc nhở vì món cháy (-50% tip)');
     }
-    return { tip: Math.max(0, baseTip), feedbackNotes: notes };
   }
-
   // 4. Hào Phóng: Rất chuộng tip to
-  if (personality === 'generous') {
+  else if (personality === 'generous') {
     if (isFast) {
       baseTip = 10000;
       notes.push('Tip đậm phục vụ thần tốc! (+10k)');
@@ -348,7 +350,7 @@ export function calculateCustomerTip(order: CustomerOrder, secretSauceBuff?: boo
       notes.push('Thưởng tay nghề món chuẩn');
     }
   }
-  // 4. Vội Vã: Nhanh mới tip, chậm cắt sạch
+  // 5. Vội Vã: Nhanh mới tip, chậm cắt sạch
   else if (personality === 'impatient') {
     if (isFast) {
       baseTip = 5000;
@@ -359,7 +361,7 @@ export function calculateCustomerTip(order: CustomerOrder, secretSauceBuff?: boo
     }
     if (isFast && perfectBonus > 0) baseTip += perfectBonus;
   }
-  // 5. Sành Ăn: Khắt khe món cháy, chuộng Perfect
+  // 6. Sành Ăn: Khắt khe món cháy, chuộng Perfect
   else if (personality === 'foodie') {
     if (hasBurnt) {
       baseTip = 0;
@@ -372,7 +374,7 @@ export function calculateCustomerTip(order: CustomerOrder, secretSauceBuff?: boo
       }
     }
   }
-  // 6. Học Sinh: Tiền lẻ
+  // 7. Học Sinh: Tiền lẻ
   else if (personality === 'student') {
     if (isFast) {
       baseTip = 1000;
@@ -381,8 +383,13 @@ export function calculateCustomerTip(order: CustomerOrder, secretSauceBuff?: boo
       baseTip = 0;
       notes.push('Cười trừ chào quán');
     }
+    // Kỷ vật Đôi Giày Múa của Na: Học sinh hâm mộ tip thêm
+    if (relics?.includes('relic_giay_mua_canh')) {
+      baseTip += 2000;
+      notes.push('🩰 Học sinh mến mộ đôi giày múa của Na tip thêm +2.000đ!');
+    }
   }
-  // 7. Dễ Tính (Mặc định): Luôn tip nhẹ vui vẻ khi nhanh
+  // 8. Dễ Tính (Mặc định): Luôn tip nhẹ vui vẻ khi nhanh
   else {
     baseTip = isFast ? FAST_SERVICE_TIP : 0;
     if (isFast) notes.push(`Khách dễ thương tip ${baseTip.toLocaleString('vi-VN')}đ`);
@@ -393,6 +400,40 @@ export function calculateCustomerTip(order: CustomerOrder, secretSauceBuff?: boo
   if (hasBurnt && personality !== 'foodie') {
     baseTip = Math.max(0, Math.round(baseTip * 0.4));
     notes.push('Trừ bớt tip vì có món cháy');
+  }
+
+  // Kỷ vật Cúp Gà Vàng: Khách tự hào tip thêm 20%
+  if (relics?.includes('relic_cup_ga_vang') && baseTip > 0) {
+    baseTip = Math.round(baseTip * 1.2);
+    notes.push('🏆 Cúp Gà Vàng: Khách tự hào boa thêm +20%!');
+  }
+
+  // Món Ăn Kỷ Niệm Cốt Truyện (Signature Story Dishes)
+  if (signatureDishes && signatureDishes.length > 0) {
+    if (signatureDishes.includes('dish_chao_ga_gung_bac_ba') && (personality === 'easygoing' || order.customerName.includes('Bác Ba'))) {
+      baseTip += 2500;
+      notes.push('🍲 Cháo Gà Bác Ba: Ấm tình làng nghĩa xóm (+2.5k tip)');
+    }
+    if (signatureDishes.includes('dish_ga_lac_thocam') && (order.isBunny || personality === 'student')) {
+      baseTip += 3000;
+      notes.push('🍯 Gà Lắc Thỏ Cam: Mê tít mật ong hoa cà phê (+3k tip)');
+    }
+    if (signatureDishes.includes('dish_uc_ga_canh_en_na') && (personality === 'student' || personality === 'generous')) {
+      baseTip += 2000;
+      notes.push('🩰 Ức Gà Cánh Én: Tiếp sức đam mê nghệ thuật (+2k tip)');
+    }
+    if (signatureDishes.includes('dish_bucket_it_long') && (order.isVip || personality === 'vip_generous')) {
+      baseTip += 5000;
+      notes.push('💻 Bucket Gà Cày Đêm IT: Sếp khao cả team tip cực đậm (+5k tip)');
+    }
+    if (signatureDishes.includes('dish_xoi_ga_mai_tuan') && personality === 'driver') {
+      baseTip += 2500;
+      notes.push('🛵 Xôi Gà Tuấn & Mai: Anh em tài xế ấm bụng gửi tiền boa (+2.5k tip)');
+    }
+    if (signatureDishes.includes('dish_ga_cho_lon_1990') && perfectBonus > 0) {
+      baseTip += 4000;
+      notes.push('🍗 Gà Thảo Mộc 1990: Công thức sư phụ Chợ Lớn vang danh (+4k tip)');
+    }
   }
 
   return { tip: Math.max(0, baseTip + sauceBonus), feedbackNotes: notes };
@@ -410,7 +451,9 @@ export function serveFirstOrder(
   removeAt: (trayIdx: number) => void,
   upgrades?: { [id: string]: UpgradeBranch },
   targetOrderId?: string,
-  secretSauceBuff?: boolean
+  secretSauceBuff?: boolean,
+  relics?: string[],
+  signatureDishes?: string[]
 ): ServeResult {
   if (session.orders.length === 0) return { kind: 'no-order' };
 
@@ -534,7 +577,7 @@ export function serveFirstOrder(
     }
 
     const paid = Math.max(0, order.totalPrice - (order.burntPenalty ?? 0));
-    const { tip, feedbackNotes } = calculateCustomerTip(order, secretSauceBuff);
+    const { tip, feedbackNotes } = calculateCustomerTip(order, secretSauceBuff, relics, signatureDishes);
     if (secretSauceBuff && order.personality !== 'frugal') {
       session.secretSauceTip = (session.secretSauceTip ?? 0) + 3000;
     }

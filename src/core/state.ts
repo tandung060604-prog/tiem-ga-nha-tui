@@ -7,6 +7,7 @@ import { ensureBatches } from './inventory';
 import { signSave, auditState, flagIntegrity } from './integrity';
 import { priceLimits } from './pricing';
 import { generateUniqueUserId } from './leaderboard';
+import { getOrCreatePetPatio } from './petPatioSystem';
 
 const SAVE_KEY = 'tiem_ga_nha_tui_save_v2';
 const SIG_KEY = `${SAVE_KEY}_sig`;
@@ -130,8 +131,45 @@ export function createInitialState(): GameState {
       totalBurnt: 0,
       totalRevenue: 0,
       perfectFriedCount: 0
-    }
+    },
+    characterStoryState: {
+      characterProgress: {},
+      pendingEpisodeId: null,
+      readEpisodeHistory: [],
+    },
+    unlockedCurioIds: [],
+    residentAffinityLevels: {},
+    lastRadioBroadcastDay: 0,
+    heardRadioBroadcastIds: [],
+    customSignatureDishesUnlocked: [],
+    todayWeather: 'sunny_hot',
+    adoptedPets: [],
+    pestIncidentsCount: 0,
+    dirtyOilPenaltyDays: 0,
+    gangsterThreatDays: 0,
+    lastRentPaidWeek: 0,
+    incidentCooldowns: {},
+    expiredWasteNotification: null,
+    bgmVolume: 0.7,
+    sfxVolume: 0.8,
+    todayMarketDiscount: 0,
+    todayMarketBargained: false,
+    deliveryRunnerDayCount: 0,
+    carePackagesSentDay: 0,
+    pendingCarePackages: [],
+    ssrAutoMarket: false,
+    ssrAutoOilFilter: false,
+    prepTutorialDone: false,
+    thiefStats: {
+      totalCaught: 0,
+      totalEscaped: 0,
+      totalFinesPaid: 0
+    },
+    claimedHeritageBadgeIds: [],
+    unlockedThemeIds: ['default'],
+    activeShopTheme: 'default',
   };
+  getOrCreatePetPatio(state);
   Object.values(state.inventory).forEach(ensureBatches);
   return state;
 }
@@ -244,6 +282,15 @@ export function migrateSave(raw: unknown): { state: GameState; repaired: string[
     state.lifetimeStats.totalBonus = Math.max(0, state.money - 850000 - state.lifetimeStats.totalRevenue);
   }
   if (typeof src.depositsPaid !== 'number') state.depositsPaid = state.currentChapter - 1;
+
+  if (!Array.isArray(state.unlockedCurioIds)) state.unlockedCurioIds = [];
+  if (!state.residentAffinityLevels || typeof state.residentAffinityLevels !== 'object') state.residentAffinityLevels = {};
+  if (!Array.isArray(state.heardRadioBroadcastIds)) state.heardRadioBroadcastIds = [];
+  if (!Array.isArray(state.customSignatureDishesUnlocked)) state.customSignatureDishesUnlocked = [];
+  if (!state.petPatio) getOrCreatePetPatio(state);
+  if (!Array.isArray(state.claimedHeritageBadgeIds)) state.claimedHeritageBadgeIds = [];
+  if (!Array.isArray(state.unlockedThemeIds)) state.unlockedThemeIds = ['default'];
+  if (!state.activeShopTheme) state.activeShopTheme = 'default';
 
   // Thoát giữa ca bán: có ảnh chụp ca của đúng ngày này → tiếp tục ca; không có → về pha Chuẩn bị
   const shift = state.pausedShift;

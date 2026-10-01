@@ -105,12 +105,19 @@ import { renderNightRadioModal } from './ui/components/NightRadioModal';
 import { getTonightRadioBroadcast } from './content/nightRadio';
 import { getUnlockedCurios } from './content/curiosAndRelics';
 import { getUnlockedSignatureDishes } from './content/signatureStoryDishes';
+import { getWeatherForDay } from './content/saigonWeather';
 import {
   petThePet,
   upgradePetPatio,
   checkDogGuardBonus
 } from './core/petPatioSystem';
 import { renderPetPatioModal } from './ui/components/PetPatioComponent';
+import { renderAchievementsWallModal } from './ui/components/AchievementsWallModal';
+import { claimBadgeReward } from './core/achievementsEngine';
+import { renderShopThemeModal } from './ui/components/ShopThemeModal';
+import { unlockShopTheme, setActiveShopTheme, getActiveShopTheme } from './content/shopThemes';
+import { renderEndlessModeModal } from './ui/components/EndlessModeModal';
+import { canEnterEndlessMode } from './core/endlessMode';
 import type { DailyIncident, DeliveryRunResult, CarePackageType, ThiefEncounter, CharacterEpisode } from './types/game';
 import confetti from 'canvas-confetti';
 
@@ -1073,6 +1080,144 @@ class AppController {
     }
   }
 
+  // --- BỨC TƯỜNG BẰNG KHEN TỔ DÂN PHỐ HẺM 1102 (WALL OF FAME) ---
+  public openAchievementsWallModal(filterCat: string = 'all') {
+    audio.playPop();
+    const state = stateManager.getState();
+    const html = renderAchievementsWallModal(state, filterCat);
+    this.openModal(html);
+
+    const closeBtn = document.getElementById('btn-close-achievements');
+    if (closeBtn) {
+      closeBtn.onclick = () => {
+        audio.playPop();
+        this.closeModal();
+      };
+    }
+
+    // Bộ lọc thể loại
+    const filterBtns = document.querySelectorAll('.btn-badge-filter');
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const cat = (e.currentTarget as HTMLElement).getAttribute('data-cat') || 'all';
+        audio.playPop();
+        this.openAchievementsWallModal(cat);
+      });
+    });
+
+    // Nút đóng dấu mộc đỏ nhận thưởng
+    const claimBtns = document.querySelectorAll('.btn-claim-badge');
+    claimBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const badgeId = (e.currentTarget as HTMLElement).getAttribute('data-badge-id') as any;
+        if (badgeId) {
+          const res = claimBadgeReward(stateManager.getState(), badgeId);
+          if (res.success) {
+            audio.playCash();
+            confetti({ particleCount: 70, spread: 80, origin: { y: 0.5 } });
+            this.showToast(`🎉 ${res.message}`);
+            stateManager.saveState();
+            this.render(); // Cập nhật số tiền header
+            this.openAchievementsWallModal(filterCat);
+          } else {
+            audio.playBurnt();
+            this.showToast(`⚠️ ${res.message}`);
+          }
+        }
+      });
+    });
+  }
+
+  public openShopThemeModal() {
+    audio.playPop();
+    const state = stateManager.getState();
+    const html = renderShopThemeModal(state);
+    this.openModal(html);
+
+    const closeBtn = document.getElementById('btn-close-shop-theme') || document.getElementById('btn-close-shop-themes');
+    if (closeBtn) {
+      closeBtn.onclick = () => {
+        audio.playPop();
+        this.closeModal();
+      };
+    }
+
+    // Nút Áp Dụng Theme đã có
+    const applyBtns = document.querySelectorAll('.btn-apply-theme');
+    applyBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const themeId = (e.currentTarget as HTMLElement).getAttribute('data-theme-id') as any;
+        if (themeId) {
+          const res = setActiveShopTheme(stateManager.getState(), themeId);
+          if (res.success) {
+            audio.playPop();
+            this.showToast(`✨ ${res.message}`);
+            stateManager.saveState();
+            this.render();
+            this.openShopThemeModal();
+          } else {
+            audio.playBurnt();
+            this.showToast(`⚠️ ${res.message}`);
+          }
+        }
+      });
+    });
+
+    // Nút Mua/Thi Công Theme Mới
+    const unlockBtns = document.querySelectorAll('.btn-unlock-theme');
+    unlockBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const themeId = (e.currentTarget as HTMLElement).getAttribute('data-theme-id') as any;
+        if (themeId) {
+          const res = unlockShopTheme(stateManager.getState(), themeId);
+          if (res.success) {
+            audio.playCash();
+            confetti({ particleCount: 75, spread: 85, origin: { y: 0.5 } });
+            this.showToast(`🎉 ${res.message}`);
+            stateManager.saveState();
+            this.render();
+            this.openShopThemeModal();
+          } else {
+            audio.playBurnt();
+            this.showToast(`⚠️ ${res.message}`);
+          }
+        }
+      });
+    });
+  }
+
+  public openEndlessModeModal() {
+    audio.playPop();
+    const state = stateManager.getState();
+    const html = renderEndlessModeModal(state);
+    this.openModal(html);
+
+    const closeBtn = document.getElementById('btn-close-endless-mode');
+    if (closeBtn) {
+      closeBtn.onclick = () => {
+        audio.playPop();
+        this.closeModal();
+      };
+    }
+
+    const startBtn = document.getElementById('btn-start-endless-run');
+    if (startBtn) {
+      startBtn.onclick = () => {
+        const check = canEnterEndlessMode(state);
+        if (!check.canEnter) {
+          audio.playBurnt();
+          this.showToast(`⚠️ ${check.reason}`);
+          return;
+        }
+        audio.playCash();
+        confetti({ particleCount: 90, spread: 100, origin: { y: 0.5 } });
+        this.closeModal();
+        this.showToast('🔥 BẮT ĐẦU CA ĐÊM BẤT TẬN! Đợt sóng khách ùa vào!');
+        this.setPhase('selling');
+      };
+    }
+  }
+
   // --- TÊN TRỘM ĐÓNG GIẢ & BẢO VỆ PHÁ ÁN (JEV-POWERED) ---
   private tickThief(session: SellingSession, gameDt: number) {
     if (this.isModalOpen()) return;
@@ -1261,6 +1406,12 @@ class AppController {
       updateThemeColor('#5a3018');
     }
     const state = stateManager.getState();
+    const activeTheme = getActiveShopTheme(state);
+    const appEl = document.getElementById('app');
+    if (appEl) {
+      appEl.classList.remove('theme-default', 'theme-saigon-90s', 'theme-tet-mai-vang', 'theme-neon-cho-lon');
+      appEl.classList.add(activeTheme.cssClass);
+    }
 
     // 1. Render Header (chỉ khi nội dung đổi, để nút header không bị thay mỗi frame)
     const headerEl = document.getElementById('header');
@@ -1531,6 +1682,38 @@ class AppController {
       };
     }
 
+    const openAchievementsBtn = document.getElementById('btn-open-achievements');
+    if (openAchievementsBtn) {
+      openAchievementsBtn.onclick = () => {
+        audio.playPop();
+        this.openAchievementsWallModal('all');
+      };
+    }
+
+    const openShopThemesBtn = document.getElementById('btn-open-shop-themes');
+    if (openShopThemesBtn) {
+      openShopThemesBtn.onclick = () => {
+        audio.playPop();
+        this.openShopThemeModal();
+      };
+    }
+
+    const bannerShopThemesBtn = document.getElementById('btn-banner-shop-themes');
+    if (bannerShopThemesBtn) {
+      bannerShopThemesBtn.onclick = () => {
+        audio.playPop();
+        this.openShopThemeModal();
+      };
+    }
+
+    const openEndlessModeBtn = document.getElementById('btn-open-endless-mode');
+    if (openEndlessModeBtn) {
+      openEndlessModeBtn.onclick = () => {
+        audio.playPop();
+        this.openEndlessModeModal();
+      };
+    }
+
     // Bind current tab events
     switch (this.activeTab) {
       case 'inventory':
@@ -1778,9 +1961,12 @@ class AppController {
     this.sellingStructureKey = '';
     this.shownBacBaTipsThisSession.clear();
     this.sellingSession = createSellingSession();
-    cookingEngine.setFryRampBonus(upgradeEffects(stateManager.getState().upgrades).fryRampPct);
-    cookingEngine.clearTray();
     const state = stateManager.getState();
+    cookingEngine.setFryRampBonus(upgradeEffects(state.upgrades).fryRampPct);
+    // Kỷ vật Chiếc Vá Gỗ Năm 1990: nới rộng cửa sổ Perfect thêm +4%
+    const hasVaGoRelic = state.unlockedCurioIds?.includes('relic_va_go_1990');
+    cookingEngine.setPerfectWindowBonus(hasVaGoRelic ? 4 : 0);
+    cookingEngine.clearTray();
     cookingEngine.setTraySize(traySizeFor(state));
     this.customerSource = createCustomerSource(state, this.currentEvent);
     this.sellingSession.orders.push(...this.customerSource.opening());
@@ -1792,7 +1978,9 @@ class AppController {
     }
 
     // Số khách cả ngày: khách nền theo chương × sao × marketing × sự kiện (GDD)
-    this.expectedCustomers = EconomyEngine.calculateDailyCustomerCount(state, this.currentEvent.effect.customerMultiplier ?? 1);
+    const weather = getWeatherForDay(state.day);
+    const weatherMultiplier = weather?.dineInMultiplier ?? 1;
+    this.expectedCustomers = EconomyEngine.calculateDailyCustomerCount(state, (this.currentEvent.effect.customerMultiplier ?? 1) * weatherMultiplier);
     this.sellingSession.expectedCustomers = this.expectedCustomers;
     this.sellingSession.spawnedCount = this.sellingSession.orders.length;
 
@@ -2420,7 +2608,9 @@ class AppController {
       idx => cookingEngine.removeFromTray(idx),
       curState.upgrades,
       targetOrderId,
-      curState.secretSauceDay?.buffActive
+      curState.secretSauceDay?.buffActive,
+      curState.unlockedCurioIds,
+      curState.customSignatureDishesUnlocked
     );
 
     switch (result.kind) {

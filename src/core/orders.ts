@@ -137,7 +137,22 @@ export class OrdersEngine {
     if (baseTotal > 0) orderRatio = (totalPrice - (isWalkupDrink ? BASKET_RULE.walkupSurcharge : 0)) / (baseTotal * priceMultiplier);
     const priceTolerance = patienceFactorFromPrice(orderRatio);
     const walkupRush = isWalkupDrink ? 0.6 : 1; // người đi đường vội, không chờ lâu
-    const patienceMax = Math.max(12, Math.round((28 + random() * 12 + spaceBonus + orderSizeBonus) * char.patienceMultiplier * patienceBoost * priceTolerance * walkupRush));
+    let patienceMax = Math.max(12, Math.round((28 + random() * 12 + spaceBonus + orderSizeBonus) * char.patienceMultiplier * patienceBoost * priceTolerance * walkupRush));
+
+    // Hiệp đồng Thời Tiết Sài Gòn & Kỷ Vật Hẻm & Thú Cưng
+    const weather = state.todayWeather ? SAIGON_WEATHERS[state.todayWeather] : getWeatherForDay(state.day);
+    if (weather?.patienceModifier) {
+      patienceMax = Math.round(patienceMax * weather.patienceModifier);
+    }
+    // Kỷ vật Khăn Rằn Bác Ba: +3s kiên nhẫn
+    if (state.unlockedCurioIds?.includes('relic_khan_ran_bacba')) {
+      patienceMax += 3;
+    }
+    // Thú cưng được vuốt ve trong ngày: +2s kiên nhẫn
+    if (state.petPatio?.pets?.some(p => p.pettedToday)) {
+      patienceMax += 2;
+    }
+    patienceMax = Math.max(12, patienceMax);
 
     return {
       id: 'ord_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),

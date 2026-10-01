@@ -19,17 +19,27 @@ export function renderIncidentPrompt(
   const choicesHtml = incident.choices.map((choice: IncidentChoice) => {
     const isSecOnly = choice.requiresSecurity === true || choice.requiresRole === 'security';
     const hasRequiredRole = choice.requiresRole ? hasStaffRole(state, choice.requiresRole) : true;
-    const canChoose = (!choice.requiresSecurity || hasSec) && hasRequiredRole;
+    const requiresCat = choice.id === 'rat_cat_ambush';
+    const hasCat = !!(state.petPatio?.pets?.some(p => p.id === 'pet_02_cat_muop') || state.adoptedPets?.includes('pet_02_cat_muop'));
+    const canChoose = (!choice.requiresSecurity || hasSec) && hasRequiredRole && (!requiresCat || hasCat);
 
     // Nút sự kiện: Các lựa chọn bình thường có màu sắc đồng đều, trung lập (btn-neutral-choice)
     let btnThemeClass = 'btn-neutral-choice';
     if (isSecOnly || choice.requiresRole) {
       btnThemeClass = canChoose ? 'btn-security-choice' : 'btn-locked-choice';
+    } else if (requiresCat) {
+      btnThemeClass = canChoose ? 'btn-security-choice' : 'btn-locked-choice';
     }
 
     // Xử lý dòng phụ (Tier 2) giải thích tình thế / hệ quả / may rủi
     let subText = choice.subDesc || choice.kicker || '';
-    if (isSecOnly) {
+    if (requiresCat) {
+      if (!hasCat) {
+        subText = '🔒 Cần nhận nuôi Bé Mèo Mướp tại Góc Thú Cưng mới kích hoạt được';
+      } else {
+        subText = '🐱 Có Bé Mèo Mướp săn chuột đêm: 100% sạch bóng không tốn 1 xu!';
+      }
+    } else if (isSecOnly) {
       if (!hasSec) {
         subText = '🔒 Cần tuyển Chú Tư Giữ Xe tại tab Nhân viên mới xài được nè';
       } else if (!subText.includes('Bảo Vệ') && !subText.includes('Chú Tư')) {

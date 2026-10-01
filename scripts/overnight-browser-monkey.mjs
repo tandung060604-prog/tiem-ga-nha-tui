@@ -252,6 +252,24 @@ class OvernightMonkey {
       return true;
     }
 
+    // 0f. Đặt tên quán nếu có dialog (Shop Name Dialog)
+    const confirmName = page.locator('#btn-confirm-shop-name');
+    if (await confirmName.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`🏷️ Bấm xác nhận đặt tên quán...`);
+      await confirmName.first().click({ force: true });
+      await sleep(400);
+      return true;
+    }
+
+    // 0g. Hộp thoại chào mừng tiệm mới (Welcome Modal)
+    const welcomeStart = page.locator('#btn-welcome-start');
+    if (await welcomeStart.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`✨ Đóng hộp thoại chào mừng...`);
+      await welcomeStart.first().click({ force: true });
+      await sleep(400);
+      return true;
+    }
+
     // Modal Kết Thúc Trò Chơi (Ending Modal): Ưu tiên Bấm Chơi Lại Mới để reset vòng lặp kiểm thử
     const endingRestartBtn = page.locator('#btn-restart-game');
     if (await endingRestartBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {

@@ -33,6 +33,7 @@ export class CookingEngine {
   private activeSeasoning: Sauce | null = null;
   private fryRampPct = 0;
   private traySize = BASE_TRAY_SIZE;
+  private perfectWindowBonus = 0;
 
   // Khay rộng thêm khi có phụ bếp / phục vụ (core/staff.ts extraTraySlots)
   public setTraySize(n: number) {
@@ -44,6 +45,10 @@ export class CookingEngine {
 
   public setFryRampBonus(pct: number) {
     this.fryRampPct = Math.max(0, pct);
+  }
+
+  public setPerfectWindowBonus(bonus: number) {
+    this.perfectWindowBonus = Math.max(0, bonus);
   }
 
   // Chụp / khôi phục chảo + khay cho "ca bán dở" (thoát app giữa ca rồi quay lại). Âm thanh chiên
@@ -103,17 +108,17 @@ export class CookingEngine {
   }
 
   public calculateCurrentQuality(): QualityRating {
-    return CookingEngine.qualityAt(this.cookState.progress);
+    return CookingEngine.qualityAt(this.cookState.progress, this.perfectWindowBonus);
   }
 
   // Ngưỡng vùng trên thanh đo; phải khớp độ rộng .zone-* trong styles/kitchen.css (38/10/22/10/20)
   public static readonly ZONES = { raw: 38, goodLow: 48, perfect: 70, goodHigh: 80 } as const;
 
-  public static qualityAt(p: number): QualityRating {
+  public static qualityAt(p: number, perfectBonus = 0): QualityRating {
     const z = CookingEngine.ZONES;
     if (p < z.raw) return 'raw';
-    if (p < z.goodLow) return 'good';
-    if (p < z.perfect) return 'perfect';
+    if (p < (z.goodLow - perfectBonus)) return 'good';
+    if (p < (z.perfect + perfectBonus)) return 'perfect';
     if (p < z.goodHigh) return 'good';
     return 'burnt';
   }

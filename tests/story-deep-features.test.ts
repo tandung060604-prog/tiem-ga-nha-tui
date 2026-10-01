@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { GameState } from '../src/types/game';
+import { GameState, CustomerOrder } from '../src/types/game';
 import { getUnlockedCurios, CURIOS_AND_RELICS } from '../src/content/curiosAndRelics';
 import { getResidentAffinity, getAllResidentAffinities } from '../src/content/residentAffinity';
 import { getTonightRadioBroadcast, NIGHT_RADIO_BROADCASTS } from '../src/content/nightRadio';
@@ -8,6 +8,9 @@ import { renderMemoriesAlbumModal } from '../src/ui/components/MemoriesAlbumModa
 import { renderNightRadioModal } from '../src/ui/components/NightRadioModal';
 import { renderCharacterEpisodeModal } from '../src/ui/components/CharacterStoryModal';
 import { CHARACTER_EPISODES } from '../src/content/characterNarrativeArcs';
+import { calculateCustomerTip } from '../src/core/day';
+import { renderMenuTab } from '../src/ui/components/MenuTab';
+import { createInitialState, migrateSave } from '../src/core/state';
 
 function createMockState(overrides?: Partial<GameState>): GameState {
   return {
@@ -212,6 +215,39 @@ describe('Hệ Thống Tính Năng Chiều Sâu Cốt Truyện & Visual Novel (S
       expect(dish.associatedCharacter).toContain('Bác Ba');
       expect(dish.priceBonusPercent).toBeGreaterThanOrEqual(15);
     });
+
+    it('4.2. calculateCustomerTip kích hoạt buff tiền tip từ món ăn kỷ niệm', () => {
+      const mockOrder: CustomerOrder = {
+        id: 'ord_test_sig',
+        customerName: 'Bác Ba Tổ Trưởng',
+        avatar: '👴',
+        personality: 'family',
+        items: [{ menuItemId: 'crispy_chicken', count: 1, served: 0, completed: false }],
+        totalPrice: 40000,
+        patienceMax: 30,
+        patienceCurrent: 25,
+      };
+
+      // Chưa mở khóa món kỷ niệm
+      const tipWithoutSig = calculateCustomerTip(mockOrder, false, [], []);
+      expect(tipWithoutSig.tip).toBe(5000); // Fast service tip
+
+      // Đã mở khóa Cháo Gà Bác Ba
+      const tipWithSig = calculateCustomerTip(mockOrder, false, [], ['dish_chao_ga_gung_bac_ba']);
+      expect(tipWithSig.tip).toBe(5000 + 2500); // 7500đ
+      expect(tipWithSig.feedbackNotes.some(n => n.includes('Cháo Gà Bác Ba'))).toBe(true);
+    });
+
+    it('4.3. renderMenuTab hiển thị section Món Kỷ Niệm Cốt Truyện', () => {
+      const state = createInitialState();
+      state.customSignatureDishesUnlocked = ['dish_chao_ga_gung_bac_ba'];
+      const html = renderMenuTab(state);
+
+      expect(html).toContain('Món Kỷ Niệm Cốt Truyện');
+      expect(html).toContain('Cháo Gà Gừng Tía Tô Bác Ba');
+      expect(html).toContain('+20% Tip/Doanh Thu');
+      expect(html).toContain('Gà Lắc Phô Mai Mật Ong Thỏ Cam');
+    });
   });
 
   // =========================================================================
@@ -257,6 +293,48 @@ describe('Hệ Thống Tính Năng Chiều Sâu Cốt Truyện & Visual Novel (S
       expect(html).toContain('Ký Sự Hẻm 1102');
       expect(html).toContain('Bác Ba');
       expect(html).toContain('btn-char-story-choice');
+    });
+  });
+
+  // =========================================================================
+  // 6. KIỂM TRA BẢO LƯU DỮ LIỆU & SAVE MIGRATION (DATA INTEGRITY)
+  // =========================================================================
+  describe('6. Kiểm Tra Khôi Phục Lưu Trữ (Save Persistence & Migration)', () => {
+    it('6.1. migrateSave bảo lưu đầy đủ kỷ vật, món kỷ niệm, góc thú cưng và đài đêm', () => {
+      const initial = createInitialState();
+      initial.unlockedCurioIds = ['relic_va_go_1990', 'relic_cup_ga_vang'];
+      initial.customSignatureDishesUnlocked = ['dish_chao_ga_gung_bac_ba'];
+      initial.residentAffinityLevels = { tho_cam: 3, bac_ba: 4 };
+      initial.heardRadioBroadcastIds = ['broadcast_ch1_d1'];
+      initial.todayWeather = 'sudden_rain';
+
+      const jsonStr = JSON.stringify(initial);
+      const migrated = migrateSave(JSON.parse(jsonStr));
+
+      expect(migrated).not.toBeNull();
+      const savedState = migrated!.state;
+      expect(savedState.unlockedCurioIds).toEqual(['relic_va_go_1990', 'relic_cup_ga_vang']);
+      expect(savedState.customSignatureDishesUnlocked).toEqual(['dish_chao_ga_gung_bac_ba']);
+      expect(savedState.residentAffinityLevels).toEqual({ tho_cam: 3, bac_ba: 4 });
+      expect(savedState.heardRadioBroadcastIds).toEqual(['broadcast_ch1_d1']);
+      expect(savedState.todayWeather).toBe('sudden_rain');
+      expect(savedState.petPatio).toBeDefined();
+      expect(savedState.petPatio?.pets).toHaveLength(2);
+    });
+
+    it('6.2. migrateSave an toàn với save phiên bản cũ không có trường mới', () => {
+      const legacyRaw = JSON.parse(JSON.stringify(createInitialState()));
+      delete (legacyRaw as any).unlockedCurioIds;
+      delete (legacyRaw as any).customSignatureDishesUnlocked;
+      delete (legacyRaw as any).petPatio;
+
+      const migrated = migrateSave(legacyRaw);
+      expect(migrated).not.toBeNull();
+      const savedState = migrated!.state;
+      expect(Array.isArray(savedState.unlockedCurioIds)).toBe(true);
+      expect(Array.isArray(savedState.customSignatureDishesUnlocked)).toBe(true);
+      expect(savedState.petPatio).toBeDefined();
+      expect(savedState.petPatio?.pets).toHaveLength(2);
     });
   });
 });

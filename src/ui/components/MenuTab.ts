@@ -4,6 +4,7 @@ import { REGULAR_CUSTOMERS } from '../../content/customers';
 import { ASSETS } from '../../content/assets';
 import { PRICE_BANDS, PRICE_STEP, adjustPrice, averagePriceRatio, communityDriftFromPrice, customerMultiplierFromPrice, priceBand, priceLimits, priceRatio, pricingTarget } from '../../core/pricing';
 import { canMake } from '../../core/orders';
+import { SIGNATURE_STORY_DISHES, getUnlockedSignatureDishes } from '../../content/signatureStoryDishes';
 
 export function renderMenuTab(state: GameState): string {
   const currentChapter = state.currentChapter;
@@ -63,6 +64,35 @@ export function renderMenuTab(state: GameState): string {
     `;
   }).join('');
 
+  // Món ăn kỷ niệm cốt truyện
+  const unlockedDishes = getUnlockedSignatureDishes(state);
+  const unlockedDishIds = new Set(unlockedDishes.map(d => d.id));
+
+  const signatureDishesHtml = SIGNATURE_STORY_DISHES.map(dish => {
+    const isUnlocked = unlockedDishIds.has(dish.id);
+    return `
+      <div style="background: ${isUnlocked ? '#fffdf0' : '#f5f5f4'}; border: ${isUnlocked ? '2px solid #eab308' : '1.5px dashed #d6d3d1'}; border-radius: 10px; padding: 10px; display: flex; gap: 10px; align-items: center; opacity: ${isUnlocked ? '1' : '0.7'};">
+        <div style="font-size: 1.6rem; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; background: ${isUnlocked ? '#fef9c3' : '#e7e5e4'}; border-radius: 8px; flex-shrink: 0;">
+          ${isUnlocked ? '🍲' : '🔒'}
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap;">
+            <b style="font-size: 0.85rem; color: ${isUnlocked ? '#854d0e' : '#57534e'};">${dish.name}</b>
+            <span style="font-size: 0.65rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: ${isUnlocked ? '#eab308' : '#d6d3d1'}; color: ${isUnlocked ? '#fff' : '#78716c'};">
+              ${isUnlocked ? `+${dish.priceBonusPercent}% Tip/Doanh Thu` : 'Khóa'}
+            </span>
+          </div>
+          <div style="font-size: 0.72rem; color: ${isUnlocked ? '#713f12' : '#78716c'}; margin-top: 2px; line-height: 1.35;">
+            ${isUnlocked ? dish.recipeDescription : `Cần mở khóa qua cốt truyện: ${dish.associatedCharacter}`}
+          </div>
+          <div style="font-size: 0.66rem; color: #a1a1aa; font-style: italic; margin-top: 2px;">
+            "${dish.storyContext}"
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
   const avg = averagePriceRatio(state);
   const bandKey = priceBand(avg);
   const avgBand = PRICE_BANDS[bandKey];
@@ -91,6 +121,18 @@ export function renderMenuTab(state: GameState): string {
     </div>
     <div class="menu-list">
       ${menuRows}
+    </div>
+
+    <!-- Món Ăn Kỷ Niệm Cốt Truyện Hẻm 1102 (Signature Story Dishes) -->
+    <div class="sec-title" style="margin-top: 16px; border-top: 1px solid var(--line); padding-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+      <span>✨ Món Kỷ Niệm Cốt Truyện (${unlockedDishes.length}/${SIGNATURE_STORY_DISHES.length})</span>
+      <span style="font-size: 0.68rem; background: #fef08a; color: #854d0e; padding: 2px 8px; border-radius: 999px; font-weight: 800;">Buff Tip & Doanh Thu</span>
+    </div>
+    <div class="sec-desc">
+      Các món ăn đặc biệt mở khóa khi hoàn thành câu chuyện của 12 cư dân Hẻm 1102, giúp tăng tiền boa và tạo hảo cảm đặc biệt!
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+      ${signatureDishesHtml}
     </div>
 
     <!-- Khách Bí Ẩn Kết Nối Cốt Truyện: Bé Thỏ Cam -->

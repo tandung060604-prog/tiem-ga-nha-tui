@@ -19,6 +19,12 @@ export function ensureCharacterStoryState(state: GameState): CharacterStoryState
       readEpisodeHistory: [],
     };
   }
+  if (!state.characterStoryState.characterProgress) {
+    state.characterStoryState.characterProgress = {};
+  }
+  if (!Array.isArray(state.characterStoryState.readEpisodeHistory)) {
+    state.characterStoryState.readEpisodeHistory = [];
+  }
   return state.characterStoryState;
 }
 

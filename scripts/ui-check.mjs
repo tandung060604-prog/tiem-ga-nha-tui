@@ -78,6 +78,12 @@ for (const width of WIDTHS) {
   await checkOverflow('màn Chuẩn bị');
   await page.screenshot({ path: `${OUT}/${width}-prep.png` });
 
+  const introOverlay = page.locator('#intro-cinematic-overlay');
+  if (await introOverlay.isVisible({ timeout: 1000 }).catch(() => false)) {
+    await introOverlay.click({ force: true }).catch(() => {});
+    await page.waitForTimeout(500);
+  }
+
   await page.locator('#btn-start-selling').click();
   await page.locator('.selling-screen').waitFor();
   await checkOverflow('vào ca bán');

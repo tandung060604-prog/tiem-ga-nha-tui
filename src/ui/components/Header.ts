@@ -2,10 +2,12 @@ import { GameState } from '../../types/game';
 import { audio } from '../../core/audio';
 import { escapeHtml } from '../escapeHtml';
 import { ASSETS } from '../../content/assets';
+import { getActiveShopTheme } from '../../content/shopThemes';
 
 export function renderHeader(state: GameState, _onOpenSettings?: () => void): string {
   const phaseLabel = state.phase === 'prep' ? 'Chuẩn bị' : state.phase === 'selling' ? 'Mở bán' : 'Tổng kết';
   const soundIcon = audio.getMuted() ? ASSETS.icons.soundOff : ASSETS.icons.soundOn;
+  const theme = getActiveShopTheme(state);
 
   // Format VNĐ e.g. 850.000đ
   const formattedMoney = state.money.toLocaleString('vi-VN') + 'đ';
@@ -36,9 +38,9 @@ export function renderHeader(state: GameState, _onOpenSettings?: () => void): st
     </div>
 
     <div class="h-m">
-      <span class="store-badge">
+      <span class="store-badge" title="${escapeHtml(theme.signboardTitle)} • ${escapeHtml(theme.signboardSubtitle)}">
         <img class="store-logo-badge" src="${ASSETS.ui.logoKoreanChicken}" alt="Logo" />
-        <span class="store-name-text">${escapeHtml(state.shopName)}</span>
+        <span class="store-name-text">${theme.id !== 'default' ? `${theme.icon} ` : ''}${escapeHtml(state.shopName)}</span>
       </span>
       <span class="money">
         <img src="${ASSETS.icons.money}" class="h-pixel-coin" alt="Tiền" />
