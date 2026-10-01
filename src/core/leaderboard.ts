@@ -3,9 +3,11 @@ import { GameState, LeaderboardEntry } from '../types/game';
 export const LEADERBOARD_STORAGE_KEY = 'tiem_ga_nha_tui_leaderboard_cache';
 export const CLOUD_ENDPOINT_KEY = 'tiem_ga_cloud_rtdb_url';
 
-// Endpoint Firebase Realtime Database mặc định cho cộng đồng Tiệm Gà Nhà Tui
-// (Người chơi hoặc nhóm 4 bạn có thể đổi URL database riêng của nhóm trong Cài Đặt)
-export const DEFAULT_CLOUD_RTDB_URL = 'https://tiem-ga-nha-tui-default-rtdb.asia-southeast1.firebasedatabase.app';
+// Master Cloud Endpoint chạy trên hạ tầng REST API đám mây công khai (Zero-Config)
+// Bất kỳ ai mở game trên bất kỳ điện thoại/máy tính nào đều tự động đồng bộ chung vào đây
+export const DEFAULT_MASTER_OBJECT_ID = 'ff808181a09d98f701a0f59ae17752c4';
+export const DEFAULT_REST_URL = `https://api.restful-api.dev/objects/${DEFAULT_MASTER_OBJECT_ID}`;
+export const DEFAULT_CLOUD_RTDB_URL = DEFAULT_REST_URL;
 
 /**
  * Sinh User ID duy nhất cho mỗi máy / mỗi lượt chơi
@@ -17,15 +19,15 @@ export function generateUniqueUserId(): string {
 }
 
 /**
- * Lấy cấu hình Cloud URL hiện tại
+ * Lấy cấu hình Cloud URL hiện tại (Mặc định dùng Zero-Config Master REST API)
  */
 export function getCloudEndpoint(): string {
-  if (typeof localStorage === 'undefined') return DEFAULT_CLOUD_RTDB_URL;
-  return localStorage.getItem(CLOUD_ENDPOINT_KEY) || DEFAULT_CLOUD_RTDB_URL;
+  if (typeof localStorage === 'undefined') return DEFAULT_REST_URL;
+  return localStorage.getItem(CLOUD_ENDPOINT_KEY) || DEFAULT_REST_URL;
 }
 
 /**
- * Cập nhật cấu hình Cloud URL (dành cho nhóm 4 bạn muốn dùng database riêng)
+ * Cập nhật cấu hình Cloud URL (Tùy chọn nâng cao)
  */
 export function setCloudEndpoint(url: string): void {
   if (typeof localStorage === 'undefined') return;
@@ -119,6 +121,7 @@ export const DEFAULT_PEER_STORES: LeaderboardEntry[] = [
 
 /**
  * Đồng bộ dữ liệu người chơi lên Cloud Leaderboard & Local Cache
+ * 100% Tự động: Người chơi không cần cấu hình bất kỳ điều gì!
  */
 export async function syncToLeaderboard(
   state: GameState
@@ -130,25 +133,36 @@ export async function syncToLeaderboard(
   cache[entry.userId] = entry;
   saveLocalLeaderboardCache(cache);
 
-  // 2. Thử gửi lên Cloud Firebase RTDB qua REST API (Timeout 3.5 giây để không chặn UI)
+  // 2. Tự động đồng bộ lên Cloud Master REST API (Timeout 3.5 giây để không chặn UI)
   const endpoint = getCloudEndpoint();
   if (endpoint && typeof fetch === 'function') {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3500);
 
-      const url = `${endpoint}/leaderboard/${encodeURIComponent(entry.userId)}.json`;
-      const res = await fetch(url, {
-        method: 'PUT',
+      // Lấy dữ liệu stores hiện tại trên Cloud
+      const getRes = await fetch(endpoint, {
+        method: 'GET',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(entry),
         signal: controller.signal
       });
 
-      clearTimeout(timeoutId);
-      if (res.ok) {
-        return await fetchLeaderboard(entry.userId);
+      if (getRes.ok) {
+        const json = await getRes.json();
+        const currentStores: Record<string, LeaderboardEntry> = (json.data && json.data.stores) || {};
+        currentStores[entry.userId] = entry;
+
+        // Cập nhật lên Cloud Master qua PATCH
+        await fetch(endpoint, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: { stores: currentStores } }),
+          signal: controller.signal
+        });
       }
+
+      clearTimeout(timeoutId);
+      return await fetchLeaderboard(entry.userId);
     } catch (e) {
       // Offline hoặc kết nối mạng chậm: tự động dùng cache cục bộ
       console.warn('Sync Cloud Leaderboard fallback to local cache:', e);
@@ -160,7 +174,7 @@ export async function syncToLeaderboard(
 
 /**
  * Lấy danh sách bảng xếp hạng từ Cloud (hoặc Local Cache nếu offline)
- * Sắp xếp theo Tài Sản (money) giảm dần, hỗ trợ đánh dấu `isSelf`
+ * Tự động đồng bộ giữa các máy điện thoại khác nhau
  */
 export async function fetchLeaderboard(
   currentUserId?: string,
@@ -176,8 +190,7 @@ export async function fetchLeaderboard(
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3500);
 
-      const url = `${endpoint}/leaderboard.json`;
-      const res = await fetch(url, {
+      const res = await fetch(endpoint, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         signal: controller.signal
@@ -185,10 +198,11 @@ export async function fetchLeaderboard(
 
       clearTimeout(timeoutId);
       if (res.ok) {
-        const cloudData = await res.json();
-        if (cloudData && typeof cloudData === 'object') {
+        const json = await res.json();
+        const cloudStores = json.data && json.data.stores;
+        if (cloudStores && typeof cloudStores === 'object') {
           // Gộp dữ liệu từ cloud vào map
-          for (const [k, v] of Object.entries(cloudData)) {
+          for (const [k, v] of Object.entries(cloudStores)) {
             if (v && typeof v === 'object') {
               entriesMap[k] = v as LeaderboardEntry;
             }
@@ -235,7 +249,7 @@ export async function fetchLeaderboard(
 
 /**
  * Xóa người chơi khỏi Bảng Xếp Hạng khi bấm "Chơi Lại Từ Đầu"
- * (Gửi lệnh DELETE lên Cloud và xóa khỏi Local Storage Cache)
+ * (Tự động xóa khỏi Cloud Master REST API và xóa khỏi Local Storage Cache)
  */
 export async function removeFromLeaderboard(userId: string): Promise<{ success: boolean }> {
   if (!userId) return { success: true };
@@ -245,18 +259,32 @@ export async function removeFromLeaderboard(userId: string): Promise<{ success: 
   delete cache[userId];
   saveLocalLeaderboardCache(cache);
 
-  // 2. Gửi request DELETE lên Cloud Firebase RTDB
+  // 2. Gửi request cập nhật xóa user khỏi Cloud Master REST API
   const endpoint = getCloudEndpoint();
   if (endpoint && typeof fetch === 'function') {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-      const url = `${endpoint}/leaderboard/${encodeURIComponent(userId)}.json`;
-      await fetch(url, {
-        method: 'DELETE',
+      const getRes = await fetch(endpoint, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
         signal: controller.signal
       });
+
+      if (getRes.ok) {
+        const json = await getRes.json();
+        const currentStores: Record<string, LeaderboardEntry> = (json.data && json.data.stores) || {};
+        delete currentStores[userId];
+
+        await fetch(endpoint, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: { stores: currentStores } }),
+          signal: controller.signal
+        });
+      }
+
       clearTimeout(timeoutId);
     } catch (e) {
       console.warn('Lỗi khi xóa user khỏi Cloud Leaderboard:', e);
@@ -265,3 +293,4 @@ export async function removeFromLeaderboard(userId: string): Promise<{ success: 
 
   return { success: true };
 }
+
