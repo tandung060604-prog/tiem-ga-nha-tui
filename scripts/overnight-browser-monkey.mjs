@@ -129,8 +129,19 @@ class OvernightMonkey {
           lastActionTimestamp = Date.now();
         }
 
-        // Thực hiện 1 bước hành vi hỗn loạn
-        const acted = await this.performChaosStep(page);
+        // Thực hiện 1 bước hành vi hỗn loạn với timeout bảo vệ 8s chống hang vô thời hạn
+        let acted = false;
+        try {
+          acted = await Promise.race([
+            this.performChaosStep(page),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Chaos step hang timeout > 8s')), 8000))
+          ]);
+        } catch (e) {
+          log(`⚠️ Bước thao tác bị nghẽn (${e?.message}) -> Tự gỡ kẹt...`);
+          await this.emergencyRecover(page);
+          acted = false;
+        }
+
         if (acted) {
           this.totalActions++;
           lastActionTimestamp = Date.now();
@@ -311,23 +322,6 @@ class OvernightMonkey {
       return true;
     }
 
-    // 1. Modal Đặt tên quán (Shop Name Dialog)
-    const confirmName = page.locator('#btn-confirm-shop-name');
-    if (await confirmName.first().isVisible({ timeout: 50 }).catch(() => false)) {
-      log(`🏷️ Bấm xác nhận đặt tên quán...`);
-      await confirmName.first().click({ force: true });
-      await sleep(300);
-      return true;
-    }
-
-    // 2. Modal Chào Mừng (Welcome Dialog)
-    const welcomeStart = page.locator('#btn-welcome-start');
-    if (await welcomeStart.first().isVisible({ timeout: 50 }).catch(() => false)) {
-      log(`✨ Đóng hộp thoại chào mừng...`);
-      await welcomeStart.first().click({ force: true });
-      await sleep(300);
-      return true;
-    }
 
     // 3. Tutorial Bác Ba dẫn đường -> Bỏ qua hoặc bấm tiếp
     const tutorialBtn = page.locator('#btn-tutorial-skip, #btn-tutorial-next');
@@ -453,10 +447,29 @@ class OvernightMonkey {
       return true;
     }
 
-    // 16. Modal Cốt Truyện Visual Novel (Story VN)
-    const storyChoice = page.locator('.dialogue-choice, .story-btn, #btn-story-next, #btn-story-close, #btn-story-choice-1');
+    // 16. Modal Cốt Truyện Visual Novel (Story VN & Ký Sự Cư Dân)
+    const storyChoice = page.locator('.dialogue-choice, .story-btn, #btn-story-next, #btn-story-close, #btn-story-choice-1, .btn-char-story-choice, #btn-dismiss-char-reaction, #btn-close-char-story, #btn-open-story-dialogue');
     if (await storyChoice.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`📖 Nhận diện thoại truyện cư dân -> Bấm lựa chọn / tiếp tục...`);
       await storyChoice.first().click({ force: true });
+      await sleep(250);
+      return true;
+    }
+
+    // 16b. Minigame Bắt Trộm (Thief Minigame & Kết quả bắt trộm)
+    const thiefBtn = page.locator('#btn-guard-instant-bust, #btn-thief-strike, #btn-thief-finish-success, #btn-thief-finish-failure, #btn-thief-catch, #btn-thief-restrain, #btn-thief-close, #btn-thief-confirm');
+    if (await thiefBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`👮‍♂️ Bắt trộm / Khống chế kẻ gian / Tiếp tục ca bán...`);
+      await thiefBtn.first().click({ force: true });
+      await sleep(250);
+      return true;
+    }
+
+    // 16c. Các Modal Hệ Thống Khác (Radio, Bằng Khen, Thử Thách Tuần, Ca Đêm, Biển Hiệu, Kỷ Niệm, Lobby)
+    const extraModalClose = page.locator('#btn-close-night-radio, #btn-close-achievements, .btn-claim-badge, #btn-close-weekly-quests, .btn-claim-quest, #btn-close-shop-theme, #btn-close-endless, #btn-close-memories, #btn-close-leaderboard');
+    if (await extraModalClose.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      await extraModalClose.first().click({ force: true });
+      await sleep(200);
       return true;
     }
 
@@ -671,6 +684,9 @@ class OvernightMonkey {
   async emergencyRecover(page) {
     // Đóng tất cả các modal đang bị kẹt hoặc tự bấm tiếp tục (không return sớm để dọn sạch toàn bộ stack)
     await page.evaluate(() => {
+      const viteOverlay = document.querySelector('vite-error-overlay');
+      if (viteOverlay) viteOverlay.remove();
+
       const introOverlay = document.getElementById('intro-cinematic-overlay');
       if (introOverlay instanceof HTMLElement) {
         introOverlay.click();
@@ -717,6 +733,19 @@ class OvernightMonkey {
       if (restartBtn instanceof HTMLElement) restartBtn.click();
       const confirmOkBtn = document.getElementById('btn-confirm-ok');
       if (confirmOkBtn instanceof HTMLElement) confirmOkBtn.click();
+
+      // Dọn dẹp tất cả modal truyện cư dân, minigame, hệ thống
+      const specialModals = document.querySelectorAll('#modal-character-story, #modal-char-reaction, #modal-thief-minigame, #modal-thief-result, #modal-night-radio, #modal-achievements-wall, #modal-shop-theme, #modal-endless-mode, #modal-memories-album, #modal-weekly-quests, #modal-leaderboard');
+      for (const sm of specialModals) {
+        if (sm instanceof HTMLElement) sm.remove();
+      }
+      const charChoice = document.querySelector('.btn-char-story-choice, #btn-dismiss-char-reaction, #btn-close-char-story');
+      if (charChoice instanceof HTMLElement) charChoice.click();
+
+      const thiefActions = document.querySelectorAll('#btn-guard-instant-bust, #btn-thief-strike, #btn-thief-finish-success, #btn-thief-finish-failure');
+      for (const tb of thiefActions) {
+        if (tb instanceof HTMLElement) tb.click();
+      }
 
       const closeButtons = document.querySelectorAll('.dash-close-x, #btn-modal-close-icon, [id*="btn-close"], .btn-close, .modal-close');
       for (const btn of closeButtons) {
