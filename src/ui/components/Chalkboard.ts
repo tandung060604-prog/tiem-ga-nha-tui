@@ -57,6 +57,9 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
           </div>
         </div>
         <div class="board-btns">
+          <button id="btn-weekly-quests" class="btn-sm" style="background: #fef3c7; border: 1.5px solid #d97706; color: #78350f; font-weight: 800;" title="Nhiệm vụ tuần nhận thưởng tiền mặt và danh hiệu">
+            📜 Thử Thách Tuần
+          </button>
           <button id="btn-secret-sauce" class="btn-sm btn-sauce-card ${state.secretSauceDay?.buffActive ? 'is-active' : ''}" title="Pha nồi sốt bí truyền nhận Buff Vàng (+3k tip & +0.25★ Hương vị)">
             <img src="${ASSETS.icons.sauce}" class="btn-pixel-icon-sm" alt="" /> ${state.secretSauceDay?.buffActive ? '✨ Sốt Thần Thánh' : 'Nấu Sốt Bí Truyền'}
           </button>

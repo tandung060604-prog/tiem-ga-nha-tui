@@ -50,6 +50,7 @@ import { squeezeCondiment, recordHelperFry, StationResult, scoopSide, changeOil,
 import { upgradeEffects } from './core/upgrades';
 import { renderSummaryModal } from './ui/components/SummaryModal';
 import { renderSettingsModal } from './ui/components/SettingsModal';
+import { renderWeeklyQuestsModal } from './ui/components/WeeklyQuestsModal';
 import { renderUpdateDashboardModal } from './ui/components/UpdateDashboardModal';
 import { renderStoryModal, bindStoryEvents, revealedStory } from './ui/components/StoryModal';
 import { renderBunnyLetterModal, renderBunnyAlbumModal, bindBunnyModalEvents } from './ui/components/BunnyModal';
@@ -75,8 +76,10 @@ import {
   setCurrentRoomId,
   generateRoomId
 } from './core/leaderboard';
-import { renderLeaderboardModal, renderLobbySlotsHtml } from './ui/components/LeaderboardModal';
-import type { DailyIncident, DeliveryRunResult } from './types/game';
+import { renderLeaderboardModal, renderLobbySlotsHtml, renderSendCarePackageDialog } from './ui/components/LeaderboardModal';
+import { sendCarePackage, fetchPendingCarePackages, claimCarePackage } from './core/carePackage';
+import { recordWeeklyQuestProgress, claimWeeklyQuestReward, ensureWeeklyQuests } from './core/weeklyQuests';
+import type { DailyIncident, DeliveryRunResult, CarePackageType } from './types/game';
 import confetti from 'canvas-confetti';
 
 type TabId = 'inventory' | 'upgrades' | 'staff' | 'reviews' | 'menu';
@@ -1033,6 +1036,14 @@ class AppController {
     });
 
     // Chalkboard Buttons
+    const weeklyQuestsBtn = document.getElementById('btn-weekly-quests');
+    if (weeklyQuestsBtn) {
+      weeklyQuestsBtn.onclick = () => {
+        audio.playPop();
+        this.openWeeklyQuests();
+      };
+    }
+
     const secretSauceBtn = document.getElementById('btn-secret-sauce');
     if (secretSauceBtn) {
       secretSauceBtn.onclick = () => {
@@ -1574,6 +1585,7 @@ class AppController {
     if (!result.trayItem) this.showToast('Khay đầy, món vừa vớt bị bỏ!');
     if (result.quality === 'perfect') {
       Haptics.perfect();
+      recordWeeklyQuestProgress(stateManager.getState(), 'perfect_fry', 1);
     } else if (result.quality === 'burnt') {
       Haptics.warning();
     } else {
@@ -2112,6 +2124,7 @@ class AppController {
     let policeInsp: PoliceInspectionResult | null = null;
     stateManager.update(draft => {
       creditSale(draft, paid, finalTip);
+      recordWeeklyQuestProgress(draft, 'serve_customer', 1);
       if (finalTip > tip && this.sellingSession) {
         this.sellingSession.tips += (finalTip - tip);
       }
@@ -2711,6 +2724,7 @@ class AppController {
       draft.todayIncidentsCount = 0;
       draft.secretSauceDay = null;
       draft.todayOilFiltered = false;
+      ensureWeeklyQuests(draft);
     });
     this.pickDailyEvent();
     this.setPhase('prep');
@@ -3085,7 +3099,13 @@ class AppController {
       };
     }
 
-    // 4. Kích hoạt Realtime Auto-Polling khi tab là 'lobby'
+    // 4. Kích hoạt nút Tiếp Tế Quà Bạn Bè
+    this.bindCarePackageButtons(sortBy, activeTab);
+
+    // 5. Kiểm tra và nhận quà tiếp tế nếu có
+    void this.checkAndPromptCarePackages();
+
+    // 6. Kích hoạt Realtime Auto-Polling khi tab là 'lobby'
     this.lastLobbyEntriesCount = result.entries.length;
     if (activeTab === 'lobby') {
       this.leaderboardPollTimer = window.setInterval(async () => {
@@ -3122,6 +3142,9 @@ class AppController {
             };
           });
 
+          // Gắn lại sự kiện tiếp tế cho các thẻ bạn bè
+          this.bindCarePackageButtons(sortBy, activeTab);
+
           // Hiệu ứng pháo hoa khi có người chơi mới vừa quét QR vào phòng!
           if (newCount > prevCount) {
             this.lastLobbyEntriesCount = newCount;
@@ -3140,6 +3163,99 @@ class AppController {
         } catch {}
       }, 4000);
     }
+  }
+
+  // --- SPRINT 2: CARE PACKAGES & WEEKLY QUESTS HANDLERS ---
+  private bindCarePackageButtons(sortBy: 'money' | 'day', activeTab: 'lobby' | 'qr') {
+    const sendBtns = document.querySelectorAll('.btn-send-care-package');
+    sendBtns.forEach(btn => {
+      (btn as HTMLElement).onclick = (e) => {
+        e.stopPropagation();
+        const recipientId = (btn as HTMLElement).dataset.recipientId || '';
+        const recipientName = (btn as HTMLElement).dataset.recipientName || 'Bạn bè';
+        if (!recipientId) return;
+
+        audio.playPop();
+        const dialogHtml = renderSendCarePackageDialog(recipientId, recipientName);
+        this.openModal(dialogHtml);
+
+        const closeBtn = document.getElementById('btn-close-care-pkg');
+        if (closeBtn) {
+          closeBtn.onclick = () => void this.openLeaderboard(sortBy, activeTab);
+        }
+
+        const pkgOptions = document.querySelectorAll('.btn-pkg-option');
+        pkgOptions.forEach(opt => {
+          (opt as HTMLElement).onclick = async () => {
+            const pkgType = (opt as HTMLElement).dataset.pkgType as CarePackageType;
+            audio.playPop();
+            const res = await sendCarePackage(stateManager.getState(), recipientId, recipientName, pkgType);
+            if (res.success) {
+              audio.playCash();
+              confetti({ particleCount: 45, spread: 60, origin: { y: 0.6 } });
+              this.showToast(res.message);
+              recordWeeklyQuestProgress(stateManager.getState(), 'community_action', 1);
+              stateManager.saveState();
+              void this.openLeaderboard(sortBy, activeTab);
+            } else {
+              audio.playPop();
+              this.showToast(res.message);
+            }
+          };
+        });
+      };
+    });
+  }
+
+  public async checkAndPromptCarePackages() {
+    const state = stateManager.getState();
+    if (!state.userId) return;
+    const roomId = state.roomId || getCurrentRoomId();
+    try {
+      const pending = await fetchPendingCarePackages(state.userId, roomId);
+      if (pending && pending.length > 0) {
+        for (const pkg of pending) {
+          const res = await claimCarePackage(state, pkg);
+          if (res.success) {
+            audio.playCash();
+            confetti({ particleCount: 50, spread: 70, origin: { y: 0.5 } });
+            this.showToast(`🎁 ${res.rewardSummary}`);
+            stateManager.saveState();
+          }
+        }
+      }
+    } catch {}
+  }
+
+  public openWeeklyQuests() {
+    audio.playPop();
+    const state = stateManager.getState();
+    const html = renderWeeklyQuestsModal(state);
+    this.openModal(html);
+
+    const closeBtn1 = document.getElementById('btn-close-weekly-quests');
+    if (closeBtn1) closeBtn1.onclick = () => this.closeModal();
+
+    const closeBtn2 = document.getElementById('btn-close-weekly-quests-footer');
+    if (closeBtn2) closeBtn2.onclick = () => this.closeModal();
+
+    const claimBtns = document.querySelectorAll('.btn-claim-quest');
+    claimBtns.forEach(btn => {
+      (btn as HTMLElement).onclick = () => {
+        const questId = (btn as HTMLElement).dataset.questId;
+        if (!questId) return;
+        const res = claimWeeklyQuestReward(state, questId);
+        if (res.success) {
+          audio.playCash();
+          confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } });
+          this.showToast(res.message);
+          stateManager.saveState();
+          this.openWeeklyQuests();
+        } else {
+          this.showToast(res.message);
+        }
+      };
+    });
   }
 
 }

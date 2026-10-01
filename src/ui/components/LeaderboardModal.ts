@@ -1,6 +1,5 @@
 import { LeaderboardEntry } from '../../types/game';
 import { escapeHtml } from '../escapeHtml';
-import { CHAPTERS } from '../../content/chapters';
 import { getInviteUrl, getQrCodeUrl } from '../../core/leaderboard';
 
 const vnd = (n: number) => n.toLocaleString('vi-VN') + 'đ';
@@ -44,41 +43,45 @@ export function renderLobbySlotsHtml(
     const rank = index + 1;
     if (entry) {
       const isSelf = Boolean(entry.isSelf || (currentUserId && entry.userId === currentUserId));
-      const chapterData = CHAPTERS.find(c => c.number === entry.chapter) || CHAPTERS[0];
       const isHost = rank === 1;
 
       return `
-        <div class="lobby-player-slot" data-user-id="${escapeHtml(entry.userId)}" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; ${getRankBg(rank, isSelf)} transition: transform 0.15s ease;">
-          <div style="display: flex; align-items: center; justify-content: center; min-width: 32px;">
+        <div class="lobby-player-slot" data-user-id="${escapeHtml(entry.userId)}" style="display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 10px; ${getRankBg(rank, isSelf)} transition: transform 0.15s ease;">
+          <div style="display: flex; align-items: center; justify-content: center; min-width: 28px;">
             ${getRankBadge(rank)}
           </div>
           <div style="flex: 1; min-width: 0;">
-            <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 2px; flex-wrap: wrap;">
-              <b style="font-size: 0.92rem; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 145px;">
+            <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 2px; flex-wrap: nowrap;">
+              <b style="font-size: 0.88rem; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 125px;">
                 ${escapeHtml(entry.shopName)}
               </b>
               ${isSelf ? `
-                <span style="background: #f59e0b; color: #fff; font-size: 0.65rem; font-weight: 800; padding: 1px 5px; border-radius: 5px; letter-spacing: 0.5px;">BẠN</span>
+                <span style="background: #f59e0b; color: #fff; font-size: 0.62rem; font-weight: 800; padding: 1px 4px; border-radius: 4px; letter-spacing: 0.5px; flex-shrink: 0;">BẠN</span>
               ` : ''}
               ${isHost ? `
-                <span style="background: #e11d48; color: #fff; font-size: 0.62rem; font-weight: 800; padding: 1px 5px; border-radius: 5px;" title="Người vào trước / Đang dẫn đầu">👑 CHỦ PHÒNG</span>
+                <span style="background: #e11d48; color: #fff; font-size: 0.6rem; font-weight: 800; padding: 1px 4px; border-radius: 4px; flex-shrink: 0;" title="Đang dẫn đầu">👑 CHỦ PHÒNG</span>
               ` : ''}
             </div>
-            <div style="display: flex; align-items: center; gap: 6px; font-size: 0.73rem; color: var(--soft);">
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 0.7rem; color: var(--soft); white-space: nowrap;">
               <span>📅 Ngày ${entry.day}</span>
               <span>•</span>
-              <span>Chương ${entry.chapter}: ${chapterData?.title || 'Khởi đầu'}</span>
+              <span>Chương ${entry.chapter}</span>
               <span>•</span>
               <span>⭐ ${(entry.overallRating || 4.0).toFixed(1)}</span>
             </div>
           </div>
-          <div style="text-align: right; min-width: 85px;">
-            <div style="font-weight: 800; font-size: 0.95rem; color: #b45309;">
+          <div style="text-align: right; min-width: 78px; flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 1px;">
+            <div style="font-weight: 800; font-size: 0.88rem; color: #b45309;">
               ${vnd(entry.money)}
             </div>
-            <div style="font-size: 0.68rem; color: var(--soft);">
+            <div style="font-size: 0.65rem; color: var(--soft);">
               🍗 ${entry.totalFried} mẻ gà
             </div>
+            ${!isSelf ? `
+              <button class="btn-sm btn-send-care-package" data-recipient-id="${escapeHtml(entry.userId)}" data-recipient-name="${escapeHtml(entry.shopName)}" style="padding: 2px 6px; font-size: 0.62rem; font-weight: 800; border-radius: 5px; background: #fffdf5; border: 1.2px solid #f59e0b; color: #b45309; cursor: pointer; margin-top: 2px;" title="Gửi quà tiếp tế cho quán bạn">
+                🎁 Tiếp Tế
+              </button>
+            ` : ''}
           </div>
         </div>
       `;
@@ -164,12 +167,12 @@ export function renderLeaderboardModal(
         </div>
 
         <!-- 4 Lobby Slots (Hỗ trợ Live Update Realtime) -->
-        <div id="lobby-slots-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 330px; overflow-y: auto; padding-right: 2px;">
+        <div id="lobby-slots-container" style="display: flex; flex-direction: column; gap: 6px; max-height: 420px; overflow-y: auto; padding-right: 2px;">
           ${slotsHtml}
         </div>
 
         <!-- Banner Mời Bạn Nhanh -->
-        <button id="btn-open-qr-tab" style="width: 100%; min-height: 42px; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #451a03; border: 2px solid #b45309; border-radius: 10px; font-weight: 800; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);">
+        <button id="btn-open-qr-tab" style="width: 100%; min-height: 36px; padding: 6px 10px; background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #451a03; border: 2px solid #b45309; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);">
           <span>📱</span>
           <span>MỞ MÃ QR MỜI BẠN BÈ VÀO LOBBY</span>
           <span>➡️</span>
@@ -230,6 +233,60 @@ export function renderLeaderboardModal(
         <button id="btn-close-leaderboard-btn" class="btn-sm primary" style="flex: 1; min-height: 40px; font-weight: 800; font-size: 0.85rem; border-radius: 8px;">
           Đã Hiểu
         </button>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Hộp thoại chọn gói quà tiếp tế gửi cho bạn cùng phòng
+ */
+export function renderSendCarePackageDialog(recipientId: string, recipientName: string): string {
+  return `
+    <div class="care-package-dialog" style="max-width: 360px; width: 100%; margin: 0 auto; background: #faeed1; padding: 14px 16px; border-radius: 12px; border: 3px solid #5a3018; box-shadow: inset 2px 2px 0 #f7d046, inset -2px -2px 0 #2b1810, 0 8px 24px rgba(0,0,0,0.35);">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #d4a373; padding-bottom: 6px; margin-bottom: 10px;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span style="font-size: 1.35rem;">🎁</span>
+          <b style="font-size: 0.95rem; color: #3d2314;">TIẾP TẾ CHO BẠN BÈ</b>
+        </div>
+        <button id="btn-close-care-pkg" style="border: 0; background: none; font-size: 1.3rem; cursor: pointer; color: #7c4f32; line-height: 1; padding: 2px 4px;">✕</button>
+      </div>
+
+      <div style="font-size: 0.78rem; color: #5a3018; margin-bottom: 10px; line-height: 1.4;">
+        Thân gửi nghĩa tình Hẻm 1102 tới <b>${escapeHtml(recipientName)}</b>. Chọn 1 gói quà để tiếp tế:
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+        <button class="btn-pkg-option" data-recipient-id="${escapeHtml(recipientId)}" data-recipient-name="${escapeHtml(recipientName)}" data-pkg-type="chicken" style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; border: 1.5px solid #d4a373; background: #fff; cursor: pointer; text-align: left;">
+          <span style="font-size: 1.4rem;">🍗</span>
+          <div style="flex: 1;">
+            <b style="font-size: 0.85rem; color: #3d2314;">5 Miếng Gà Tươi</b>
+            <div style="font-size: 0.68rem; color: #7c4f32;">Trích 5 gà từ kho (hoặc 70.000đ mua hộ)</div>
+          </div>
+          <span style="font-size: 0.72rem; font-weight: 800; color: #b45309;">GỬI ➔</span>
+        </button>
+
+        <button class="btn-pkg-option" data-recipient-id="${escapeHtml(recipientId)}" data-recipient-name="${escapeHtml(recipientName)}" data-pkg-type="oil" style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; border: 1.5px solid #d4a373; background: #fff; cursor: pointer; text-align: left;">
+          <span style="font-size: 1.4rem;">🛢️</span>
+          <div style="flex: 1;">
+            <b style="font-size: 0.85rem; color: #3d2314;">Quỹ Dầu Sạch</b>
+            <div style="font-size: 0.68rem; color: #7c4f32;">Hỗ trợ 50.000đ tiền thay dầu mới</div>
+          </div>
+          <span style="font-size: 0.72rem; font-weight: 800; color: #b45309;">GỬI ➔</span>
+        </button>
+
+        <button class="btn-pkg-option" data-recipient-id="${escapeHtml(recipientId)}" data-recipient-name="${escapeHtml(recipientName)}" data-pkg-type="tip" style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; border: 1.5px solid #d4a373; background: #fff; cursor: pointer; text-align: left;">
+          <span style="font-size: 1.4rem;">🧧</span>
+          <div style="flex: 1;">
+            <b style="font-size: 0.85rem; color: #3d2314;">Lì Xì May Mắn</b>
+            <div style="font-size: 0.68rem; color: #7c4f32;">Tặng 20.000đ tiền tip chúc quán đắt khách</div>
+          </div>
+          <span style="font-size: 0.72rem; font-weight: 800; color: #b45309;">GỬI ➔</span>
+        </button>
+      </div>
+
+      <div style="font-size: 0.68rem; color: #7c4f32; line-height: 1.4; background: #fffdf5; padding: 6px 8px; border-radius: 6px; border: 1px solid #fed7aa;">
+        ❤️ Gửi tiếp tế giúp tăng <b>+5 Tình Thân Hẻm</b>. Giới hạn 1 lần gửi mỗi ngày kinh doanh.
       </div>
     </div>
   `;

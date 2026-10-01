@@ -511,6 +511,12 @@ export interface GameState {
   staffGachaSsrPity?: number;        // Số roll liên tiếp chưa ra SSR (Hard pity 50)
   staffGachaTotalRolls?: number;     // Tổng số lượt gacha đã roll
   gachaPullsHistory?: string[];      // Lịch sử ID các nhân viên đã roll gần nhất
+  // Sprint 2: Tương tác bạn bè & Nhiệm vụ tuần
+  carePackagesSentDay?: number;      // Ngày gần nhất đã gửi quà tiếp tế (1 lần/ngày game)
+  pendingCarePackages?: CarePackage[]; // Các gói quà tiếp tế đã nhận được từ bạn bè
+  weeklyQuestsProgress?: WeeklyQuestProgress;
+  ssrAutoMarket?: boolean;           // Quản lý SSR tự động đi chợ trả giá
+  ssrAutoOilFilter?: boolean;        // Quản lý SSR tự động lọc cặn dầu
 }
 
 export interface BargainWholesaler {
@@ -590,4 +596,46 @@ export interface LeaderboardEntry {
   totalFried: number;
   updatedAt: number;
   isSelf?: boolean;
+}
+
+// Sprint 2: Gói Quà Tiếp Tế Bạn Bè Trong Phòng Lobby
+export type CarePackageType = 'chicken' | 'oil' | 'tip';
+
+export interface CarePackage {
+  id: string;
+  senderId: string;
+  senderName: string;
+  recipientId: string;
+  roomId: string;
+  type: CarePackageType;
+  message: string;
+  amount: number;       // Số lượng gà (5) hoặc tiền tip (20.000)
+  sentAt: number;
+  claimed?: boolean;
+}
+
+// Sprint 2: Nhiệm Vụ Tuần (Weekly Milestones)
+export interface WeeklyQuest {
+  id: string;
+  week: number;
+  title: string;
+  icon: string;
+  desc: string;
+  targetCount: number;
+  currentCount: number;
+  rewardMoney: number;
+  rewardKarma?: {
+    community?: number;
+    craftsmanship?: number;
+    ambition?: number;
+  };
+  rewardBadge?: string;
+  completed: boolean;
+  claimed: boolean;
+}
+
+export interface WeeklyQuestProgress {
+  week: number;
+  quests: WeeklyQuest[];
+  allClaimed: boolean;
 }
