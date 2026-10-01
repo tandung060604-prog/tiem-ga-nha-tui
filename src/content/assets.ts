@@ -56,7 +56,8 @@ export const ASSETS = {
     char_33_couple_genz: url('assets/characters/char_33_couple_genz.png'),
     pet_01_dog_vang: url('assets/characters/pet_01_dog_vang.png'),
     pet_02_cat_muop: url('assets/characters/pet_02_cat_muop.png'),
-    pest_01_rat_cong: url('assets/characters/pest_01_rat_cong.png')
+    pest_01_rat_cong: url('assets/characters/pest_01_rat_cong.png'),
+    char_37_thief_busted: url('assets/characters/char_37_thief_busted.png')
   },
   // Ánh xạ tương thích cho các component cũ (dùng ảnh từ bộ 36 nhân vật chuẩn)
   bacba: {

@@ -54,6 +54,11 @@ export interface SellingSession {
   disruptionTimerSec?: number;         // đếm ngược thời gian gián đoạn quán khi bị giang hồ quậy phá
   disruptionNotice?: string;           // thông báo tình trạng gián đoạn quán
   secretSauceTip?: number;             // tiền tip nhận được từ hiệu ứng Sốt Bí Truyền
+  // Tên Trộm Đóng Giả Khách Hàng (Thief Encounter)
+  thiefSchedule?: { count: number; timestamps: number[] };
+  activeThief?: import('../types/game').ThiefEncounter | null;
+  thiefCaughtCount?: number;
+  thiefEscapedCount?: number;
 }
 
 // Hiệu ứng "đã tay": core ghi lại chuyện vừa xảy ra, giao diện rút ra (drainFx) để vẽ đúng một lần.

@@ -369,7 +369,10 @@ export interface IncidentChoice {
   kicker?: string;
   subDesc?: string; // Dòng phụ giải thích tình thế, hệ quả, cái giá phải trả hoặc may rủi (chuẩn 2 tầng chữ phong cách Mì Cay Bà Tám)
   requiresSecurity?: boolean; // Cần có Nhân viên Bảo vệ mới kích hoạt được
-  riskRate?: number; // Tỷ lệ rủi ro thất bại khi KHÔNG có bảo vệ (0.0 -> 1.0)
+  requiresRole?: StaffRole; // Yêu cầu vai trò nhân viên chuyên trách ('cook' | 'waiter' | 'cashier' | 'delivery' | 'manager' | 'security')
+  requiresRoleDesc?: string; // Gợi ý nhắc nhở khi thiếu nhân sự
+  mitigatedByRoles?: StaffRole[]; // Các vai trò nhân viên có thể hóa giải rủi ro thất bại về 0%
+  riskRate?: number; // Tỷ lệ rủi ro thất bại khi KHÔNG có nhân viên bảo vệ / hỗ trợ (0.0 -> 1.0)
   karmaDelta: {
     community?: number;
     craftsmanship?: number;
@@ -517,6 +520,11 @@ export interface GameState {
   weeklyQuestsProgress?: WeeklyQuestProgress;
   ssrAutoMarket?: boolean;           // Quản lý SSR tự động đi chợ trả giá
   ssrAutoOilFilter?: boolean;        // Quản lý SSR tự động lọc cặn dầu
+  thiefStats?: {
+    totalCaught: number;
+    totalEscaped: number;
+    totalFinesPaid: number;
+  };
 }
 
 export interface BargainWholesaler {
@@ -639,3 +647,30 @@ export interface WeeklyQuestProgress {
   quests: WeeklyQuest[];
   allClaimed: boolean;
 }
+
+// --- HỆ THỐNG TÊN TRỘM ĐÓNG GIẢ & BẢO VỆ PHÁ ÁN (JEV SYSTEM) ---
+export interface ThiefEncounter {
+  id: string;
+  disguiseName: string;          // Tên hiển thị khi đóng giả (VD: "Vị Khách Đội Mũ Trùm")
+  disguiseAvatar: string;        // Avatar đóng giả (lấy từ các khách thường)
+  trueName: string;              // Tên thật khi bị lột mặt nạ: "Tí Chuột Nhắt (Kẻ Đạo Chích Hẻm 1102)"
+  trueAvatar: string;            // Avatar thật sau khi lột mặt nạ
+  targetCustomerName: string;    // Khách hàng bị nhắm tới (VD: "Chị Thảo Văn Phòng")
+  targetTable: number;           // Vị trí bàn (1-12)
+  targetItem: string;            // Đồ vật bị nhắm tới ("Ví da & iPhone 15", "Túi xách đựng laptop", ...)
+  lossAmount: number;            // Số tiền tiệm phải đền bù nếu trộm thoát (150.000đ - 350.000đ)
+  timeRemaining: number;         // Thời gian còn lại để bắt (giây)
+  initialTime: number;           // Thời lượng ban đầu (12s)
+  isCaught: boolean;             // Đã bị bắt quả tang
+  isEscaped: boolean;            // Đã cuỗm đồ tẩu thoát
+  caughtBySecurity: boolean;     // Được Bảo Vệ khống chế hay người chơi tự bấm
+  tellTaleClue: string;          // Dấu hiệu khả nghi (bong bóng suy nghĩ / cử chỉ)
+}
+
+export interface ThiefShiftState {
+  scheduledTimes: number[];      // Các mốc giây trong ca bán xuất hiện trộm
+  activeEncounter: ThiefEncounter | null;
+  caughtCountToday: number;
+  escapedCountToday: number;
+}
+

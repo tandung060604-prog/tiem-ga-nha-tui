@@ -81,7 +81,19 @@ import { sendCarePackage, fetchPendingCarePackages, claimCarePackage } from './c
 import { recordWeeklyQuestProgress, claimWeeklyQuestReward, ensureWeeklyQuests } from './core/weeklyQuests';
 import { renderMemoriesAlbumModal, MemoriesTabId } from './ui/components/MemoriesAlbumModal';
 import { downloadLobbyPoster } from './core/canvasPoster';
-import type { DailyIncident, DeliveryRunResult, CarePackageType } from './types/game';
+import {
+  scheduleThiefEvents,
+  createThiefEncounter,
+  checkSecurityStaff,
+  resolveThiefCaught,
+  resolveThiefEscaped
+} from './core/thiefSystem';
+import {
+  renderThiefMinigameModal,
+  renderThiefCaughtModal,
+  renderThiefEscapedModal
+} from './ui/components/ThiefMinigameModal';
+import type { DailyIncident, DeliveryRunResult, CarePackageType, ThiefEncounter } from './types/game';
 import confetti from 'canvas-confetti';
 
 type TabId = 'inventory' | 'upgrades' | 'staff' | 'reviews' | 'menu';
@@ -159,6 +171,7 @@ class AppController {
   private lastLobbyEntriesCount: number = 0;
   private memoriesActiveTab: MemoriesTabId = 'residents';
   private memoriesFilter: string = 'all';
+  private thiefAnimId: number | null = null;
 
   constructor() {
     if (import.meta.env?.DEV) {
@@ -921,6 +934,161 @@ class AppController {
     });
   }
 
+  // --- TÊN TRỘM ĐÓNG GIẢ & BẢO VỆ PHÁ ÁN (JEV-POWERED) ---
+  private tickThief(session: SellingSession, gameDt: number) {
+    if (this.isModalOpen()) return;
+
+    // Tính thời gian giây của ca bán hiện tại (tương ứng 75s / ca)
+    const currentSec = ((session.gameHour - OPEN_HOUR) / (CLOSE_HOUR - OPEN_HOUR)) * 75;
+
+    // 1. Kiểm tra kích hoạt trộm theo lịch
+    const schedule = session.thiefSchedule;
+    if (schedule && schedule.timestamps && schedule.timestamps.length > 0 && !session.activeThief) {
+      const firstTarget = schedule.timestamps[0];
+      if (firstTarget !== undefined && currentSec >= firstTarget) {
+        schedule.timestamps.shift();
+        const maxTables = stateManager.getState().upgrades.space?.currentLevel ?? 1;
+        const encounter = createThiefEncounter(String(Date.now()), maxTables);
+        session.activeThief = encounter;
+
+        const sec = checkSecurityStaff(stateManager.getState());
+        if (sec.hasSecurity) {
+          audio.playBurnt();
+          this.showToast(`🚨 ${sec.guardName}: "Phát hiện kẻ khả nghi tại Bàn ${encounter.targetTable}! Bấm BẮT NGAY!"`);
+        } else {
+          audio.playBurnt();
+          this.showToast(`👀 Khách khả nghi: "${encounter.disguiseName}" đang me móc ví khách khác! Bấm vào để bắt!`);
+        }
+      }
+    }
+
+    // 2. Đếm ngược thời gian nếu trộm đang rình rập
+    if (session.activeThief && !session.activeThief.isCaught && !session.activeThief.isEscaped) {
+      session.activeThief.timeRemaining -= gameDt / 1000;
+      if (session.activeThief.timeRemaining <= 0) {
+        // Hết giờ mà người chơi chưa kịp bấm! Tên trộm cuỗm đồ chạy mất!
+        const encounter = session.activeThief;
+        session.activeThief = null;
+        audio.playBurnt();
+        resolveThiefEscaped(stateManager.getState(), encounter);
+        this.whenModalFree(() => {
+          this.openModal(renderThiefEscapedModal(stateManager.getState(), encounter));
+          this.bindThiefEscapedFailure(encounter);
+        });
+      }
+    }
+  }
+
+  public openThiefMinigameModal(encounter: ThiefEncounter) {
+    if (encounter.isCaught || encounter.isEscaped) return;
+    const state = stateManager.getState();
+    const security = checkSecurityStaff(state);
+    const greenWidth = security.greenZoneWidthPercent;
+    const greenLeft = Math.round((100 - greenWidth) / 2);
+
+    const html = renderThiefMinigameModal(state, encounter);
+    this.openModal(html);
+
+    let needlePos = 0;
+    let needleDir = 1; // 1: sang phải, -1: sang trái
+    const speed = security.hasSecurity ? 0.9 : 1.8;
+    let isResolved = false;
+
+    const needleEl = document.getElementById('thief-needle');
+    const timerSecEl = document.getElementById('thief-timer-sec');
+
+    const updateNeedle = () => {
+      if (isResolved || !this.isModalOpen()) return;
+      needlePos += needleDir * speed;
+      if (needlePos >= 100) {
+        needlePos = 100;
+        needleDir = -1;
+      } else if (needlePos <= 0) {
+        needlePos = 0;
+        needleDir = 1;
+      }
+      if (needleEl) needleEl.style.left = `${needlePos}%`;
+      if (timerSecEl) timerSecEl.textContent = `${Math.ceil(encounter.timeRemaining)}`;
+      this.thiefAnimId = requestAnimationFrame(updateNeedle);
+    };
+
+    if (this.thiefAnimId) cancelAnimationFrame(this.thiefAnimId);
+    this.thiefAnimId = requestAnimationFrame(updateNeedle);
+
+    // Xử lý nút Bảo Vệ khống chế 100%
+    const guardBtn = document.getElementById('btn-guard-instant-bust');
+    if (guardBtn) {
+      guardBtn.onclick = () => {
+        if (isResolved) return;
+        isResolved = true;
+        if (this.thiefAnimId) {
+          cancelAnimationFrame(this.thiefAnimId);
+          this.thiefAnimId = null;
+        }
+        audio.playCash();
+        const result = resolveThiefCaught(stateManager.getState(), encounter, true);
+        confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
+        this.openModal(renderThiefCaughtModal(stateManager.getState(), encounter, result.rewardMoney));
+        this.bindThiefCaughtSuccess(encounter);
+      };
+    }
+
+    // Xử lý nút Người chơi căn bấm chụp tay trộm
+    const strikeBtn = document.getElementById('btn-thief-strike');
+    if (strikeBtn) {
+      strikeBtn.onclick = () => {
+        if (isResolved) return;
+        isResolved = true;
+        if (this.thiefAnimId) {
+          cancelAnimationFrame(this.thiefAnimId);
+          this.thiefAnimId = null;
+        }
+
+        const isHit = needlePos >= greenLeft && needlePos <= (greenLeft + greenWidth);
+        if (isHit) {
+          // Bắt được!
+          audio.playCash();
+          const result = resolveThiefCaught(stateManager.getState(), encounter, false);
+          confetti({ particleCount: 70, spread: 80, origin: { y: 0.6 } });
+          this.openModal(renderThiefCaughtModal(stateManager.getState(), encounter, result.rewardMoney));
+          this.bindThiefCaughtSuccess(encounter);
+        } else {
+          // Trượt! Tên trộm cuỗm đồ phóng chạy
+          audio.playBurnt();
+          resolveThiefEscaped(stateManager.getState(), encounter);
+          this.openModal(renderThiefEscapedModal(stateManager.getState(), encounter));
+          this.bindThiefEscapedFailure(encounter);
+        }
+      };
+    }
+  }
+
+  private bindThiefCaughtSuccess(_encounter: ThiefEncounter) {
+    const finishBtn = document.getElementById('btn-thief-finish-success');
+    if (finishBtn) {
+      finishBtn.onclick = () => {
+        audio.playPop();
+        if (this.sellingSession) this.sellingSession.activeThief = null;
+        this.closeModal();
+        this.showToast('✅ Đã bàn giao tên trộm cho Công an! Tiệm tiếp tục bán!');
+        this.render();
+      };
+    }
+  }
+
+  private bindThiefEscapedFailure(_encounter: ThiefEncounter) {
+    const finishBtn = document.getElementById('btn-thief-finish-failure');
+    if (finishBtn) {
+      finishBtn.onclick = () => {
+        audio.playPop();
+        if (this.sellingSession) this.sellingSession.activeThief = null;
+        this.closeModal();
+        this.showToast('💸 Đã bồi thường thiệt hại cho khách! Rút kinh nghiệm sâu sắc!');
+        this.render();
+      };
+    }
+  }
+
   // Chuyển đổi giữa các pha (Prep -> Selling -> Summary)
   public setPhase(phase: GamePhase) {
     // Bỏ phiên cũ trước khi đổi pha, để lần render do update() gây ra không vẽ phiên của hôm qua
@@ -1419,6 +1587,8 @@ class AppController {
     cookingEngine.setTraySize(traySizeFor(state));
     this.customerSource = createCustomerSource(state, this.currentEvent);
     this.sellingSession.orders.push(...this.customerSource.opening());
+    this.sellingSession.thiefSchedule = scheduleThiefEvents(state.day);
+    this.sellingSession.activeThief = null;
     if (shouldRunTutorial(state)) {
       this.tutorial = { introSeen: false, servedAtStart: 0 };
       this.sellingSession.tutorial = true;
@@ -1449,6 +1619,10 @@ class AppController {
     if (this.animFrameId) {
       cancelAnimationFrame(this.animFrameId);
       this.animFrameId = null;
+    }
+    if (this.thiefAnimId) {
+      cancelAnimationFrame(this.thiefAnimId);
+      this.thiefAnimId = null;
     }
     audio.stopSizzle();
   }
@@ -1508,6 +1682,9 @@ class AppController {
 
     // Nhân viên: phụ bếp tự chiên, phục vụ tự lên món (luật ở core/staff.ts)
     this.tickStaff(session, gameDt);
+
+    // Kiểm tra và đếm ngược tên trộm rình mò (JEV-powered thief system)
+    this.tickThief(session, gameDt);
 
     // Nồi mì / lò bánh vừa chín → chuông báo một lần (đang canh chảo dễ quên)
     for (const id of Object.keys(TIMER_RECIPES) as TimerStationId[]) {
@@ -1728,6 +1905,14 @@ class AppController {
   // Đọc state tại thời điểm bấm, không dùng state bắt trong closure lúc render.
   private handleSellingClick(target: Element) {
     if (!this.sellingSession) return;
+
+    // Bắt quả tang tên trộm rình mò
+    const thiefBanner = target.closest<HTMLElement>('#btn-open-thief-bust, .thief-alert-strip');
+    if (thiefBanner && this.sellingSession.activeThief) {
+      Haptics.tap();
+      this.openThiefMinigameModal(this.sellingSession.activeThief);
+      return;
+    }
 
     const trayEl = target.closest<HTMLElement>('.tray-item');
     if (trayEl) {

@@ -207,6 +207,7 @@ export function sellingStructureKey(state: GameState, session: SellingSession): 
     state.oilCondition, state.currentChapter,
     session.isFastForward, isRushHour(session.gameHour),
     session.perfectStreak >= 2,
+    Boolean(session.activeThief),
     stationStripKey(state, session),
     staffStripKey(state, session),
     prepStationKey(state)
@@ -465,7 +466,11 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
     }
   }
 
-  // Floating money on collect
+  // Cập nhật đếm ngược tên trộm
+  const thiefTimerEl = root.querySelector('#thief-banner-time');
+  if (thiefTimerEl && session.activeThief) {
+    thiefTimerEl.textContent = `⏳ ${Math.ceil(session.activeThief.timeRemaining)}s`;
+  }
 }
 
 function potHint(): string {
@@ -895,6 +900,31 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           </button>
         </div>
       </div>
+
+      <!-- THIEF ALERT BANNER (Tên Trộm Đang Rình Mò Trong Quán) -->
+      ${session.activeThief && !session.activeThief.isCaught && !session.activeThief.isEscaped ? `
+        <div id="btn-open-thief-bust" class="thief-alert-strip" style="background: linear-gradient(135deg, #b91c1c, #991b1b); color: #fff; padding: 7px 10px; margin: 4px 6px; border-radius: 8px; border: 2px solid #f87171; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(220,38,38,0.4); cursor: pointer; animation: pulse 1s infinite;">
+          <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+            <img src="${session.activeThief.disguiseAvatar}" style="width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid #fef08a; object-fit: contain; background: #fff;" alt="" />
+            <div style="min-width: 0;">
+              <div style="font-size: 0.76rem; font-weight: 900; color: #fef08a; display: flex; align-items: center; gap: 4px;">
+                <span>🚨 KẺ GIAN ĐÓNG GIẢ: "${escapeHtml(session.activeThief.disguiseName)}"</span>
+              </div>
+              <div style="font-size: 0.65rem; color: #fecaca; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                Đang rình Bàn ${session.activeThief.targetTable} (${escapeHtml(session.activeThief.targetCustomerName)})!
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span id="thief-banner-time" style="font-size: 0.72rem; font-weight: 800; background: #7f1d1d; color: #fef08a; padding: 2px 6px; border-radius: 4px; border: 1px solid #ef4444; white-space: nowrap;">
+              ⏳ ${Math.ceil(session.activeThief.timeRemaining)}s
+            </span>
+            <button class="btn-sm" style="padding: 4px 8px; font-size: 0.7rem; font-weight: 900; background: #fbbf24; color: #78350f; border: 1px solid #d97706; border-radius: 5px; cursor: pointer; white-space: nowrap;">
+              ✋ BẮT NGAY!
+            </button>
+          </div>
+        </div>
+      ` : ''}
 
       <!-- Customer Queue Lane (Khách vào/ra quán) -->
       <div class="customer-lane">
