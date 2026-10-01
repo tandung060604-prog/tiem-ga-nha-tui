@@ -67,6 +67,8 @@ import { getTodayWholesaler, executeBargain, BargainTactic } from './core/market
 import { renderMarketBargainModal } from './ui/components/MarketBargainModal';
 import { DeliveryRunnerEngine, DeliveryRunState } from './core/deliveryRunner';
 import { renderDeliveryPromptModal, renderDeliveryRunnerGame, renderDeliveryResultModal } from './ui/components/DeliveryRunnerModal';
+import { syncToLeaderboard, fetchLeaderboard, removeFromLeaderboard } from './core/leaderboard';
+import { renderLeaderboardModal } from './ui/components/LeaderboardModal';
 import type { DailyIncident, DeliveryRunResult } from './types/game';
 import confetti from 'canvas-confetti';
 
@@ -239,12 +241,25 @@ class AppController {
       document.getElementById('title-screen')?.remove();
       void this.confirmDialog('Xóa tiến độ hiện tại và mở tiệm lại từ Ngày 1?', 'Chơi mới').then(ok => {
         if (!ok) { this.showTitleScreen(); return; }
+        const oldUserId = stateManager.getState().userId;
+        if (oldUserId) {
+          void removeFromLeaderboard(oldUserId);
+        }
         stateManager.resetGame();
         this.pickDailyEvent();
         this.render();
         start(true);
       });
     };
+
+    const leaderboardBtn = document.getElementById('btn-title-leaderboard');
+    if (leaderboardBtn) {
+      leaderboardBtn.onclick = (e) => {
+        e.stopPropagation();
+        void this.openLeaderboard();
+      };
+    }
+
     const musicBtn = document.getElementById('btn-title-music')!;
     musicBtn.onclick = () => {
       music.unlock();
@@ -866,7 +881,8 @@ class AppController {
         () => this.render(),
         () => this.openSettings(),
         () => this.openUpdateDashboardModal(),
-        () => openBacBaManualModal()
+        () => openBacBaManualModal(),
+        () => this.openLeaderboard()
       );
     }
 
@@ -1035,7 +1051,10 @@ class AppController {
           let chapter: number | null = null;
           stateManager.update(draft => { chapter = depositForNextChapter(draft); });
           stateManager.flush();
-          if (chapter !== null) this.openChapterUnlockedDialog(chapter);
+          if (chapter !== null) {
+            this.openChapterUnlockedDialog(chapter);
+            void syncToLeaderboard(stateManager.getState());
+          }
         });
       };
     }
@@ -2665,6 +2684,7 @@ class AppController {
     this.pickDailyEvent();
     this.setPhase('prep');
     this.showToast(`Chào buổi sáng Ngày ${stateManager.getState().day}! Chuẩn bị hàng nào! ☀️`);
+    void syncToLeaderboard(stateManager.getState());
 
     // Thông báo hàng hết hạn bị hủy nếu có
     const expiredNotice = stateManager.getState().expiredWasteNotification;
@@ -2872,10 +2892,61 @@ class AppController {
           'Xóa &amp; chơi lại'
         ).then(ok => {
           if (!ok) return;
+          const oldUserId = stateManager.getState().userId;
+          if (oldUserId) {
+            void removeFromLeaderboard(oldUserId);
+          }
           stateManager.resetGame();
           this.setPhase('prep');
           this.showToast('Đã khôi phục game về ngày đầu tiên!');
         });
+      };
+    }
+  }
+
+  // --- LEADERBOARD MODAL ---
+  public async openLeaderboard(sortBy: 'money' | 'day' = 'money') {
+    audio.playPop();
+    const state = stateManager.getState();
+    const currentUserId = state.userId;
+
+    // 1. Tự động đồng bộ bản ghi của mình trước khi mở bảng
+    void syncToLeaderboard(state);
+
+    // 2. Tải danh sách bảng xếp hạng (từ cloud hoặc cache)
+    const result = await fetchLeaderboard(currentUserId, sortBy);
+    const html = renderLeaderboardModal(result.entries, currentUserId, sortBy, result.isOffline);
+    this.openModal(html);
+
+    // 3. Bind events
+    const closeBtn1 = document.getElementById('btn-close-leaderboard');
+    if (closeBtn1) closeBtn1.onclick = () => this.closeModal();
+
+    const closeBtn2 = document.getElementById('btn-close-leaderboard-btn');
+    if (closeBtn2) closeBtn2.onclick = () => this.closeModal();
+
+    const sortMoneyBtn = document.getElementById('btn-sort-money');
+    if (sortMoneyBtn) {
+      sortMoneyBtn.onclick = () => {
+        audio.playPop();
+        void this.openLeaderboard('money');
+      };
+    }
+
+    const sortDayBtn = document.getElementById('btn-sort-day');
+    if (sortDayBtn) {
+      sortDayBtn.onclick = () => {
+        audio.playPop();
+        void this.openLeaderboard('day');
+      };
+    }
+
+    const refreshBtn = document.getElementById('btn-refresh-leaderboard');
+    if (refreshBtn) {
+      refreshBtn.onclick = async () => {
+        audio.playCash();
+        this.showToast('Đang kết nối làm mới Bảng Xếp Hạng... 🔄');
+        await this.openLeaderboard(sortBy);
       };
     }
   }

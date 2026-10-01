@@ -6,6 +6,7 @@ import { INITIAL_CANDIDATES } from '../content/staff';
 import { ensureBatches } from './inventory';
 import { signSave, auditState, flagIntegrity } from './integrity';
 import { priceLimits } from './pricing';
+import { generateUniqueUserId } from './leaderboard';
 
 const SAVE_KEY = 'tiem_ga_nha_tui_save_v2';
 const SIG_KEY = `${SAVE_KEY}_sig`;
@@ -17,6 +18,7 @@ export function createInitialState(): GameState {
     phase: 'prep',
     money: 850000, // Tiền vốn khởi đầu cho xe đẩy chương 1
     shopName: 'Tiệm Gà Nhà Tui',
+    userId: generateUniqueUserId(),
     currentChapter: 1,
     isFastForward: false,
     soundEnabled: true,
@@ -158,6 +160,9 @@ export function migrateSave(raw: unknown): { state: GameState; repaired: string[
   }
 
   const defaults = createInitialState();
+  if (!state.userId || typeof state.userId !== 'string') {
+    state.userId = generateUniqueUserId();
+  }
   // Save từ trước khi có hướng dẫn: đã qua ngày 1 thì coi như đã học, không bật lại
   if (typeof src.tutorialDone !== 'boolean') state.tutorialDone = typeof src.day === 'number' && src.day > 1;
   if (!Number.isInteger(state.day) || state.day < 1) { state.day = defaults.day; repaired.push('day'); }

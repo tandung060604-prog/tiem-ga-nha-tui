@@ -82,8 +82,13 @@ export function renderTitleScreen(state: GameState, hasProgress: boolean, musicO
             </button>
           ` : ''}
 
-          <!-- Hàng 3 nút tiện ích tinh gọn -->
+          <!-- Hàng nút tiện ích tinh gọn -->
           <div class="title-utilities-row">
+            <button id="btn-title-leaderboard" class="btn-utility-pill" aria-label="Bảng xếp hạng đua top">
+              <span class="u-icon">🏆</span>
+              <span class="u-text">Đua Top</span>
+            </button>
+
             <button id="btn-title-bacba-manual" class="btn-utility-pill" aria-label="Cẩm nang Bác Ba">
               <span class="u-icon">📖</span>
               <span class="u-text">Cẩm Nang</span>

@@ -20,6 +20,9 @@ export function renderHeader(state: GameState, _onOpenSettings?: () => void): st
       <button id="btn-settings-toggle" class="h-btn" aria-label="Cài đặt" title="Cài đặt tiệm">
         <img src="${ASSETS.icons.settings}" class="h-pixel-icon" alt="Cài đặt" />
       </button>
+      <button id="btn-leaderboard-toggle" class="h-btn" aria-label="Bảng xếp hạng" title="Bảng xếp hạng Đua Top 4 Tiệm Gà">
+        <span style="font-size: 1.15rem; line-height: 1;">🏆</span>
+      </button>
       <button id="btn-changelog-toggle" class="h-btn" aria-label="Bảng tin" title="Xem bản cập nhật">
         <img src="${ASSETS.icons.book}" class="h-pixel-icon" alt="Bảng tin" />
       </button>
@@ -58,7 +61,8 @@ export function bindHeaderEvents(
   onRefresh: () => void, 
   onOpenSettings: () => void,
   onOpenChangelog?: () => void,
-  onOpenBacBaManual?: () => void
+  onOpenBacBaManual?: () => void,
+  onOpenLeaderboard?: () => void
 ) {
   const audioBtn = document.getElementById('btn-audio-toggle');
   if (audioBtn) {
@@ -73,6 +77,14 @@ export function bindHeaderEvents(
     settingsBtn.onclick = () => {
       audio.playPop();
       onOpenSettings();
+    };
+  }
+
+  const leaderboardBtn = document.getElementById('btn-leaderboard-toggle');
+  if (leaderboardBtn && onOpenLeaderboard) {
+    leaderboardBtn.onclick = () => {
+      audio.playPop();
+      onOpenLeaderboard();
     };
   }
 

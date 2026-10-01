@@ -439,6 +439,7 @@ export interface GameState {
   phase: GamePhase;
   money: number;
   shopName: string;
+  userId?: string;
   currentChapter: number;
   isFastForward: boolean;
   soundEnabled: boolean;
@@ -575,4 +576,16 @@ export interface SecretSauceDayState {
   success: boolean;
   buffActive: boolean;
   tipsEarnedToday?: number;
+}
+
+export interface LeaderboardEntry {
+  userId: string;
+  shopName: string;
+  day: number;
+  money: number;
+  chapter: number;
+  overallRating: number;
+  totalFried: number;
+  updatedAt: number;
+  isSelf?: boolean;
 }
