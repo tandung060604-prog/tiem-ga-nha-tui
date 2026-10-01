@@ -70,6 +70,9 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
           <button id="btn-open-incidents" class="btn-sm btn-incident-card">
             <img src="${ASSETS.icons.reviews}" class="btn-pixel-icon-sm" alt="" /> Sổ Tay Hẻm (${state.seenIncidentIds?.length ?? 0}/${DAILY_INCIDENTS.length})
           </button>
+          <button id="btn-open-memories" class="btn-sm" style="background: #fef9c3; border: 1.5px solid #ca8a04; color: #854d0e; font-weight: 800;" title="Sổ Tay Kỷ Niệm: 36 Cư Dân, 6 Kết Cục & Thư Thỏ Cam">
+            📖 Kỷ Niệm Hẻm
+          </button>
           <button id="btn-read-story" class="btn-sm primary btn-story-card">
             <img src="${ASSETS.icons.book}" class="btn-pixel-icon-sm" alt="" /> Truyện Hẻm 1102
           </button>

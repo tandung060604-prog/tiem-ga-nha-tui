@@ -79,6 +79,8 @@ import {
 import { renderLeaderboardModal, renderLobbySlotsHtml, renderSendCarePackageDialog } from './ui/components/LeaderboardModal';
 import { sendCarePackage, fetchPendingCarePackages, claimCarePackage } from './core/carePackage';
 import { recordWeeklyQuestProgress, claimWeeklyQuestReward, ensureWeeklyQuests } from './core/weeklyQuests';
+import { renderMemoriesAlbumModal, MemoriesTabId } from './ui/components/MemoriesAlbumModal';
+import { downloadLobbyPoster } from './core/canvasPoster';
 import type { DailyIncident, DeliveryRunResult, CarePackageType } from './types/game';
 import confetti from 'canvas-confetti';
 
@@ -155,6 +157,8 @@ class AppController {
   private isNewShopFlow = false;
   private leaderboardPollTimer: number | null = null;
   private lastLobbyEntriesCount: number = 0;
+  private memoriesActiveTab: MemoriesTabId = 'residents';
+  private memoriesFilter: string = 'all';
 
   constructor() {
     if (import.meta.env?.DEV) {
@@ -879,6 +883,44 @@ class AppController {
     }
   }
 
+  // --- SỔ TAY KỶ NIỆM HẺM 1102 (36 CƯ DÂN, 6 KẾT CỤC, 6 THƯ THỎ CAM) ---
+  public openMemoriesAlbumModal(activeTab?: MemoriesTabId, filter?: string) {
+    if (activeTab) this.memoriesActiveTab = activeTab;
+    if (filter !== undefined) this.memoriesFilter = filter;
+
+    const state = stateManager.getState();
+    const html = renderMemoriesAlbumModal(state, this.memoriesActiveTab, this.memoriesFilter);
+    this.openModal(html);
+
+    const closeBtn = document.getElementById('btn-close-memories');
+    if (closeBtn) {
+      closeBtn.onclick = () => {
+        audio.playPop();
+        this.closeModal();
+      };
+    }
+
+    const tabBtns = document.querySelectorAll('.tab-memories-btn');
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const tab = (e.currentTarget as HTMLElement).getAttribute('data-tab') as MemoriesTabId;
+        if (tab) {
+          audio.playPop();
+          this.openMemoriesAlbumModal(tab, this.memoriesFilter);
+        }
+      });
+    });
+
+    const filterBtns = document.querySelectorAll('.filter-res-btn');
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const cat = (e.currentTarget as HTMLElement).getAttribute('data-cat') || 'all';
+        audio.playPop();
+        this.openMemoriesAlbumModal('residents', cat);
+      });
+    });
+  }
+
   // Chuyển đổi giữa các pha (Prep -> Selling -> Summary)
   public setPhase(phase: GamePhase) {
     // Bỏ phiên cũ trước khi đổi pha, để lần render do update() gây ra không vẽ phiên của hôm qua
@@ -1113,6 +1155,14 @@ class AppController {
     if (openIncidentsBtn) {
       openIncidentsBtn.onclick = () => {
         this.openIncidentsAlbumDialog();
+      };
+    }
+
+    const openMemoriesBtn = document.getElementById('btn-open-memories');
+    if (openMemoriesBtn) {
+      openMemoriesBtn.onclick = () => {
+        audio.playPop();
+        this.openMemoriesAlbumModal('residents', 'all');
       };
     }
 
@@ -3037,6 +3087,25 @@ class AppController {
           this.showToast('📋 Đã sao chép link mời! Gửi Zalo/Messenger cho bạn bè ngay!');
         } catch {
           this.showToast('📋 Vui lòng sao chép link trong ô bên cạnh!');
+        }
+      };
+    }
+
+    // Tải poster phòng retro 9:16 chia sẻ Story
+    const downloadPosterBtn = document.getElementById('btn-download-room-poster');
+    if (downloadPosterBtn) {
+      downloadPosterBtn.onclick = async () => {
+        try {
+          audio.playCash();
+          this.showToast('🎨 Đang vẽ poster 9:16 retro... Vui lòng đợi!');
+          await downloadLobbyPoster({
+            state: stateManager.getState(),
+            roomId: currentRoomId,
+          });
+          this.showToast('✅ Đã tải poster phòng 9:16! Hãy chia sẻ Story ngay!');
+        } catch (err) {
+          console.error('Lỗi khi tải poster:', err);
+          this.showToast('❌ Có lỗi khi tạo ảnh poster. Vui lòng thử lại!');
         }
       };
     }

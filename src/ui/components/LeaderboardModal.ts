@@ -192,7 +192,7 @@ export function renderLeaderboardModal(
             📸 Dùng <b>Camera điện thoại</b> hoặc <b>Zalo</b> quét mã QR để vào ngay phòng đua top cùng bạn!
           </div>
 
-          <!-- Link Mời & Nút Copy -->
+          <!-- Link Mời, Nút Copy & Nút Tải Poster -->
           <div style="width: 100%; display: flex; flex-direction: column; gap: 6px;">
             <div style="display: flex; gap: 6px;">
               <input id="input-invite-link" type="text" readonly value="${inviteUrl}" style="flex: 1; padding: 8px 10px; font-size: 0.72rem; border-radius: 8px; border: 1.5px solid #c49a6c; background: #fff; color: #475569; font-family: monospace;" />
@@ -200,6 +200,10 @@ export function renderLeaderboardModal(
                 📋 Sao Chép
               </button>
             </div>
+            <button id="btn-download-room-poster" class="btn-sm" style="width: 100%; min-height: 38px; padding: 8px 12px; background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; border: 1.5px solid #047857; border-radius: 8px; font-weight: 800; font-size: 0.78rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3);">
+              <span>📸</span>
+              <span>TẢI POSTER PHÒNG ĐUA TOP (9:16 STORY)</span>
+            </button>
           </div>
 
           <!-- Khu Vực Đổi Phòng Hoặc Tạo Phòng Mới -->

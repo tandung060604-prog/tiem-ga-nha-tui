@@ -32,7 +32,40 @@ export function getCustomerMood(order: CustomerOrder): CustomerMood {
   return 'happy';
 }
 
-export function getMoodThought(mood: CustomerMood, order?: CustomerOrder): string {
+export function getMoodThought(mood: CustomerMood, order?: CustomerOrder, state?: GameState): string {
+  // 1. Phản xạ ngữ cảnh theo trạng thái quán realtime (Dầu, Lobby 4P, Streak)
+  if (state) {
+    // Ngữ cảnh Dầu đen / bẩn
+    const isDirtyOil = state.oilCondition === 'dirty' || (state as any).oilQuality === 'black' || (typeof (state as any).oilQuality === 'number' && (state as any).oilQuality < 35);
+    const isCleanOil = state.oilCondition === 'clean' || (state as any).oilQuality === 'clean' || (typeof (state as any).oilQuality === 'number' && (state as any).oilQuality >= 90);
+
+    if (isDirtyOil) {
+      if (mood === 'waiting' && Math.random() < 0.4) {
+        return 'Mùi dầu hơi khét rồi đó chủ tiệm ơi... thay dầu đi nè! 🛢️';
+      }
+      if (mood === 'impatient') {
+        return 'Dầu đen kịt vầy ăn có đau bụng hông ta... lo quá! 🥺';
+      }
+    } else if (isCleanOil && mood === 'waiting' && Math.random() < 0.3) {
+      return 'Dầu vàng ươm thơm phức nghen, nhìn là ưng cái bụng liền ✨!';
+    }
+
+    // Ngữ cảnh Đua Top Lobby 4 Người
+    if (state.roomId && mood === 'waiting' && Math.random() < 0.25) {
+      return `Phòng ${state.roomId.toUpperCase()} đang đua top gắt lắm, quán mình ráng giật cúp nha 🏆!`;
+    }
+
+    // Ngữ cảnh Chuỗi Perfect cao
+    if (((state as any)?.perfectStreak ?? 0) >= 3 && mood === 'happy' && Math.random() < 0.4) {
+      return 'Bếp trưởng chiên Perfect liên hoàn đỉnh nóc kịch trần luôn 🔥!';
+    }
+  }
+
+  // Ngữ cảnh dặn kèm tương dặn
+  if (order?.items?.some(it => it.condiment) && mood === 'waiting' && Math.random() < 0.35) {
+    return 'Nhớ xịt đúng tương dặn kèm nha, thiếu tương là hờn á 🍅!';
+  }
+
   if (order?.isBunny) {
     if (mood === 'leaving') return 'Em đói lả người rồi tiệm ơi... 🥺';
     if (mood === 'impatient') return 'Chờ thêm xíu nữa thui nè! 🐰';
@@ -324,7 +357,7 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
     if (c.thoughtEl && c.thoughtEl.dataset.mood !== mood) {
       c.thoughtEl.dataset.mood = mood;
       c.thoughtEl.className = `thought-bubble ${mood}`;
-      if (c.thoughtText) c.thoughtText.textContent = getMoodThought(mood, order);
+      if (c.thoughtText) c.thoughtText.textContent = getMoodThought(mood, order, state);
     }
 
     // Dynamic 2D sprite expression swap
@@ -645,7 +678,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
     const { percent: patiencePercent, cls: patienceColorClass, angry: isAngry } = patienceLevel(ord);
     const visual = getCustomerVisual(ord);
     const mood = getCustomerMood(ord);
-    const thought = getMoodThought(mood, ord);
+    const thought = getMoodThought(mood, ord, state);
     const hasMatchInTray = tray.some(t => ord.items.some(it => it.menuItemId === t.menuItemId && !it.completed));
 
     const comboHtml = ord.comboName ? `<div class="order-combo">🍱 ${escapeHtml(ord.comboName)}</div>` : '';
