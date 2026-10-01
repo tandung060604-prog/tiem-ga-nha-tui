@@ -56,6 +56,7 @@ describe('bắt các kiểu gian lận phổ biến', () => {
     const s = createInitialState();
     s.currentChapter = 5;
     s.depositsPaid = 4;
+    s.day = 100;
     s.money = CHAPTERS.find(c => c.number === 5)!.targetMoney;
     s.karma = { community: 90, craftsmanship: 90, ambition: 50 };
     s.unlockedBunnyLetters = ['a', 'b', 'c', 'd', 'e', 'f'];

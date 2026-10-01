@@ -11,6 +11,7 @@ const atFinale = (tweak: (s: GameState) => void = () => {}) => {
   const s = createInitialState();
   s.currentChapter = 5;
   s.money = FINALE_MONEY;
+  s.day = 100;
   tweak(s);
   return s;
 };
@@ -26,6 +27,16 @@ describe('kết thúc chỉ đến khi đi hết hành trình', () => {
   it('Chương 5 nhưng chưa đủ quỹ dự lễ → chưa kết thúc', () => {
     expect(finaleReady(atFinale(s => { s.money = FINALE_MONEY - 1; }))).toBe(false);
     expect(evaluateEnding(atFinale(s => { s.money = FINALE_MONEY - 1; }))).toBeNull();
+  });
+
+  it('Chương 5 đủ quỹ 300M nhưng chưa đủ 100 ngày (ví dụ ngày 99) → chưa kích hoạt kết thúc', () => {
+    const early = atFinale(s => {
+      s.day = 99;
+      s.karma = { community: 90, craftsmanship: 90, ambition: 50 };
+      s.unlockedBunnyLetters = ['1', '2', '3', '4', '5', '6'];
+    });
+    expect(finaleReady(early)).toBe(false);
+    expect(evaluateEnding(early)).toBeNull();
   });
 
   it('đủ quỹ ở Chương 5, không cực đoan → Bình dị', () => {

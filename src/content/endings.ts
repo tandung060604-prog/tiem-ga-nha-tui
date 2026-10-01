@@ -10,7 +10,7 @@ export const STORY_ENDINGS: Record<StoryEndingId, StoryEnding> = {
     title: 'BẾP LỬA HẺM 1102 & CHUỖI GÀ TRI KỶ',
     tagline: 'Khi mùi thơm gà rán hòa cùng nghĩa tình Sài Gòn, không đế chế nào có thể đánh bại bạn.',
     excerpt: 'Mimi đứng trên sân khấu trao giải Gà Vàng, từ từ tháo chiếc đầu mascot Thỏ Cam. Dưới ánh đèn rực rỡ, cô gái nở nụ cười rạng rỡ. Bác Ba trao lại cho bạn chiếc vá gỗ gia truyền của tiệm Gà Chợ Lớn năm 1990. Hẻm 1102 tối nay sáng rực ánh đèn mừng ngày hội ngộ.',
-    conditionDescription: '❤️ Tình thân hẻm ≥ 75 · 🔥 Tay nghề ≥ 75 · Mở khóa trọn vẹn 6 thư Thỏ Cam',
+    conditionDescription: '❤️ Tình thân hẻm ≥ 75 · 🔥 Tay nghề ≥ 75 · Mở khóa trọn vẹn 6 thư Thỏ Cam · Gắn bó tiệm ≥ 100 ngày',
     karma: { community: 95, craftsmanship: 88, ambition: 72 }
   },
   open: {
@@ -65,7 +65,7 @@ export const STORY_ENDINGS: Record<StoryEndingId, StoryEnding> = {
     title: 'CHIẾC VÁ VÀNG 1975',
     tagline: 'Đẳng cấp nghệ nhân ẩm thực đường phố vươn tầm di sản ẩm thực.',
     excerpt: 'Suốt chuỗi ngày kinh doanh, tiệm đạt 5.0 sao tuyệt đối, không một miếng gà cháy, tỷ lệ giòn Perfect đạt cảnh giới thượng thừa. Hiệp hội Ẩm thực Quốc tế trao tặng danh hiệu Bàn Tay Vàng. Chiếc vá gỗ của Bác Ba được đúc đồng mạ vàng trang trọng.',
-    conditionDescription: 'Về đích Chương 5 với ≥ 4.9⭐ · Perfect ≥ 85% · cháy ≤ 2% (≥ 200 mẻ).',
+    conditionDescription: 'Về đích Chương 5 với ≥ 4.9⭐ · Perfect ≥ 85% · cháy ≤ 2% (≥ 200 mẻ) · Gắn bó tiệm ≥ 100 ngày',
     karma: { community: 92, craftsmanship: 100, ambition: 85 }
   }
 };
@@ -84,11 +84,14 @@ export function applyKarmaChange(
 
 export const BANKRUPTCY_DEBT_DAYS = 3;
 export const FINALE_CHAPTER = 5;
+export const MIN_DAYS_FOR_FINALE = 100;
+export const MIN_DAYS_FOR_BEST_ENDING = 100;
 
-// Đỉnh hành trình: đang ở Chương 5 và đã gom đủ quỹ dự lễ trao giải Gà Vàng.
+// Đỉnh hành trình: đang ở Chương 5, gắn bó tiệm ít nhất 100 ngày và đã gom đủ quỹ dự lễ trao giải Gà Vàng.
 export function finaleReady(state: GameState): boolean {
   const finale = CHAPTERS.find(c => c.number === FINALE_CHAPTER);
-  return state.currentChapter >= FINALE_CHAPTER && !!finale && state.money >= finale.targetMoney;
+  const daysReached = (state.day ?? 1) >= MIN_DAYS_FOR_FINALE;
+  return state.currentChapter >= FINALE_CHAPTER && !!finale && state.money >= finale.targetMoney && daysReached;
 }
 
 // Kết thúc duy nhất có thể xảy ra giữa chừng là phá sản (âm quỹ nhiều ngày liền).
@@ -102,8 +105,10 @@ export function evaluateEnding(state: GameState): StoryEndingId | null {
   const perfectRatio = perfectFriedCount / Math.max(1, totalFried);
   const burntRatio = totalBurnt / Math.max(1, totalFried);
   const trusted = state.integrity?.tampered !== true; // save bị sửa: không công nhận Viên mãn / Bí mật
-  if (trusted && state.ratings.overall >= 4.9 && totalFried >= 200 && perfectRatio >= 0.85 && burntRatio <= 0.02) return 'secret';
+  const hasMinDays = (state.day ?? 1) >= MIN_DAYS_FOR_BEST_ENDING;
+
+  if (trusted && hasMinDays && state.ratings.overall >= 4.9 && totalFried >= 200 && perfectRatio >= 0.85 && burntRatio <= 0.02) return 'secret';
   if (state.karma.ambition >= 85 && state.karma.community < 40) return 'bad_corporate';
-  if (trusted && state.karma.community >= 75 && state.karma.craftsmanship >= 75 && state.unlockedBunnyLetters.length >= 6) return 'happy';
+  if (trusted && hasMinDays && state.karma.community >= 75 && state.karma.craftsmanship >= 75 && state.unlockedBunnyLetters.length >= 6) return 'happy';
   return 'open';
 }
