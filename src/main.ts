@@ -197,6 +197,9 @@ class AppController {
   private memoriesActiveTab: MemoriesTabId = 'residents';
   private memoriesFilter: string = 'all';
   private thiefAnimId: number | null = null;
+  private toastQueue: string[] = [];
+  private isToastActive = false;
+  private toastTimer: number | null = null;
 
   constructor() {
     if (import.meta.env?.DEV) {
@@ -540,14 +543,42 @@ class AppController {
     this.currentEvent = eventForDay(stateManager.getState().day);
   }
 
-  public showToast(message: string) {
+  public showToast(message: string, priority = false) {
+    if (!message) return;
+    if (priority) {
+      this.toastQueue.unshift(message);
+    } else {
+      // Tránh lặp lại đúng câu vừa có trong queue
+      if (this.toastQueue[this.toastQueue.length - 1] === message) return;
+      this.toastQueue.push(message);
+    }
+    this.processToastQueue();
+  }
+
+  private processToastQueue() {
+    if (this.isToastActive || this.toastQueue.length === 0) return;
+    const msg = this.toastQueue.shift();
+    if (!msg) return;
+
     const toast = document.getElementById('toast');
     if (!toast) return;
-    toast.textContent = message;
+
+    this.isToastActive = true;
+    toast.textContent = msg;
     toast.classList.add('show');
-    setTimeout(() => {
+
+    if (this.toastTimer !== null) {
+      window.clearTimeout(this.toastTimer);
+    }
+
+    this.toastTimer = window.setTimeout(() => {
       toast.classList.remove('show');
-    }, 2400);
+      // Khoảng đệm thư thái 350ms giữa 2 thông báo giúp mắt người chơi kịp nghỉ ngơi
+      this.toastTimer = window.setTimeout(() => {
+        this.isToastActive = false;
+        this.processToastQueue();
+      }, 350);
+    }, 2200);
   }
 
   public showBacBaTip(trigger: 'oil_dirty' | 'perfect_streak' | 'low_patience' | 'out_of_chicken' | 'general') {
@@ -2104,6 +2135,27 @@ class AppController {
       }
     }
 
+    // Cập nhật chu kỳ phục vụ 4 nhịp (The 4-Beat Serving Cadence) cho khách rời quán
+    if (session.departingCustomers && session.departingCustomers.length > 0) {
+      const now = performance.now();
+      let hasStateChange = false;
+      session.departingCustomers = session.departingCustomers.filter(dep => {
+        const elapsed = now - dep.startedAt;
+        if (elapsed > 1350) {
+          hasStateChange = true;
+          return false; // Đã bước ra khỏi quán, gỡ bỏ
+        }
+        if (elapsed > 650 && dep.phase === 'receiving') {
+          dep.phase = 'leaving'; // Chuyển từ nhận đồ sang quay người bước đi
+          hasStateChange = true;
+        }
+        return true;
+      });
+      if (hasStateChange) {
+        this.sellingStructureKey = '';
+      }
+    }
+
     this.render();
     this.updateTutorial(session); // sau render: viền sáng gắn vào nút vừa dựng
     // Hiệu ứng "đã tay" do core ghi lại (tiền vào, chuỗi Perfect, khách bỏ về): vẽ đúng một lần
@@ -2806,9 +2858,28 @@ class AppController {
       this.handlePoliceInspection(policeInsp);
     }
 
+    // Đưa khách vào danh sách diễn hoạt nhận món & quay người rời quán (The 4-Beat Serving Cadence)
+    if (this.sellingSession) {
+      this.sellingSession.departingCustomers ??= [];
+      this.sellingSession.departingCustomers.push({
+        order,
+        phase: 'receiving',
+        startedAt: performance.now(),
+        paid,
+        tip: finalTip,
+        isDelighted: (order.burntPenalty ?? 0) === 0 && (finalTip > 0 || (order.perfectBonus ?? 0) > 0),
+        takeawayItemName: order.items[0]
+          ? (stateManager.getState().menu.find(m => m.id === order.items[0]?.menuItemId)?.name || 'Gà Rán Giòn')
+          : 'Gà Rán Giòn'
+      });
+      this.sellingStructureKey = '';
+    }
+
     if (letter) {
-      audio.playPerfect();
-      this.openBunnyLetterDialog(letter, true);
+      setTimeout(() => {
+        audio.playPerfect();
+        if (letter) this.openBunnyLetterDialog(letter, true);
+      }, 750); // Đệm trễ 750ms để người chơi ngắm trọn vẹn cử chỉ nhận đồ và vẫy tai chào của Bé Thỏ Cam!
     } else if (order.isBunny) {
       audio.playCash();
       this.showToast(`🐰 Bé Thỏ Cam gật gù hạnh phúc, tip thêm ${BUNNY_VISIT_TIP.toLocaleString('vi-VN')}đ và vẫy tai chào! 💖`);
@@ -2817,8 +2888,8 @@ class AppController {
       const personalityTag = order.personalityLabel ? `[${order.personalityLabel}] ` : '';
       const notesStr = (feedbackNotes && feedbackNotes.length > 0)
         ? feedbackNotes.join(' · ')
-        : (tip > 0 ? `+${(tip / 1000).toLocaleString('vi-VN')}k tip` : '0đ tip');
-      this.showToast(`${personalityTag}+${(paid + tip).toLocaleString('vi-VN')}đ (${notesStr}) 💵`);
+        : (finalTip > 0 ? `+${(finalTip / 1000).toLocaleString('vi-VN')}k tip` : '0đ tip');
+      this.showToast(`${personalityTag}+${(paid + finalTip).toLocaleString('vi-VN')}đ (${notesStr}) 💵`);
     }
     this.render();
   }

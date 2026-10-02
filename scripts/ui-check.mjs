@@ -102,6 +102,8 @@ for (const width of WIDTHS) {
   try {
     const tutNext = page.locator('#btn-tutorial-next');
     if (await tutNext.isVisible().catch(() => false)) await tutNext.click();
+    const tutSkip = page.locator('#btn-tutorial-skip');
+    if (await tutSkip.isVisible().catch(() => false)) await tutSkip.click();
     await page.locator('#btn-add-drink').click({ timeout: 3000 });
     record('PASS', width, 'nút bấm ăn (click thật)');
   } catch (e) {

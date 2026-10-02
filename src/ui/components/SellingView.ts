@@ -204,6 +204,7 @@ export function sellingStructureKey(state: GameState, session: SellingSession): 
   const cook = cookingEngine.getCookState();
   return JSON.stringify([
     session.orders.map(o => [o.id, o.items.map(it => it.served)]),
+    (session.departingCustomers || []).map(d => [d.order.id, d.phase]),
     cookingEngine.getTray().map(t => t.id + (t.condiment ?? '')),
     cook.isFrying, cook.fryingType, cookingEngine.getActiveSeasoning(),
     state.oilCondition, state.currentChapter,
@@ -697,6 +698,64 @@ export function renderSellingView(state: GameState, session: SellingSession): st
   const timePeriodLabel = hourNum < 14 ? '☀️ Ca Trưa Hẻm 1102 · Nắng Vàng Giòn Rụm' : '🌙 Ca Tối Hẻm 1102 · Đèn Dầu Bập Bùng';
   const tray = cookingEngine.getTray();
 
+  // 1. Khách Hàng Hoàn Tất Đang Diễn Hoạt Nhận Món & Bước Đi Rời Quán (The 4-Beat Serving Cadence)
+  const departingCardsHtml = (session.departingCustomers || []).map((dep) => {
+    const visual = getCustomerVisual(dep.order);
+    const isReceiving = dep.phase === 'receiving';
+    const isLeaving = dep.phase === 'leaving';
+    const initialSrc = isLeaving ? visual.walk : visual.stand;
+
+    return `
+      <div class="customer-card departing ${isReceiving ? 'receiving' : 'leaving'} ${dep.isDelighted ? 'delighted' : ''}" 
+           data-order-id="${dep.order.id}" 
+           aria-hidden="true"
+           style="pointer-events: none;">
+        <!-- Stardew Floating Emote Bubble -->
+        <div class="stardew-emote-bubble ${dep.isDelighted ? 'happy' : 'leaving'}">
+          <img src="${dep.isDelighted ? ASSETS.icons.sparkle : ASSETS.icons.emoteYum}" class="emote-pixel-img" alt="✨" width="16" height="16" />
+        </div>
+
+        <!-- 2D Character Walking & Standing Stage -->
+        <div class="cust-stage">
+          <div class="char-actor ${isReceiving ? 'char-hop-delight' : 'char-flip-exit'}">
+            <img src="${initialSrc}" alt="${visual.name}" class="char-sprite-img ${isLeaving ? 'walking-out' : 'happy-hop'}" />
+            <div class="char-shadow ${isLeaving ? 'shadow-walk' : ''}"></div>
+            <!-- Túi giấy Kraft mang về trên tay khách -->
+            <div class="prop-takeaway-bag" title="Đã đóng gói mang về">
+              <span class="bag-steam">♨️</span>
+              <span class="bag-icon">🛍️</span>
+            </div>
+          </div>
+          <div class="cust-info-col">
+            <div class="cust-name-row">
+              <span class="cust-name">${visual.name}</span>
+              <span class="mood-indicator"><img src="${ASSETS.icons.sparkle}" class="badge-pixel-star-xs" alt="✨" /></span>
+            </div>
+            <div class="cust-badges-row">
+              <span class="cust-badge served-success-badge"><img src="${ASSETS.icons.check}" class="badge-pixel-star-xs" alt="" /> ĐÃ LÊN MÓN</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phiếu hoàn tất đơn hàng đóng gói xinh xắn -->
+        <div class="speech-bubble wooden-order-ticket is-takeaway-served">
+          <div class="bubble-arrow"></div>
+          <div class="served-bag-notice">
+            <span class="served-bag-title">🎁 ĐÃ LÊN MÓN</span>
+            <span class="served-bag-sub">${escapeHtml(dep.takeawayItemName || 'Gà Rán Giòn')} · Cảm ơn quán!</span>
+          </div>
+        </div>
+
+        <!-- Thanh hoàn thành xanh lá đầy 100% -->
+        <div class="patience-container">
+          <div class="patience-bar">
+            <div class="patience-fill" style="width: 100%; background: var(--mint);"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
   // Customer Queue Lane
   const customerCardsHtml = session.orders.map((ord, idx) => {
     const { percent: patiencePercent, cls: patienceColorClass, angry: isAngry } = patienceLevel(ord);
@@ -979,7 +1038,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
 
       <!-- Customer Queue Lane (Khách vào/ra quán) -->
       <div class="customer-lane">
-        ${session.orders.length > 0 ? customerCardsHtml : (
+        ${(session.orders.length > 0 || (session.departingCustomers && session.departingCustomers.length > 0)) ? `${departingCardsHtml}${customerCardsHtml}` : (
           (session.disruptionTimerSec ?? 0) > 0 ? `
             <div class="empty-queue disruption-alert" style="background: #fff1f0; border: 1.5px solid #ff4d4f; color: #cf1322; padding: 12px 14px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(255,77,79,0.15);">
               <div style="font-weight: 800; font-size: 0.92rem; display: flex; align-items: center; justify-content: center; gap: 6px;">

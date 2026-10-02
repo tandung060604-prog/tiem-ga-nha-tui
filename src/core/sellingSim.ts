@@ -59,6 +59,18 @@ export interface SellingSession {
   activeThief?: import('../types/game').ThiefEncounter | null;
   thiefCaughtCount?: number;
   thiefEscapedCount?: number;
+  departingCustomers?: DepartingCustomer[]; // Khách hàng vừa nhận đồ, đang diễn hoạt nhận món & quay người bước đi
+}
+
+// Khách hàng hoàn tất đơn hàng đang trong chu trình thư thái rời quán (4-Beat Serving Flow)
+export interface DepartingCustomer {
+  order: CustomerOrder;
+  phase: 'receiving' | 'leaving';
+  startedAt: number;
+  paid: number;
+  tip: number;
+  isDelighted: boolean;
+  takeawayItemName?: string;
 }
 
 // Hiệu ứng "đã tay": core ghi lại chuyện vừa xảy ra, giao diện rút ra (drainFx) để vẽ đúng một lần.
@@ -107,7 +119,8 @@ export function createSellingSession(): SellingSession {
     wrongOrderCount: 0,
     missedItemsCount: 0,
     expectedCustomers: 10,
-    spawnedCount: 0
+    spawnedCount: 0,
+    departingCustomers: []
   };
 }
 
