@@ -24,16 +24,84 @@ export interface ChangelogRelease {
   }[];
 }
 
-export const CURRENT_GAME_VERSION = 'v2.6.0';
-export const CURRENT_VERSION_CODENAME = 'Bếp Nấu Thủ Công Cozy 16-Bit & Trị Dứt Điểm Cắt Cụt Thông Tin (Zero Truncation)';
-export const CURRENT_BUILD_DATE = '02/10/2026';
+export const CURRENT_GAME_VERSION = 'v2.7.0';
+export const CURRENT_VERSION_CODENAME = 'Hiên Quán Bàn Ăn Tại Chỗ (Dine-In Patio) & Giám Khảo Ẩm Thực VIP Khó Tính';
+export const CURRENT_BUILD_DATE = '03/10/2026';
 
 export const CHANGELOG_DATA: ChangelogRelease[] = [
+  {
+    version: 'v2.7.0',
+    codename: 'Hiên Quán Bàn Ăn Tại Chỗ (Dine-In Patio) & Giám Khảo Ẩm Thực VIP Khó Tính',
+    releaseDate: '03/10/2026',
+    isLatest: true,
+    highlightSummary: 'Đột phá chiều sâu trải nghiệm quán gà với 2 trụ cột gameplay mới toanh: Mở rộng Góc Bàn Ăn Hiên Quán (Dine-In Patio Tables) cho thực khách nán lại thưởng thức món ăn nóng hổi, đếm ngược thời gian và để lại cọc tiền tip vàng rực kèm thao tác dọn bàn 1 ngón cái; đồng thời diện kiến dàn Giám Khảo Ẩm Thực VIP Khó Tính (Food Critic Bosses) với những yêu cầu chế biến khắt khe thử thách bản lĩnh tay nghề chiên gà Vàng Kim thượng hạng!',
+    metrics: [
+      { icon: '🪑', label: 'Bàn Ăn Hiên Quán', value: '3 Bàn Độc Lập' },
+      { icon: '🧐', label: 'Giám Khảo VIP', value: 'Thẩm Định Khắt Khe' },
+      { icon: '🧹', label: 'Dọn Bàn & Thu Tip', value: 'Touch Target 44px' },
+      { icon: '💵', label: 'Thưởng Vàng', value: 'Tip Tới +45.000đ' },
+      { icon: '⚡', label: 'Tốc Độ Tự Hành', value: '200 Ngày Bền Bỉ' },
+      { icon: '🧪', label: 'Kiểm Định', value: '701 Tests PASS 100%' }
+    ],
+    categories: [
+      {
+        categoryName: 'Góc Bàn Ăn Hiên Quán (Dine-In Patio Tables)',
+        categoryIcon: '🪑',
+        items: [
+          {
+            tag: 'DINE-IN PATIO',
+            tagColor: '#ea580c',
+            title: 'Không Gian Thưởng Thức Món Ăn Tại Chỗ',
+            desc: 'Khách ghé tiệm giờ đây không chỉ mua mang về mà còn có thể chọn ngồi lại hiên quán:',
+            details: [
+              'Khu vực 3 bàn ăn hiên quán phong cách retro bố trí gọn gàng phía trên quầy gọi món, không che lấp tầm nhìn.',
+              'Trạng thái bàn ăn linh hoạt: Sạch sẽ chờ khách ➔ Khách ngồi thưởng thức (avatar tròn, bong bóng gặm đùi gà thơm ngon 😋) ➔ Đĩa sạch để lại cọc tiền tip vàng rực.',
+              'Thao tác dọn bàn chuẩn công thái học: Nút Dọn Bàn đạt chuẩn ≥ 44px, chạm để bỏ túi tiền tip từ 2.000đ đến 15.000đ+.'
+            ]
+          }
+        ]
+      },
+      {
+        categoryName: 'Dàn Giám Khảo Ẩm Thực VIP Khó Tính (Food Critic Bosses)',
+        categoryIcon: '🧐',
+        items: [
+          {
+            tag: 'VIP CRITIC',
+            tagColor: '#9333ea',
+            title: 'Thử Thách Tay Nghề & Tiêu Chí Chế Biến Khắt Khe',
+            desc: 'Các chuyên gia thẩm định ẩm thực và nhân vật tầm cỡ bất ngờ ghé thăm Hẻm 1102:',
+            details: [
+              'Thẻ khách viền tím phát quang lộng lẫy (.critic-card), huy hiệu ⭐ PHÊ BÌNH và bong bóng suy nghĩ nghiêm khắc.',
+              'Cơ chế đánh giá thưởng phạt công bằng: Gà cháy khét lập tức bị trừ sạch 0đ tip; Gà chín thường chỉ nhận 3.000đ nhắc nhở; Gà chiên Vàng Giòn chuẩn Perfect thưởng khủng 35.000đ - 45.000đ+ và lời khen 5 sao nức nở!',
+              'Thoại ngữ cảnh độc quyền cho Giám Khảo Ẩm Thực, phản ánh chính xác từng mẻ chiên của người chơi.'
+            ]
+          }
+        ]
+      },
+      {
+        categoryName: 'Tiến Hóa Test Bot & Độ Ổn Định 200 Ngày',
+        categoryIcon: '🤖',
+        items: [
+          {
+            tag: 'LOOP BOT',
+            tagColor: '#16a34a',
+            title: 'Test Bot Tự Động Nhận Diện & Dọn Bàn',
+            desc: 'Nâng cấp toàn diện kịch bản test bot tự hành theo chuẩn Loop Engineering:',
+            details: [
+              'Dạy bot tự động dọn bàn (.btn-clean-table) và giải phóng chỗ ngồi trong cả chu trình thường và cấp cứu.',
+              'Bộ kiểm thử Vitest nâng lên 61 files với 701/701 tests PASS 100%.',
+              'Vite Production Build sạch 0 lỗi TypeScript, UI Check đạt 16/16 checks trên 360px & 390px.'
+            ]
+          }
+        ]
+      }
+    ]
+  },
   {
     version: 'v2.6.0',
     codename: 'Bếp Nấu Thủ Công Cozy 16-Bit & Trị Dứt Điểm Cắt Cụt Thông Tin (Zero Truncation)',
     releaseDate: '02/10/2026',
-    isLatest: true,
+    isLatest: false,
     highlightSummary: 'Đột phá mỹ thuật và trải nghiệm người dùng với bản nâng cấp toàn diện Bếp Nấu Thủ Công Cozy 16-bit Pixel Art: Mặt quầy gỗ tếch đầm ấm, chảo gang đúc ngập dầu sủi bọt chân thực, trạm máy rót nước 3 cần gạt phong cách retro diner và mẹt tre lót giấy sáp ca-rô cổ điển. Đồng thời trị dứt điểm 100% tình trạng che khuất và cắt cụt chữ (Zero Truncation) trên toàn bộ màn hình bán hàng, đảm bảo avatar khách hàng và tên món ăn luôn hiển thị trọn vẹn, sắc nét!',
     metrics: [
       { icon: '🍳', label: 'Bếp Thủ Công', value: 'Cozy Pixel 16-Bit' },
