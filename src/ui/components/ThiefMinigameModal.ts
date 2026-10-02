@@ -158,7 +158,7 @@ export function renderThiefCaughtModal(_state: GameState, encounter: ThiefEncoun
           <div style="width: 100%; background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 8px; padding: 8px 10px; text-align: left; font-size: 0.72rem; color: #166534; display: flex; flex-direction: column; gap: 4px;">
             <div>💖 <b>${escapeHtml(encounter.targetCustomerName)}:</b> "Cảm ơn quán đã kịp thời tóm gọn kẻ gian bảo vệ ${escapeHtml(encounter.targetItem)} cho em!"</div>
             <div style="color: #047857; font-weight: 800;">🎁 Thưởng nóng tiệm gà: +${rewardMoney.toLocaleString('vi-VN')}đ</div>
-            <div style="color: #0284c7; font-weight: 700;">✨ Tăng +15 Tình Thân Hẻm & +10 Tay Nghề!</div>
+            <div style="color: #0284c7; font-weight: 700;">✨ Chòm xóm Hẻm 1102 tin yêu và thán phục nghĩa hiệp!</div>
             <div style="color: #eab308; font-weight: 700;">⭐⭐⭐⭐⭐ Đánh giá 5 sao khen ngợi uy tín!</div>
           </div>
 
@@ -206,7 +206,7 @@ export function renderThiefEscapedModal(_state: GameState, encounter: ThiefEncou
 
           <div style="width: 100%; background: #fee2e2; border: 1.5px solid #f87171; border-radius: 8px; padding: 8px 10px; text-align: left; font-size: 0.72rem; color: #991b1b; display: flex; flex-direction: column; gap: 4px;">
             <div>💸 <b>Tiệm phải đền bù thiệt hại:</b> -${encounter.lossAmount.toLocaleString('vi-VN')}đ</div>
-            <div>💔 <b>Giảm -15 Tình Thân Hẻm</b></div>
+            <div>💔 <b>Chòm xóm chê trách, tình cảm xóm hẻm rạn nứt</b></div>
             <div>⭐ <b>Nhận 1 sao đánh giá cay đắng về an ninh</b> (-0.2★ điểm tiệm)</div>
           </div>
 

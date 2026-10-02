@@ -89,9 +89,8 @@ export function renderReviewReplyModal(review: CustomerReview): string {
 
           ${review.playerReply ? `
             <div class="reply-outcome-bar">
-              ${review.playerReply.karmaBonus?.community ? `<span class="outcome-pill">💖 Tình Hẻm +${review.playerReply.karmaBonus.community}</span>` : ''}
-              ${review.playerReply.karmaBonus?.craftsmanship ? `<span class="outcome-pill">🔪 Tay Nghề +${review.playerReply.karmaBonus.craftsmanship}</span>` : ''}
-              ${review.playerReply.karmaBonus?.ambition ? `<span class="outcome-pill">🏆 Tham Vọng +${review.playerReply.karmaBonus.ambition}</span>` : ''}
+              <span class="outcome-pill">💌 Khách cảm kích</span>
+              <span class="outcome-pill">✨ Hẻm 1102 ghi nhận</span>
             </div>
           ` : ''}
         </div>

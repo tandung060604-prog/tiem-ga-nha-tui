@@ -1,6 +1,5 @@
 import { GameState } from '../../types/game';
 import { STORY_ACTS, StoryEpisode, chooseDialogueOption } from '../../content/storyNovel';
-import { describeKarmaEffects } from '../../core/karmaEffects';
 import { audio } from '../../core/audio';
 import { chapterProgress } from '../../core/progression';
 import { canNarrate } from '../../core/music';
@@ -52,7 +51,6 @@ export function renderStoryModal(state: GameState, selectedActIndex: number = 0)
   const revealed = revealedStory(currentEpisode, state);
 
   // Lựa chọn hiện tại đã chọn
-  const karmaLines = describeKarmaEffects(state.karma); // core/karmaEffects.ts
   const chosenId = currentEpisode.options?.find(opt => state.chosenDialogueIds?.includes(opt.id))?.id;
   const chosenOption = currentEpisode.options?.find(opt => opt.id === chosenId);
 
@@ -148,11 +146,10 @@ export function renderStoryModal(state: GameState, selectedActIndex: number = 0)
                 <div class="story-reaction-narrative">
                   <b>💬 Diễn biến tiếp theo:</b> ${chosenOption.reactionNarrative}
                 </div>
-              ` : ''}
-              ${karmaLines.length ? `
                 <div class="story-karma-effects">
-                  <b>🧭 Lựa chọn của bạn đang tác động tới quán:</b>
-                  ${karmaLines.map(l => `<div class="story-karma-effect">${l}</div>`).join('')}
+                  <div class="story-karma-effect" style="font-style: italic; color: var(--soft); font-size: 0.78rem;">
+                    ✨ Lựa chọn của bạn đã được Hẻm 1102 ghi nhận và đang âm thầm định hình tương lai của tiệm...
+                  </div>
                 </div>
               ` : ''}
             </div>

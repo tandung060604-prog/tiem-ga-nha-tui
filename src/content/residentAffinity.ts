@@ -82,7 +82,7 @@ export const RESIDENT_DOSSIERS: RawResidentDossier[] = [
       2: 'Thu hút đông đảo học sinh sinh viên ghé ủng hộ.',
       3: 'Sáng tác điệu nhảy viral TikTok quảng bá món ăn.',
       4: 'Biên đạo điệu múa độc quyền cho tiệm gà trong các dịp lễ.',
-      5: 'Học viện múa của Na giúp điểm Karma Cộng Đồng đạt cực đại 100.',
+      5: 'Học viện múa của Na giúp tình nghĩa xóm giềng Hẻm 1102 đạt đỉnh cao gắn kết tuyệt đối.',
     },
   },
   {

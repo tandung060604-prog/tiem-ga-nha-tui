@@ -2383,7 +2383,7 @@ export const EXPANDED_DAILY_INCIDENTS: DailyIncident[] = [
       {
         id: 'reunion_feast_allout',
         label: 'Đãi toàn bộ bà con ăn uống no nê 100% miễn phí & lì xì phong bao đỏ cho trẻ nhỏ',
-        subDesc: 'Tốn 1.5 triệu, đỉnh cao tình thân xóm hẻm, đạt điểm tuyệt đối Karma Community',
+        subDesc: 'Tốn 1.5 triệu, đỉnh cao tình thân xóm hẻm, gắn kết trọn vẹn tình làng nghĩa xóm',
         kicker: '🧧 HÀO SẢNG NGHĨA TÌNH HẺM',
         karmaDelta: { community: 50, craftsmanship: 30 },
         moneyDelta: -1500000,

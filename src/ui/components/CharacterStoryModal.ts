@@ -41,9 +41,6 @@ export function renderCharacterEpisodeModal(
   }).join('');
 
   const choicesHtml = episode.choices.map((choice) => {
-    const karmaCommunity = choice.karmaEffect?.community ? `<span style="background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 700;">💖 Tình Hẻm ${choice.karmaEffect.community > 0 ? '+' : ''}${choice.karmaEffect.community}</span>` : '';
-    const karmaCraft = choice.karmaEffect?.craftsmanship ? `<span style="background: #fef3c7; color: #b45309; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 700;">🔪 Tay Nghề ${choice.karmaEffect.craftsmanship > 0 ? '+' : ''}${choice.karmaEffect.craftsmanship}</span>` : '';
-    const karmaAmbition = choice.karmaEffect?.ambition ? `<span style="background: #e0e7ff; color: #4338ca; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 700;">🏆 Tham Vọng ${choice.karmaEffect.ambition > 0 ? '+' : ''}${choice.karmaEffect.ambition}</span>` : '';
     const rewardMoneyHtml = choice.rewardMoney ? `<span style="background: #dcfce7; color: #15803d; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: 700;">💰 +${choice.rewardMoney.toLocaleString('vi-VN')}đ</span>` : '';
 
     return `
@@ -52,12 +49,11 @@ export function renderCharacterEpisodeModal(
           <span style="font-size: 0.72rem; font-weight: 800; color: #d97706; background: #fef3c7; padding: 2px 6px; border-radius: 4px; border: 1px solid #fde68a;">
             ${escapeHtml(choice.kicker)}
           </span>
-          <div style="display: flex; gap: 4px; flex-wrap: wrap;">
-            ${karmaCommunity}
-            ${karmaCraft}
-            ${karmaAmbition}
-            ${rewardMoneyHtml}
-          </div>
+          ${rewardMoneyHtml ? `
+            <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+              ${rewardMoneyHtml}
+            </div>
+          ` : ''}
         </div>
         <div style="font-size: 0.84rem; font-weight: 800; color: #111827; margin-top: 3px; line-height: 1.35;">
           ${escapeHtml(choice.label)}

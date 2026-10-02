@@ -114,7 +114,7 @@ export const CURIOS_AND_RELICS: CurioRelic[] = [
     unlockedByFlag: 'community_academy_founded',
     loreDescription: 'Kỷ niệm chương do Ủy ban Phường trao tặng cho lớp học múa miễn phí trên tầng 2 tiệm gà, nơi hàng chục trẻ em lao động nghèo được theo đuổi ước mơ nghệ thuật.',
     flavorQuote: 'Tiệm gà không chỉ bán đồ ăn... Tiệm gà nuôi dưỡng những ước mơ bay cao.',
-    passiveBuffText: 'Điểm Karma Cộng Đồng luôn được duy trì ở mức tối đa 100.',
+    passiveBuffText: 'Tình thân và sự tin yêu của bà con Hẻm 1102 luôn bền vững ở mức cao nhất.',
   },
   {
     id: 'relic_cup_ga_vang',

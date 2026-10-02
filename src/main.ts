@@ -3159,7 +3159,7 @@ class AppController {
         Haptics.serveSuccess();
 
         if (resultOutcome) {
-          this.showToast(`Đã phản hồi! ${(resultOutcome as any).bonusText} 💌`);
+          this.showToast('Đã phản hồi đánh giá! Thực khách rất cảm kích 💌');
         }
 
         const updatedReview = stateManager.getState().recentReviews.find(r => r.id === reviewId) || currentReview;
