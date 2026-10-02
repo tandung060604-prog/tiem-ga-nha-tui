@@ -282,10 +282,17 @@ class OvernightMonkey {
     }
 
     // 0h. Banner Bác Ba Nam Bộ mách nước trong ca bán (#bacba-tip-banner)
-    const bacbaTipClose = page.locator('#bacba-tip-banner .bacba-tip-banner-close, #bacba-tip-banner.show, .bacba-tip-banner.show');
+    const bacbaTipClose = page.locator('#bacba-tip-banner.show .bacba-tip-banner-close, #bacba-tip-banner.show');
     if (await bacbaTipClose.first().isVisible({ timeout: 40 }).catch(() => false)) {
       log(`👴 Đóng Banner Bác Ba mách nước...`);
       await bacbaTipClose.first().click({ force: true }).catch(() => {});
+      await page.evaluate(() => {
+        const b = document.getElementById('bacba-tip-banner');
+        if (b) {
+          b.classList.remove('show');
+          b.style.display = 'none';
+        }
+      }).catch(() => {});
       await sleep(150);
       return true;
     }

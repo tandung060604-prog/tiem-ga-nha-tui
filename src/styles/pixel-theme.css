@@ -1977,6 +1977,7 @@ body.selling-mode .toast {
 
 /* Bác Ba Live Tips Banner trong ca bán */
 .bacba-tip-banner {
+  display: none;
   position: fixed;
   top: calc(14px + var(--safe-top));
   left: 50%;
@@ -1989,7 +1990,6 @@ body.selling-mode .toast {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.25);
   border-radius: 14px;
   padding: 10px 14px;
-  display: flex;
   align-items: center;
   gap: 12px;
   z-index: 2600;
@@ -1999,6 +1999,7 @@ body.selling-mode .toast {
 }
 
 .bacba-tip-banner.show {
+  display: flex;
   transform: translateX(-50%) translateY(0);
   opacity: 1;
   pointer-events: auto;
