@@ -279,5 +279,32 @@ describe('bảo vệ tương & bưng món của phục vụ (Waiter Condiment Sa
     // Thay vào đó, phục vụ thông minh sẽ tự động gọi hook squeeze tương cà giùm người chơi
     expect(squeezeCalledWith).toBe('ketchup');
   });
+
+  it('nhân viên cấp dưới (rarity C / kỹ năng thấp) có thể lơ đễnh hoặc làm nhầm món', () => {
+    seedRandom(42);
+    const juniorCook = member('cook', { rarity: 'C', skill: 30, mood: 40 });
+    const eff = staffEffects([juniorCook]);
+    expect(eff.cooks[0]?.isJunior).toBe(true);
+
+    const session = createSellingSession(1);
+    session.orders = [order([['crispy_chicken', 1]])];
+    const hooks: StaffHooks = {
+      use: () => true,
+      place: () => true,
+      pour: () => true,
+      traySize: 6
+    };
+
+    let hasMistakeOrSlacking = false;
+    for (let i = 0; i < 50; i++) {
+      const events = tickStaff(session, [], 1000, eff, null, hooks);
+      if (events.some(e => e.type === 'staffSlacking' || e.type === 'staffMistake')) {
+        hasMistakeOrSlacking = true;
+        break;
+      }
+    }
+    expect(hasMistakeOrSlacking).toBe(true);
+  });
 });
+
 

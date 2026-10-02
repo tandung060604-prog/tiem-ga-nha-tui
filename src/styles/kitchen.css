@@ -201,9 +201,9 @@
 
 /* The Pot with bubbling oil (Chảo gang chiên ngập dầu Chợ Lớn đầu tư) */
 .fry-pot {
-  height: 112px;
-  flex: 0 0 112px;
-  border-radius: 18px;
+  height: 96px;
+  flex: 0 0 96px;
+  border-radius: 16px;
   border: 4px solid #2e180d;
   background: radial-gradient(ellipse at 50% 35%, #fff1b8 0%, #fbbf24 35%, #d97706 70%, #78350f 100%);
   position: relative;
@@ -346,7 +346,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 72px;
+  height: 60px;
 }
 
 .pot-idle-view {

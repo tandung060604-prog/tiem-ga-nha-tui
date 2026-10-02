@@ -99,7 +99,15 @@ export function orderPendingCondiment(order: CustomerOrder, tray: readonly TrayI
 // Hiệu ứng của cả đội
 // ---------------------------------------------------------------------------
 
-export interface HelperCook { staffId: string; name: string; cycleMs: number; perfectChance: number; burntChance: number }
+export interface HelperCook {
+  staffId: string;
+  name: string;
+  cycleMs: number;
+  perfectChance: number;
+  burntChance: number;
+  isJunior?: boolean;
+  rarity?: string;
+}
 
 export interface StaffEffects {
   cooks: HelperCook[];
@@ -113,6 +121,8 @@ export interface StaffEffects {
   dineInTipBonus: number;       // Thưởng tip tại quán nhờ Phục Vụ & Bảo Vệ (%)
   expressDeliveryBonus: number; // Thưởng đơn giao hỏa tốc nhờ Shipper + App riêng (đ)
   upsellChance: number;         // Tỷ lệ Thu Ngân upsell thành công (0-1)
+  hasJuniorWaiter?: boolean;
+  waiterName?: string;
 }
 
 const managerBoost = (staff: readonly StaffMember[]) => (staff.some(m => m.role === 'manager') ? 1.2 : 1);
@@ -132,18 +142,29 @@ export function staffEffects(staff: readonly StaffMember[], gameHour = 12, upgra
     .slice(0, MAX_HELPER_FRYERS)
     .map(m => {
       const nightOwl = has(m, 'night_owl') && gameHour >= 18 ? 1.4 : 1;
+      const isJunior = m.rarity === 'C' || (m.skill < 50 && m.mood < 60);
       return {
         staffId: m.id,
         name: m.name,
         cycleMs: Math.round(Math.max(3500, 8000 - 5000 * power(m, 'speed', boost)) / nightOwl / kitchenSpeed),
         perfectChance: Math.min(0.95, 0.3 + 0.6 * power(m, 'skill', boost)),
-        burntChance: up?.autoLift ? 0 : (has(m, 'clumsy') ? 0.1 : 0.03) // Bếp tự động bảo vệ gà không bao giờ cháy
+        burntChance: up?.autoLift ? 0 : (has(m, 'clumsy') ? 0.1 : 0.03), // Bếp tự động bảo vệ gà không bao giờ cháy
+        isJunior,
+        rarity: m.rarity
       };
     });
 
   // Dây chuyền chiên tự động (Bếp cấp 3): một giỏ robot chạy riêng, không cần người đứng
   if (up?.autoLift) {
-    cooks.push({ staffId: 'robot', name: 'Robot Dây Chuyền', cycleMs: Math.round(ROBOT_CYCLE_MS / kitchenSpeed), perfectChance: 0.95, burntChance: 0 });
+    cooks.push({
+      staffId: 'robot',
+      name: 'Robot Dây Chuyền',
+      cycleMs: Math.round(ROBOT_CYCLE_MS / kitchenSpeed),
+      perfectChance: 0.95,
+      burntChance: 0,
+      isJunior: false,
+      rarity: 'SSR'
+    });
   }
 
   const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
@@ -190,6 +211,8 @@ export function staffEffects(staff: readonly StaffMember[], gameHour = 12, upgra
     (hasSec ? 10 : 0)
   );
 
+  const juniorWaiter = waiters.find(m => m.rarity === 'C' || (m.skill < 50 && m.mood < 60));
+
   return {
     cooks,
     walkInPatiencePct,
@@ -201,7 +224,9 @@ export function staffEffects(staff: readonly StaffMember[], gameHour = 12, upgra
     hasSecurity: hasSec,
     dineInTipBonus,
     expressDeliveryBonus,
-    upsellChance
+    upsellChance,
+    hasJuniorWaiter: !!juniorWaiter,
+    waiterName: juniorWaiter?.name || waiters[0]?.name
   };
 }
 
@@ -243,7 +268,9 @@ export interface HelperFry { menuItemId: string; elapsedMs: number }
 
 export type StaffEvent =
   | { type: 'helperDone'; item: TrayItem; cook: string }
-  | { type: 'autoServe' };
+  | { type: 'autoServe' }
+  | { type: 'staffSlacking'; staffName: string; reason: string }
+  | { type: 'staffMistake'; staffName: string; detail: string; item: TrayItem };
 
 export interface StaffSession {
   helpers: (HelperFry | null)[];
@@ -306,6 +333,15 @@ export function tickStaff(
     const slot = session.helpers[i] ?? null;
     if (slot) {
       slot.elapsedMs += gameDt;
+      // Nhân viên cấp dưới lười biếng: thi thoảng lơ đễnh bấm điện thoại / tạm ngưng
+      if (cook.isJunior && slot.elapsedMs < cook.cycleMs && random() < 0.025) {
+        slot.elapsedMs = Math.max(0, slot.elapsedMs - 400);
+        events.push({
+          type: 'staffSlacking',
+          staffName: cook.name,
+          reason: 'mải lướt điện thoại xem clip, chiên chậm lại 📱'
+        });
+      }
       if (slot.elapsedMs < cook.cycleMs) return;
       const look = FRY_LOOK[slot.menuItemId] ?? { name: slot.menuItemId, icon: '🍗' };
       const item: TrayItem = {
@@ -321,7 +357,23 @@ export function tickStaff(
     // Luôn chừa 1 ô khay cho chủ quán (phụ bếp chiếm hết khay thì chủ quán kẹt tay)
     if (tray.length + inProgress.length >= hooks.traySize - 1) return;
     if (playerFrying) inProgress.push(playerFrying);
-    const target = nextFryTarget(session.orders, tray, inProgress);
+    let target = nextFryTarget(session.orders, tray, inProgress);
+    // Nhân viên cấp dưới lơ đễnh: thi thoảng chiên nhầm món khác!
+    if (target && cook.isJunior && random() < 0.05) {
+      const altKeys = Object.keys(FRY_RECIPES).filter(k => k !== target);
+      const wrongTarget = altKeys[Math.floor(random() * altKeys.length)];
+      if (wrongTarget && FRY_RECIPES[wrongTarget] && hooks.use(FRY_RECIPES[wrongTarget].stock)) {
+        session.helpers[i] = { menuItemId: wrongTarget, elapsedMs: 0 };
+        session.totalFriedCount += 1;
+        events.push({
+          type: 'staffMistake',
+          staffName: cook.name,
+          detail: `lơ đễnh chiên nhầm ${FRY_LOOK[wrongTarget]?.name ?? wrongTarget}`,
+          item: { id: '', menuItemId: wrongTarget, name: FRY_LOOK[wrongTarget]?.name ?? wrongTarget, icon: '🍗', quality: 'good' }
+        });
+        return;
+      }
+    }
     const recipe = target ? FRY_RECIPES[target] : undefined;
     if (!target || !recipe || !hooks.use(recipe.stock)) return;
     session.helpers[i] = { menuItemId: target, elapsedMs: 0 };
@@ -332,23 +384,46 @@ export function tickStaff(
   if (eff.waiterServeMs !== null) {
     session.pourMs = (session.pourMs ?? 0) + gameDt;
     if (session.pourMs >= eff.waiterServeMs) {
-      const pendingSauce = session.orders[0] ? orderPendingCondiment(session.orders[0], tray) : null;
-      // 1. Phục vụ thông minh: tự xịt tương dặn kèm lên món chiên đã có trong khay (không cần ô khay trống)
-      if (pendingSauce && hooks.squeeze?.(pendingSauce)) {
+      // Phục vụ cấp dưới lười biếng / đứng ngáp
+      if (eff.hasJuniorWaiter && random() < 0.03) {
         session.pourMs = 0;
+        events.push({
+          type: 'staffSlacking',
+          staffName: eff.waiterName || 'Phục vụ',
+          reason: 'đang ngáp dài ngáp ngắn, chậm chạp chưa dọn khay 🥱'
+        });
       } else {
-        // 2. Rót nước / múc món kèm cần thêm ô khay mới, nên phải chừa 1 ô khay cho chủ quán
-        const trayLimit = (hooks.traySize ?? 4) - 1;
-        const busy = session.helpers.filter(Boolean).length;
-        if (tray.length + busy < trayLimit) {
-          const missing = session.orders.slice(0, 2).flatMap(o => missingItems(o, tray));
-          const drink = missing.find(isDrinkId);
-          const side = missing.find(isScoopId);
+        const pendingSauce = session.orders[0] ? orderPendingCondiment(session.orders[0], tray) : null;
+        // 1. Phục vụ thông minh: tự xịt tương dặn kèm lên món chiên đã có trong khay (không cần ô khay trống)
+        if (pendingSauce && hooks.squeeze?.(pendingSauce)) {
+          session.pourMs = 0;
+        } else {
+          // 2. Rót nước / múc món kèm cần thêm ô khay mới, nên phải chừa 1 ô khay cho chủ quán
+          const trayLimit = (hooks.traySize ?? 4) - 1;
+          const busy = session.helpers.filter(Boolean).length;
+          if (tray.length + busy < trayLimit) {
+            const missing = session.orders.slice(0, 2).flatMap(o => missingItems(o, tray));
+            const drink = missing.find(isDrinkId);
+            const side = missing.find(isScoopId);
 
-          if (drink && hooks.pour(drink)) {
-            session.pourMs = 0;
-          } else if (side && hooks.scoop?.(side)) {
-            session.pourMs = 0;
+            // Phục vụ cấp dưới lơ đễnh rót nhầm vị nước
+            if (drink && eff.hasJuniorWaiter && random() < 0.05) {
+              const allDrinks: DrinkId[] = ['soda', 'seven_up', 'fanta_orange'];
+              const wrongDrink = allDrinks.find(d => d !== drink) || 'soda';
+              if (hooks.pour(wrongDrink)) {
+                session.pourMs = 0;
+                events.push({
+                  type: 'staffMistake',
+                  staffName: eff.waiterName || 'Phục vụ',
+                  detail: `lơ đãng rót nhầm ly ${wrongDrink === 'seven_up' ? '7Up Chanh' : wrongDrink === 'fanta_orange' ? 'Fanta Cam' : 'Coca-Cola'}`,
+                  item: { id: '', menuItemId: wrongDrink, name: 'Nước ngọt', icon: '🥤', quality: 'good' }
+                });
+              }
+            } else if (drink && hooks.pour(drink)) {
+              session.pourMs = 0;
+            } else if (side && hooks.scoop?.(side)) {
+              session.pourMs = 0;
+            }
           }
         }
       }

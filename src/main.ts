@@ -2191,6 +2191,12 @@ class AppController {
         case 'autoServe':
           this.serveCurrentCustomer();
           break;
+        case 'staffSlacking':
+          this.showToast(`⚠️ Nhân viên ${ev.staffName} ${ev.reason}!`);
+          break;
+        case 'staffMistake':
+          this.showToast(`🤦 ${ev.staffName} ${ev.detail}! Bác Ba nhắc nhở nhẹ nhàng.`);
+          break;
         default:
           assertNever(ev);
       }
@@ -2466,6 +2472,14 @@ class AppController {
         }
         session.totalFriedCount += 1;
         cookingEngine.startFrying(recipe.type);
+        if (action === 'fry-chicken') {
+          const s = cookingEngine.getActiveSeasoning();
+          if (s === 'spicy') {
+            this.showToast('🔥 Đang chiên Cánh Gà Sốt Cay Yangnyeom thơm nức mũi! Chờ chín vàng rồi vớt!');
+          } else if (s === 'honey') {
+            this.showToast('🍯 Đang chiên Gà Sốt Bơ Tỏi Đậu Nành béo ngậy! Chờ chín vàng rồi vớt!');
+          }
+        }
         break;
       }
 
@@ -2589,11 +2603,19 @@ class AppController {
         const sauce: Sauce = action === 'season-spicy' ? 'spicy' : 'honey';
         if (cookingEngine.getActiveSeasoning() === sauce) {
           cookingEngine.setSeasoning(null);
+          audio.playPop();
+          this.showToast('🍗 Đã hủy ướp sốt, chiên Gà Rán Giòn truyền thống.');
         } else if ((stateManager.getState().inventory[SAUCE_STOCK[sauce]]?.amount ?? 0) < 1) {
           this.showToast('Hết sốt trong kho! Vào Kho hàng để nhập thêm.');
           return;
         } else {
           cookingEngine.setSeasoning(sauce);
+          audio.playPop();
+          if (sauce === 'spicy') {
+            this.showToast('🌶️ ĐÃ ƯỚP SỐT CAY! Giờ hãy chạm [🍗 Gà Tẩm Bột] để chiên mẻ Cánh Gà Sốt Cay!');
+          } else {
+            this.showToast('🧄 ĐÃ ƯỚP BƠ TỎI! Giờ hãy chạm [🍗 Gà Tẩm Bột] để chiên mẻ Gà Bơ Tỏi Đậu Nành!');
+          }
         }
         break;
       }

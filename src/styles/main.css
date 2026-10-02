@@ -3769,3 +3769,268 @@ body.selling-mode .toast.show {
   border-color: #a855f7 !important;
 }
 
+/* SỔ TAY KỶ NIỆM: TOP TAB BAR CHO ĐIỆN THOẠI */
+.memories-tabs-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #3c1d0f;
+  border-bottom: 2px solid #5a3018;
+  width: 100%;
+}
+
+.memories-tabs-nav {
+  display: flex;
+  gap: 5px;
+  padding: 6px 8px;
+  overflow-x: auto;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #d4a373 #3c1d0f;
+}
+
+.memories-tabs-nav::-webkit-scrollbar {
+  height: 3px;
+}
+
+.memories-tabs-nav::-webkit-scrollbar-thumb {
+  background: #d4a373;
+  border-radius: 3px;
+}
+
+.tab-memories-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  min-height: 40px;
+  padding: 5px 9px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  border-radius: 8px;
+  border: 1.5px solid #854d0e;
+  background: #5a3018;
+  color: #fef3c7;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tab-memories-btn.active {
+  background: #ffffff;
+  color: #451a03;
+  border-color: #f59e0b;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  font-weight: 900;
+}
+
+.tab-memories-btn .tab-icon {
+  font-size: 0.92rem;
+  line-height: 1;
+}
+
+.tab-memories-btn .tab-label {
+  white-space: nowrap;
+}
+
+.tab-pill-badge {
+  font-size: 0.62rem;
+  font-weight: 900;
+  background: #f59e0b;
+  color: #78350f;
+  border-radius: 10px;
+  padding: 1px 5px;
+  margin-left: 2px;
+}
+
+.tab-memories-btn.active .tab-pill-badge {
+  background: #78350f;
+  color: #fef3c7;
+}
+
+.memories-tabs-scroll-hint {
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(90deg, transparent 0%, rgba(60, 29, 15, 0.95) 60%);
+  color: #fbbf24;
+  font-size: 1.1rem;
+  font-weight: 900;
+  pointer-events: none;
+}
+
+/* GIAO DIỆN BẾP: TOPBAR & STAFF CORNER CARD */
+.kitchen-counter-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 2px 6px;
+  margin-bottom: 4px;
+  border-bottom: 1.5px dashed rgba(92, 53, 31, 0.2);
+  width: 100%;
+}
+
+.counter-brand {
+  font-size: 0.74rem;
+  font-weight: 900;
+  color: #5c351f;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.staff-corner-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(35, 20, 12, 0.95);
+  border: 1.5px solid #d4a373;
+  border-radius: 20px;
+  padding: 2px 8px 2px 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  min-height: 34px;
+  transition: transform 0.15s ease;
+}
+
+.staff-corner-card:active {
+  transform: scale(0.96);
+}
+
+.staff-corner-avatars-stack {
+  display: flex;
+  align-items: center;
+}
+
+.staff-corner-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid #ffd166;
+  overflow: hidden;
+  background: #fff;
+  margin-right: -6px;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.staff-corner-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.staff-corner-more {
+  margin-left: 9px;
+  font-size: 0.62rem;
+  font-weight: 900;
+  color: #fef08a;
+}
+
+.staff-corner-meta {
+  display: flex;
+  align-items: center;
+  margin-left: 6px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #fef08a;
+  white-space: nowrap;
+}
+
+.staff-corner-status.busy {
+  color: #fb923c;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.staff-corner-status.idle {
+  color: #86efac;
+}
+
+/* HƯỚNG DẪN CÔNG THỨC SỐT TRỰC QUAN */
+.sauce-recipe-banner {
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  border: 1.5px solid #f59e0b;
+  border-radius: 8px;
+  padding: 5px 8px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #78350f;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sauce-recipe-banner.active.spicy {
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  border-color: #ef4444;
+  color: #991b1b;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.35);
+}
+
+.sauce-recipe-banner.active.honey {
+  background: linear-gradient(135deg, #fffbeb, #fef08a);
+  border-color: #eab308;
+  color: #854d0e;
+  box-shadow: 0 0 8px rgba(234, 179, 8, 0.35);
+}
+
+.recipe-hint-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cancel-sauce-hint {
+  font-size: 0.6rem;
+  color: #9ca3af;
+  font-style: italic;
+  white-space: nowrap;
+  margin-left: 4px;
+}
+
+/* KHUNG VẬT LIỆU CỐ ĐỊNH (DOCKED MATERIALS BAR) */
+.prep-baskets-section.docked-materials {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #e6e9ed;
+  border: 1.5px solid #b8bec5;
+  border-radius: 8px;
+  padding: 5px 6px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  margin-bottom: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.prep-baskets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  padding-bottom: 2px;
+  border-bottom: 1px dashed #ced4da;
+}
+
+.prep-baskets-sub {
+  font-size: 0.6rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
+

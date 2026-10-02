@@ -998,9 +998,57 @@ export function renderSellingView(state: GameState, session: SellingSession): st
 
       <!-- Wood Kitchen Counter (Quầy Bếp Gỗ Chiên Gà) -->
       <div class="kitchen-counter">
+        <div class="kitchen-counter-topbar">
+          <div class="counter-brand">
+            <img src="${ASSETS.icons.pan}" class="pixel-section-icon" alt="" />
+            <span>QUẦY BẾP HẺM 1102</span>
+          </div>
+          ${renderStaffCornerCard(state, session)}
+        </div>
+
         <div class="work-grid">
           <!-- Real Cast Iron Fryer Card (Bếp Chiên Ngập Dầu Chợ Lớn) -->
           <div class="fryer-card">
+            <!-- Hướng Dẫn Công Thức Sốt Trực Quan Cho Gà Rán -->
+            <div class="sauce-recipe-banner ${cookingEngine.getActiveSeasoning() ? 'active ' + cookingEngine.getActiveSeasoning() : ''}">
+              ${cookingEngine.getActiveSeasoning() === 'spicy' ? `
+                <span class="recipe-hint-badge spicy">🌶️ ĐÃ ƯỚP SỐT CAY! ➔ Chạm [Gà Tẩm Bột] để chiên mẻ Gà Sốt Cay!</span>
+                <span class="cancel-sauce-hint">(Chạm lại khay sốt để hủy)</span>
+              ` : cookingEngine.getActiveSeasoning() === 'honey' ? `
+                <span class="recipe-hint-badge honey">🧄 ĐÃ ƯỚP BƠ TỎI! ➔ Chạm [Gà Tẩm Bột] để chiên Gà Bơ Tỏi Đậu Nành!</span>
+                <span class="cancel-sauce-hint">(Chạm lại khay sốt để hủy)</span>
+              ` : `
+                <span class="recipe-hint-badge">💡 MẸO SỐT: Chạm [🌶️ Sốt Cay / 🧄 Bơ Tỏi] ➔ Thả [🍗 Gà Bột] = Gà Sốt!</span>
+              `}
+            </div>
+
+            <!-- Kệ Topping & Nguyên Liệu Tươi Cố Định Tại Chỗ (Docked Materials) -->
+            <div class="prep-baskets-section docked-materials">
+              <div class="prep-baskets-header">
+                <span class="prep-baskets-title">
+                  <img src="${ASSETS.icons.inventory}" class="pixel-section-icon" alt="" /> Khay Sơ Chế GN
+                </span>
+                <span class="prep-baskets-sub">Chạm để thả chảo hoặc ướp sốt</span>
+              </div>
+              ${renderPrepStation(state)}
+              <!-- Hai chai tương xịt lên món trong khay -->
+              <div class="food-shelf-grid prep-bottles">
+                <!-- Slot 4: Chai Tương Cà -->
+                <button id="btn-squeeze-ketchup" class="shelf-tile condiment ketchup" title="Xịt Tương Cà đỏ tươi thơm ngọt lên món (+Tip & Hương vị)">
+                  <div class="shelf-badge sauce">+Tip</div>
+                  <img src="${ASSETS.kitchen.bottleKetchup}" alt="Tương Cà" class="shelf-img bottle" />
+                  <span class="shelf-label">Tương Cà</span>
+                </button>
+
+                <!-- Slot 5: Chai Tương Ớt -->
+                <button id="btn-squeeze-chili" class="shelf-tile condiment chili" title="Xịt Tương Ớt cay nồng giòn rụm lên món (+Tip & Hương vị)">
+                  <div class="shelf-badge sauce">+Tip</div>
+                  <img src="${ASSETS.kitchen.bottleChili}" alt="Tương Ớt" class="shelf-img bottle" />
+                  <span class="shelf-label">Tương Ớt</span>
+                </button>
+              </div>
+            </div>
+
             <div class="fryer-header">
               <span class="fryer-title">
                 <img src="${ASSETS.icons.bell}" class="pixel-card-title-icon" alt="" /> Bếp Chiên
@@ -1054,32 +1102,6 @@ export function renderSellingView(state: GameState, session: SellingSession): st
                   <div class="zone-burnt"></div>
                 </div>
                 <div class="cook-gauge-pointer" style="left: ${potProgressPercent}%;"></div>
-              </div>
-            </div>
-
-            <!-- Kệ Topping & Nguyên Liệu Tươi (Food Shelf / Topping Rack như Mì Cay Bà Tám) -->
-            <div class="prep-baskets-section">
-              <div class="prep-baskets-header">
-                <span class="prep-baskets-title">
-                  <img src="${ASSETS.icons.inventory}" class="pixel-section-icon" alt="" /> Khay Sơ Chế
-                </span>
-              </div>
-              ${renderPrepStation(state)}
-              <!-- Hai chai tương xịt lên món trong khay -->
-              <div class="food-shelf-grid prep-bottles">
-                <!-- Slot 4: Chai Tương Cà -->
-                <button id="btn-squeeze-ketchup" class="shelf-tile condiment ketchup" title="Xịt Tương Cà đỏ tươi thơm ngọt lên món (+Tip & Hương vị)">
-                  <div class="shelf-badge sauce">+Tip</div>
-                  <img src="${ASSETS.kitchen.bottleKetchup}" alt="Tương Cà" class="shelf-img bottle" />
-                  <span class="shelf-label">Tương Cà</span>
-                </button>
-
-                <!-- Slot 5: Chai Tương Ớt -->
-                <button id="btn-squeeze-chili" class="shelf-tile condiment chili" title="Xịt Tương Ớt cay nồng giòn rụm lên món (+Tip & Hương vị)">
-                  <div class="shelf-badge sauce">+Tip</div>
-                  <img src="${ASSETS.kitchen.bottleChili}" alt="Tương Ớt" class="shelf-img bottle" />
-                  <span class="shelf-label">Tương Ớt</span>
-                </button>
               </div>
             </div>
           </div>
@@ -1147,7 +1169,6 @@ export function renderSellingView(state: GameState, session: SellingSession): st
               </div>
             </div>
 
-            ${renderStaffStrip(state, session)}
             ${renderStationStrip(state, session)}
 
             <!-- Serve Button -->
@@ -1225,7 +1246,7 @@ function staffStripKey(state: GameState, session: SellingSession): string {
   return state.staff.map(m => `${m.id}-${m.mood}`).join(',') + '|' + (session.helpers ?? []).map(h => h?.menuItemId ?? '-').join(',');
 }
 
-function renderStaffStrip(state: GameState, session: SellingSession): string {
+export function renderStaffStrip(state: GameState, session: SellingSession): string {
   if (state.staff.length === 0) return '';
   const eff = staffEffects(state.staff, session.gameHour);
   let cookIndex = 0;
@@ -1302,4 +1323,52 @@ function renderStaffStrip(state: GameState, session: SellingSession): string {
   return `<div class="staff-strip">${chips.join('')}</div>`;
 }
 
+// ---------------------------------------------------------------------------
+// Card bo tròn nhân viên trên góc quầy bếp: nhỏ gọn, tinh tế, tiết kiệm không gian
+// ---------------------------------------------------------------------------
+export function renderStaffCornerCard(state: GameState, session: SellingSession): string {
+  if (state.staff.length === 0) return '';
+  const eff = staffEffects(state.staff, session.gameHour);
+  const totalStaff = state.staff.length;
+  let helperStatusHtml = '';
+
+  const avatarBadges = state.staff.slice(0, 3).map((m, idx) => {
+    const modelSrc = staffImage(m);
+    const fallbackSrc = staffImage({ role: m.role, rarity: m.rarity });
+    return `
+      <div class="staff-corner-avatar" style="z-index: ${10 - idx};" title="${escapeHtml(m.name)} (${m.role})">
+        <img src="${modelSrc}" alt="${escapeHtml(m.name)}" onerror="this.onerror=null;this.src='${fallbackSrc}';" />
+      </div>
+    `;
+  }).join('');
+
+  const firstCook = eff.cooks[0];
+  if (firstCook) {
+    const slot = session.helpers?.[0];
+    if (slot) {
+      const fryIcon = FRY_ICON[slot.menuItemId] ?? '🍗';
+      helperStatusHtml = `<span class="staff-corner-status busy">${fryIcon} Chiên <b class="helper-progress" data-helper="0">0%</b></span>`;
+    } else {
+      helperStatusHtml = `<span class="staff-corner-status idle">👨‍🍳 Trực chiến</span>`;
+    }
+  } else {
+    helperStatusHtml = `<span class="staff-corner-status">${totalStaff} NV</span>`;
+  }
+
+  const teamTooltip = state.staff.map(m => `${m.name} (${m.role})`).join(' • ');
+
+  return `
+    <div class="staff-corner-card" title="Đội ngũ nhân sự trực chiến: ${escapeHtml(teamTooltip)}">
+      <div class="staff-corner-avatars-stack">
+        ${avatarBadges}
+        ${totalStaff > 3 ? `<span class="staff-corner-more">+${totalStaff - 3}</span>` : ''}
+      </div>
+      <div class="staff-corner-meta">
+        ${helperStatusHtml}
+      </div>
+    </div>
+  `;
+}
+
 const FRY_ICON: Record<string, string> = { crispy_chicken: '🍗', spicy_chicken: '🌶️', honey_garlic_chicken: '🍯', shake_fries: '🍟', popcorn_chicken: '🍿' };
+

@@ -58,23 +58,26 @@ export function renderMemoriesAlbumModal(
           </button>
         </div>
 
-        <!-- 5 Tabs Điều Hướng Cuộn Ngang Siêu Mượt Cho Điện Thoại -->
-        <div style="display: flex; background: #e8d5b7; border-bottom: 2px solid #c49a6c; padding: 5px 6px; gap: 5px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;">
-          <button class="tab-memories-btn ${activeTab === 'residents' ? 'active' : ''}" data-tab="residents" style="flex-shrink: 0; min-height: 34px; padding: 5px 9px; font-size: 0.72rem; font-weight: 800; border-radius: 7px; border: 1.5px solid ${activeTab === 'residents' ? '#5a3018' : 'transparent'}; background: ${activeTab === 'residents' ? '#fff' : '#dfc7a5'}; color: ${activeTab === 'residents' ? '#5a3018' : '#78350f'}; cursor: pointer;">
-            👥 Cư Dân (${unlockedResidents}/${totalResidents})
-          </button>
-          <button class="tab-memories-btn ${activeTab === 'affinity' ? 'active' : ''}" data-tab="affinity" style="flex-shrink: 0; min-height: 34px; padding: 5px 9px; font-size: 0.72rem; font-weight: 800; border-radius: 7px; border: 1.5px solid ${activeTab === 'affinity' ? '#5a3018' : 'transparent'}; background: ${activeTab === 'affinity' ? '#fff' : '#dfc7a5'}; color: ${activeTab === 'affinity' ? '#5a3018' : '#78350f'}; cursor: pointer;">
-            💖 Thân Thiết (Dossier)
-          </button>
-          <button class="tab-memories-btn ${activeTab === 'curios' ? 'active' : ''}" data-tab="curios" style="flex-shrink: 0; min-height: 34px; padding: 5px 9px; font-size: 0.72rem; font-weight: 800; border-radius: 7px; border: 1.5px solid ${activeTab === 'curios' ? '#5a3018' : 'transparent'}; background: ${activeTab === 'curios' ? '#fff' : '#dfc7a5'}; color: ${activeTab === 'curios' ? '#5a3018' : '#78350f'}; cursor: pointer;">
-            🏺 Tủ Kỷ Vật (${unlockedCurios.length}/${CURIOS_AND_RELICS.length})
-          </button>
-          <button class="tab-memories-btn ${activeTab === 'endings' ? 'active' : ''}" data-tab="endings" style="flex-shrink: 0; min-height: 34px; padding: 5px 9px; font-size: 0.72rem; font-weight: 800; border-radius: 7px; border: 1.5px solid ${activeTab === 'endings' ? '#5a3018' : 'transparent'}; background: ${activeTab === 'endings' ? '#fff' : '#dfc7a5'}; color: ${activeTab === 'endings' ? '#5a3018' : '#78350f'}; cursor: pointer;">
-            🏆 Kết Cục (${achievedEndings.size}/6)
-          </button>
-          <button class="tab-memories-btn ${activeTab === 'bunny' ? 'active' : ''}" data-tab="bunny" style="flex-shrink: 0; min-height: 34px; padding: 5px 9px; font-size: 0.72rem; font-weight: 800; border-radius: 7px; border: 1.5px solid ${activeTab === 'bunny' ? '#5a3018' : 'transparent'}; background: ${activeTab === 'bunny' ? '#fff' : '#dfc7a5'}; color: ${activeTab === 'bunny' ? '#5a3018' : '#78350f'}; cursor: pointer;">
-            💌 Thư Thỏ Cam (${receivedLetters.size}/6)
-          </button>
+        <!-- 5 Tabs Điều Hướng Cao Cấp Tối Ưu Màn Hình Điện Thoại -->
+        <div class="memories-tabs-wrapper">
+          <div class="memories-tabs-nav">
+            <button class="tab-memories-btn ${activeTab === 'residents' ? 'active' : ''}" data-tab="residents">
+              👥 Cư Dân (${unlockedResidents}/${totalResidents})
+            </button>
+            <button class="tab-memories-btn ${activeTab === 'affinity' ? 'active' : ''}" data-tab="affinity">
+              💖 Thân Thiết (Dossier)
+            </button>
+            <button class="tab-memories-btn ${activeTab === 'curios' ? 'active' : ''}" data-tab="curios">
+              🏺 Tủ Kỷ Vật (${unlockedCurios.length}/${CURIOS_AND_RELICS.length})
+            </button>
+            <button class="tab-memories-btn ${activeTab === 'endings' ? 'active' : ''}" data-tab="endings">
+              🏆 Kết Cục (${achievedEndings.size}/6)
+            </button>
+            <button class="tab-memories-btn ${activeTab === 'bunny' ? 'active' : ''}" data-tab="bunny">
+              💌 Thư Thỏ Cam (${receivedLetters.size}/6)
+            </button>
+          </div>
+          <div class="memories-tabs-scroll-hint" title="Cuộn sang để xem thêm tab">›</div>
         </div>
 
         <!-- Nội Dung Scroll Theo Tab -->
