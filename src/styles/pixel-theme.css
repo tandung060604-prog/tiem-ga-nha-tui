@@ -459,7 +459,7 @@ body.selling-mode .toast {
    ========================================================================== */
 
 .prep-container {
-  padding-bottom: 96px !important;
+  padding-bottom: calc(108px + var(--safe-bottom, 0px)) !important;
 }
 
 .board {
