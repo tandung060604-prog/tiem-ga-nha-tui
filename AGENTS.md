@@ -43,3 +43,12 @@ Không Agent nào được bàn giao task nếu chưa tự vượt qua chốt ki
 ### Quy tắc 5: Nghiệm Thu Tối Cao Bởi Claude Lead
 * Sau khi 3 Gemini hoàn thành, User hoặc Gemini thông báo cho Claude Lead.
 * Claude Lead thực hiện review toàn bộ git diff, chạy kiểm tra tổng hợp và chốt hoàn thành mốc (Sprint Done).
+
+### Quy tắc 6: Khung Kỹ Sư Vòng Lặp Khép Kín (Loop Engineering Framework)
+* Mọi chu kỳ kiểm thử dài hạn (Round 8, 9, 10, 11...) bắt buộc phải tuân thủ nghiêm ngặt quy trình 5 pha và bảng checklist tại [docs/05-loop-engineering-framework.md](docs/05-loop-engineering-framework.md):
+  1. **Pha 1 (Thu hoạch)**: Rút trích chỉ số crash, freeze, DOM leak, xuất báo cáo vào `docs/phan-cong.md` & `docs/bao-cao-test-xuyen-dem.md`.
+  2. **Pha 2 (Nâng cấp Codebase)**: Triển khai tính năng mới theo Blueprint, bảo đảm 5 Zone cố định không va chạm, touch target $\ge 44\text{px}$.
+  3. **Pha 3 (Tiến hóa Test Bot)**: **Tuyệt đối không sửa UI mà giữ nguyên bot test cũ!** Phải cập nhật `scripts/overnight-browser-monkey.mjs` để dạy bot chơi tính năng mới.
+  4. **Pha 4 (Nghiệm thu kép 3 lớp)**: Vượt qua cả 3 chốt kiểm định (`vitest run` 100% PASS, `build` 0 lỗi TS, `ui:check` 100% PASS trên 360px & 390px).
+  5. **Pha 5 (Tái khởi động)**: Chạy bot test mới với cờ `--days=200`, commit Git và lặp lại vòng tuần hoàn.
+
