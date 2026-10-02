@@ -157,6 +157,7 @@ export class OrdersEngine {
     return {
       id: 'ord_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
       customerName,
+      characterId: char.id,
       avatar,
       isDelivery,
       ...(isLongDistance ? { isLongDistance: true } : {}),

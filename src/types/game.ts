@@ -217,6 +217,7 @@ export type CustomerPersonality =
 export interface CustomerOrder {
   id: string;
   customerName: string;
+  characterId?: string;
   avatar: string;
   isDelivery: boolean;
   isLongDistance?: boolean; // Đơn giao xa cần tự chạy xe máy hoặc thuê ship ngoài (Delivery Runner)

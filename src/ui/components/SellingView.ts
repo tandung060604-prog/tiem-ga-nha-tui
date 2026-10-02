@@ -10,6 +10,7 @@ import { escapeHtml } from '../escapeHtml';
 import { renderPrepStation, prepStationKey } from './PrepStation';
 import { getWeatherForDay } from '../../content/saigonWeather';
 import { renderWeatherAtmosphereStrip } from './WeatherAtmosphere';
+import { CHARACTERS_36 } from '../../content/characters36';
 
 export type { SellingSession };
 
@@ -366,25 +367,38 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
       }
     }
 
-    // Dynamic 2D sprite expression swap
+    // Dynamic 2D sprite expression & actor motion swap
     if (c.img) {
       const standSrc = c.card.dataset.standSrc;
       const angrySrc = c.card.dataset.angrySrc;
       const walkSrc = c.card.dataset.walkSrc;
-      const isNew = Date.now() - order.startTime < 750;
+      const isNew = Date.now() - order.startTime < 850;
+      const actor = c.card.querySelector<HTMLElement>('.char-actor');
 
       if (p.angry && angrySrc) {
         if (!c.img.src.endsWith(angrySrc)) c.img.src = angrySrc;
         c.img.classList.remove('standing', 'walking');
         c.img.classList.add('angry');
+        if (actor) {
+          actor.classList.remove('char-idle-breath', 'char-walk-in');
+          actor.classList.add('char-tremble-angry');
+        }
       } else if (isNew && walkSrc) {
         if (!c.img.src.endsWith(walkSrc)) c.img.src = walkSrc;
         c.img.classList.remove('standing', 'angry');
         c.img.classList.add('walking');
+        if (actor) {
+          actor.classList.remove('char-idle-breath', 'char-tremble-angry');
+          actor.classList.add('char-walk-in');
+        }
       } else if (standSrc) {
         if (!c.img.src.endsWith(standSrc)) c.img.src = standSrc;
         c.img.classList.remove('angry', 'walking');
         c.img.classList.add('standing');
+        if (actor) {
+          actor.classList.remove('char-walk-in', 'char-tremble-angry');
+          actor.classList.add('char-idle-breath');
+        }
       }
     }
   }
@@ -520,20 +534,33 @@ export interface CustomerVisualModel {
   badgeClass: string;
 }
 
-function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
-  // Ưu tiên sử dụng model sprite từ bộ 36 nhân vật Hẻm 1102
-  if (order.avatar && (order.avatar.includes('assets/') || order.avatar.endsWith('.png'))) {
-    return {
-      stand: order.avatar,
-      walk: order.avatar,
-      angry: order.avatar,
-      leave: order.avatar,
-      name: order.customerName,
-      badge: order.archetypeBadge || 'Cư Dân Hẻm',
-      badgeClass: order.isDelivery ? 'delivery-badge' : 'genz-badge'
-    };
+// 33 nhân vật người thực khách & cư dân Hẻm 1102 (trừ 3 thú cưng)
+const HUMAN_CHAR_POOL = CHARACTERS_36.filter(c => c.category !== 'animal');
+const CHAR_MAP = new Map<string, (typeof CHARACTERS_36)[number]>(CHARACTERS_36.map(c => [c.id as string, c]));
+
+const charUrl = (id: string): string =>
+  (ASSETS.characters as Record<string, string>)[id] || `${import.meta.env?.BASE_URL ?? './'}assets/characters/${id}.png`;
+
+function getBadgeClassForChar(category?: string, id?: string): string {
+  if (category === 'authority') return 'security-badge';
+  if (category === 'street_worker') return 'worker-badge';
+  if (category === 'staff') return 'staff-badge';
+  if (category === 'transit') {
+    if (id?.includes('shipper') || id?.includes('courier')) return 'delivery-badge';
+    if (id?.includes('student')) return 'student-badge';
+    return 'office-badge';
   }
-  if (order.isBunny) {
+  if (id?.includes('kid')) return 'kid-badge';
+  if (id?.includes('granny') || id?.includes('grumpy')) return 'elder-badge';
+  if (id?.includes('winner') || id?.includes('wholesale')) return 'vip-badge';
+  if (id?.includes('trendy') || id?.includes('couple') || id?.includes('jogger')) return 'genz-badge';
+  if (id?.includes('gossip') || id?.includes('tough')) return 'demanding-badge';
+  return 'local-badge';
+}
+
+export function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
+  // 1. Nhân vật đặc biệt & Cốt truyện
+  if (order.isBunny || order.customerName.includes('Thỏ Cam')) {
     return {
       stand: ASSETS.thocam.front,
       walk: ASSETS.thocam.side,
@@ -544,6 +571,7 @@ function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
       badgeClass: 'bunny-badge'
     };
   }
+
   if (order.customerName.includes('Bác Ba')) {
     return {
       stand: ASSETS.bacba.front,
@@ -555,6 +583,7 @@ function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
       badgeClass: 'vip-badge'
     };
   }
+
   if (order.customerName.includes('Gà Bông') || order.isMysteryGuest) {
     return {
       stand: ASSETS.gabong.front,
@@ -566,128 +595,258 @@ function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
       badgeClass: 'mystery-badge'
     };
   }
-  if (order.isDelivery || order.customerName.includes('Shipper') || order.customerName.includes('Giao Hàng') || order.customerName.includes('[App]')) {
+
+  if (order.customerName.includes('Trộm') || order.customerName.includes('Kẻ Gian')) {
+    const thiefAsset = ASSETS.characters.char_37_thief_busted;
     return {
-      stand: ASSETS.shipper.stand,
-      walk: ASSETS.shipper.walk,
-      angry: ASSETS.shipper.angry,
-      leave: ASSETS.shipper.leave,
+      stand: thiefAsset,
+      walk: thiefAsset,
+      angry: thiefAsset,
+      leave: thiefAsset,
       name: order.customerName,
-      badge: 'Shipper Ruột',
+      badge: 'Kẻ Gian Bị Bắt',
+      badgeClass: 'thief-badge'
+    };
+  }
+
+  if (order.isDelivery || order.customerName.includes('Shipper') || order.customerName.includes('Giao Hàng') || order.customerName.includes('[App]')) {
+    const shipAsset = ASSETS.characters.char_19_shipper_tuan;
+    return {
+      stand: shipAsset,
+      walk: shipAsset,
+      angry: shipAsset,
+      leave: shipAsset,
+      name: order.customerName,
+      badge: order.archetypeBadge ? `🛵 ${order.archetypeBadge}` : '🛵 Shipper Ruột',
       badgeClass: 'delivery-badge'
     };
   }
 
-  const n = order.customerName;
-  if (n.includes('Học Sinh') || n.includes('Sinh Viên') || n.includes('Kiệt') || n.includes('Vy') || n.includes('Khôi') || n.includes('Nguyên')) {
+  // 2. Tra cứu trực tiếp theo characterId
+  if (order.characterId && CHAR_MAP.has(order.characterId)) {
+    const profile = CHAR_MAP.get(order.characterId)!;
+    const asset = charUrl(profile.id);
     return {
-      stand: ASSETS.hocsinh.stand,
-      walk: ASSETS.hocsinh.walk,
-      angry: ASSETS.hocsinh.angry,
-      leave: ASSETS.hocsinh.leave,
+      stand: asset,
+      walk: asset,
+      angry: asset,
+      leave: asset,
       name: order.customerName,
-      badge: 'Học Sinh Ôn Thi',
-      badgeClass: 'student-badge'
-    };
-  }
-  if (n.includes('Game') || n.includes('Huy') || n.includes('Rank') || n.includes('Cú Đêm') || n.includes('Bảo')) {
-    return {
-      stand: ASSETS.gamethu.stand,
-      walk: ASSETS.gamethu.walk,
-      angry: ASSETS.gamethu.angry,
-      leave: ASSETS.gamethu.leave,
-      name: order.customerName,
-      badge: 'Cú Đêm Cày Rank',
-      badgeClass: 'genz-badge'
-    };
-  }
-  if (n.includes('Review') || n.includes('Tiktok') || n.includes('Mukbang') || n.includes('Quỳnh Anh') || n.includes('Hân') || n.includes('Trend')) {
-    return {
-      stand: ASSETS.tiktoker.stand,
-      walk: ASSETS.tiktoker.walk,
-      angry: ASSETS.tiktoker.angry,
-      leave: ASSETS.tiktoker.leave,
-      name: order.customerName,
-      badge: 'Tiktoker Triệu View',
-      badgeClass: 'genz-badge'
-    };
-  }
-  if (n.includes('Khó Tính') || n.includes('Karen') || n.includes('Lan') || n.includes('Hằng') || n.includes('Soi')) {
-    return {
-      stand: ASSETS.karen.stand,
-      walk: ASSETS.karen.walk,
-      angry: ASSETS.karen.angry,
-      leave: ASSETS.karen.leave,
-      name: order.customerName,
-      badge: 'Thực Khách Kỹ Tính',
-      badgeClass: 'demanding-badge'
-    };
-  }
-  if (n.includes('Bắp') || n.includes('Bé') || n.includes('Mít') || n.includes('Cháu')) {
-    return {
-      stand: ASSETS.becon.stand,
-      walk: ASSETS.becon.walk,
-      angry: ASSETS.becon.angry,
-      leave: ASSETS.becon.leave,
-      name: order.customerName,
-      badge: 'Khách Hàng Nhí',
-      badgeClass: 'kid-badge'
-    };
-  }
-  if (n.includes('Trưởng Phòng') || n.includes('Long') || n.includes('Khải') || n.includes('Sếp')) {
-    return {
-      stand: ASSETS.truongphong.stand,
-      walk: ASSETS.truongphong.walk,
-      angry: ASSETS.truongphong.angry,
-      leave: ASSETS.truongphong.leave,
-      name: order.customerName,
-      badge: 'Sếp Khao Team',
-      badgeClass: 'office-badge'
-    };
-  }
-  if (n.includes('Bảy') || n.includes('Bà') || n.includes('Chợ Cũ') || n.includes('Cô Tư') || n.includes('Bác Hạc')) {
-    return {
-      stand: ASSETS.babay.stand,
-      walk: ASSETS.babay.walk,
-      angry: ASSETS.babay.angry,
-      leave: ASSETS.babay.leave,
-      name: order.customerName,
-      badge: 'Bà Bảy Nam Bộ',
-      badgeClass: 'local-badge'
-    };
-  }
-  if (n.includes('Cặp Đôi') || n.includes('Bé Na') || n.includes('Bạn Trai') || n.includes('Hẹn Hò')) {
-    return {
-      stand: ASSETS.capdoi.stand,
-      walk: ASSETS.capdoi.walk,
-      angry: ASSETS.capdoi.angry,
-      leave: ASSETS.capdoi.leave,
-      name: order.customerName,
-      badge: 'Cặp Đôi Hẹn Hò',
-      badgeClass: 'genz-badge'
-    };
-  }
-  if (n.includes('Su Su') || n.includes('Mẹ Con') || n.includes('Gia Đình') || n.includes('Nhà')) {
-    return {
-      stand: ASSETS.mecon.stand,
-      walk: ASSETS.mecon.walk,
-      angry: ASSETS.mecon.angry,
-      leave: ASSETS.mecon.leave,
-      name: order.customerName,
-      badge: 'Gia Đình Ấm Cúng',
-      badgeClass: 'family-badge'
+      badge: order.isVip ? `👑 ${order.archetypeBadge || profile.roleTitle}` : (order.archetypeBadge || profile.roleTitle),
+      badgeClass: order.isVip ? 'vip-badge' : getBadgeClassForChar(profile.category, profile.id)
     };
   }
 
-  // Default: Office Lady
+  // 3. Tra cứu theo order.avatar nếu chứa asset character hợp lệ
+  if (order.avatar && (order.avatar.includes('char_') || order.avatar.includes('assets/characters/'))) {
+    const match = order.avatar.match(/char_\d+_[a-z0-9_]+/);
+    if (match && CHAR_MAP.has(match[0])) {
+      const profile = CHAR_MAP.get(match[0])!;
+      const asset = order.avatar;
+      return {
+        stand: asset,
+        walk: asset,
+        angry: asset,
+        leave: asset,
+        name: order.customerName,
+        badge: order.isVip ? `👑 ${order.archetypeBadge || profile.roleTitle}` : (order.archetypeBadge || profile.roleTitle),
+        badgeClass: order.isVip ? 'vip-badge' : getBadgeClassForChar(profile.category, profile.id)
+      };
+    }
+    return {
+      stand: order.avatar,
+      walk: order.avatar,
+      angry: order.avatar,
+      leave: order.avatar,
+      name: order.customerName,
+      badge: order.isVip ? `👑 ${order.archetypeBadge || 'Khách Sộp'}` : (order.archetypeBadge || 'Cư Dân Hẻm'),
+      badgeClass: order.isVip ? 'vip-badge' : 'genz-badge'
+    };
+  }
+
+  // 4. Đối soát từ khóa tên theo toàn bộ 36 nhân vật Hẻm 1102
+  const n = order.customerName;
+
+  // Vé Số
+  if (n.includes('Vé Số') || n.includes('Bảy Bán Vé') || n.includes('Cô Bảy')) {
+    const asset = charUrl('char_02_lottery_lady');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Vé Số Dạo', badgeClass: 'local-badge' };
+  }
+  // Bếp & Phụ tá
+  if (n.includes('Bé Linh') || n.includes('Phụ Bếp')) {
+    const asset = charUrl('char_03_helper_linh');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Bé Linh Phụ Bếp', badgeClass: 'staff-badge' };
+  }
+  if (n.includes('Anh Khang') || n.includes('Thợ Chiên')) {
+    const asset = charUrl('char_04_fryer_khang');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Anh Khang Thợ Chiên', badgeClass: 'staff-badge' };
+  }
+  // Khách nhí
+  if (n.includes('Bắp') || n.includes('Bé Bo') || n.includes('Mít') || n.includes('Cháu') || n.includes('Khách Nhí') || n.includes('Trẻ Em')) {
+    const asset = charUrl('char_05_kid_bo');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Khách Hàng Nhí', badgeClass: 'kid-badge' };
+  }
+  // Bô lão & Gia đình
+  if (n.includes('Cụ Ba') || n.includes('Bà Ba') || n.includes('Mẹ Con') || n.includes('Gia Đình') || n.includes('Bô Lão')) {
+    const asset = charUrl('char_06_granny_ba');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Gia Đình Ấm Cúng', badgeClass: 'elder-badge' };
+  }
+  // Trendy TikTok & Văn phòng
+  if (n.includes('Vy') || n.includes('Trendy') || n.includes('TikTok') || n.includes('Mukbang') || n.includes('Review') || n.includes('Quỳnh Anh') || n.includes('Hân')) {
+    const asset = charUrl('char_07_trendy_vy');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Tiktoker Triệu View', badgeClass: 'genz-badge' };
+  }
+  // Bác Hai cựu chiến binh
+  if (n.includes('Bác Hai') || n.includes('Nghiêm Nghị') || n.includes('Cựu Chiến Binh')) {
+    const asset = charUrl('char_08_grumpy_hai');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Lão Tiền Bối Hẻm', badgeClass: 'elder-badge' };
+  }
+  // Chú Tám xe ôm
+  if (n.includes('Chú Tám') || n.includes('Xe Ôm') || n.includes('Tài Xế Ôm')) {
+    const asset = charUrl('char_09_buyer_tam');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Bác Tài Xe Ôm', badgeClass: 'local-badge' };
+  }
+  // Sếp khao team / Trúng số
+  if (n.includes('Trúng Số') || n.includes('Hưng') || n.includes('Trưởng Phòng') || n.includes('Sếp') || n.includes('Long') || n.includes('Khải')) {
+    const asset = charUrl('char_10_winner_hung');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Sếp Khao Team', badgeClass: 'office-badge' };
+  }
+  // Đại lý sỉ
+  if (n.includes('Đại Lý Sỉ') || n.includes('Bà Năm') || n.includes('Mua Sỉ')) {
+    const asset = charUrl('char_11_wholesale_nam');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Đại Lý Sỉ Hẻm', badgeClass: 'vip-badge' };
+  }
+  // Cậu Út / Game thủ
+  if (n.includes('Cậu Út') || n.includes('Giao Vé') || n.includes('Game') || n.includes('Huy') || n.includes('Rank') || n.includes('Cú Đêm')) {
+    const asset = charUrl('char_12_courier_ut');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Cú Đêm Cày Rank', badgeClass: 'genz-badge' };
+  }
+  // Gánh tàu hũ / Chè
+  if (n.includes('Thắm') || n.includes('Tàu Hũ') || n.includes('Gánh Chè')) {
+    const asset = charUrl('char_13_vendor_tham');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Gánh Tàu Hũ Nam Bộ', badgeClass: 'local-badge' };
+  }
+  // Ve chai đồng nát
+  if (n.includes('Ve Chai') || n.includes('Đồng Nát') || n.includes('Bác Năm')) {
+    const asset = charUrl('char_14_scrap_nam');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Bác Năm Ve Chai', badgeClass: 'worker-badge' };
+  }
+  // Lò bánh mì
+  if (n.includes('Bánh Mì') || n.includes('Chú Bảy Bánh')) {
+    const asset = charUrl('char_15_bread_bay');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Bánh Mì Xe Đạp', badgeClass: 'local-badge' };
+  }
+  // Xe kem
+  if (n.includes('Xe Kem') || n.includes('Kem Ống') || n.includes('Anh Tư')) {
+    const asset = charUrl('char_16_icecream_tu');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Xe Kem Tuổi Thơ', badgeClass: 'local-badge' };
+  }
+  // Lao công vệ sinh
+  if (n.includes('Cô Lan') || n.includes('Lao Công') || n.includes('Quét Rác')) {
+    const asset = charUrl('char_17_sweeper_lan');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Lao Công Ca Đêm', badgeClass: 'worker-badge' };
+  }
+  if (n.includes('Chú Hùng') || n.includes('Xe Rác') || n.includes('Môi Trường')) {
+    const asset = charUrl('char_18_garbage_hung');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Vệ Sinh Môi Trường', badgeClass: 'worker-badge' };
+  }
+  // Bốc vác / Cường
+  if (n.includes('Cường') || n.includes('Bốc Vác') || n.includes('Cửu Vạn')) {
+    const asset = charUrl('char_20_mover_cuong');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Anh Cường Bốc Vác', badgeClass: 'worker-badge' };
+  }
+  // Tài xế xe tải
+  if (n.includes('Tài Xế Long') || n.includes('Xe Đông Lạnh') || n.includes('Xe Tải')) {
+    const asset = charUrl('char_21_trucker_long');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Tài Xế Bắc Nam', badgeClass: 'worker-badge' };
+  }
+  // Thợ điện
+  if (n.includes('Dũng') || n.includes('Thợ Điện') || n.includes('Điện Lực')) {
+    const asset = charUrl('char_22_electrician_dung');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Anh Dũng Thợ Điện', badgeClass: 'worker-badge' };
+  }
+  // Thợ hồ
+  if (n.includes('Thợ Hồ') || n.includes('Thợ Nề') || n.includes('Xây Dựng')) {
+    const asset = charUrl('char_23_builder_bay');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Chú Bảy Thợ Hồ', badgeClass: 'worker-badge' };
+  }
+  // Tạp hóa
+  if (n.includes('Dì Sáu') || n.includes('Tạp Hóa')) {
+    const asset = charUrl('char_24_grocer_sau');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Tạp Hóa Đầu Hẻm', badgeClass: 'local-badge' };
+  }
+  // Công an khu vực
+  if (n.includes('Công An') || n.includes('Cảnh Sát') || n.includes('Đồng Chí Nam')) {
+    const asset = charUrl('char_25_police_nam');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Cảnh Sát Khu Vực', badgeClass: 'security-badge' };
+  }
+  // CSGT
+  if (n.includes('CSGT') || n.includes('Giao Thông') || n.includes('Đại Úy Hoàng')) {
+    const asset = charUrl('char_26_traffic_hoang');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Chiến Sĩ CSGT', badgeClass: 'security-badge' };
+  }
+  // Dân phòng
+  if (n.includes('Dân Phòng') || n.includes('Tuần Tra') || n.includes('Hải Dân Phòng')) {
+    const asset = charUrl('char_27_warden_hai');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Dân Phòng Hẻm', badgeClass: 'security-badge' };
+  }
+  // Đại ca giang hồ
+  if (n.includes('Đại Ca Beo') || n.includes('Bảo Kê') || n.includes('Giang Hồ') || n.includes('Đại Ca')) {
+    const asset = charUrl('char_28_tough_beo');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Đại Ca Hẻm', badgeClass: 'demanding-badge' };
+  }
+  // Rút tiền ATM
+  if (n.includes('ATM') || n.includes('Chị Nga')) {
+    const asset = charUrl('char_29_atm_nga');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Chị Nga Rút ATM', badgeClass: 'office-badge' };
+  }
+  // Học sinh đón bus
+  if (n.includes('Học Sinh') || n.includes('Sinh Viên') || n.includes('Kiệt') || n.includes('Khôi') || n.includes('Nguyên') || n.includes('Xe Buýt') || n.includes('Đón Buýt')) {
+    const asset = charUrl('char_30_student_bus');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Học Sinh Ôn Thi', badgeClass: 'student-badge' };
+  }
+  // Bà Tám / Karen khó tính
+  if (n.includes('Bà Tám') || n.includes('Khó Tính') || n.includes('Karen') || n.includes('Lan Khó') || n.includes('Hằng') || n.includes('Soi') || n.includes('Bàn Tán')) {
+    const asset = charUrl('char_31_gossip_tam');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Bà Tám Hóng Mát', badgeClass: 'demanding-badge' };
+  }
+  // Chạy bộ thể thao
+  if (n.includes('Chạy Bộ') || n.includes('Thể Thao') || n.includes('Healthy') || n.includes('Tuấn Chạy')) {
+    const asset = charUrl('char_32_jogger_tuan');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Anh Tuấn Chạy Bộ', badgeClass: 'genz-badge' };
+  }
+  // Cặp đôi GenZ
+  if (n.includes('Cặp Đôi') || n.includes('Bé Na') || n.includes('Bạn Trai') || n.includes('Hẹn Hò') || n.includes('Bách & Diệp')) {
+    const asset = charUrl('char_33_couple_genz');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Cặp Đôi Hẹn Hò', badgeClass: 'genz-badge' };
+  }
+  // Dân văn phòng
+  if (n.includes('Văn Phòng') || n.includes('Chị Mai') || n.includes('Công Sở')) {
+    const asset = charUrl('char_07_trendy_vy');
+    return { stand: asset, walk: asset, angry: asset, leave: asset, name: n, badge: 'Dân Văn Phòng', badgeClass: 'office-badge' };
+  }
+
+  // 5. Deterministic Hash Fallback cho TOÀN BỘ nhân vật khác (đảm bảo không ai bị trùng lắp hoặc bỏ sót)
+  let hash = 0;
+  const str = order.customerName || order.id || 'khach';
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
+  }
+  const picked = HUMAN_CHAR_POOL[Math.abs(hash) % HUMAN_CHAR_POOL.length] || HUMAN_CHAR_POOL[0]!;
+  const asset = charUrl(picked.id);
+  const badgeClass = order.isVip ? 'vip-badge' : getBadgeClassForChar(picked.category, picked.id);
+  const badgeText = order.isVip 
+    ? (order.archetypeBadge ? `👑 ${order.archetypeBadge}` : `👑 ${picked.roleTitle} (Khách Sộp)`)
+    : (order.archetypeBadge || picked.roleTitle);
+
   return {
-    stand: ASSETS.vanphong.stand,
-    walk: ASSETS.vanphong.walk,
-    angry: ASSETS.vanphong.angry,
-    leave: ASSETS.vanphong.leave,
+    stand: asset,
+    walk: asset,
+    angry: asset,
+    leave: asset,
     name: order.customerName,
-    badge: order.archetypeBadge || 'Dân Văn Phòng',
-    badgeClass: 'office-badge'
+    badge: badgeText,
+    badgeClass
   };
 }
 
@@ -706,7 +865,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
     const initialSrc = isLeaving ? visual.walk : visual.stand;
 
     return `
-      <div class="customer-card departing ${isReceiving ? 'receiving' : 'leaving'} ${dep.isDelighted ? 'delighted' : ''}" 
+      <div class="customer-card departing ${isReceiving ? 'receiving' : 'leaving'} ${dep.isDelighted ? 'delighted' : ''} at-counter" 
            data-order-id="${dep.order.id}" 
            aria-hidden="true"
            style="pointer-events: none;">
@@ -717,13 +876,19 @@ export function renderSellingView(state: GameState, session: SellingSession): st
 
         <!-- 2D Character Walking & Standing Stage -->
         <div class="cust-stage">
-          <div class="char-actor ${isReceiving ? 'char-hop-delight' : 'char-flip-exit'}">
+          <div class="char-actor ${isReceiving ? 'char-hop-delight' : 'char-flip-exit'} focus-actor">
             <img src="${initialSrc}" alt="${visual.name}" class="char-sprite-img ${isLeaving ? 'walking-out' : 'happy-hop'}" />
             <div class="char-shadow ${isLeaving ? 'shadow-walk' : ''}"></div>
             <!-- Túi giấy Kraft mang về trên tay khách -->
             <div class="prop-takeaway-bag" title="Đã đóng gói mang về">
               <span class="bag-steam">♨️</span>
               <span class="bag-icon">🛍️</span>
+            </div>
+            <!-- Thảm đón khách tại quầy -->
+            <div class="counter-welcome-mat" aria-hidden="true">
+              <span class="mat-sparkle">★</span>
+              <span class="mat-text">CHICKEN 1102</span>
+              <span class="mat-sparkle">★</span>
             </div>
           </div>
           <div class="cust-info-col">
@@ -786,11 +951,24 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       `;
     }).join('');
 
-    const isNew = Date.now() - ord.startTime < 750;
+    const isFirstInQueue = idx === 0;
+    const alleySlotClass = isFirstInQueue ? 'at-counter' : idx === 1 ? 'waiting-slot-1' : 'waiting-slot-2';
+    const isNew = Date.now() - ord.startTime < 850;
+    const actorMotionCls = isAngry ? 'char-tremble-angry' : isNew ? 'char-walk-in' : 'char-idle-breath';
     const initialSrc = isAngry ? visual.angry : isNew ? visual.walk : visual.stand;
     const initialCls = isAngry ? 'angry' : isNew ? 'walking' : 'standing';
-    const actorHtml = `<img src="${initialSrc}" alt="${visual.name}" class="char-sprite-img ${initialCls}" />`;
-    const queueBadge = idx === 0 
+    const shadowCls = isNew ? 'shadow-walk' : 'shadow-idle';
+    const vipAuraHtml = ord.isVip ? '<div class="vip-aura-glow" aria-hidden="true"></div>' : '';
+    const welcomeMatHtml = isFirstInQueue ? `
+      <div class="counter-welcome-mat" aria-hidden="true" title="Quầy gọi món chính">
+        <span class="mat-sparkle">★</span>
+        <span class="mat-text">CHICKEN 1102</span>
+        <span class="mat-sparkle">★</span>
+      </div>
+    ` : '';
+
+    const actorHtml = `<img src="${initialSrc}" alt="${visual.name}" class="char-sprite-img ${initialCls} ${isFirstInQueue ? 'focus-sprite' : ''}" />`;
+    const queueBadge = isFirstInQueue 
       ? `<span class="queue-pos-badge first"><img src="${ASSETS.icons.star}" class="badge-pixel-star-xs" alt="" /> Đang phục vụ</span>` 
       : idx === 1 
       ? '<span class="queue-pos-badge next"><span class="queue-num-badge">2</span> Kế tiếp</span>' 
@@ -809,7 +987,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       : ASSETS.icons.emoteYum;
 
     return `
-      <div class="customer-card ${ord.isBunny ? 'bunny-card' : ''} ${ord.isVip ? 'vip-card' : ''} ${isAngry ? 'angry' : ''} ${idx === 0 ? 'active' : ''}" 
+      <div class="customer-card ${ord.isBunny ? 'bunny-card' : ''} ${ord.isVip ? 'vip-card' : ''} ${isAngry ? 'angry' : ''} ${isFirstInQueue ? 'active at-counter' : alleySlotClass}" 
            data-order-id="${ord.id}" 
            data-mood="${mood}" 
            data-is-bunny="${ord.isBunny ? 'true' : 'false'}" 
@@ -826,7 +1004,8 @@ export function renderSellingView(state: GameState, session: SellingSession): st
 
         <!-- 2D Character Walking & Standing Stage -->
         <div class="cust-stage">
-          <div class="char-actor">
+          <div class="char-actor ${actorMotionCls} ${isFirstInQueue ? 'focus-actor' : ''}">
+            ${vipAuraHtml}
             <!-- Vòng thời gian kiên nhẫn quanh khách (aenhatrang report #51) -->
             <svg class="patience-ring-svg" viewBox="0 0 52 52" aria-hidden="true">
               <circle class="ring-track" cx="26" cy="26" r="22" />
@@ -835,18 +1014,8 @@ export function renderSellingView(state: GameState, session: SellingSession): st
                       stroke-dashoffset="${(138.23 * (1 - patiencePercent / 100)).toFixed(1)}" />
             </svg>
             ${actorHtml}
-            <div class="char-shadow"></div>
-            <div class="stardew-emote-bubble" title="Cảm xúc">
-              ${isAngry 
-                ? `<img src="${ASSETS.icons.emoteAnger}" class="emote-pixel-img" alt="💢" />` 
-                : patienceColorClass === 'low' 
-                ? `<img src="${ASSETS.icons.emoteSweat}" class="emote-pixel-img" alt="💦" />` 
-                : (ord.isVip 
-                  ? `<img src="${ASSETS.icons.heart}" class="emote-pixel-img" alt="VIP" />` 
-                  : (patienceColorClass === 'mid' 
-                    ? `<img src="${ASSETS.icons.emoteQuestion}" class="emote-pixel-img" alt="⏳" />` 
-                    : `<img src="${ASSETS.icons.emoteYum}" class="emote-pixel-img" alt="😋" />`))}
-            </div>
+            <div class="char-shadow ${shadowCls}"></div>
+            ${welcomeMatHtml}
           </div>
           <div class="cust-info-col">
             <div class="cust-name-row">
@@ -1036,23 +1205,44 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         </div>
       ` : ''}
 
-      <!-- Customer Queue Lane (Khách vào/ra quán) -->
-      <div class="customer-lane">
-        ${(session.orders.length > 0 || (session.departingCustomers && session.departingCustomers.length > 0)) ? `${departingCardsHtml}${customerCardsHtml}` : (
-          (session.disruptionTimerSec ?? 0) > 0 ? `
-            <div class="empty-queue disruption-alert" style="background: #fff1f0; border: 1.5px solid #ff4d4f; color: #cf1322; padding: 12px 14px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(255,77,79,0.15);">
-              <div style="font-weight: 800; font-size: 0.92rem; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                <span>💥</span> <span>QUÁN ĐANG HỖN LOẠN: KHÁCH CHẠY HẾT!</span>
+      <!-- SÂN KHẤU HẺM 1102 & LỐI ĐI QUẦY GỌI MÓN (Living Alley 2D Staging) -->
+      <div class="alley-stage-container">
+        <!-- Đèn lồng treo tường hẻm tỏa sáng ấm áp -->
+        <div class="alley-lantern-mount" aria-hidden="true">
+          <span class="alley-lantern-pixel">🏮</span>
+          <div class="alley-lantern-glow"></div>
+        </div>
+
+        <!-- Biển hiệu vỉa hè Hẻm 1102 -->
+        <div class="alley-sidewalk-sign" aria-hidden="true">
+          <span class="sign-lantern-icon">🏮</span>
+          <span class="sign-street-name">Hẻm 1102 · Quầy Gọi Món</span>
+          <span class="sign-lantern-icon">🏮</span>
+        </div>
+
+        <!-- Customer Queue Lane (Khách vào/ra quán) -->
+        <div class="customer-lane">
+          ${(session.orders.length > 0 || (session.departingCustomers && session.departingCustomers.length > 0)) ? `${departingCardsHtml}${customerCardsHtml}` : (
+            (session.disruptionTimerSec ?? 0) > 0 ? `
+              <div class="empty-queue disruption-alert" style="background: #fff1f0; border: 1.5px solid #ff4d4f; color: #cf1322; padding: 12px 14px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(255,77,79,0.15);">
+                <div style="font-weight: 800; font-size: 0.92rem; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                  <span>💥</span> <span>QUÁN ĐANG HỖN LOẠN: KHÁCH CHẠY HẾT!</span>
+                </div>
+                <div style="font-size: 0.78rem; margin-top: 4px; color: #595959;">
+                  Giang hồ vừa quậy phá! Đang dọn dẹp bàn ghế và trấn an bà con lối xóm...
+                </div>
+                <div style="margin-top: 6px; font-weight: 800; font-size: 0.85rem; color: #d4380d;">
+                  ⏳ Chờ lứa khách mới sau: <b>${Math.ceil(session.disruptionTimerSec ?? 0)}s</b> 🧹
+                </div>
               </div>
-              <div style="font-size: 0.78rem; margin-top: 4px; color: #595959;">
-                Giang hồ vừa quậy phá! Đang dọn dẹp bàn ghế và trấn an bà con lối xóm...
-              </div>
-              <div style="margin-top: 6px; font-weight: 800; font-size: 0.85rem; color: #d4380d;">
-                ⏳ Chờ lứa khách mới sau: <b>${Math.ceil(session.disruptionTimerSec ?? 0)}s</b> 🧹
-              </div>
-            </div>
-          ` : '<div class="empty-queue">🍗 Mùi gà thơm phức bay khắp hẻm... Khách đang tấp nập tới! 🏃</div>'
-        )}
+            ` : '<div class="empty-queue">🍗 Mùi gà thơm phức bay khắp hẻm... Khách đang tấp nập tới! 🏃</div>'
+          )}
+        </div>
+
+        <!-- Lớp vỉa hè lát đá Nam Bộ & gờ đá vỉa hè -->
+        <div class="alley-pavement-strip" aria-hidden="true">
+          <div class="curb-stone"></div>
+        </div>
       </div>
 
       <!-- Wood Kitchen Counter (Quầy Bếp Gỗ Chiên Gà) -->
