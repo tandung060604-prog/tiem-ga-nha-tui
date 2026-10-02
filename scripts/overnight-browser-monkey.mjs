@@ -564,6 +564,13 @@ class OvernightMonkey {
         }
       }
 
+      // 1b. Dọn dẹp bàn ăn hiên quán (Dine-In Patio) và thu gom tiền tip
+      const cleanTableBtn = page.locator('.btn-clean-table:not([disabled]), .patio-table.dirty');
+      if (await cleanTableBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
+        await cleanTableBtn.first().click({ force: true }).catch(() => {});
+        return true;
+      }
+
       // 2. Nhấc chảo rán NGAY khi vàng giòn (Perfect) hoặc sẵn sàng nhấc
       const readyPot = page.locator('#btn-fry-pot.perfect-glow, #btn-fry-pot.ready-lift, .fry-pot.perfect-glow, .fry-pot.ready-lift');
       if (await readyPot.first().isVisible({ timeout: 30 }).catch(() => false)) {
@@ -857,7 +864,12 @@ class OvernightMonkey {
       const overlay = document.querySelector('.modal-overlay, #modal-overlay, #btn-drawer-overlay');
       if (overlay instanceof HTMLElement) overlay.click();
 
-      // Nếu đang kẹt trong màn bán hàng: hủy các đơn khách tồn đọng để kích hoạt lứa khách mới
+      // Nếu đang kẹt trong màn bán hàng: dọn bàn ăn & hủy các đơn khách tồn đọng
+      const cleanBtns = document.querySelectorAll('.btn-clean-table, .patio-table.dirty');
+      for (const cln of cleanBtns) {
+        if (cln instanceof HTMLElement) cln.click();
+      }
+
       const cancelBtns = document.querySelectorAll('.btn-cancel-order');
       for (const cb of cancelBtns) {
         if (cb instanceof HTMLElement) cb.click();

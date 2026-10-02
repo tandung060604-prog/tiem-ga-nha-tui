@@ -1,5 +1,5 @@
-import { GameState, GamePhase, DayLedger, CustomerReview, StoryEndingId, CustomerOrder } from './types/game';
-import { stateManager } from './core/state';
+import { GameState, GamePhase, DayLedger, CustomerReview, StoryEndingId, CustomerOrder, DineInTable } from './types/game';
+import { stateManager, createDefaultDineInTables } from './core/state';
 import { audio } from './core/audio';
 import { Haptics } from './core/haptics';
 import { music, babble, narrate, stopNarration } from './core/music';
@@ -30,7 +30,7 @@ import { renderReviewReplyModal } from './ui/components/ReviewReplyModal';
 import { ReviewsEngine } from './core/reviewsEngine';
 import { renderMenuTab, bindMenuEvents } from './ui/components/MenuTab';
 import { renderSellingView, patchSellingView, sellingStructureKey, renderFx } from './ui/components/SellingView';
-import { SellingSession, createSellingSession, gameDeltaMs, tickSelling, drainFx } from './core/sellingSim';
+import { SellingSession, createSellingSession, gameDeltaMs, tickSelling, drainFx, cleanDineInTable } from './core/sellingSim';
 import { OPEN_HOUR, CLOSE_HOUR } from './core/clock';
 import type { ShiftSnapshot } from './core/sellingSim';
 import { DRINK_RECIPES, TIMER_RECIPES, timerPhase, TimerStationId, AssemblyId, DrinkId, isTimerStationId, isAssemblyId, isDrinkId, ScoopId, isScoopId } from './core/stations';
@@ -2033,6 +2033,19 @@ class AppController {
     this.shownBacBaTipsThisSession.clear();
     this.sellingSession = createSellingSession();
     const state = stateManager.getState();
+    const tables: DineInTable[] = JSON.parse(JSON.stringify(state.dineInTables || createDefaultDineInTables()));
+    for (const t of tables) {
+      t.status = 'empty';
+      t.customerName = undefined;
+      t.customerAvatar = undefined;
+      t.foodName = undefined;
+      t.foodIcon = undefined;
+      t.tipAmount = 0;
+      t.eatingTimerSec = 0;
+      t.eatingDurationSec = 0;
+      t.isCritic = false;
+    }
+    this.sellingSession.dineInTables = tables;
     cookingEngine.setFryRampBonus(upgradeEffects(state.upgrades).fryRampPct);
     // Kỷ vật Chiếc Vá Gỗ Năm 1990: nới rộng cửa sổ Perfect thêm +4%
     const hasVaGoRelic = state.unlockedCurioIds?.includes('relic_va_go_1990');
@@ -2443,6 +2456,16 @@ class AppController {
       return;
     }
 
+    const cleanTableBtn = target.closest<HTMLElement>('.btn-clean-table, .patio-table.dirty');
+    if (cleanTableBtn) {
+      Haptics.tap();
+      const idxStr = cleanTableBtn.dataset.tableIdx ?? cleanTableBtn.getAttribute('data-table-idx');
+      if (idxStr !== null && idxStr !== undefined) {
+        this.cleanPatioTable(Number(idxStr));
+      }
+      return;
+    }
+
     const button = target.closest<HTMLElement>('[id]');
     const action = button?.id.replace(/^btn-/, '');
     if (!button || button.hasAttribute('disabled')) return;
@@ -2713,6 +2736,20 @@ class AppController {
     }
   }
 
+  // Dọn dẹp bàn ăn hiên quán và thu gom tiền tip
+  private cleanPatioTable(tableIndex: number) {
+    const session = this.sellingSession;
+    if (!session) return;
+    const res = cleanDineInTable(session, tableIndex);
+    if (res.success) {
+      audio.playCash();
+      Haptics.serveSuccess();
+      this.showToast(`🧹 Đã dọn sạch ${res.tableName}! Thu gom +${res.tipCollected.toLocaleString('vi-VN')}đ tiền tip 🪙✨`);
+      this.sellingStructureKey = '';
+      this.render();
+    }
+  }
+
   // Giao món cho khách trong hàng đợi (ưu tiên khách đầu hoặc khách có món khớp)
   private serveCurrentCustomer(targetOrderId?: string) {
     const session = this.sellingSession;
@@ -2881,8 +2918,29 @@ class AppController {
       this.handlePoliceInspection(policeInsp);
     }
 
-    // Đưa khách vào danh sách diễn hoạt nhận món & quay người rời quán (The 4-Beat Serving Cadence)
-    if (this.sellingSession) {
+    // Nếu khách chọn ngồi ăn tại bàn hiên quán (Dine-In) và có bàn trống
+    let seatedAtTable: DineInTable | null = null;
+    if (this.sellingSession && order.isDineIn && this.sellingSession.dineInTables) {
+      const emptyTable = this.sellingSession.dineInTables.find(t => t.status === 'empty');
+      if (emptyTable) {
+        seatedAtTable = emptyTable;
+        emptyTable.status = 'eating';
+        emptyTable.customerName = order.customerName;
+        emptyTable.customerAvatar = order.avatar;
+        emptyTable.foodName = order.items[0]
+          ? (stateManager.getState().menu.find(m => m.id === order.items[0]?.menuItemId)?.name || 'Gà Rán Giòn')
+          : 'Gà Rán Giòn';
+        emptyTable.foodIcon = '🍗';
+        emptyTable.eatingDurationSec = 8;
+        emptyTable.eatingTimerSec = 8;
+        emptyTable.tipAmount = finalTip;
+        emptyTable.isCritic = !!order.isCriticVip;
+        this.sellingStructureKey = '';
+      }
+    }
+
+    // Đưa khách vào danh sách diễn hoạt nhận món & quay người rời quán (The 4-Beat Serving Cadence) nếu mang về
+    if (this.sellingSession && !seatedAtTable) {
       this.sellingSession.departingCustomers ??= [];
       this.sellingSession.departingCustomers.push({
         order,
@@ -2906,6 +2964,13 @@ class AppController {
     } else if (order.isBunny) {
       audio.playCash();
       this.showToast(`🐰 Bé Thỏ Cam gật gù hạnh phúc, tip thêm ${BUNNY_VISIT_TIP.toLocaleString('vi-VN')}đ và vẫy tai chào! 💖`);
+    } else if (seatedAtTable) {
+      audio.playCash();
+      if (order.isCriticVip) {
+        this.showToast(`⭐ Giám khảo ẩm thực ngồi vào ${seatedAtTable.name} thưởng thức & thẩm định! (+${paid.toLocaleString('vi-VN')}đ) 🍽️`);
+      } else {
+        this.showToast(`🍽️ ${order.customerName} ngồi vào ${seatedAtTable.name} dùng món nóng giòn! (+${paid.toLocaleString('vi-VN')}đ) ✨`);
+      }
     } else {
       audio.playCash();
       const personalityTag = order.personalityLabel ? `[${order.personalityLabel}] ` : '';

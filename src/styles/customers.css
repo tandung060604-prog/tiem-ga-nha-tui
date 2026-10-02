@@ -1256,6 +1256,242 @@
   50% { transform: scale(1.05); }
 }
 
+/* --- GÓC BÀN ĂN HIÊN QUÁN (DINE-IN PATIO TABLES) --- */
+.dine-in-patio-container {
+  margin: 2px 6px 4px;
+  padding: 4px 6px;
+  background: rgba(254, 243, 199, 0.65);
+  border: 1px solid rgba(217, 119, 6, 0.3);
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.patio-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3px;
+}
+
+.patio-title {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #78350f;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.patio-tables-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.patio-table {
+  background: #fff;
+  border: 1.5px solid #d6d3d1;
+  border-radius: 6px;
+  padding: 4px 2px;
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  user-select: none;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.patio-table.empty {
+  border-style: dashed;
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.patio-table-inner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.patio-icon {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.patio-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.patio-name {
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: #44403c;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.patio-status-tag.empty {
+  font-size: 0.52rem;
+  color: #059669;
+  font-weight: 700;
+}
+
+.patio-table.eating {
+  border-color: #f59e0b;
+  background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 100%);
+  animation: eatingGlow 2s infinite alternate ease-in-out;
+}
+
+.patio-table.eating.critic {
+  border-color: #a855f7;
+  background: linear-gradient(180deg, #faf5ff 0%, #f3e8ff 100%);
+}
+
+@keyframes eatingGlow {
+  0% { box-shadow: 0 0 4px rgba(245, 158, 11, 0.2); }
+  100% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.45); }
+}
+
+.patio-guest-avatar-wrap {
+  position: relative;
+  display: inline-block;
+  width: 26px;
+  height: 26px;
+}
+
+.patio-guest-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #d97706;
+  background: #fff;
+}
+
+.patio-eating-bubble {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  font-size: 0.6rem;
+  line-height: 1;
+  background: #fff;
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  padding: 1px 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.patio-progress-bar {
+  width: 80%;
+  height: 3px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.patio-progress-fill {
+  height: 100%;
+  background: #10b981;
+  border-radius: 2px;
+  transition: width 0.2s linear;
+}
+
+/* Dirty table & clean button */
+.patio-table.dirty {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.patio-dirty-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.patio-dish-icon {
+  font-size: 0.85rem;
+}
+
+.patio-tip-tag {
+  font-size: 0.6rem;
+  font-weight: 900;
+  color: #b45309;
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 4px;
+  padding: 0 3px;
+  line-height: 1.2;
+}
+
+.btn-clean-table {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 2px;
+  padding: 2px 4px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  border: 1px solid #047857;
+  border-radius: 6px;
+  font-size: 0.62rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.35);
+  box-sizing: border-box;
+}
+
+.btn-clean-table:active {
+  transform: scale(0.95);
+  background: #047857;
+}
+
+/* VIP Critic Cards & Badges */
+.customer-card.critic-card {
+  border-color: #a855f7;
+  background: linear-gradient(180deg, #faf5ff 0%, #f3e8ff 100%);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.3), 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.customer-card.critic-card.active {
+  border-color: #9333ea;
+  box-shadow: 0 0 16px rgba(147, 51, 234, 0.5), 0 0 0 2px rgba(168, 85, 247, 0.4);
+}
+
+.critic-gold-badge {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: #fff !important;
+  font-weight: 900 !important;
+  border: 1px solid #6d28d9;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 1px 3px rgba(139, 92, 246, 0.4);
+}
+
+.dine-in-tag {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  color: #fff !important;
+  font-weight: 800 !important;
+  border: 1px solid #0369a1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .alley-lantern-pixel,
   .alley-lantern-glow,

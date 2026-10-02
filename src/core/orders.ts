@@ -122,8 +122,33 @@ export class OrdersEngine {
     }
     const extraItems = selectedItems.reduce((n, it) => n + it.count, 0) - 1;
 
+    // VIP Critic xuất hiện khi không phải đơn app / không phải mua nước gấp, từ Ngày 2 trở đi với tỷ lệ 15%
+    const isCriticVip = !isDelivery && !isWalkupDrink && !isVip && state.day >= 2 && (random() < 0.15);
+    // Khách chọn ngồi ăn tại bàn hiên quán (Dine-In Patio): 45% khách tại quán
+    const isDineIn = !isDelivery && !isWalkupDrink && (random() < 0.45);
+
+    let finalPersonality = char.personality;
+    let finalPersonalityLabel = char.personalityLabel;
+    let finalPersonalityDesc = char.personalityDesc;
+    let finalArchetypeBadge = char.title;
+
+    if (isCriticVip) {
+      finalPersonality = 'critic';
+      finalPersonalityLabel = '⭐ Phê Bình VIP';
+      finalPersonalityDesc = 'Nhà phê bình ẩm thực khắt khe, chỉ nhận gà Vàng Giòn chuẩn vị!';
+      finalArchetypeBadge = 'Ẩm Thực 5★';
+    }
+
     const isLongDistance = isDelivery && (state.deliveryRunnerDayCount ?? 0) < 2 && (random() < 0.35);
-    const customerName = isDelivery ? `${isLongDistance ? '🛵 [Giao Xa] ' : '[App] '}${isVip ? '👑 ' : ''}${char.name}` : isWalkupDrink ? `Người đi đường (${char.name})` : (isVip ? `👑 ${char.name} 💵` : `${char.name}`);
+    const customerName = isDelivery
+      ? `${isLongDistance ? '🛵 [Giao Xa] ' : '[App] '}${isVip ? '👑 ' : ''}${char.name}`
+      : isWalkupDrink
+      ? `Người đi đường (${char.name})`
+      : isCriticVip
+      ? `⭐ Giám Khảo ${char.name}`
+      : isVip
+      ? `👑 ${char.name} 💵`
+      : char.name;
     const avatar = isDelivery ? '🛵' : char.avatar;
 
     // Thời gian kiên nhẫn: 28 - 42 giây (ảnh hưởng bởi archetype và nâng cấp không gian)
@@ -136,7 +161,7 @@ export class OrdersEngine {
     // Thấy đắt thì khách mất kiên nhẫn nhanh (core/pricing.ts): giá chặt chém → khách bỏ về giữa chừng
     if (baseTotal > 0) orderRatio = (totalPrice - (isWalkupDrink ? BASKET_RULE.walkupSurcharge : 0)) / (baseTotal * priceMultiplier);
     const priceTolerance = patienceFactorFromPrice(orderRatio);
-    const walkupRush = isWalkupDrink ? 0.6 : 1; // người đi đường vội, không chờ lâu
+    const walkupRush = isWalkupDrink ? 0.6 : isCriticVip ? 0.85 : 1; // người đi đường vội, critic khó tính
     let patienceMax = Math.max(12, Math.round((28 + random() * 12 + spaceBonus + orderSizeBonus) * char.patienceMultiplier * patienceBoost * priceTolerance * walkupRush));
 
     // Hiệp đồng Thời Tiết Sài Gòn & Kỷ Vật Hẻm & Thú Cưng
@@ -162,10 +187,18 @@ export class OrdersEngine {
       isDelivery,
       ...(isLongDistance ? { isLongDistance: true } : {}),
       isVip,
-      archetypeBadge: char.title,
-      personality: char.personality,
-      personalityLabel: char.personalityLabel,
-      personalityDesc: char.personalityDesc,
+      ...(isCriticVip ? {
+        isCriticVip: true,
+        criticStandards: {
+          targetQuality: 'perfect' as const,
+          minPatiencePercent: 40
+        }
+      } : {}),
+      ...(isDineIn ? { isDineIn: true } : {}),
+      archetypeBadge: finalArchetypeBadge,
+      personality: finalPersonality,
+      personalityLabel: finalPersonalityLabel,
+      personalityDesc: finalPersonalityDesc,
       items: selectedItems,
       ...(comboName ? { comboName } : {}),
       ...(isWalkupDrink ? { isWalkupDrink } : {}),

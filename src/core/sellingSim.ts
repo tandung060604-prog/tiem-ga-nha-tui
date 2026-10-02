@@ -1,4 +1,4 @@
-import { CustomerOrder } from '../types/game';
+import { CustomerOrder, DineInTable } from '../types/game';
 import { EconomyEngine } from './economy';
 import type { CookingSnapshot } from './cooking';
 import { TimerStations, emptyTimerStations, tickTimers } from './stations';
@@ -60,6 +60,7 @@ export interface SellingSession {
   thiefCaughtCount?: number;
   thiefEscapedCount?: number;
   departingCustomers?: DepartingCustomer[]; // Khách hàng vừa nhận đồ, đang diễn hoạt nhận món & quay người bước đi
+  dineInTables?: DineInTable[];             // Bàn ăn hiên quán (Patio Tables)
 }
 
 // Khách hàng hoàn tất đơn hàng đang trong chu trình thư thái rời quán (4-Beat Serving Flow)
@@ -120,8 +121,47 @@ export function createSellingSession(): SellingSession {
     missedItemsCount: 0,
     expectedCustomers: 10,
     spawnedCount: 0,
-    departingCustomers: []
+    departingCustomers: [],
+    dineInTables: []
   };
+}
+
+export function tickDineInTables(session: SellingSession, gameDtMs: number): void {
+  if (!session.dineInTables || session.dineInTables.length === 0) return;
+  const dtSec = gameDtMs / 1000;
+  for (const table of session.dineInTables) {
+    if (table.status === 'eating') {
+      table.eatingTimerSec -= dtSec;
+      if (table.eatingTimerSec <= 0) {
+        table.eatingTimerSec = 0;
+        table.status = 'dirty';
+      }
+    }
+  }
+}
+
+export function cleanDineInTable(session: SellingSession, tableIndex: number): { success: boolean; tipCollected: number; tableName: string } {
+  if (!session.dineInTables) return { success: false, tipCollected: 0, tableName: '' };
+  const table = session.dineInTables.find(t => t.tableIndex === tableIndex) || session.dineInTables[tableIndex];
+  if (!table || table.status !== 'dirty') {
+    return { success: false, tipCollected: 0, tableName: table?.name || '' };
+  }
+  const tipCollected = Math.max(0, table.tipAmount || 2000); // Tối thiểu 2k tip thưởng cho việc dọn bàn
+  session.tips = (session.tips || 0) + tipCollected;
+  session.grossRevenue = (session.grossRevenue || 0) + tipCollected;
+  pushFx(session, { kind: 'cash', paid: 0, tip: tipCollected });
+
+  table.status = 'empty';
+  table.customerName = undefined;
+  table.customerAvatar = undefined;
+  table.foodName = undefined;
+  table.foodIcon = undefined;
+  table.tipAmount = 0;
+  table.eatingTimerSec = 0;
+  table.eatingDurationSec = 0;
+  table.isCritic = false;
+
+  return { success: true, tipCollected, tableName: table.name };
 }
 
 // Ca bán dở được lưu vào save để thoát app giữa ca không mất gì (và không chơi lại được ngày đó)
@@ -161,6 +201,7 @@ export function tickSelling(session: SellingSession, gameDt: number, ctx: TickCo
 
   session.gameHour += gameDt / GAME_HOUR_MS;
   tickTimers(session.timers, gameDt);
+  tickDineInTables(session, gameDt);
 
   session.expectedCustomers = ctx.expectedCustomers;
   session.spawnedCount ??= session.orders.length;

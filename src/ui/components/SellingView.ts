@@ -1,5 +1,5 @@
 import { staffEffects } from '../../core/staff';
-import { GameState, CustomerOrder, QualityRating } from '../../types/game';
+import { GameState, CustomerOrder, QualityRating, DineInTable } from '../../types/game';
 import { cookingEngine } from '../../core/cooking';
 import { SellingSession, FxEvent } from '../../core/sellingSim';
 import { isRushHour } from '../../core/clock';
@@ -83,6 +83,15 @@ export function getMoodThought(mood: CustomerMood, order?: CustomerOrder, state?
       case 'impatient': return 'Lâu quá anh sốt ruột nha, nhanh tay là có thưởng đậm! ⏱️';
       case 'waiting': return 'Tiền nong không quan trọng, làm chuẩn giòn rụm anh bo hết nấc! 💵';
       case 'happy': return 'Gà ngon xuất sắc! Khỏi thối tiền thừa nha em! 👑✨';
+    }
+  }
+
+  if (p === 'critic' || order?.isCriticVip) {
+    switch (mood) {
+      case 'leaving': return 'Phục vụ quá chậm trễ! Đánh giá 1 sao và bêu tên trên bài viết! 💢';
+      case 'impatient': return 'Lâu quá đấy! Tôi đang bấm giờ từng giây chất lượng phục vụ! ⏱️';
+      case 'waiting': return 'Chờ xem độ giòn và mùi vị có xứng danh đồn thổi hay không... 🧐';
+      case 'happy': return 'Vàng giòn rụm, vỏ mỏng ráo dầu! Xứng đáng 5 sao thượng hạng! ⭐⭐⭐⭐⭐';
     }
   }
 
@@ -206,6 +215,7 @@ export function sellingStructureKey(state: GameState, session: SellingSession): 
   return JSON.stringify([
     session.orders.map(o => [o.id, o.items.map(it => it.served)]),
     (session.departingCustomers || []).map(d => [d.order.id, d.phase]),
+    (session.dineInTables || []).map(t => [t.id, t.status, Math.ceil(t.eatingTimerSec), t.tipAmount]),
     cookingEngine.getTray().map(t => t.id + (t.condiment ?? '')),
     cook.isFrying, cook.fryingType, cookingEngine.getActiveSeasoning(),
     state.oilCondition, state.currentChapter,
@@ -982,11 +992,13 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       : ASSETS.icons.emoteYum;
 
     return `
-      <div class="customer-card ${ord.isBunny ? 'bunny-card' : ''} ${ord.isVip ? 'vip-card' : ''} ${isAngry ? 'angry' : ''} ${isFirstInQueue ? 'active at-counter' : alleySlotClass}" 
+      <div class="customer-card ${ord.isBunny ? 'bunny-card' : ''} ${ord.isVip ? 'vip-card' : ''} ${ord.isCriticVip ? 'critic-card' : ''} ${isAngry ? 'angry' : ''} ${isFirstInQueue ? 'active at-counter' : alleySlotClass}" 
            data-order-id="${ord.id}" 
            data-mood="${mood}" 
            data-is-bunny="${ord.isBunny ? 'true' : 'false'}" 
            data-is-vip="${ord.isVip ? 'true' : 'false'}"
+           data-is-critic="${ord.isCriticVip ? 'true' : 'false'}"
+           data-is-dinein="${ord.isDineIn ? 'true' : 'false'}"
            data-letter-id="${ord.bunnyLetterId || ''}"
            data-stand-src="${visual.stand}"
            data-walk-src="${visual.walk}"
@@ -1026,6 +1038,8 @@ export function renderSellingView(state: GameState, session: SellingSession): st
               <span class="queue-pos-badge ${isFirstInQueue ? 'first' : 'wait'}">${queuePosText}</span>
               <span class="cust-badge ${visual.badgeClass}">${visual.badge}</span>
               ${ord.isVip ? '<span class="cust-badge vip-gold-badge">👑 VIP</span>' : ''}
+              ${ord.isCriticVip ? '<span class="cust-badge critic-gold-badge">⭐ PHÊ BÌNH</span>' : ''}
+              ${ord.isDineIn ? '<span class="cust-badge dine-in-tag">🍽️ Ngồi Quán</span>' : ''}
               ${ord.personalityLabel ? `<span class="cust-badge trait-badge" title="${escapeHtml(ord.personalityDesc || '')}">${escapeHtml(ord.personalityLabel)}</span>` : ''}
             </div>
           </div>
@@ -1221,6 +1235,9 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <span class="sign-street-name">Hẻm 1102 · Quầy Gọi Món</span>
           <span class="sign-lantern-icon">🏮</span>
         </div>
+
+        <!-- Góc Bàn Ăn Hiên Quán (Dine-In Patio Tables) -->
+        ${renderDineInPatio(session.dineInTables)}
 
         <!-- Customer Queue Lane (Khách vào/ra quán) -->
         <div class="customer-lane">
@@ -1586,4 +1603,75 @@ export function renderStaffCornerCard(state: GameState, session: SellingSession)
 }
 
 const FRY_ICON: Record<string, string> = { crispy_chicken: '🍗', spicy_chicken: '🌶️', honey_garlic_chicken: '🍯', shake_fries: '🍟', popcorn_chicken: '🍿' };
+
+// ---------------------------------------------------------------------------
+// Góc Bàn Ăn Hiên Quán (Dine-In Patio Tables) - Thưởng thức tại chỗ & Thu gom tip
+// ---------------------------------------------------------------------------
+export function renderDineInPatio(tables?: DineInTable[]): string {
+  if (!tables || tables.length === 0) return '';
+  const tablesHtml = tables.map(table => {
+    if (table.status === 'empty') {
+      return `
+        <div class="patio-table empty" data-table-idx="${table.tableIndex}" title="${table.name} đang sẵn sàng đón khách">
+          <div class="patio-table-inner">
+            <span class="patio-icon">🪑</span>
+            <div class="patio-info">
+              <span class="patio-name">${escapeHtml(table.name)}</span>
+              <span class="patio-status-tag empty">Sạch sẽ</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    if (table.status === 'eating') {
+      const progressPct = Math.round((table.eatingTimerSec / Math.max(1, table.eatingDurationSec)) * 100);
+      return `
+        <div class="patio-table eating ${table.isCritic ? 'critic' : ''}" data-table-idx="${table.tableIndex}" title="${escapeHtml(table.customerName || 'Khách')} đang thưởng thức món ăn">
+          <div class="patio-table-inner">
+            <div class="patio-guest-avatar-wrap">
+              <img src="${table.customerAvatar || ASSETS.capdoi.stand}" class="patio-guest-avatar" alt="${escapeHtml(table.customerName || '')}" />
+              <span class="patio-eating-bubble">😋 ${table.isCritic ? '⭐' : '🍗'}</span>
+            </div>
+            <div class="patio-info">
+              <span class="patio-name">${escapeHtml(table.customerName || table.name)}</span>
+              <div class="patio-progress-bar" title="Đang ăn: ${Math.ceil(table.eatingTimerSec)}s">
+                <div class="patio-progress-fill" style="width: ${progressPct}%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    // dirty
+    const tip = table.tipAmount || 2000;
+    const tipK = Math.round(tip / 1000);
+    return `
+      <div class="patio-table dirty ${table.isCritic ? 'critic' : ''}" data-table-idx="${table.tableIndex}" title="Khách đã ăn xong! Chạm dọn bàn để thu ${tip.toLocaleString('vi-VN')}đ tiền tip">
+        <div class="patio-table-inner">
+          <div class="patio-dirty-icon-wrap">
+            <span class="patio-dish-icon">🍽️</span>
+            <span class="patio-tip-tag">+${tipK}k 🪙</span>
+          </div>
+          <button class="btn-clean-table" data-table-idx="${table.tableIndex}" title="Dọn bàn và thu ${tip.toLocaleString('vi-VN')}đ tiền tip">
+            🧹 DỌN BÀN
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="dine-in-patio-container">
+      <div class="patio-header">
+        <span class="patio-title">
+          <img src="${ASSETS.icons.broom}" class="pixel-section-icon" alt="" /> Hiên Quán · Bàn Ăn Tại Chỗ
+        </span>
+      </div>
+      <div class="patio-tables-grid">
+        ${tablesHtml}
+      </div>
+    </div>
+  `;
+}
+
 

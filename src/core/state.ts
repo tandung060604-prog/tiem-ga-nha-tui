@@ -1,4 +1,4 @@
-import { GameState } from '../types/game';
+import { GameState, DineInTable } from '../types/game';
 import { INITIAL_INVENTORY } from '../content/inventory';
 import { INITIAL_MENU } from '../content/menu';
 import { INITIAL_UPGRADES } from '../content/upgrades';
@@ -12,6 +12,14 @@ import { staffImage } from '../content/assets';
 
 const SAVE_KEY = 'tiem_ga_nha_tui_save_v2';
 const SIG_KEY = `${SAVE_KEY}_sig`;
+
+export function createDefaultDineInTables(): DineInTable[] {
+  return [
+    { id: 'table_0', tableIndex: 0, name: 'Bàn 1 (Hiên Quán)', status: 'empty', eatingTimerSec: 0, eatingDurationSec: 0, tipAmount: 0 },
+    { id: 'table_1', tableIndex: 1, name: 'Bàn 2 (Góc Phố)', status: 'empty', eatingTimerSec: 0, eatingDurationSec: 0, tipAmount: 0 },
+    { id: 'table_2', tableIndex: 2, name: 'Bàn 3 (Bóng Râm)', status: 'empty', eatingTimerSec: 0, eatingDurationSec: 0, tipAmount: 0 }
+  ];
+}
 
 export function createInitialState(): GameState {
   const state: GameState = {
@@ -170,6 +178,7 @@ export function createInitialState(): GameState {
     claimedHeritageBadgeIds: [],
     unlockedThemeIds: ['default'],
     activeShopTheme: 'default',
+    dineInTables: createDefaultDineInTables(),
   };
   getOrCreatePetPatio(state);
   Object.values(state.inventory).forEach(ensureBatches);
@@ -206,6 +215,9 @@ export function migrateSave(raw: unknown): { state: GameState; repaired: string[
   }
   if (!state.roomId || typeof state.roomId !== 'string') {
     state.roomId = 'HEM1102';
+  }
+  if (!state.dineInTables || !Array.isArray(state.dineInTables) || state.dineInTables.length === 0) {
+    state.dineInTables = createDefaultDineInTables();
   }
   // Save từ trước khi có hướng dẫn: đã qua ngày 1 thì coi như đã học, không bật lại
   if (typeof src.tutorialDone !== 'boolean') state.tutorialDone = typeof src.day === 'number' && src.day > 1;

@@ -64,6 +64,11 @@ export const PERSONALITY_MAP: Record<CustomerPersonality, { label: string; desc:
     label: '🛵 Tài Xế',
     desc: 'Cần đơn gấp đi giao, không tip nhưng đơn nhanh gọn',
     patienceRate: 1.3
+  },
+  critic: {
+    label: '⭐ Phê Bình VIP',
+    desc: 'Nhà phê bình ẩm thực khắt khe, chỉ nhận gà Vàng Giòn chuẩn vị, tip khủng khi hoàn hảo',
+    patienceRate: 0.9
   }
 };
 

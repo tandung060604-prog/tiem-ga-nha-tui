@@ -212,7 +212,25 @@ export type CustomerPersonality =
   | 'foodie'       // 👑 Sành Ăn: Cực chuộng Perfect (+8k-12k tip), gà cháy phạt gấp đôi
   | 'student'      // 🎓 Học Sinh: Tiền túi có hạn, tip 1k-2k tiền lẻ hoặc không tip
   | 'driver'       // 🛵 Tài Xế / Shipper: Cần đơn gấp chạy chuyến, không tip
-  | 'vip_generous';// 👑✨ Khách Sộp: Đại gia/CEO/Tiktoker, tip khủng +35k-150k+, viền hào quang vàng lấp lánh!
+  | 'vip_generous' // 👑✨ Khách Sộp: Đại gia/CEO/Tiktoker, tip khủng +35k-150k+, viền hào quang vàng lấp lánh!
+  | 'critic';      // ⭐ Nhà Phê Bình Ẩm Thực VIP: Khắt khe tuyệt đối, soi chuẩn độ giòn, tip khủng khi hoàn hảo!
+
+export type TableStatus = 'empty' | 'eating' | 'dirty';
+
+export interface DineInTable {
+  id: string;
+  tableIndex: number;
+  name: string;
+  status: TableStatus;
+  customerName?: string;
+  customerAvatar?: string;
+  foodName?: string;
+  foodIcon?: string;
+  eatingTimerSec: number;
+  eatingDurationSec: number;
+  tipAmount: number;
+  isCritic?: boolean;
+}
 
 export interface CustomerOrder {
   id: string;
@@ -224,12 +242,21 @@ export interface CustomerOrder {
   isMysteryGuest?: boolean;
   isWalkupDrink?: boolean; // người đi đường chỉ mua nước mang đi (đã gồm phụ thu)
   isVip?: boolean;         // Khách Sộp hào phóng
+  isCriticVip?: boolean;   // Giám khảo ẩm thực / Nhà phê bình VIP
+  criticStandards?: {
+    targetQuality?: QualityRating;
+    requiredSauce?: string;
+    minPatiencePercent?: number;
+  };
+  criticReviewOutcome?: 'praised' | 'slammed';
+  isDineIn?: boolean;      // Khách chọn ngồi ăn tại chỗ tại bàn hiên quán
+  assignedTableIndex?: number;
   mysteryQuestId?: string;
   isBunny?: boolean;
   bunnyLetterId?: string;
   archetypeBadge?: string;
   personality?: CustomerPersonality;
-  personalityLabel?: string; // Ví dụ: "💎 Hào Phóng", "🦀 Keo Kiệt", "⚡ Vội Vã", "🌸 Dễ Tính", "👑 Sành Ăn"
+  personalityLabel?: string; // Ví dụ: "💎 Hào Phóng", "🦀 Keo Kiệt", "⚡ Vội Vã", "🌸 Dễ Tính", "👑 Sành Ăn", "⭐ Phê Bình VIP"
   personalityDesc?: string;  // Mô tả ngắn ảnh hưởng
   // condiment: khách dặn thêm tương (chỉ xịt đúng loại khách dặn mới có tip); condimentServed: số phần đã xịt đúng
   items: { menuItemId: string; count: number; served: number; completed: boolean; condiment?: Condiment; condimentServed?: number }[];
@@ -542,6 +569,7 @@ export interface GameState {
   unlockedThemeIds?: ShopThemeId[];
   activeShopTheme?: ShopThemeId;
   endlessRecord?: EndlessRunRecord;
+  dineInTables?: DineInTable[];
 }
 
 export interface BargainWholesaler {

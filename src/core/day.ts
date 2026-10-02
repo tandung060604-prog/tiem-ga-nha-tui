@@ -333,6 +333,19 @@ export function calculateCustomerTip(
       notes.push('Khách sộp nhắc nhở vì món cháy (-50% tip)');
     }
   }
+  // 3b. Nhà Phê Bình Ẩm Thực VIP (Food Critic / Michelin Inspector): Khắt khe chuẩn vị
+  else if (personality === 'critic' || order.isCriticVip) {
+    if (hasBurnt) {
+      baseTip = 0;
+      notes.push('💥 NHÀ PHÊ BÌNH: Thất vọng cùng cực vì món cháy khét lẹt! (0đ tip, chê trách)');
+    } else if (perfectBonus > 0) {
+      baseTip = 35000 + perfectBonus * 2;
+      notes.push('⭐ Michelin Inspector: Nức nở khen ngợi tay nghề Vàng Giòn 5 sao! (+35k tip khủng)');
+    } else {
+      baseTip = 3000;
+      notes.push('⚠️ NHÀ PHÊ BÌNH: Món chỉ đạt mức thường, chưa chuẩn Vàng Giòn thượng hạng (+3k tip nhắc nhở)');
+    }
+  }
   // 4. Hào Phóng: Rất chuộng tip to
   else if (personality === 'generous') {
     if (isFast) {
@@ -688,7 +701,8 @@ export function cancelAndApologizeOrder(
     vip_generous: 'Haha không sao em ơi! Quán bán đắt như tôm tươi là mừng rồi! Hôm khác anh lại ghé ủng hộ tiếp!',
     foodie: 'Tiếc ghê, món ngon nên mau hết hả tiệm? Bữa sau nhớ phần tui nghen!',
     frugal: 'Hơi tiếc công ghé, nhưng tiệm xin lỗi nhiệt tình quá, để bữa khác vậy!',
-    impatient: 'Biết trước hết món thì đỡ đợi, nhưng cảm ơn quán đã báo sớm nha!'
+    impatient: 'Biết trước hết món thì đỡ đợi, nhưng cảm ơn quán đã báo sớm nha!',
+    critic: 'Hết món rồi sao? Quán nên dự trù nguyên liệu tốt hơn, hôm khác tôi sẽ quay lại kiểm tra tiếp!'
   };
 
   const apologyReply = (order.personality && replies[order.personality])
