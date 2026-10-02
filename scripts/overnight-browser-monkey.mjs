@@ -281,6 +281,15 @@ class OvernightMonkey {
       return true;
     }
 
+    // 0h. Banner Bác Ba Nam Bộ mách nước trong ca bán (#bacba-tip-banner)
+    const bacbaTipClose = page.locator('#bacba-tip-banner .bacba-tip-banner-close, #bacba-tip-banner.show, .bacba-tip-banner.show');
+    if (await bacbaTipClose.first().isVisible({ timeout: 40 }).catch(() => false)) {
+      log(`👴 Đóng Banner Bác Ba mách nước...`);
+      await bacbaTipClose.first().click({ force: true }).catch(() => {});
+      await sleep(150);
+      return true;
+    }
+
     // Modal Kết Thúc Trò Chơi (Ending Modal): Ưu tiên Bấm Chơi Lại Mới để reset vòng lặp kiểm thử
     const endingRestartBtn = page.locator('#btn-restart-game');
     if (await endingRestartBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
@@ -768,10 +777,12 @@ class OvernightMonkey {
         if (tb instanceof HTMLElement) tb.click();
       }
 
-      const closeButtons = document.querySelectorAll('.dash-close-x, #btn-modal-close-icon, #btn-close-header-drawer, [id*="btn-close"], .btn-close, .modal-close');
+      const closeButtons = document.querySelectorAll('.dash-close-x, #btn-modal-close-icon, #btn-close-header-drawer, .bacba-tip-banner-close, [id*="btn-close"], .btn-close, .modal-close');
       for (const btn of closeButtons) {
         if (btn instanceof HTMLElement) btn.click();
       }
+      const bacbaTipBanner = document.getElementById('bacba-tip-banner');
+      if (bacbaTipBanner) bacbaTipBanner.classList.remove('show');
       const overlay = document.querySelector('.modal-overlay, #modal-overlay, #btn-drawer-overlay');
       if (overlay instanceof HTMLElement) overlay.click();
 

@@ -1297,8 +1297,8 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         </div>
 
         <div class="work-grid">
-          <!-- Real Cast Iron Fryer Card (Bếp Chiên Ngập Dầu Chợ Lớn) -->
-          <div class="fryer-card">
+          <!-- Cột Trái: Trạm Sản Xuất (Bếp Chiên Ngập Dầu & Máy Rót Nước Đa Vị) -->
+          <div class="fryer-card production-station">
 
             <div class="fryer-header">
               <span class="fryer-title">
@@ -1354,19 +1354,8 @@ export function renderSellingView(state: GameState, session: SellingSession): st
                 <div class="cook-gauge-pointer" style="left: ${potProgressPercent}%;"></div>
               </div>
             </div>
-          </div>
 
-          <!-- Tray & Assemble Card (Quầy Giữ Nhiệt Giòn Tan) -->
-          <div class="assemble-card">
-            <div class="tray-title">
-              <span><img src="${ASSETS.icons.book}" class="pixel-section-icon" alt="" /> Khay (${tray.length}/${cookingEngine.getTraySize()})</span>
-            </div>
-
-            <div class="tray-slots">
-              ${traySlotsHtml}
-            </div>
-
-            <!-- Quầy Máy Rót Nước Đa Vị & Hiệu Ứng Rót Tinh Gọn -->
+            <!-- Quầy Máy Rót Nước Đa Vị Nằm Gọn Ngay Dưới Bếp Chiên (Production Bay) -->
             <div class="fountain-station compact-fountain">
               <div class="fountain-header">
                 <span class="fountain-title"><img src="${ASSETS.food.soda}" class="pixel-section-icon" alt="" /> Rót Nước</span>
@@ -1401,11 +1390,22 @@ export function renderSellingView(state: GameState, session: SellingSession): st
                 </button>
               </div>
             </div>
+          </div>
+
+          <!-- Cột Phải: Trạm Ra Món Hoàng Kim (Hero Serving Tray & Keng Lên Món) -->
+          <div class="assemble-card hero-tray-card">
+            <div class="tray-title">
+              <span><img src="${ASSETS.icons.book}" class="pixel-section-icon" alt="" /> Khay Ra Món (${tray.length}/${cookingEngine.getTraySize()})</span>
+            </div>
+
+            <div class="tray-slots hero-tray-slots">
+              ${traySlotsHtml}
+            </div>
 
             ${renderStationStrip(state, session)}
 
             <!-- Serve Button -->
-            <button id="btn-serve-order" class="btn-serve" ${session.orders.length === 0 || tray.length === 0 ? 'disabled' : ''}>
+            <button id="btn-serve-order" class="btn-serve hero-serve-btn" ${session.orders.length === 0 || tray.length === 0 ? 'disabled' : ''}>
               <img src="${ASSETS.icons.bell}" class="btn-pixel-icon-lg" alt="" /> KENG! LÊN MÓN (SERVE)
             </button>
           </div>
