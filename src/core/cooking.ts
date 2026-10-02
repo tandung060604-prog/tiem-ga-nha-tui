@@ -82,6 +82,8 @@ export class CookingEngine {
     this.cookState.isFrying = true;
     this.cookState.fryingType = type;
     this.cookState.progress = 0;
+    audio.playTongsClick();
+    audio.playSizzleBurst();
     audio.startSizzle();
     return true;
   }
@@ -158,6 +160,7 @@ export class CookingEngine {
     if (!this.cookState.isFrying) return { quality: 'raw', trayItem: null, usedSauce: null };
 
     audio.stopSizzle();
+    audio.playTongsClick();
     const quality = this.calculateCurrentQuality();
     this.cookState.isFrying = false;
 

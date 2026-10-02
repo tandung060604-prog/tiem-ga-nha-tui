@@ -345,24 +345,24 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
         : `<img src="${ASSETS.icons.sparkle}" class="badge-pixel-star-xs" alt="✨" />`;
     }
     if (c.emoteBubble) {
-      if (p.angry) {
-        c.emoteBubble.innerHTML = `<img src="${ASSETS.icons.emoteAnger}" class="emote-pixel-img" alt="💢" />`;
-      } else if (p.cls === 'low') {
-        c.emoteBubble.innerHTML = `<img src="${ASSETS.icons.emoteSweat}" class="emote-pixel-img" alt="💦" />`;
-      } else if (order.isVip) {
-        c.emoteBubble.innerHTML = `<img src="${ASSETS.icons.heart}" class="emote-pixel-img" alt="VIP" />`;
-      } else if (p.cls === 'mid') {
-        c.emoteBubble.innerHTML = `<img src="${ASSETS.icons.emoteQuestion}" class="emote-pixel-img" alt="⏳" />`;
-      } else {
-        c.emoteBubble.innerHTML = `<img src="${ASSETS.icons.emoteYum}" class="emote-pixel-img" alt="😋" />`;
-      }
-    }
+      const thoughtMsg = getMoodThought(mood, order, state);
+      c.emoteBubble.title = thoughtMsg;
+      const targetIcon = p.angry
+        ? ASSETS.icons.emoteAnger
+        : p.cls === 'low'
+        ? ASSETS.icons.emoteSweat
+        : order.isVip || order.isBunny
+        ? ASSETS.icons.heart
+        : p.cls === 'mid'
+        ? ASSETS.icons.emoteQuestion
+        : ASSETS.icons.emoteYum;
 
-    // Dynamic Thought Bubble update
-    if (c.thoughtEl && c.thoughtEl.dataset.mood !== mood) {
-      c.thoughtEl.dataset.mood = mood;
-      c.thoughtEl.className = `thought-bubble ${mood}`;
-      if (c.thoughtText) c.thoughtText.textContent = getMoodThought(mood, order, state);
+      const img = c.emoteBubble.querySelector<HTMLImageElement>('img');
+      if (img) {
+        if (!img.src.endsWith(targetIcon)) img.src = targetIcon;
+      } else {
+        c.emoteBubble.innerHTML = `<img src="${targetIcon}" class="emote-pixel-img" alt="${mood}" width="16" height="16" />`;
+      }
     }
 
     // Dynamic 2D sprite expression swap
@@ -384,6 +384,21 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
         if (!c.img.src.endsWith(standSrc)) c.img.src = standSrc;
         c.img.classList.remove('angry', 'walking');
         c.img.classList.add('standing');
+      }
+    }
+  }
+
+  // Cập nhật dòng chữ chạy LED đáy quán theo khách hàng đầu tiên
+  if (session.orders.length > 0) {
+    const liveTicker = root.querySelector<HTMLElement>('#ticker-live-text');
+    const activeOrd = session.orders[0];
+    if (liveTicker && activeOrd) {
+      const activeVisual = getCustomerVisual(activeOrd);
+      const activeMood = getCustomerMood(activeOrd);
+      const activeThought = getMoodThought(activeMood, activeOrd, state);
+      const msg = `${activeVisual.name}: "${activeThought}" • Hẻm 1102 phục vụ chu đáo!`;
+      if (liveTicker.textContent !== msg) {
+        liveTicker.textContent = msg;
       }
     }
   }
@@ -722,6 +737,18 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       ? '<span class="queue-pos-badge next"><span class="queue-num-badge">2</span> Kế tiếp</span>' 
       : `<span class="queue-pos-badge wait"><span class="queue-num-badge">${idx + 1}</span> Xếp hàng</span>`;
 
+    const emoteIcon = isAngry
+      ? ASSETS.icons.emoteAnger
+      : patiencePercent < 25
+      ? ASSETS.icons.emoteSweat
+      : ord.isBunny || ord.isVip
+      ? ASSETS.icons.heart
+      : hasMatchInTray
+      ? ASSETS.icons.sparkle
+      : patiencePercent < 55
+      ? ASSETS.icons.emoteQuestion
+      : ASSETS.icons.emoteYum;
+
     return `
       <div class="customer-card ${ord.isBunny ? 'bunny-card' : ''} ${ord.isVip ? 'vip-card' : ''} ${isAngry ? 'angry' : ''} ${idx === 0 ? 'active' : ''}" 
            data-order-id="${ord.id}" 
@@ -733,9 +760,9 @@ export function renderSellingView(state: GameState, session: SellingSession): st
            data-walk-src="${visual.walk}"
            data-angry-src="${visual.angry}"
            data-leave-src="${visual.leave}">
-        <!-- Realtime Customer Thought Bubble -->
-        <div class="thought-bubble ${mood}" data-mood="${mood}">
-          <span class="thought-text">${thought}</span>
+        <!-- Stardew Floating Emote Bubble (16x16 Pixel Emote) -->
+        <div class="stardew-emote-bubble ${mood}" data-mood="${mood}" title="${escapeHtml(thought)}">
+          <img src="${emoteIcon}" class="emote-pixel-img" alt="${mood}" width="16" height="16" />
         </div>
 
         <!-- 2D Character Walking & Standing Stage -->

@@ -194,6 +194,101 @@ class AudioManager {
     osc.stop(now + 0.25);
   }
 
+  // Customer Arrival Melodic Doorbell Chime (C6 -> G5 ding-dong)
+  public playDoorChime() {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const notes = [
+      { freq: 1046.50, start: 0, dur: 0.35 },    // C6 "Ding"
+      { freq: 783.99,  start: 0.16, dur: 0.45 }   // G5 "Dong"
+    ];
+
+    notes.forEach(n => {
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const startTime = now + n.start;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(n.freq, startTime);
+
+      gain.gain.setValueAtTime(0.18, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + n.dur);
+
+      osc.connect(gain);
+      gain.connect(this.dest());
+
+      osc.start(startTime);
+      osc.stop(startTime + n.dur);
+    });
+  }
+
+  // Metal Tongs Click (Kẹp gắp kim loại cạch cạch)
+  public playTongsClick() {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    [0, 0.045].forEach(offset => {
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const startTime = now + offset;
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(2400, startTime);
+      osc.frequency.exponentialRampToValueAtTime(800, startTime + 0.035);
+
+      gain.gain.setValueAtTime(0.15, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.035);
+
+      osc.connect(gain);
+      gain.connect(this.dest());
+
+      osc.start(startTime);
+      osc.stop(startTime + 0.035);
+    });
+  }
+
+  // Punchy short sizzle burst when raw food hits hot 180°C oil
+  public playSizzleBurst() {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const dur = 0.35;
+    const bufSize = Math.floor(this.ctx.sampleRate * dur);
+    const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.4));
+    }
+
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = buf;
+
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(2200, now);
+    filter.Q.setValueAtTime(1.5, now);
+
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.dest());
+
+    noise.start(now);
+    noise.stop(now + dur);
+  }
+
   // Continuous Sizzling Oil Sound
   public startSizzle() {
     if (this.isMuted || this.sizzleNode) return;

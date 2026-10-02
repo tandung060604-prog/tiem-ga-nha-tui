@@ -2076,6 +2076,7 @@ class AppController {
           break;
         }
         case 'customerArrived':
+          audio.playDoorChime();
           break;
         case 'dayOver':
           dayOver = true;
