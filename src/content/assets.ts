@@ -75,28 +75,35 @@ export const ASSETS = {
     ngu: url('assets/mascot/mascot_gabong_front.png')
   },
   shipper: {
-    walk: url('assets/characters/char_19_shipper_tuan.png'),
+    walk: url('assets/characters/char_19_shipper_walk.png'),
     stand: url('assets/characters/char_19_shipper_tuan.png'),
     angry: url('assets/characters/char_19_shipper_tuan.png'),
-    leave: url('assets/characters/char_19_shipper_tuan.png')
+    leave: url('assets/characters/char_19_shipper_walk.png')
   },
   hocsinh: {
-    walk: url('assets/characters/char_30_student_bus.png'),
+    walk: url('assets/characters/char_30_student_walk.png'),
     stand: url('assets/characters/char_30_student_bus.png'),
     angry: url('assets/characters/char_30_student_bus.png'),
-    leave: url('assets/characters/char_30_student_bus.png')
+    leave: url('assets/characters/char_takeaway_walk.png')
   },
   vanphong: {
-    walk: url('assets/characters/char_07_trendy_vy.png'),
+    walk: url('assets/characters/char_07_office_walk.png'),
     stand: url('assets/characters/char_07_trendy_vy.png'),
     angry: url('assets/characters/char_07_trendy_vy.png'),
-    leave: url('assets/characters/char_07_trendy_vy.png')
+    leave: url('assets/characters/char_takeaway_walk.png')
+  },
+  takeawayCustomer: url('assets/characters/char_takeaway_walk.png'),
+  pets: {
+    dogWalk: url('assets/characters/pet_01_dog_vang_walk.png'),
+    catWalk: url('assets/characters/pet_02_cat_muop_walk.png'),
+    ratWalk: url('assets/characters/pest_01_rat_cong_walk.png'),
+    mascotWalk: url('assets/mascot/mascot_gabong_walk.png')
   },
   karen: {
-    walk: url('assets/characters/char_31_gossip_tam.png'),
+    walk: url('assets/characters/char_07_office_walk.png'),
     stand: url('assets/characters/char_31_gossip_tam.png'),
     angry: url('assets/characters/char_31_gossip_tam.png'),
-    leave: url('assets/characters/char_31_gossip_tam.png')
+    leave: url('assets/characters/char_takeaway_walk.png')
   },
   gamethu: {
     walk: url('assets/characters/char_12_courier_ut.png'),

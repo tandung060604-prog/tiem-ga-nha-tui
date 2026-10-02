@@ -36,20 +36,15 @@ export function renderWeatherAtmosphereStrip(weather: SaigonWeather): string {
   }
 
   return `
-    <div class="weather-atmosphere-strip ${weather.bgAtmosphereClass}" style="background: ${bgColor}; border: 1.5px solid ${borderColor}; border-radius: 8px; padding: 6px 10px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span style="font-size: 1.3rem;">${weather.icon}</span>
-        <div>
-          <div style="font-size: 0.75rem; font-weight: 900; color: ${textColor};">
-            ${escapeHtml(weather.badgeText)}
-          </div>
-          <div style="font-size: 0.65rem; color: ${textColor}; font-style: italic; opacity: 0.9;">
-            "${escapeHtml(weather.flavorQuote)}"
-          </div>
-        </div>
+    <div class="weather-atmosphere-strip ${weather.bgAtmosphereClass}" style="background: ${bgColor}; border: 1.5px solid ${borderColor}; border-radius: 6px; padding: 2px 8px; margin: 2px 0 4px; display: flex; align-items: center; justify-content: space-between; gap: 6px; height: 26px; box-sizing: border-box;">
+      <div style="display: flex; align-items: center; gap: 6px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+        <span style="font-size: 0.95rem;">${weather.icon}</span>
+        <span style="font-size: 0.7rem; font-weight: 800; color: ${textColor}; overflow: hidden; text-overflow: ellipsis;">
+          ${escapeHtml(weather.badgeText)}
+        </span>
       </div>
-      <div style="font-size: 0.65rem; font-weight: 800; background: rgba(255,255,255,0.7); border: 1px solid ${borderColor}; border-radius: 4px; padding: 2px 6px; white-space: nowrap; color: ${textColor};">
-        SÀI GÒN 🇻🇳
+      <div style="font-size: 0.58rem; font-weight: 800; background: rgba(255,255,255,0.75); border: 1px solid ${borderColor}; border-radius: 4px; padding: 1px 5px; white-space: nowrap; color: ${textColor}; flex-shrink: 0;">
+        SÀI GÒN
       </div>
     </div>
   `;

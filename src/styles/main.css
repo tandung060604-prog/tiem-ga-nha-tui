@@ -4003,34 +4003,68 @@ body.selling-mode .toast.show {
   margin-left: 4px;
 }
 
-/* KHUNG VẬT LIỆU CỐ ĐỊNH (DOCKED MATERIALS BAR) */
+/* KHUNG VẬT LIỆU CỐ ĐỊNH (FULL WIDTH DOCKED MATERIALS BAR) */
 .prep-baskets-section.docked-materials {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: #e6e9ed;
+  background: #f1f3f5;
   border: 1.5px solid #b8bec5;
   border-radius: 8px;
-  padding: 5px 6px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-  margin-bottom: 6px;
+  padding: 3px 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-bottom: 4px;
   width: 100%;
   box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .prep-baskets-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   padding-bottom: 2px;
   border-bottom: 1px dashed #ced4da;
 }
 
-.prep-baskets-sub {
-  font-size: 0.6rem;
-  color: #6c757d;
-  font-style: italic;
+.prep-baskets-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #343a40;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.food-shelf-grid.prep-bottles {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.food-shelf-grid.prep-bottles .shelf-tile {
+  min-width: 44px;
+  max-width: 46px;
+  width: 44px;
+  min-height: 44px;
+  height: 44px;
+  padding: 2px 1px;
+  box-sizing: border-box;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.food-shelf-grid.prep-bottles .shelf-img.bottle {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.food-shelf-grid.prep-bottles .shelf-label {
+  font-size: 0.58rem;
+  line-height: 1;
+  text-align: center;
 }
 
 

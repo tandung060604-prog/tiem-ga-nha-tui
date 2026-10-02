@@ -430,7 +430,7 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
     cache.oilDot.className = `oil-dot ${currentOil}`;
   }
   if (cache.oilLabel) {
-    const label = currentOil === 'clean' ? 'Vàng óng' : currentOil === 'medium' ? 'Nâu sẫm' : 'Đen khét';
+    const label = currentOil === 'clean' ? 'Sạch' : currentOil === 'medium' ? 'Vừa' : 'Đen';
     if (cache.oilLabel.textContent !== label) cache.oilLabel.textContent = label;
   }
 
@@ -610,12 +610,13 @@ export function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
   }
 
   if (order.isDelivery || order.customerName.includes('Shipper') || order.customerName.includes('Giao Hàng') || order.customerName.includes('[App]')) {
-    const shipAsset = ASSETS.characters.char_19_shipper_tuan;
+    const shipStand = ASSETS.characters.char_19_shipper_tuan;
+    const shipWalk = ASSETS.shipper.walk;
     return {
-      stand: shipAsset,
-      walk: shipAsset,
-      angry: shipAsset,
-      leave: shipAsset,
+      stand: shipStand,
+      walk: shipWalk,
+      angry: shipStand,
+      leave: shipWalk,
       name: order.customerName,
       badge: order.archetypeBadge ? `🛵 ${order.archetypeBadge}` : '🛵 Shipper Ruột',
       badgeClass: 'delivery-badge'
@@ -626,11 +627,18 @@ export function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
   if (order.characterId && CHAR_MAP.has(order.characterId)) {
     const profile = CHAR_MAP.get(order.characterId)!;
     const asset = charUrl(profile.id);
+    const walkAsset = profile.id === 'char_19_shipper_tuan' ? ASSETS.shipper.walk :
+                      profile.id === 'char_30_student_bus' ? ASSETS.hocsinh.walk :
+                      profile.id === 'char_07_trendy_vy' ? ASSETS.vanphong.walk :
+                      profile.id.includes('dog') ? ASSETS.pets.dogWalk :
+                      profile.id.includes('cat') ? ASSETS.pets.catWalk :
+                      profile.id.includes('rat') ? ASSETS.pets.ratWalk : asset;
+    const leaveAsset = profile.id === 'char_19_shipper_tuan' ? ASSETS.shipper.leave : ASSETS.takeawayCustomer;
     return {
       stand: asset,
-      walk: asset,
+      walk: walkAsset,
       angry: asset,
-      leave: asset,
+      leave: leaveAsset,
       name: order.customerName,
       badge: order.isVip ? `👑 ${order.archetypeBadge || profile.roleTitle}` : (order.archetypeBadge || profile.roleTitle),
       badgeClass: order.isVip ? 'vip-badge' : getBadgeClassForChar(profile.category, profile.id)
@@ -834,6 +842,10 @@ export function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
   }
   const picked = HUMAN_CHAR_POOL[Math.abs(hash) % HUMAN_CHAR_POOL.length] || HUMAN_CHAR_POOL[0]!;
   const asset = charUrl(picked.id);
+  const walkAsset = picked.id === 'char_19_shipper_tuan' ? ASSETS.shipper.walk :
+                    picked.id === 'char_30_student_bus' ? ASSETS.hocsinh.walk :
+                    picked.id === 'char_07_trendy_vy' ? ASSETS.vanphong.walk : asset;
+  const leaveAsset = picked.id === 'char_19_shipper_tuan' ? ASSETS.shipper.leave : ASSETS.takeawayCustomer;
   const badgeClass = order.isVip ? 'vip-badge' : getBadgeClassForChar(picked.category, picked.id);
   const badgeText = order.isVip 
     ? (order.archetypeBadge ? `👑 ${order.archetypeBadge}` : `👑 ${picked.roleTitle} (Khách Sộp)`)
@@ -841,9 +853,9 @@ export function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
 
   return {
     stand: asset,
-    walk: asset,
+    walk: walkAsset,
     angry: asset,
-    leave: asset,
+    leave: leaveAsset,
     name: order.customerName,
     badge: badgeText,
     badgeClass
@@ -1213,6 +1225,14 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <div class="alley-lantern-glow"></div>
         </div>
 
+        <!-- Thú cưng hiên quán sinh động đi lại/sưởi nắng -->
+        ${state.adoptedPets?.includes('pet_01_dog_vang') ? `
+          <div class="alley-pet-actor dog" title="Chó Vàng Chợ Lớn canh quán"><img src="${ASSETS.pets.dogWalk}" alt="Chó Vàng" class="pet-walk-sprite" /></div>
+        ` : ''}
+        ${state.adoptedPets?.includes('pet_02_cat_muop') ? `
+          <div class="alley-pet-actor cat" title="Mèo Mướp sưởi nắng"><img src="${ASSETS.pets.catWalk}" alt="Mèo Mướp" class="pet-walk-sprite" /></div>
+        ` : ''}
+
         <!-- Biển hiệu vỉa hè Hẻm 1102 -->
         <div class="alley-sidewalk-sign" aria-hidden="true">
           <span class="sign-lantern-icon">🏮</span>
@@ -1247,56 +1267,38 @@ export function renderSellingView(state: GameState, session: SellingSession): st
 
       <!-- Wood Kitchen Counter (Quầy Bếp Gỗ Chiên Gà) -->
       <div class="kitchen-counter">
-        <div class="kitchen-counter-topbar">
-          <div class="counter-brand">
-            <img src="${ASSETS.icons.pan}" class="pixel-section-icon" alt="" />
-            <span>QUẦY BẾP HẺM 1102</span>
-          </div>
-          ${renderStaffCornerCard(state, session)}
-        </div>
-
-        <div class="work-grid">
-          <!-- Real Cast Iron Fryer Card (Bếp Chiên Ngập Dầu Chợ Lớn) -->
-          <div class="fryer-card">
-            <!-- Hướng Dẫn Công Thức Sốt Trực Quan Cho Gà Rán -->
-            <div class="sauce-recipe-banner ${cookingEngine.getActiveSeasoning() ? 'active ' + cookingEngine.getActiveSeasoning() : ''}">
-              ${cookingEngine.getActiveSeasoning() === 'spicy' ? `
-                <span class="recipe-hint-badge spicy">🌶️ ĐÃ ƯỚP SỐT CAY! ➔ Chạm [Gà Tẩm Bột] để chiên mẻ Gà Sốt Cay!</span>
-                <span class="cancel-sauce-hint">(Chạm lại khay sốt để hủy)</span>
-              ` : cookingEngine.getActiveSeasoning() === 'honey' ? `
-                <span class="recipe-hint-badge honey">🧄 ĐÃ ƯỚP BƠ TỎI! ➔ Chạm [Gà Tẩm Bột] để chiên Gà Bơ Tỏi Đậu Nành!</span>
-                <span class="cancel-sauce-hint">(Chạm lại khay sốt để hủy)</span>
-              ` : `
-                <span class="recipe-hint-badge">💡 MẸO SỐT: Chạm [🌶️ Sốt Cay / 🧄 Bơ Tỏi] ➔ Thả [🍗 Gà Bột] = Gà Sốt!</span>
-              `}
-            </div>
-
-            <!-- Kệ Topping & Nguyên Liệu Tươi Cố Định Tại Chỗ (Docked Materials) -->
-            <div class="prep-baskets-section docked-materials">
-              <div class="prep-baskets-header">
-                <span class="prep-baskets-title">
-                  <img src="${ASSETS.icons.inventory}" class="pixel-section-icon" alt="" /> Khay Sơ Chế GN
-                </span>
-                <span class="prep-baskets-sub">Chạm để thả chảo hoặc ướp sốt</span>
-              </div>
-              ${renderPrepStation(state)}
+        <!-- Kệ Topping & Nguyên Liệu Tươi Cố Định Nằm Ngang (Full-Width Compact Prep Shelf) -->
+        <div class="prep-baskets-section docked-materials">
+          <div class="prep-baskets-header">
+            <span class="prep-baskets-title">
+              <img src="${ASSETS.icons.inventory}" class="pixel-section-icon" alt="" /> Sơ Chế GN & Sốt
+            </span>
+            <div style="display: flex; align-items: center; gap: 4px;">
+              ${renderStaffCornerCard(state, session)}
               <!-- Hai chai tương xịt lên món trong khay -->
               <div class="food-shelf-grid prep-bottles">
                 <!-- Slot 4: Chai Tương Cà -->
                 <button id="btn-squeeze-ketchup" class="shelf-tile condiment ketchup" title="Xịt Tương Cà đỏ tươi thơm ngọt lên món (+Tip & Hương vị)">
                   <div class="shelf-badge sauce">+Tip</div>
                   <img src="${ASSETS.kitchen.bottleKetchup}" alt="Tương Cà" class="shelf-img bottle" />
-                  <span class="shelf-label">Tương Cà</span>
+                  <span class="shelf-label">T.Cà</span>
                 </button>
 
                 <!-- Slot 5: Chai Tương Ớt -->
                 <button id="btn-squeeze-chili" class="shelf-tile condiment chili" title="Xịt Tương Ớt cay nồng giòn rụm lên món (+Tip & Hương vị)">
                   <div class="shelf-badge sauce">+Tip</div>
                   <img src="${ASSETS.kitchen.bottleChili}" alt="Tương Ớt" class="shelf-img bottle" />
-                  <span class="shelf-label">Tương Ớt</span>
+                  <span class="shelf-label">T.Ớt</span>
                 </button>
               </div>
             </div>
+          </div>
+          ${renderPrepStation(state)}
+        </div>
+
+        <div class="work-grid">
+          <!-- Real Cast Iron Fryer Card (Bếp Chiên Ngập Dầu Chợ Lớn) -->
+          <div class="fryer-card">
 
             <div class="fryer-header">
               <span class="fryer-title">
@@ -1304,9 +1306,8 @@ export function renderSellingView(state: GameState, session: SellingSession): st
               </span>
               <button id="btn-change-oil" class="oil-change-btn ${oilCondition === 'dirty' ? 'dirty-alert' : ''}" title="Dầu: ${oilLabel} - Chạm để thay chảo mới (150.000đ)">
                 <span class="oil-dot ${oilCondition}"></span>
-                <span class="oil-status-label">${oilLabel}</span>
+                <span class="oil-status-label">${oilCondition === 'clean' ? 'Sạch' : oilCondition === 'medium' ? 'Vừa' : 'Đen'}</span>
                 <span class="oil-sep">|</span>
-                <img src="${ASSETS.icons.oilCan}" class="btn-pixel-icon-xs" alt="" />
                 <span>150k</span>
               </button>
             </div>
@@ -1365,35 +1366,18 @@ export function renderSellingView(state: GameState, session: SellingSession): st
               ${traySlotsHtml}
             </div>
 
-            <!-- Quầy Máy Rót Nước Đa Vị & Hiệu Ứng Đổ Đầy Cốc Nước -->
-            <div class="fountain-station">
+            <!-- Quầy Máy Rót Nước Đa Vị & Hiệu Ứng Rót Tinh Gọn -->
+            <div class="fountain-station compact-fountain">
               <div class="fountain-header">
-                <span class="fountain-title"><img src="${ASSETS.food.soda}" class="pixel-section-icon" alt="" /> Máy Rót Nước</span>
+                <span class="fountain-title"><img src="${ASSETS.food.soda}" class="pixel-section-icon" alt="" /> Rót Nước</span>
                 <span class="fountain-stock">Kho: <b>${drinkStock}</b></span>
               </div>
 
-              <!-- Khu vực mô phỏng dòng nước rót và cốc dâng đầy nước -->
-              <div class="fountain-pour-stage" id="fountain-pour-stage">
-                <div class="fountain-nozzle-row">
-                  <div class="nozzle-tap tap-coca" title="Vòi Coca"></div>
-                  <div class="nozzle-tap tap-7up" title="Vòi 7Up"></div>
-                  <div class="nozzle-tap tap-fanta" title="Vòi Fanta"></div>
-                </div>
-                <div class="pour-stream-line" id="pour-stream-line"></div>
-                <div class="glass-cup-wrap" id="glass-cup-wrap">
-                  <div class="glass-cup-rim"></div>
-                  <div class="glass-cup-body">
-                    <div class="cup-ice-cube ice-1">🧊</div>
-                    <div class="cup-ice-cube ice-2">🧊</div>
-                    <div class="cup-liquid-fill" id="cup-liquid-fill">
-                      <div class="liquid-foam"></div>
-                      <div class="soda-bubble b1"></div>
-                      <div class="soda-bubble b2"></div>
-                      <div class="soda-bubble b3"></div>
-                    </div>
-                  </div>
-                  <span class="glass-cup-label" id="glass-cup-label">💧 Chạm vòi để rót</span>
-                </div>
+              <!-- Khu vực mô phỏng rót nước tinh gọn -->
+              <div class="fountain-pour-stage" id="fountain-pour-stage" style="padding: 1px 3px; display: flex; align-items: center; justify-content: space-between;">
+                <span class="glass-cup-label" id="glass-cup-label" style="font-size: 0.58rem; color: #475569; font-weight: 800;">💧 Rót nước</span>
+                <div class="pour-stream-line" id="pour-stream-line" style="display: none;"></div>
+                <div class="cup-liquid-fill" id="cup-liquid-fill" style="display: none;"></div>
               </div>
 
               <!-- Hàng 3 vòi bấm rót nước đa vị -->

@@ -76,15 +76,20 @@ export const TUTORIAL_TEXT: Record<TutorialStep, Omit<TutorialHint, 'step'>> = {
 
 export interface BacBaGameTip {
   id: string;
-  trigger: 'oil_dirty' | 'perfect_streak' | 'low_patience' | 'out_of_chicken' | 'general';
+  trigger: 'oil_dirty' | 'perfect_streak' | 'low_patience' | 'out_of_chicken' | 'general' | 'sauce_needed';
   text: string;
 }
 
 export const BAC_BA_GAME_TIPS: BacBaGameTip[] = [
   {
+    id: 'tip_sauce',
+    trigger: 'sauce_needed',
+    text: 'Bác Ba chỉ nghề: Khách gọi Gà Sốt kìa cháu! Chạm khay [🌶️ Sốt Cay] hoặc [🧄 Bơ Tỏi] trước, rồi chạm [Gà Tẩm Bột] thả chảo là thành Gà Sốt thơm nức mũi nhé!'
+  },
+  {
     id: 'tip_oil',
     trigger: 'oil_dirty',
-    text: 'Bác Ba nhắc nhỏ: Chảo dầu đen khét rồi đó con! Bấm "Thay dầu 150k" liền đi kẻo công an ghé hốt phạt tội vệ sinh nghen!'
+    text: 'Bác Ba nhắc nhỏ: Chảo dầu đen khét rồi đó con! Bấm "Thay dầu 150k" hoặc dùng khay lọc cặn cuối ngày kẻo công an phạt tội vệ sinh nghen!'
   },
   {
     id: 'tip_streak',

@@ -581,11 +581,21 @@ class AppController {
     }, 2200);
   }
 
-  public showBacBaTip(trigger: 'oil_dirty' | 'perfect_streak' | 'low_patience' | 'out_of_chicken' | 'general') {
+  public showBacBaTip(trigger: 'oil_dirty' | 'perfect_streak' | 'low_patience' | 'out_of_chicken' | 'general' | 'sauce_needed') {
     if (this.shownBacBaTipsThisSession.has(trigger) || this.isModalOpen()) return;
+    const curState = stateManager.getState();
+    if (trigger === 'sauce_needed' && curState.hasSeenSauceTutorial) return;
+    if (trigger === 'oil_dirty' && curState.hasSeenOilTutorial) return;
+
     const tip = BAC_BA_GAME_TIPS.find(t => t.trigger === trigger);
     if (!tip) return;
     this.shownBacBaTipsThisSession.add(trigger);
+
+    if (trigger === 'sauce_needed') {
+      stateManager.update(s => { s.hasSeenSauceTutorial = true; });
+    } else if (trigger === 'oil_dirty') {
+      stateManager.update(s => { s.hasSeenOilTutorial = true; });
+    }
 
     let banner = document.getElementById('bacba-tip-banner');
     if (!banner) {
@@ -2181,7 +2191,10 @@ class AppController {
     // Bác Ba Live Tips mách nước trong ca bán
     if (!session.tutorial && !this.isModalOpen()) {
       const curState = stateManager.getState();
-      if (curState.oilCondition === 'dirty') {
+      const hasSauceOrder = session.orders.some(o => o.items.some(it => it.menuItemId.includes('spicy') || it.menuItemId.includes('honey')));
+      if (hasSauceOrder && !curState.hasSeenSauceTutorial) {
+        this.showBacBaTip('sauce_needed');
+      } else if (curState.oilCondition === 'dirty' && !curState.hasSeenOilTutorial) {
         this.showBacBaTip('oil_dirty');
       } else if (session.perfectStreak >= 3) {
         this.showBacBaTip('perfect_streak');
