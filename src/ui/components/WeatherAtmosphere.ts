@@ -36,10 +36,10 @@ export function renderWeatherAtmosphereStrip(weather: SaigonWeather): string {
   }
 
   return `
-    <div class="weather-atmosphere-strip ${weather.bgAtmosphereClass}" style="background: ${bgColor}; border: 1.5px solid ${borderColor}; border-radius: 6px; padding: 2px 8px; margin: 2px 0 4px; display: flex; align-items: center; justify-content: space-between; gap: 6px; height: 26px; box-sizing: border-box;">
-      <div style="display: flex; align-items: center; gap: 6px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
-        <span style="font-size: 0.95rem;">${weather.icon}</span>
-        <span style="font-size: 0.7rem; font-weight: 800; color: ${textColor}; overflow: hidden; text-overflow: ellipsis;">
+    <div class="weather-atmosphere-strip ${weather.bgAtmosphereClass}" style="background: ${bgColor}; border: 1.5px solid ${borderColor}; border-radius: 6px; padding: 2px 8px; margin: 2px 0 4px; display: flex; align-items: center; justify-content: space-between; gap: 6px; height: 26px; box-sizing: border-box;" title="${escapeHtml(weather.flavorQuote)}">
+      <div style="display: flex; align-items: center; gap: 5px; min-width: 0; flex: 1; overflow: hidden; white-space: nowrap;">
+        <span style="font-size: 0.92rem; flex-shrink: 0;">${weather.icon}</span>
+        <span class="weather-strip-text" style="font-size: 0.64rem; font-weight: 800; color: ${textColor}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
           ${escapeHtml(weather.badgeText)}
         </span>
       </div>

@@ -509,12 +509,12 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
 
 function potHint(): string {
   const cook = cookingEngine.getCookState();
-  if (!cook.isFrying) return '👉 Chạm để thả gà tươi / khoai vào chảo!';
+  if (!cook.isFrying) return '👉 Thả gà vào chiên';
   const quality = cookingEngine.calculateCurrentQuality();
-  if (quality === 'perfect') return '⭐ VÀNG GIÒN RỒI! BẤM VỚT NGAY!';
-  if (quality === 'burnt') return '💥 CHÁY KHÉT! BẤM VỚT BỎ NGAY!';
-  if (quality === 'good') return '🔥 Dầu sôi xèo xèo... Canh vàng giòn!';
-  return '🍗 Đang chiên ngập dầu... Chờ chín!';
+  if (quality === 'perfect') return '⭐ VÀNG GIÒN! VỚT';
+  if (quality === 'burnt') return '💥 CHÁY KHÉT! BỎ';
+  if (quality === 'good') return '🔥 Dầu sôi xèo xèo...';
+  return '🍗 Đang chiên giòn...';
 }
 
 const TRAY_QUALITY_LABEL: Record<QualityRating, string> = {
@@ -896,12 +896,6 @@ export function renderSellingView(state: GameState, session: SellingSession): st
               <span class="bag-steam">♨️</span>
               <span class="bag-icon">🛍️</span>
             </div>
-            <!-- Thảm đón khách tại quầy -->
-            <div class="counter-welcome-mat" aria-hidden="true">
-              <span class="mat-sparkle">★</span>
-              <span class="mat-text">CHICKEN 1102</span>
-              <span class="mat-sparkle">★</span>
-            </div>
           </div>
           <div class="cust-info-col">
             <div class="cust-name-row">
@@ -971,20 +965,9 @@ export function renderSellingView(state: GameState, session: SellingSession): st
     const initialCls = isAngry ? 'angry' : isNew ? 'walking' : 'standing';
     const shadowCls = isNew ? 'shadow-walk' : 'shadow-idle';
     const vipAuraHtml = ord.isVip ? '<div class="vip-aura-glow" aria-hidden="true"></div>' : '';
-    const welcomeMatHtml = isFirstInQueue ? `
-      <div class="counter-welcome-mat" aria-hidden="true" title="Quầy gọi món chính">
-        <span class="mat-sparkle">★</span>
-        <span class="mat-text">CHICKEN 1102</span>
-        <span class="mat-sparkle">★</span>
-      </div>
-    ` : '';
 
     const actorHtml = `<img src="${initialSrc}" alt="${visual.name}" class="char-sprite-img ${initialCls} ${isFirstInQueue ? 'focus-sprite' : ''}" />`;
-    const queueBadge = isFirstInQueue 
-      ? `<span class="queue-pos-badge first"><img src="${ASSETS.icons.star}" class="badge-pixel-star-xs" alt="" /> Đang phục vụ</span>` 
-      : idx === 1 
-      ? '<span class="queue-pos-badge next"><span class="queue-num-badge">2</span> Kế tiếp</span>' 
-      : `<span class="queue-pos-badge wait"><span class="queue-num-badge">${idx + 1}</span> Xếp hàng</span>`;
+    const queuePosText = isFirstInQueue ? '#1 Đang phục vụ' : `#${idx + 1}`;
 
     const emoteIcon = isAngry
       ? ASSETS.icons.emoteAnger
@@ -1027,7 +1010,6 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             </svg>
             ${actorHtml}
             <div class="char-shadow ${shadowCls}"></div>
-            ${welcomeMatHtml}
           </div>
           <div class="cust-info-col">
             <div class="cust-name-row">
@@ -1041,9 +1023,9 @@ export function renderSellingView(state: GameState, session: SellingSession): st
                   : `<img src="${ASSETS.icons.sparkle}" class="badge-pixel-star-xs" alt="" />`)}</span>
             </div>
             <div class="cust-badges-row">
-              ${queueBadge}
-              ${ord.isVip ? `<span class="cust-badge vip-gold-badge"><img src="${ASSETS.icons.star}" class="badge-pixel-star-xs" alt="" /> KHÁCH SỘP</span>` : ''}
+              <span class="queue-pos-badge ${isFirstInQueue ? 'first' : 'wait'}">${queuePosText}</span>
               <span class="cust-badge ${visual.badgeClass}">${visual.badge}</span>
+              ${ord.isVip ? '<span class="cust-badge vip-gold-badge">👑 VIP</span>' : ''}
               ${ord.personalityLabel ? `<span class="cust-badge trait-badge" title="${escapeHtml(ord.personalityDesc || '')}">${escapeHtml(ord.personalityLabel)}</span>` : ''}
             </div>
           </div>
