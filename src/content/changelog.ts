@@ -24,16 +24,120 @@ export interface ChangelogRelease {
   }[];
 }
 
-export const CURRENT_GAME_VERSION = 'v2.5.0';
-export const CURRENT_VERSION_CODENAME = 'Đại Trùng Tu Pixel Art: Hoài Niệm Stardew Valley & Typography Tiếng Việt Tuyệt Đối';
-export const CURRENT_BUILD_DATE = '29/09/2026';
+export const CURRENT_GAME_VERSION = 'v2.6.0';
+export const CURRENT_VERSION_CODENAME = 'Bếp Nấu Thủ Công Cozy 16-Bit & Trị Dứt Điểm Cắt Cụt Thông Tin (Zero Truncation)';
+export const CURRENT_BUILD_DATE = '02/10/2026';
 
 export const CHANGELOG_DATA: ChangelogRelease[] = [
+  {
+    version: 'v2.6.0',
+    codename: 'Bếp Nấu Thủ Công Cozy 16-Bit & Trị Dứt Điểm Cắt Cụt Thông Tin (Zero Truncation)',
+    releaseDate: '02/10/2026',
+    isLatest: true,
+    highlightSummary: 'Đột phá mỹ thuật và trải nghiệm người dùng với bản nâng cấp toàn diện Bếp Nấu Thủ Công Cozy 16-bit Pixel Art: Mặt quầy gỗ tếch đầm ấm, chảo gang đúc ngập dầu sủi bọt chân thực, trạm máy rót nước 3 cần gạt phong cách retro diner và mẹt tre lót giấy sáp ca-rô cổ điển. Đồng thời trị dứt điểm 100% tình trạng che khuất và cắt cụt chữ (Zero Truncation) trên toàn bộ màn hình bán hàng, đảm bảo avatar khách hàng và tên món ăn luôn hiển thị trọn vẹn, sắc nét!',
+    metrics: [
+      { icon: '🍳', label: 'Bếp Thủ Công', value: 'Cozy Pixel 16-Bit' },
+      { icon: '📐', label: 'Cắt Cụt Chữ', value: '0% Truncation' },
+      { icon: '👤', label: 'Avatar Khách', value: '100% Lộ Diện Rõ' },
+      { icon: '🪧', label: 'Khay Sơ Chế GN', value: 'Inox Dập Nổi 3D' },
+      { icon: '🔔', label: 'Chuông Ra Món', value: 'Chuông Đồng KENG' },
+      { icon: '🧪', label: 'Kiểm Định', value: '691 Tests Vitest 100%' }
+    ],
+    categories: [
+      {
+        categoryName: 'Đại Tu Không Gian Bếp Nấu Cozy 16-Bit Pixel Art',
+        categoryIcon: '🍳',
+        items: [
+          {
+            tag: 'COZY KITCHEN',
+            tagColor: '#ea580c',
+            title: 'Mặt Bếp Gỗ Tếch & Không Gian Nấu Nướng Ấm Cúng',
+            desc: 'Thay thế hoàn toàn các khối ô vuông cơ bản bằng trạm bếp ấm áp mang đậm linh hồn quán nhỏ:',
+            details: [
+              'Mặt quầy bếp vân gỗ tếch tự nhiên (Teakwood Countertop) với thớ gỗ bóng bẩy, viền vát cạnh và đinh tán đồng ấm áp.',
+              'Chảo chiên gang đúc sâu lòng (Cast-Iron Deep Fryer) ngập dầu vàng óng ánh sủi bọt tăm xèo xèo chân thực.',
+              'Đồng hồ đo nhiệt độ kim cơ khí retro phân chia 3 vùng nhiệt: Quá nguội, Vàng giòn chuẩn xác, Quá lửa.',
+              'Hệ thống hiệu ứng hơi nước bốc lên nghi ngút cùng ánh lửa rực rỡ khi thả gà rán.'
+            ]
+          },
+          {
+            tag: 'DINER STATION',
+            tagColor: '#0284c7',
+            title: 'Trạm Rót Nước 3 Cần Gạt & Mẹt Ra Món Gingham Ca-rô',
+            desc: 'Trang bị trạm pha chế và bàn phục vụ thủ công phong cách retro hoài niệm:',
+            details: [
+              'Máy rót nước ngọt 3 cần gạt diner cổ điển với 3 hương vị: Trà Tắc Má Bảy, 7Up Băng Đậy và Fanta Cam Đá Xay.',
+              'Mẹt tre ra món thủ công lót giấy sáp ca-rô đỏ trắng (Gingham Checkered Wax Paper) phong cách quán ăn hoài niệm.',
+              'Chuông gọi phục vụ bằng đồng nguyên khối (Brass Service Bell) 3D dập nổi, phát hào quang vàng khi đủ món giao khách.'
+            ]
+          },
+          {
+            tag: 'GN PANS',
+            tagColor: '#16a34a',
+            title: 'Khay Inox Gastronorm Chuyên Nghiệp & Khóa Đồng Cổ',
+            desc: 'Thiết kế lại 8 khay sơ chế nguyên liệu theo chuẩn bếp nhà hàng Gastronorm (GN Pan):',
+            details: [
+              'Khay inox phay xước viền kim loại 3D bo góc với đáy lõm phản quang chân thực.',
+              'Huy hiệu xu đồng dập nổi hiển thị số lượng tồn kho sắc nét, không che lấp nguyên liệu.',
+              'Nắp đậy kim loại phay xước đính ổ khóa đồng cổ điển cho các nguyên liệu chưa mở khóa.'
+            ]
+          }
+        ]
+      },
+      {
+        categoryName: 'Trị Dứt Điểm Cắt Cụt & Che Khuất Thông Tin (Zero Truncation)',
+        categoryIcon: '👁️',
+        items: [
+          {
+            tag: 'ZERO OVERLAP',
+            tagColor: '#d97706',
+            title: 'Giải Phóng 100% Tầm Nhìn Cho Avatar Thực Khách',
+            desc: 'Khắc phục hoàn toàn lỗi dải ruy-băng "CHICKEN 1102" chắn ngang nửa người nhân vật:',
+            details: [
+              'Loại bỏ ribbon counter-welcome-mat chèn đè lên người diễn hoạt của thực khách.',
+              'Toàn bộ 36 nhân vật và thú cưng Hẻm 1102 giờ đây lộ diện nguyên vẹn từ đầu đến chân với biểu cảm sống động.',
+              'Bong bóng thoại và thanh kiên nhẫn hiển thị thoáng đãng, không bị va chạm hay chồng lấn.'
+            ]
+          },
+          {
+            tag: 'TYPO POLISH',
+            tagColor: '#dc2626',
+            title: 'Tự Động Xuống Dòng Thông Minh & Tối Ưu Độ Dài Nhãn',
+            desc: 'Loại bỏ hoàn toàn dấu ba chấm cắt chữ (...) gây khó chịu trên màn hình hẹp 360px & 390px:',
+            details: [
+              'Huy hiệu đặc điểm và vai trò thực khách tự động ngắt dòng thông minh (flex-wrap), không bao giờ bị cắt cụt.',
+              'Tên món ăn dài tự động co giãn và xuống dòng 2 dòng thanh thoát, giữ trọn vẹn từng chữ tiếng Việt có dấu.',
+              'Chuẩn hóa nhãn khay sơ chế GN thành cụm từ 2 chữ súc tích: "Gà Tươi", "Củ Cải", "Khoai Cắt", "Má Đùi", "Gà Viên", "Phô Mai", "Sốt Cay", "Sốt Bơ Tỏi".',
+              'Thông điệp hướng dẫn chảo chiên cô đọng, sinh động: "👉 Thả gà vào chiên", "🍗 Đang chiên giòn...", "⭐ VÀNG GIÒN! VỚT".'
+            ]
+          }
+        ]
+      },
+      {
+        categoryName: 'Độ Tin Cậy, Hiệu Năng & Nghiệm Thu Kép 3 Lớp',
+        categoryIcon: '⚡',
+        items: [
+          {
+            tag: 'QUALITY GATE',
+            tagColor: '#7c3aed',
+            title: 'Vượt Qua Tuyệt Đối Cả 3 Cổng Kiểm Định Khắt Khe',
+            desc: 'Bảo đảm chất lượng phần mềm không tì vết trước khi đưa lên máy chủ sản xuất:',
+            details: [
+              '100% bộ kiểm thử Vitest PASS (691/691 tests trên 60 file kiểm thử cốt lõi).',
+              'Biên dịch TypeScript Build nghiêm ngặt đạt 0 lỗi type checking và 0 cảnh báo.',
+              'Bộ kiểm thử UI Automation (scripts/ui-check.mjs) đạt 16/16 chốt kiểm định PASS trên cả 2 độ phân giải chuẩn iPhone/Android (360×780px và 390×844px).',
+              'Mọi nút bấm thao tác đạt chuẩn công thái học ngón cái (Touch Target ≥ 44px).'
+            ]
+          }
+        ]
+      }
+    ]
+  },
   {
     version: 'v2.5.0',
     codename: 'Đại Trùng Tu Pixel Art: Hoài Niệm Stardew Valley & Typography Tiếng Việt Tuyệt Đối',
     releaseDate: '29/09/2026',
-    isLatest: true,
+    isLatest: false,
     highlightSummary: 'Big Update đồ họa và trải nghiệm lớn nhất từ trước đến nay: Chuyển mình toàn diện sang phong cách Pixel Art 16-bit hoài niệm Stardew Valley! Bức tranh bìa & banner quầy xe Hẻm 1102 hoàn toàn mới từ Gemini AI, bộ font Tiny5 Duo / Tiny5 hỗ trợ 100% tiếng Việt chống lỗi font, 118 asset pixel sắc nét và âm thanh 16-bit acoustic ấm áp.',
     metrics: [
       { icon: '🎨', label: 'Bìa & Banner', value: 'Stardew 16-Bit' },
