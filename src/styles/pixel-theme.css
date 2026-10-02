@@ -819,14 +819,15 @@ body.selling-mode .toast {
 
 /* Holding Tray Equipment Slots */
 .tray-item {
-  background: #3a1f11 !important;
-  border: 2px solid #1a0c06 !important;
-  border-radius: 2px !important;
-  box-shadow: inset 2px 2px 0 #1a0c06, inset -2px -2px 0 #5a3018 !important;
+  background: #ffffff !important;
+  border: 1.5px solid #d4a373 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08) !important;
 }
 .tray-item.empty {
-  background: #2b1810 !important;
-  border: 2px dashed #5a3018 !important;
+  background: rgba(255, 255, 255, 0.45) !important;
+  border: 1.5px dashed #d4a373 !important;
+  border-radius: 8px !important;
 }
 
 /* Stainless Steel GN Pan Slots */
