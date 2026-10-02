@@ -702,6 +702,66 @@ class OvernightMonkey {
         }
       }
 
+      // 5. Thỉnh thoảng đi Chợ Đầu Mối Chợ Lớn để mặc cả giá sỉ
+      if (Math.random() < 0.12) {
+        const marketBtn = page.locator('#btn-open-market-bargain');
+        if (await marketBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+          log(`🛒 Đi Chợ Đầu Mối Chợ Lớn mặc cả giá sỉ...`);
+          await marketBtn.first().click({ force: true }).catch(() => {});
+          await sleep(200);
+        }
+      }
+
+      // 6. Thỉnh thoảng kiểm tra Bằng Khen nhận thưởng
+      if (Math.random() < 0.1) {
+        const achieveBtn = page.locator('#btn-open-achievements');
+        if (await achieveBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+          await achieveBtn.first().click({ force: true }).catch(() => {});
+          await sleep(150);
+          const claimBtn = page.locator('.btn-claim-badge:not([disabled])');
+          if (await claimBtn.first().isVisible({ timeout: 150 }).catch(() => false)) {
+            log(`🎖️ Nhận thưởng Bằng Khen Tổ Dân Phố...`);
+            await claimBtn.first().click({ force: true }).catch(() => {});
+            await sleep(100);
+          }
+          const closeAchieve = page.locator('#btn-close-achievements, #btn-modal-close-icon');
+          if (await closeAchieve.first().isVisible({ timeout: 150 }).catch(() => false)) {
+            await closeAchieve.first().click({ force: true }).catch(() => {});
+            await sleep(100);
+          }
+        }
+      }
+
+      // 7. Thỉnh thoảng nấu Sốt Bí Truyền nếu có
+      if (Math.random() < 0.1) {
+        const sauceBtn = page.locator('#btn-secret-sauce:not(.is-active)');
+        if (await sauceBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+          log(`🍲 Nấu nồi Sốt Bí Truyền...`);
+          await sauceBtn.first().click({ force: true }).catch(() => {});
+          await sleep(200);
+        }
+      }
+
+      // 8. Thỉnh thoảng tương tác Thú Cưng hiên quán
+      if (Math.random() < 0.08) {
+        const petPatioBtn = page.locator('#btn-open-pet-patio');
+        if (await petPatioBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+          await petPatioBtn.first().click({ force: true }).catch(() => {});
+          await sleep(150);
+          const petAction = page.locator('.btn-pet-action:not([disabled])');
+          if (await petAction.first().isVisible({ timeout: 150 }).catch(() => false)) {
+            log(`🐾 Vuốt ve chăm sóc thú cưng hiên quán...`);
+            await petAction.first().click({ force: true }).catch(() => {});
+            await sleep(100);
+          }
+          const closePet = page.locator('#btn-close-pet-patio, #btn-modal-close-icon, .modal-close');
+          if (await closePet.first().isVisible({ timeout: 150 }).catch(() => false)) {
+            await closePet.first().click({ force: true }).catch(() => {});
+            await sleep(100);
+          }
+        }
+      }
+
       log(`🍗 Bấm 'BẮT ĐẦU MỞ BÁN' Ngày ${this.daysCompleted + 1}...`);
       await page.locator('#btn-start-selling').first().click({ timeout: 2000 }).catch(() => {});
       await sleep(500);
