@@ -801,3 +801,13 @@
   - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 71.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
 ---
+
+### 🐞 [19:00:38 2/10/2026] (via Jev MCP) Secret Sauce Modal Cooking Buttons Selector Mismatch in Test Bot
+- **Triệu chứng:** System idles > 25s during Secret Sauce cooking phase until Watchdog triggers emergencyRecover
+- **Vị trí:** `scripts/overnight-browser-monkey.mjs` 
+- **Đánh giá Jev (517ms):**
+  - **Mức độ (Severity):** `p2_ui_friction` (Độ tin cậy: 67.0%)
+  - **Nguyên nhân gốc (Root Cause):** `ui_modal_stack` (Độ tin cậy: 89.0%)
+  - **Chiến lược Fix:** `contract_first_type_fix` (Độ tin cậy: 40.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---

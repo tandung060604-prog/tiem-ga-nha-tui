@@ -443,7 +443,7 @@ class OvernightMonkey {
     }
 
     // 13. Modal Minigame Sốt Bí Truyền (Secret Sauce)
-    const spiceBtn = page.locator('#btn-start-cooking-now, .btn-spice, #btn-sauce-stir, #btn-close-sauce-modal, #btn-sauce-already-done');
+    const spiceBtn = page.locator('#btn-start-cooking-now, .btn-spice-touch, .btn-spice, #btn-sauce-stir, #btn-sauce-done, #btn-sauce-fail-done, #btn-cancel-sauce, #btn-sauce-already-done, #btn-close-sauce-modal');
     if (await spiceBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
       await spiceBtn.first().click({ force: true });
       return true;
