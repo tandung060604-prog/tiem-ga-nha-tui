@@ -696,17 +696,18 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       const name = menuItem ? menuItem.name : it.menuItemId;
       const img = foodImage(it.menuItemId, 'perfect');
       const qtyText = it.count > 1 ? (it.served > 0 ? `${it.served}/${it.count}` : `${it.count}×`) : '1×';
-      const statusClass = it.completed ? 'done' : it.served > 0 ? 'partial' : 'pending';
-      const statusText = it.completed ? '✓ Đủ' : it.served > 0 ? `⏳ ${it.served}/${it.count}` : '○ Đợi';
+      const isItemInTray = tray.some(t => t.menuItemId === it.menuItemId && !it.completed);
+      const statusClass = it.completed ? 'done' : isItemInTray ? 'ready' : it.served > 0 ? 'partial' : 'pending';
+      const statusText = it.completed ? '✓ Đủ' : isItemInTray ? '✨ Sẵn sàng!' : it.served > 0 ? `⏳ ${it.served}/${it.count}` : '○ Đợi';
       return `
-        <div class="order-row ${it.completed ? 'is-completed' : ''}">
+        <div class="order-row ${it.completed ? 'is-completed' : ''} ${isItemInTray ? 'is-ready-in-tray' : ''}">
           <span class="order-item-title">
-            ${img ? `<img src="${img}" class="order-food-thumb" alt="${escapeHtml(name)}" width="28" height="28" />` : `<span class="order-food-emoji">${menuItem ? menuItem.icon : '🍗'}</span>`}
+            ${img ? `<img src="${img}" class="order-food-thumb ${isItemInTray ? 'pulse-thumb' : ''}" alt="${escapeHtml(name)}" width="28" height="28" />` : `<span class="order-food-emoji">${menuItem ? menuItem.icon : '🍗'}</span>`}
             <span class="order-qty">${qtyText}</span>
             <span class="order-food-name">${escapeHtml(name)}</span>
             ${it.condiment ? `<span class="order-condiment" data-condiment="${it.condiment}">${it.condiment === 'ketchup' ? `<img src="${ASSETS.icons.sauce}" class="btn-pixel-icon-xs" alt="" /> + tương cà` : `<img src="${ASSETS.icons.chickenSpicy}" class="btn-pixel-icon-xs" alt="" /> + tương ớt`}</span>` : ''}
           </span>
-          <span class="order-check ${statusClass}" title="${it.completed ? 'Món đã giao đủ' : 'Đang chờ món này'}">${statusText}</span>
+          <span class="order-check ${statusClass}" title="${it.completed ? 'Món đã giao đủ' : isItemInTray ? 'Khay đã có sẵn món này, chạm để giao ngay!' : 'Đang chờ món này'}">${statusText}</span>
         </div>
       `;
     }).join('');
@@ -781,8 +782,8 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           </div>
         </div>
 
-        <!-- Speech Bubble Order -->
-        <div class="speech-bubble">
+        <!-- Speech Bubble Order / Wooden Order Ticket -->
+        <div class="speech-bubble wooden-order-ticket ${hasMatchInTray ? 'has-match' : ''}" data-order-id="${ord.id}" title="${hasMatchInTray ? 'Khay đã sẵn món! Chạm để lên món ngay.' : 'Phiếu Order Khách Hàng'}">
           <div class="bubble-arrow"></div>
           ${itemsHtml}
         </div>

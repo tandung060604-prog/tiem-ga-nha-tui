@@ -39,29 +39,31 @@ export function renderInventoryTab(state: GameState): string {
 
     if (isLocked) {
       return `
-        <div class="item-row is-locked" data-id="${item.id}" style="opacity: 0.9;">
-          <div class="item-icon" style="filter: grayscale(0.8); background: #eee;">${getInventoryIcon(item)}</div>
-          
-          <div class="item-meta">
-            <div class="item-name">
-              ${item.name}
-              <span class="shelf-tag" style="background:#e2e8f0;color:#475569;"><img src="${ASSETS.icons.lock}" class="pixel-lock-img" alt="" /> Chưa ký HĐ</span>
+        <div class="item-row inv-grid-card is-locked" data-id="${item.id}">
+          <div class="inv-card-header">
+            <div class="item-icon" style="filter: grayscale(0.8); background: #eee;">${getInventoryIcon(item)}</div>
+            <div class="item-meta">
+              <div class="item-name">${item.name}</div>
+              <span class="shelf-tag is-locked-tag"><img src="${ASSETS.icons.lock}" class="pixel-lock-img" alt="" /> Chưa ký HĐ</span>
             </div>
-            <div class="item-sub">
+          </div>
+          
+          <div class="inv-card-body">
+            <div class="item-sub locked-sub">
               ${canUnlockDay 
-                ? `Phí ký quỹ hợp đồng: <b style="color:var(--accent,#d97706);">${(item.unlockCost ?? 0).toLocaleString('vi-VN')}đ</b>`
-                : `Mở hợp đồng từ <b>Ngày ${item.unlockDay}</b> · Phí: ${(item.unlockCost ?? 0).toLocaleString('vi-VN')}đ`
+                ? `<div>Phí ký quỹ hợp đồng:</div><b style="color:var(--accent,#d97706);font-size:0.85rem;">${(item.unlockCost ?? 0).toLocaleString('vi-VN')}đ</b>`
+                : `<div>Mở từ <b>Ngày ${item.unlockDay}</b></div><div>Phí: ${(item.unlockCost ?? 0).toLocaleString('vi-VN')}đ</div>`
               }
             </div>
           </div>
 
-          <div class="btn-group">
+          <div class="btn-group inv-card-actions">
             ${canUnlockDay ? `
               <button class="btn-sm primary btn-unlock" data-id="${item.id}" ${!canAfford ? 'disabled' : ''} style="background:var(--accent,#b45309);border-color:var(--accent,#b45309);color:#fff;" title="Ký hợp đồng cung ứng">
                 <img src="${ASSETS.icons.check}" class="btn-pixel-icon-xs" alt="" /> Mở HĐ<small>(${((item.unlockCost ?? 0) / 1000)}k)</small>
               </button>
             ` : `
-              <button class="btn-sm" disabled style="opacity:0.6;font-size:0.7rem;padding:6px 8px;">
+              <button class="btn-sm" disabled style="opacity:0.6;font-size:0.7rem;padding:6px 8px;width:100%;">
                 <img src="${ASSETS.icons.lock}" class="pixel-lock-img" alt="" /> Ngày ${item.unlockDay}
               </button>
             `}
@@ -78,29 +80,32 @@ export function renderInventoryTab(state: GameState): string {
     const totalCost10 = unitCost * 10;
 
     return `
-      <div class="item-row" data-id="${item.id}">
-        <div class="item-icon">${getInventoryIcon(item)}</div>
-        
-        <div class="item-meta">
-          <div class="item-name">
-            ${item.name}
+      <div class="item-row inv-grid-card ${isLow ? 'is-low-stock' : ''} ${isOutOfStock ? 'is-out-of-stock' : ''}" data-id="${item.id}">
+        <div class="inv-card-header">
+          <div class="item-icon">${getInventoryIcon(item)}</div>
+          <div class="item-meta">
+            <div class="item-name">${item.name}</div>
             ${isOutOfStock 
-              ? '<span class="shelf-tag" style="background:#f1f5f9;color:#64748b;font-weight:600;">Hết hàng</span>'
+              ? '<span class="shelf-tag is-out-tag">Hết hàng</span>'
               : isUrgentShelf 
-              ? '<span class="shelf-tag" style="background:#ffd2d2;color:#b71c1c;font-weight:700;"><img src="' + ASSETS.icons.clock + '" class="btn-pixel-icon-xs" alt="" /> HSD: ' + item.currentLifeDays + ' ngày!</span>' 
+              ? '<span class="shelf-tag is-urgent-tag"><img src="' + ASSETS.icons.clock + '" class="btn-pixel-icon-xs" alt="" /> HSD: ' + item.currentLifeDays + 'd!</span>' 
               : '<span class="shelf-tag">HSD: ' + item.currentLifeDays + ' ngày</span>'}
           </div>
+        </div>
+        
+        <div class="inv-card-body">
           <div class="item-sub ${isLow ? 'low-stock' : ''}">
-            Tồn kho: <b>${item.amount} ${item.unit}</b> · Giá sỉ: <b>${unitCost.toLocaleString('vi-VN')}đ</b> ${discount > 0 ? `<small style="color:var(--mint-dark,#10b981);font-weight:700;">(-${discount}%)</small>` : ''}
+            <div class="inv-stock-line">Tồn kho: <b>${item.amount} ${item.unit}</b></div>
+            <div class="inv-cost-line">Giá sỉ: <b>${unitCost.toLocaleString('vi-VN')}đ</b> ${discount > 0 ? `<small style="color:var(--mint-dark,#10b981);font-weight:700;">(-${discount}%)</small>` : ''}</div>
           </div>
           ${item.batches && item.batches.length > 1 ? `
-            <div style="font-size: 0.65rem; color: var(--soft); margin-top: 2px;">
-              <img src="${ASSETS.icons.inventory}" class="btn-pixel-icon-xs" alt="" /> Theo lô FIFO: ${item.batches.map(b => `<b>${b.amount}</b> ${item.unit} (${b.daysLeft}d)`).join(' · ')}
+            <div class="inv-batch-info" style="font-size: 0.65rem; color: var(--soft); margin-top: 2px;">
+              <img src="${ASSETS.icons.inventory}" class="btn-pixel-icon-xs" alt="" /> FIFO: ${item.batches.map(b => `<b>${b.amount}</b>${item.unit}(${b.daysLeft}d)`).join(' · ')}
             </div>
           ` : ''}
         </div>
 
-        <div class="btn-group">
+        <div class="btn-group inv-card-actions">
           <button class="btn-sm btn-refund" data-id="${item.id}" data-qty="5" ${refundableUnits(item) < 5 ? 'disabled' : ''} title="Đổi trả trong ngày: chỉ hàng vừa nhập hôm nay">
             -5<small>(+${(unitCost * 5 / 1000)}k)</small>
           </button>
@@ -134,7 +139,7 @@ export function renderInventoryTab(state: GameState): string {
 
   return `
     <div class="sec-title">
-      <span>📦 Quản Lý Kho & Nguyên Liệu</span>
+      <span>📦 Quản Lý Kho & Nguyên Liệu (Stardew Shelf)</span>
       <span style="font-size: 0.78rem; color: var(--soft); font-weight: normal;">Lưu ý: Mua dư hết hạn là lỗ!</span>
     </div>
     ${marketBannerHtml}
@@ -142,7 +147,7 @@ export function renderInventoryTab(state: GameState): string {
       Nhập đủ gà tươi, bột, dầu và gia vị trước giờ mở bán (10:00). Bấm <b>-5</b> để hoàn trả nếu lỡ tay mua nhầm!
       ${effects.shelfLifeBonus > 0 ? `<br><b style="color:var(--mint-dark,#10b981);">❄️ Kho lạnh bảo quản: +${effects.shelfLifeBonus} ngày hạn dùng cho mọi lô nhập mới!</b>` : ''}
     </div>
-    <div class="inventory-list">
+    <div class="inventory-list inventory-grid-stardew">
       ${rowsHtml}
     </div>
   `;

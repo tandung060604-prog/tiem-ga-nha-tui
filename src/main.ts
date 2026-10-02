@@ -2344,16 +2344,16 @@ class AppController {
       return;
     }
 
-    const serveCustBtn = target.closest<HTMLElement>('.btn-serve-cust');
+    const serveCustBtn = target.closest<HTMLElement>('.btn-serve-cust, .wooden-order-ticket.has-match');
     if (serveCustBtn) {
       Haptics.tap();
-      const orderId = serveCustBtn.dataset.orderId;
+      const orderId = serveCustBtn.dataset.orderId || serveCustBtn.closest<HTMLElement>('.customer-card')?.dataset.orderId;
       if (orderId) this.serveCurrentCustomer(orderId);
       return;
     }
 
     const bunnyCard = target.closest<HTMLElement>('.customer-card[data-is-bunny="true"]');
-    if (bunnyCard && !target.closest('.btn-cancel-order') && !target.closest('.btn-serve-cust')) {
+    if (bunnyCard && !target.closest('.btn-cancel-order') && !target.closest('.btn-serve-cust') && !target.closest('.wooden-order-ticket.has-match')) {
       Haptics.tap();
       const letter = BUNNY_LETTERS.find(l => l.id === bunnyCard.dataset.letterId);
       if (letter) this.openBunnyLetterDialog(letter);
