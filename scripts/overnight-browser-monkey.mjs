@@ -571,8 +571,8 @@ class OvernightMonkey {
         return true;
       }
 
-      // 3. Phục vụ món cho khách (Nút 'LÊN MÓN' .btn-serve-cust, #btn-serve-order hoặc Phiếu Gỗ Mini .wooden-order-ticket)
-      const serveBtn = page.locator('.wooden-order-ticket.is-ready-in-tray, .btn-serve-cust:not([disabled]), #btn-serve-order:not([disabled]), .wooden-order-ticket:not([disabled])');
+      // 3. Phục vụ món cho khách (Nút 'LÊN MÓN' .btn-serve-cust, #btn-serve-order hoặc Phiếu Gỗ Mini .wooden-order-ticket.is-ready-in-tray)
+      const serveBtn = page.locator('.wooden-order-ticket.is-ready-in-tray, .btn-serve-cust:not([disabled]), #btn-serve-order:not([disabled])');
       if (await serveBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
         await serveBtn.first().click({ force: true }).catch(() => {});
         return true;
