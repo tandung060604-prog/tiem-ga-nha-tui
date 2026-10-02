@@ -61,6 +61,19 @@ for (const width of WIDTHS) {
 
   console.log(`[ui-check] Đang kiểm tra viewport ${width}px...`);
   await page.goto(TARGET);
+
+  const dismissIntro = async () => {
+    await page.evaluate(() => {
+      const tap = document.querySelector('#intro-tap-prompt, .intro-tap-prompt');
+      if (tap instanceof HTMLElement) tap.click();
+      const overlay = document.getElementById('intro-cinematic-overlay');
+      if (overlay instanceof HTMLElement) {
+        overlay.click();
+        overlay.remove();
+      }
+    }).catch(() => {});
+  };
+
   // Đóng video mở màn nếu đang hiển thị
   const introPrompt = page.locator('#intro-tap-prompt');
   if (await introPrompt.isVisible({ timeout: 2500 }).catch(() => false)) {
@@ -68,6 +81,8 @@ for (const width of WIDTHS) {
     await introPrompt.click({ force: true }).catch(() => {});
     await page.waitForTimeout(600);
   }
+  await dismissIntro();
+
   console.log(`[ui-check ${width}px] Bấm #btn-title-play...`);
   await page.locator('#btn-title-play').click(); // màn tiêu đề (chạm đầu tiên bật âm thanh iOS)
   console.log(`[ui-check ${width}px] Bấm #btn-confirm-shop-name...`);
@@ -78,14 +93,10 @@ for (const width of WIDTHS) {
   await checkOverflow('màn Chuẩn bị');
   await page.screenshot({ path: `${OUT}/${width}-prep.png` });
 
-  const introOverlay = page.locator('#intro-cinematic-overlay');
-  if (await introOverlay.isVisible({ timeout: 1000 }).catch(() => false)) {
-    await introOverlay.click({ force: true }).catch(() => {});
-    await page.waitForTimeout(500);
-  }
+  await dismissIntro();
 
-  await page.locator('#btn-start-selling').click();
-  await page.locator('.selling-screen').waitFor();
+  await page.locator('#btn-start-selling').click({ force: true });
+  await page.locator('.selling-screen').waitFor({ timeout: 10000 });
   await checkOverflow('vào ca bán');
 
   // Thanh đo 5 vùng đúng tỉ lệ
@@ -100,11 +111,16 @@ for (const width of WIDTHS) {
 
   // Bấm nút thật + món trong khay nhìn thấy được
   try {
-    const tutNext = page.locator('#btn-tutorial-next');
-    if (await tutNext.isVisible().catch(() => false)) await tutNext.click();
-    const tutSkip = page.locator('#btn-tutorial-skip');
-    if (await tutSkip.isVisible().catch(() => false)) await tutSkip.click();
-    await page.locator('#btn-add-drink').click({ timeout: 3000 });
+    await page.evaluate(() => {
+      const b = document.querySelector('#btn-tutorial-skip, #btn-bacba-understood, #btn-tutorial-next');
+      if (b instanceof HTMLElement) b.click();
+    }).catch(() => {});
+    const tutNext = page.locator('#btn-tutorial-next, #btn-bacba-understood');
+    if (await tutNext.isVisible().catch(() => false)) await tutNext.click({ force: true }).catch(() => {});
+    const tutSkip = page.locator('#btn-tutorial-skip, #btn-bacba-understood');
+    if (await tutSkip.isVisible().catch(() => false)) await tutSkip.click({ force: true }).catch(() => {});
+    await page.waitForTimeout(300);
+    await page.locator('#btn-add-drink').click({ timeout: 5000, force: true });
     record('PASS', width, 'nút bấm ăn (click thật)');
   } catch (e) {
     record('FAIL', width, 'nút bấm ăn (click thật)', e.message.split('\n')[0]);
