@@ -443,7 +443,7 @@ class OvernightMonkey {
     }
 
     // 13. Modal Minigame Sốt Bí Truyền (Secret Sauce)
-    const spiceBtn = page.locator('.btn-spice, #btn-sauce-stir, #btn-close-sauce-modal');
+    const spiceBtn = page.locator('#btn-start-cooking-now, .btn-spice, #btn-sauce-stir, #btn-close-sauce-modal, #btn-sauce-already-done');
     if (await spiceBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
       await spiceBtn.first().click({ force: true });
       return true;
@@ -624,7 +624,7 @@ class OvernightMonkey {
 
     // C. PHA CHUẨN BỊ (PREPARATION SCREEN)
     // Nếu đang có modal mở trên màn hình, không cố bấm vào màn hình chuẩn bị
-    const hasModal = await page.locator('#modal-container:not([hidden])').isVisible({ timeout: 40 }).catch(() => false);
+    const hasModal = await page.locator('#modal-container:not([hidden]), #sauce-minigame-modal, .sauce-modal-overlay').isVisible({ timeout: 40 }).catch(() => false);
     if (hasModal) return false;
 
     const openBarBtn = page.locator('#btn-start-selling');
@@ -716,6 +716,7 @@ class OvernightMonkey {
           log(`🛒 Đi Chợ Đầu Mối Chợ Lớn mặc cả giá sỉ...`);
           await marketBtn.first().click({ force: true }).catch(() => {});
           await sleep(200);
+          return true;
         }
       }
 
@@ -736,6 +737,7 @@ class OvernightMonkey {
             await closeAchieve.first().click({ force: true }).catch(() => {});
             await sleep(100);
           }
+          return true;
         }
       }
 
@@ -746,6 +748,7 @@ class OvernightMonkey {
           log(`🍲 Nấu nồi Sốt Bí Truyền...`);
           await sauceBtn.first().click({ force: true }).catch(() => {});
           await sleep(200);
+          return true;
         }
       }
 
@@ -766,11 +769,12 @@ class OvernightMonkey {
             await closePet.first().click({ force: true }).catch(() => {});
             await sleep(100);
           }
+          return true;
         }
       }
 
       log(`🍗 Bấm 'BẮT ĐẦU MỞ BÁN' Ngày ${this.daysCompleted + 1}...`);
-      await page.locator('#btn-start-selling').first().click({ timeout: 2000 }).catch(() => {});
+      await page.locator('#btn-start-selling').first().click({ force: true, timeout: 2000 }).catch(() => {});
       await sleep(500);
       return true;
     }
@@ -832,7 +836,7 @@ class OvernightMonkey {
       if (confirmOkBtn instanceof HTMLElement) confirmOkBtn.click();
 
       // Dọn dẹp tất cả modal truyện cư dân, minigame, hệ thống
-      const specialModals = document.querySelectorAll('#modal-character-story, #modal-char-reaction, #modal-thief-minigame, #modal-thief-result, #modal-night-radio, #modal-achievements-wall, #modal-shop-theme, #modal-endless-mode, #modal-memories-album, #modal-weekly-quests, #modal-leaderboard');
+      const specialModals = document.querySelectorAll('#modal-character-story, #modal-char-reaction, #modal-thief-minigame, #modal-thief-result, #modal-night-radio, #modal-achievements-wall, #modal-shop-theme, #modal-endless-mode, #modal-memories-album, #modal-weekly-quests, #modal-leaderboard, #sauce-minigame-modal, .sauce-modal-overlay');
       for (const sm of specialModals) {
         if (sm instanceof HTMLElement) sm.remove();
       }

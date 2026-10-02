@@ -791,3 +791,13 @@
   - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 25.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
 ---
+
+### 🐞 [18:02:07 2/10/2026] (via Jev MCP) Tiệm đứng yên ở màn Chuẩn Bị Ngày 7, liên tục bấm BẮT ĐẦU MỞ BÁN
+- **Triệu chứng:** Vòng lặp test bot liên tục log 'Bấm BẮT ĐẦU MỞ BÁN Ngày 7' mỗi 2-3s mà không chuyển sang phase bán hàng
+- **Vị trí:** `src/main.ts` 
+- **Đánh giá Jev (630ms):**
+  - **Mức độ (Severity):** `p0_blocker` (Độ tin cậy: 88.0%)
+  - **Nguyên nhân gốc (Root Cause):** `state_lifecycle` (Độ tin cậy: 89.0%)
+  - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 71.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---

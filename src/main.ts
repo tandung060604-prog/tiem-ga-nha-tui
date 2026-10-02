@@ -1850,6 +1850,16 @@ class AppController {
               const freshStock = stateManager.getState().inventory.chicken_meat?.amount || 0;
               this.showToast(`❤️ Bác Ba tương trợ kịp thời (${freshStock >= 15 ? '15 miếng gà & 150k vốn' : '5 miếng gà cho mượn tạm'})! Mở bán được rồi con nhé!`);
             } else {
+              // Kiểm tra xem người chơi còn nguyên liệu nào có thể hoàn tiền (-5) để xoay vốn không
+              const currentInv = stateManager.getState().inventory;
+              const canRefundAnything = Object.values(currentInv).some(item => (item?.amount || 0) >= 5);
+              const currentMoney = stateManager.getState().money || 0;
+              if (!canRefundAnything && currentMoney < minChickenPackCost) {
+                this.showToast('💸 Tiệm đã cạn kiệt toàn bộ vốn liếng và gà tươi, không thể tiếp tục kinh doanh!');
+                this.openEndingModal('bad_bankruptcy');
+                return;
+              }
+
               this.showToast('Hết gà với hết vốn rồi… Bác Ba đã giúp một lần trong chương này rồi. Bán bớt đồ hoặc nhận thưởng Thỏ Cam đi con.');
               this.activeTab = 'inventory';
               this.render();
