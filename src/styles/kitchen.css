@@ -79,6 +79,42 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Bottom Street Ticker Rail - Non-intrusive Live Status */
+.selling-ticker-rail {
+  background: #1c2646;
+  border-top: 2px solid #3a1f11;
+  color: #faeed1;
+  padding: 3px 8px;
+  font-family: var(--font-pixel-body, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  height: 24px;
+  z-index: 15;
+}
+
+.ticker-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  animation: tickerSlide 25s linear infinite;
+}
+
+.ticker-dot {
+  color: #22c55e;
+  font-size: 0.6rem;
+}
+
+@keyframes tickerSlide {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
 /* Wood Counter (Mặt quầy gỗ) */
 .kitchen-counter {
   background: var(--counter);

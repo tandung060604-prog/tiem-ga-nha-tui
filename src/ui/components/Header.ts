@@ -11,29 +11,45 @@ export function renderHeader(state: GameState, _onOpenSettings?: () => void): st
 
   // Format VNĐ e.g. 850.000đ
   const formattedMoney = state.money.toLocaleString('vi-VN') + 'đ';
-
   const reviewCount = state.totalReviewsCount ?? state.recentReviews.length;
 
   return `
     <div class="h-l">
+      <button id="btn-header-drawer" class="h-btn btn-drawer-toggle" aria-label="Menu Tiệm" title="Danh mục chức năng quán">
+        <span class="drawer-burger-icon">☰</span>
+      </button>
       <button id="btn-audio-toggle" class="h-btn" aria-label="Âm thanh" title="Bật/Tắt âm thanh">
         <img src="${soundIcon}" class="h-pixel-icon" alt="Âm thanh" />
-      </button>
-      <button id="btn-settings-toggle" class="h-btn" aria-label="Cài đặt" title="Cài đặt tiệm">
-        <img src="${ASSETS.icons.settings}" class="h-pixel-icon" alt="Cài đặt" />
-      </button>
-      <button id="btn-leaderboard-toggle" class="h-btn" aria-label="Bảng xếp hạng" title="Bảng xếp hạng Đua Top 4 Tiệm Gà">
-        <span style="font-size: 1.15rem; line-height: 1;">🏆</span>
-      </button>
-      <button id="btn-changelog-toggle" class="h-btn" aria-label="Bảng tin" title="Xem bản cập nhật">
-        <img src="${ASSETS.icons.book}" class="h-pixel-icon" alt="Bảng tin" />
-      </button>
-      <button id="btn-bacba-manual" class="h-btn" aria-label="Cẩm nang Bác Ba" title="Cẩm nang Bác Ba (Cách chơi)">
-        <img src="${ASSETS.bacba.front}" class="h-pixel-icon" style="border-radius: 4px; object-fit: cover;" alt="Bác Ba" />
       </button>
       <div class="h-day-box">
         <b>Ngày ${state.day}</b>
         <small>${phaseLabel}</small>
+      </div>
+
+      <!-- Quick Utilities Dropdown Drawer -->
+      <div id="header-quick-drawer" class="header-drawer-popover" style="display: none;">
+        <div class="drawer-header-bar">
+          <span class="drawer-title">📜 TIỆN ÍCH HẺM 1102</span>
+          <button id="btn-close-header-drawer" class="drawer-close-btn" aria-label="Đóng">✕</button>
+        </div>
+        <div class="drawer-items-list">
+          <button id="btn-settings-toggle" class="drawer-action-btn" title="Cài đặt tiệm">
+            <img src="${ASSETS.icons.settings}" class="drawer-icon-img" alt="" />
+            <span class="drawer-label">Cài đặt tiệm</span>
+          </button>
+          <button id="btn-leaderboard-toggle" class="drawer-action-btn" title="Bảng xếp hạng Đua Top 4 Tiệm Gà">
+            <span class="drawer-icon-emoji">🏆</span>
+            <span class="drawer-label">Đua Top 4 Máy</span>
+          </button>
+          <button id="btn-changelog-toggle" class="drawer-action-btn" title="Xem bản cập nhật">
+            <img src="${ASSETS.icons.book}" class="drawer-icon-img" alt="" />
+            <span class="drawer-label">Bản tin cập nhật</span>
+          </button>
+          <button id="btn-bacba-manual" class="drawer-action-btn" title="Cẩm nang Bác Ba (Cách chơi)">
+            <img src="${ASSETS.bacba.front}" class="drawer-icon-img avatar" alt="" />
+            <span class="drawer-label">Cẩm nang Bác Ba</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -66,6 +82,41 @@ export function bindHeaderEvents(
   onOpenBacBaManual?: () => void,
   onOpenLeaderboard?: () => void
 ) {
+  const drawerBtn = document.getElementById('btn-header-drawer');
+  const drawer = document.getElementById('header-quick-drawer');
+  const closeDrawerBtn = document.getElementById('btn-close-header-drawer');
+
+  const closeDrawer = () => {
+    if (drawer) drawer.style.display = 'none';
+  };
+
+  if (drawerBtn && drawer) {
+    drawerBtn.onclick = (e) => {
+      e.stopPropagation();
+      audio.playPop();
+      const isOpen = drawer.style.display !== 'none';
+      drawer.style.display = isOpen ? 'none' : 'block';
+    };
+  }
+
+  if (closeDrawerBtn) {
+    closeDrawerBtn.onclick = (e) => {
+      e.stopPropagation();
+      audio.playPop();
+      closeDrawer();
+    };
+  }
+
+  // Click outside closes drawer
+  document.addEventListener('click', (e) => {
+    if (drawer && drawer.style.display !== 'none') {
+      const target = e.target as HTMLElement;
+      if (!target.closest('#header-quick-drawer') && !target.closest('#btn-header-drawer')) {
+        closeDrawer();
+      }
+    }
+  });
+
   const audioBtn = document.getElementById('btn-audio-toggle');
   if (audioBtn) {
     audioBtn.onclick = () => {
@@ -77,6 +128,7 @@ export function bindHeaderEvents(
   const settingsBtn = document.getElementById('btn-settings-toggle');
   if (settingsBtn) {
     settingsBtn.onclick = () => {
+      closeDrawer();
       audio.playPop();
       onOpenSettings();
     };
@@ -85,6 +137,7 @@ export function bindHeaderEvents(
   const leaderboardBtn = document.getElementById('btn-leaderboard-toggle');
   if (leaderboardBtn && onOpenLeaderboard) {
     leaderboardBtn.onclick = () => {
+      closeDrawer();
       audio.playPop();
       onOpenLeaderboard();
     };
@@ -93,6 +146,7 @@ export function bindHeaderEvents(
   const changelogBtn = document.getElementById('btn-changelog-toggle');
   if (changelogBtn && onOpenChangelog) {
     changelogBtn.onclick = () => {
+      closeDrawer();
       audio.playPop();
       onOpenChangelog();
     };
@@ -101,6 +155,7 @@ export function bindHeaderEvents(
   const bacbaBtn = document.getElementById('btn-bacba-manual');
   if (bacbaBtn && onOpenBacBaManual) {
     bacbaBtn.onclick = () => {
+      closeDrawer();
       audio.playPop();
       onOpenBacBaManual();
     };

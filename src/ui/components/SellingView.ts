@@ -1111,6 +1111,14 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           </div>
         </div>
       </div>
+
+      <!-- Bottom Street Ticker Rail (Băng Tin LED Đáy Quán) -->
+      <div id="selling-ticker-rail" class="selling-ticker-rail">
+        <div class="ticker-content">
+          <span class="ticker-dot">●</span>
+          <span id="ticker-live-text" class="ticker-text">Hẻm 1102: Mùi gà rán thơm giòn nức mũi • Khách đang tấp nập ghé tiệm • Chúc bà con ngon miệng!</span>
+        </div>
+      </div>
     </div>
   `;
 }

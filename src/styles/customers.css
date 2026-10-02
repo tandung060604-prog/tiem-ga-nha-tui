@@ -581,41 +581,37 @@
   box-shadow: 0 1px 3px rgba(230, 81, 0, 0.3);
 }
 
-/* Realtime Customer Thought Bubble with Multi-Mood Support */
+/* Realtime Customer Thought Bubble with Multi-Mood Support - Zero Collision */
 .thought-bubble {
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
+  position: static;
+  transform: none;
   background: #ffffff;
   border: 1.5px solid var(--line-strong, #c4a988);
-  border-radius: 14px;
-  padding: 2px 8px;
+  border-radius: 4px;
+  padding: 3px 6px;
   font-size: 0.66rem;
   font-weight: 800;
   color: var(--ink);
-  white-space: nowrap;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  white-space: normal;
+  line-height: 1.25;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   pointer-events: none;
-  z-index: 10;
-  max-width: 92%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  z-index: 2;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 4px;
+  display: none; /* Hide on background cards */
+}
+
+.customer-card.active .thought-bubble,
+.customer-card:hover .thought-bubble {
   display: flex;
   align-items: center;
   gap: 3px;
-  transition: all 0.2s ease;
 }
 
 .thought-bubble::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 4px 4px 0;
-  border-style: solid;
-  border-color: #ffffff transparent;
+  display: none !important;
 }
 
 /* Happy / Vui */

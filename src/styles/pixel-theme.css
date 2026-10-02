@@ -450,8 +450,8 @@ p, span, div, b, small, button, input, select, textarea,
 }
 
 body.selling-mode .toast {
-  top: auto !important;
-  bottom: calc(72px + var(--safe-bottom)) !important;
+  top: calc(52px + var(--safe-top)) !important;
+  bottom: auto !important;
 }
 
 /* ==========================================================================
@@ -878,6 +878,11 @@ body.selling-mode .toast {
 }
 
 .thought-bubble {
+  position: static !important;
+  transform: none !important;
+  margin-bottom: 4px !important;
+  max-width: 100% !important;
+  white-space: normal !important;
   background: #ffffff !important;
   border: 2px solid #2b1810 !important;
   border-radius: 2px !important;
@@ -886,6 +891,10 @@ body.selling-mode .toast {
   font-size: 0.85rem !important;
   line-height: 1.35 !important;
   color: #2b1810 !important;
+}
+
+.thought-bubble::after {
+  display: none !important;
 }
 
 .stardew-emote-bubble {
