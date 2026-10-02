@@ -336,23 +336,25 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
       c.ringFill.classList.toggle('low', p.cls === 'low');
     }
     if (c.moodEmoji) {
-      c.moodEmoji.textContent = p.angry ? '💢' : p.cls === 'low' ? '🥺' : p.cls === 'mid' ? '😋' : '✨';
+      c.moodEmoji.innerHTML = p.angry 
+        ? `<img src="${ASSETS.icons.emoteAnger}" class="badge-pixel-star-xs" alt="💢" />`
+        : p.cls === 'low' 
+        ? `<img src="${ASSETS.icons.emoteSweat}" class="badge-pixel-star-xs" alt="💦" />`
+        : p.cls === 'mid' 
+        ? `<img src="${ASSETS.icons.emoteYum}" class="badge-pixel-star-xs" alt="😋" />`
+        : `<img src="${ASSETS.icons.sparkle}" class="badge-pixel-star-xs" alt="✨" />`;
     }
     if (c.emoteBubble) {
       if (p.angry) {
-        c.emoteBubble.textContent = '💢';
+        c.emoteBubble.innerHTML = `<img src="${ASSETS.icons.emoteAnger}" class="emote-pixel-img" alt="💢" />`;
       } else if (p.cls === 'low') {
-        c.emoteBubble.textContent = '💦';
+        c.emoteBubble.innerHTML = `<img src="${ASSETS.icons.emoteSweat}" class="emote-pixel-img" alt="💦" />`;
       } else if (order.isVip) {
-        if (!c.emoteBubble.querySelector('img')) {
-          c.emoteBubble.innerHTML = `<img src="${ASSETS.icons.heart}" class="emote-pixel-img" alt="VIP" />`;
-        }
+        c.emoteBubble.innerHTML = `<img src="${ASSETS.icons.heart}" class="emote-pixel-img" alt="VIP" />`;
       } else if (p.cls === 'mid') {
-        c.emoteBubble.textContent = '💡';
+        c.emoteBubble.innerHTML = `<img src="${ASSETS.icons.emoteQuestion}" class="emote-pixel-img" alt="⏳" />`;
       } else {
-        if (!c.emoteBubble.querySelector('img')) {
-          c.emoteBubble.innerHTML = `<img src="${ASSETS.icons.sparkle}" class="emote-pixel-img" alt="✨" />`;
-        }
+        c.emoteBubble.innerHTML = `<img src="${ASSETS.icons.emoteYum}" class="emote-pixel-img" alt="😋" />`;
       }
     }
 
@@ -688,7 +690,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
     const thought = getMoodThought(mood, ord, state);
     const hasMatchInTray = tray.some(t => ord.items.some(it => it.menuItemId === t.menuItemId && !it.completed));
 
-    const comboHtml = ord.comboName ? `<div class="order-combo">🍱 ${escapeHtml(ord.comboName)}</div>` : '';
+    const comboHtml = ord.comboName ? `<div class="order-combo"><img src="${ASSETS.icons.gift}" class="btn-pixel-icon-xs" alt="" /> ${escapeHtml(ord.comboName)}</div>` : '';
     const itemsHtml = comboHtml + ord.items.map(it => {
       const menuItem = state.menu.find(m => m.id === it.menuItemId);
       const name = menuItem ? menuItem.name : it.menuItemId;
@@ -702,7 +704,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             ${img ? `<img src="${img}" class="order-food-thumb" alt="${escapeHtml(name)}" width="28" height="28" />` : `<span class="order-food-emoji">${menuItem ? menuItem.icon : '🍗'}</span>`}
             <span class="order-qty">${qtyText}</span>
             <span class="order-food-name">${escapeHtml(name)}</span>
-            ${it.condiment ? `<span class="order-condiment" data-condiment="${it.condiment}">${it.condiment === 'ketchup' ? '🍅 + tương cà' : '🌶️ + tương ớt'}</span>` : ''}
+            ${it.condiment ? `<span class="order-condiment" data-condiment="${it.condiment}">${it.condiment === 'ketchup' ? `<img src="${ASSETS.icons.sauce}" class="btn-pixel-icon-xs" alt="" /> + tương cà` : `<img src="${ASSETS.icons.chickenSpicy}" class="btn-pixel-icon-xs" alt="" /> + tương ớt`}</span>` : ''}
           </span>
           <span class="order-check ${statusClass}" title="${it.completed ? 'Món đã giao đủ' : 'Đang chờ món này'}">${statusText}</span>
         </div>
@@ -716,8 +718,8 @@ export function renderSellingView(state: GameState, session: SellingSession): st
     const queueBadge = idx === 0 
       ? `<span class="queue-pos-badge first"><img src="${ASSETS.icons.star}" class="badge-pixel-star-xs" alt="" /> Đang phục vụ</span>` 
       : idx === 1 
-      ? '<span class="queue-pos-badge next">2️⃣ Kế tiếp</span>' 
-      : `<span class="queue-pos-badge wait">${idx + 1}️⃣ Xếp hàng</span>`;
+      ? '<span class="queue-pos-badge next"><span class="queue-num-badge">2</span> Kế tiếp</span>' 
+      : `<span class="queue-pos-badge wait"><span class="queue-num-badge">${idx + 1}</span> Xếp hàng</span>`;
 
     return `
       <div class="customer-card ${ord.isBunny ? 'bunny-card' : ''} ${ord.isVip ? 'vip-card' : ''} ${isAngry ? 'angry' : ''} ${idx === 0 ? 'active' : ''}" 
@@ -747,12 +749,28 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             </svg>
             ${actorHtml}
             <div class="char-shadow"></div>
-            <div class="stardew-emote-bubble" title="Cảm xúc">${isAngry ? '💢' : patienceColorClass === 'low' ? '💦' : (ord.isVip ? `<img src="${ASSETS.icons.heart}" class="emote-pixel-img" alt="VIP" />` : (patienceColorClass === 'mid' ? '💡' : `<img src="${ASSETS.icons.sparkle}" class="emote-pixel-img" alt="✨" />`))}</div>
+            <div class="stardew-emote-bubble" title="Cảm xúc">
+              ${isAngry 
+                ? `<img src="${ASSETS.icons.emoteAnger}" class="emote-pixel-img" alt="💢" />` 
+                : patienceColorClass === 'low' 
+                ? `<img src="${ASSETS.icons.emoteSweat}" class="emote-pixel-img" alt="💦" />` 
+                : (ord.isVip 
+                  ? `<img src="${ASSETS.icons.heart}" class="emote-pixel-img" alt="VIP" />` 
+                  : (patienceColorClass === 'mid' 
+                    ? `<img src="${ASSETS.icons.emoteQuestion}" class="emote-pixel-img" alt="⏳" />` 
+                    : `<img src="${ASSETS.icons.emoteYum}" class="emote-pixel-img" alt="😋" />`))}
+            </div>
           </div>
           <div class="cust-info-col">
             <div class="cust-name-row">
               <span class="cust-name">${visual.name}</span>
-              <span class="mood-indicator">${isAngry ? '💢' : patienceColorClass === 'low' ? '🥺' : (ord.isVip ? `<img src="${ASSETS.icons.heart}" class="badge-pixel-star-xs" alt="" />` : `<img src="${ASSETS.icons.sparkle}" class="badge-pixel-star-xs" alt="" />`)}</span>
+              <span class="mood-indicator">${isAngry 
+                ? `<img src="${ASSETS.icons.emoteAnger}" class="badge-pixel-star-xs" alt="💢" />` 
+                : patienceColorClass === 'low' 
+                ? `<img src="${ASSETS.icons.emoteSweat}" class="badge-pixel-star-xs" alt="🥺" />` 
+                : (ord.isVip 
+                  ? `<img src="${ASSETS.icons.heart}" class="badge-pixel-star-xs" alt="" />` 
+                  : `<img src="${ASSETS.icons.sparkle}" class="badge-pixel-star-xs" alt="" />`)}</span>
             </div>
             <div class="cust-badges-row">
               ${queueBadge}
@@ -837,7 +855,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
   } else {
     panFoodHtml = `
       <div class="pot-idle-view">
-        <span class="pan-big-icon">🍳</span>
+        <img src="${ASSETS.icons.pan}" class="pan-big-pixel-img" alt="🍳" />
         <div class="pan-idle-text">Chảo dầu sôi 180°C sẵn sàng</div>
       </div>
     `;
@@ -859,9 +877,9 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         : 'ƯỚP LẠNH ❄️';
       const qText = isDrink ? drinkTag : TRAY_QUALITY_LABEL[item.quality];
       const condimentHtml = item.condiment === 'ketchup'
-        ? `<span class="tray-condiment-tag ketchup">🍅 Tương Cà</span>`
+        ? `<span class="tray-condiment-tag ketchup"><img src="${ASSETS.icons.sauce}" class="btn-pixel-icon-xs" alt="" /> Tương Cà</span>`
         : item.condiment === 'chili'
-        ? `<span class="tray-condiment-tag chili">🌶️ Tương Ớt</span>`
+        ? `<span class="tray-condiment-tag chili"><img src="${ASSETS.icons.chickenSpicy}" class="btn-pixel-icon-xs" alt="" /> Tương Ớt</span>`
         : '';
       const drinkClass = item.menuItemId === 'soda' ? 'drink-coca' : item.menuItemId === 'seven_up' ? 'drink-7up' : item.menuItemId === 'fanta_orange' ? 'drink-fanta' : '';
       return `

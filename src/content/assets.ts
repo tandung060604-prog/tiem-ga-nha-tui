@@ -230,9 +230,55 @@ export const ASSETS = {
     scooter: url('assets/icons/icon_scooter.png'),
     trash: url('assets/icons/icon_trash.png'),
     sparkle: url('assets/icons/icon_sparkle.png'),
-    broom: url('assets/icons/icon_broom.png')
+    broom: url('assets/icons/icon_broom.png'),
+    trophy: url('assets/icons/icon_trophy.png'),
+    newspaper: url('assets/icons/icon_newspaper.png'),
+    chickenCrispy: url('assets/icons/icon_chicken_crispy.png'),
+    chickenSpicy: url('assets/icons/icon_chicken_spicy.png'),
+    chickenHoney: url('assets/icons/icon_chicken_honey.png'),
+    shakeFries: url('assets/icons/icon_shake_fries.png'),
+    sodaCup: url('assets/icons/icon_soda_cup.png'),
+    pan: url('assets/icons/icon_pan.png'),
+    roleCook: url('assets/icons/icon_role_cook.png'),
+    roleWaiter: url('assets/icons/icon_role_waiter.png'),
+    roleCashier: url('assets/icons/icon_role_cashier.png'),
+    roleDelivery: url('assets/icons/icon_role_delivery.png'),
+    roleManager: url('assets/icons/icon_role_manager.png'),
+    roleSecurity: url('assets/icons/icon_role_security.png'),
+    menu: url('assets/icons/icon_hamburger_menu.png'),
+    lightning: url('assets/icons/icon_lightning.png'),
+    cat: url('assets/icons/icon_cat.png'),
+    dog: url('assets/icons/icon_dog.png'),
+    radio: url('assets/icons/icon_radio.png'),
+    check: url('assets/icons/icon_check.png'),
+    close: url('assets/icons/icon_close.png'),
+    gift: url('assets/icons/icon_gift.png'),
+    target: url('assets/icons/icon_target.png'),
+    police: url('assets/icons/icon_police.png'),
+    emoteYum: url('assets/icons/emote_yum.png'),
+    emoteSweat: url('assets/icons/emote_sweat.png'),
+    emoteAnger: url('assets/icons/emote_anger.png'),
+    emoteQuestion: url('assets/icons/emote_question.png'),
+    emoteMoney: url('assets/icons/emote_money.png'),
+    emoteOilAlert: url('assets/icons/emote_oil_alert.png')
   }
 } as const;
+
+/**
+ * Trả về đường dẫn ảnh icon Sài Gòn Retro theo tên
+ */
+export function saigonIcon(name: keyof typeof ASSETS.icons | string): string {
+  const iconsMap = ASSETS.icons as Record<string, string>;
+  return iconsMap[name] || iconsMap.sparkle || '';
+}
+
+/**
+ * Trả về chuỗi HTML thẻ <img> chuẩn pixel art
+ */
+export function saigonIconImg(name: keyof typeof ASSETS.icons | string, className = 'btn-pixel-icon-sm', alt = ''): string {
+  const src = saigonIcon(name);
+  return `<img class="${className}" src="${src}" alt="${alt}" loading="lazy" />`;
+}
 
 // Ảnh món theo chất lượng; món chưa có ảnh (gà sốt, món chương sau) → null, UI dùng emoji
 export function foodImage(menuItemId: string, quality: QualityRating): string | null {

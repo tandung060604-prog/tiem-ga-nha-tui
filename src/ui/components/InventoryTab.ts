@@ -2,6 +2,29 @@ import { GameState } from '../../types/game';
 import { audio } from '../../core/audio';
 import { addStock, refundPurchase, refundableUnits, signIngredientContract, isIngredientUnlocked, UnlockResult } from '../../core/inventory';
 import { upgradeEffects } from '../../core/upgrades';
+import { ASSETS } from '../../content/assets';
+
+function getInventoryIcon(item: any): string {
+  const iconMap: Record<string, string> = {
+    chicken_meat: ASSETS.icons.chickenCrispy,
+    flour: ASSETS.icons.sauce,
+    fry_oil: ASSETS.icons.oilCan,
+    potato_cheese: ASSETS.icons.shakeFries,
+    soft_drink: ASSETS.food.soda,
+    spicy_sauce: ASSETS.icons.chickenSpicy,
+    honey_garlic_sauce: ASSETS.icons.chickenHoney,
+    popcorn_chicken_meat: ASSETS.kitchen.gnPrepPopcornRaw || ASSETS.food.popcornChicken,
+    chicken_thigh: ASSETS.kitchen.gnPrepThighRaw || ASSETS.food.spicyThigh,
+    cheese_stick: ASSETS.food.cheeseStick,
+    radish_danmuji: ASSETS.food.danmuji,
+    coleslaw_salad: ASSETS.food.coleslaw,
+  };
+  const src = iconMap[item.id];
+  if (src) {
+    return `<img src="${src}" class="item-pixel-thumb" alt="${item.name}" width="32" height="32" />`;
+  }
+  return `<span class="item-icon-char">${item.icon}</span>`;
+}
 
 export function renderInventoryTab(state: GameState): string {
   const items = Object.values(state.inventory);
@@ -17,12 +40,12 @@ export function renderInventoryTab(state: GameState): string {
     if (isLocked) {
       return `
         <div class="item-row is-locked" data-id="${item.id}" style="opacity: 0.9;">
-          <div class="item-icon" style="filter: grayscale(0.8); background: #eee;">${item.icon}</div>
+          <div class="item-icon" style="filter: grayscale(0.8); background: #eee;">${getInventoryIcon(item)}</div>
           
           <div class="item-meta">
             <div class="item-name">
               ${item.name}
-              <span class="shelf-tag" style="background:#e2e8f0;color:#475569;">🔒 Chưa ký HĐ</span>
+              <span class="shelf-tag" style="background:#e2e8f0;color:#475569;"><img src="${ASSETS.icons.lock}" class="pixel-lock-img" alt="" /> Chưa ký HĐ</span>
             </div>
             <div class="item-sub">
               ${canUnlockDay 
@@ -35,11 +58,11 @@ export function renderInventoryTab(state: GameState): string {
           <div class="btn-group">
             ${canUnlockDay ? `
               <button class="btn-sm primary btn-unlock" data-id="${item.id}" ${!canAfford ? 'disabled' : ''} style="background:var(--accent,#b45309);border-color:var(--accent,#b45309);color:#fff;" title="Ký hợp đồng cung ứng">
-                🔓 Mở HĐ<small>(${((item.unlockCost ?? 0) / 1000)}k)</small>
+                <img src="${ASSETS.icons.check}" class="btn-pixel-icon-xs" alt="" /> Mở HĐ<small>(${((item.unlockCost ?? 0) / 1000)}k)</small>
               </button>
             ` : `
               <button class="btn-sm" disabled style="opacity:0.6;font-size:0.7rem;padding:6px 8px;">
-                🔒 Ngày ${item.unlockDay}
+                <img src="${ASSETS.icons.lock}" class="pixel-lock-img" alt="" /> Ngày ${item.unlockDay}
               </button>
             `}
           </div>
@@ -56,7 +79,7 @@ export function renderInventoryTab(state: GameState): string {
 
     return `
       <div class="item-row" data-id="${item.id}">
-        <div class="item-icon">${item.icon}</div>
+        <div class="item-icon">${getInventoryIcon(item)}</div>
         
         <div class="item-meta">
           <div class="item-name">
@@ -64,7 +87,7 @@ export function renderInventoryTab(state: GameState): string {
             ${isOutOfStock 
               ? '<span class="shelf-tag" style="background:#f1f5f9;color:#64748b;font-weight:600;">Hết hàng</span>'
               : isUrgentShelf 
-              ? '<span class="shelf-tag" style="background:#ffd2d2;color:#b71c1c;font-weight:700;">⚠️ HSD: ' + item.currentLifeDays + ' ngày!</span>' 
+              ? '<span class="shelf-tag" style="background:#ffd2d2;color:#b71c1c;font-weight:700;"><img src="' + ASSETS.icons.clock + '" class="btn-pixel-icon-xs" alt="" /> HSD: ' + item.currentLifeDays + ' ngày!</span>' 
               : '<span class="shelf-tag">HSD: ' + item.currentLifeDays + ' ngày</span>'}
           </div>
           <div class="item-sub ${isLow ? 'low-stock' : ''}">
@@ -72,7 +95,7 @@ export function renderInventoryTab(state: GameState): string {
           </div>
           ${item.batches && item.batches.length > 1 ? `
             <div style="font-size: 0.65rem; color: var(--soft); margin-top: 2px;">
-              📦 Theo lô FIFO: ${item.batches.map(b => `<b>${b.amount}</b> ${item.unit} (${b.daysLeft}d)`).join(' · ')}
+              <img src="${ASSETS.icons.inventory}" class="btn-pixel-icon-xs" alt="" /> Theo lô FIFO: ${item.batches.map(b => `<b>${b.amount}</b> ${item.unit} (${b.daysLeft}d)`).join(' · ')}
             </div>
           ` : ''}
         </div>
@@ -95,7 +118,7 @@ export function renderInventoryTab(state: GameState): string {
   const marketBannerHtml = state.todayMarketBargained
     ? (marketDiscount > 0
         ? `<div style="background: rgba(16,185,129,0.12); border: 1.5px solid #10b981; border-radius: 6px; padding: 6px 10px; margin-bottom: 10px; font-size: 0.8rem; color: #065f46; display: flex; justify-content: space-between; align-items: center;">
-            <span>🏷️ <b>Đã đi Chợ Lớn:</b> Giảm -${marketDiscount}% giá nhập sỉ cả ngày hôm nay!</span>
+            <span><img src="${ASSETS.icons.scooter}" class="btn-pixel-icon-xs" alt="" /> <b>Đã đi Chợ Lớn:</b> Giảm -${marketDiscount}% giá nhập sỉ cả ngày hôm nay!</span>
           </div>`
         : `<div style="background: rgba(0,0,0,0.05); border: 1px dashed var(--line); border-radius: 6px; padding: 6px 10px; margin-bottom: 10px; font-size: 0.78rem; color: var(--soft);">
             <span>🛒 Đã ghé chợ sáng nay (tiểu thương giữ nguyên giá sỉ).</span>

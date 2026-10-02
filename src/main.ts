@@ -1651,6 +1651,26 @@ class AppController {
       };
     }
 
+    const toggleChalkboardBtn = document.getElementById('btn-toggle-chalkboard');
+    if (toggleChalkboardBtn) {
+      const board = document.getElementById('main-chalkboard');
+      if (localStorage.getItem('tiemga_chalkboard_collapsed') === '1' && board) {
+        board.classList.add('is-collapsed');
+        const iconSpan = toggleChalkboardBtn.querySelector('.toggle-icon');
+        if (iconSpan) iconSpan.textContent = '▲';
+      }
+      toggleChalkboardBtn.onclick = () => {
+        audio.playPop();
+        if (board) {
+          board.classList.toggle('is-collapsed');
+          const isCollapsed = board.classList.contains('is-collapsed');
+          const iconSpan = toggleChalkboardBtn.querySelector('.toggle-icon');
+          if (iconSpan) iconSpan.textContent = isCollapsed ? '▲' : '▼';
+          localStorage.setItem('tiemga_chalkboard_collapsed', isCollapsed ? '1' : '0');
+        }
+      };
+    }
+
     const openIncidentsBtn = document.getElementById('btn-open-incidents');
     if (openIncidentsBtn) {
       openIncidentsBtn.onclick = () => {

@@ -4,7 +4,7 @@ import { audio } from '../../core/audio';
 import { describeStaffEffect, maxStaff, severancePay } from '../../core/staff';
 import { performGachaRollSingle, performGachaRollTen, GACHA_PRICES } from '../../core/staffGacha';
 import { openGachaResultModal } from './GachaResultModal';
-import { staffImage } from '../../content/assets';
+import { staffImage, ASSETS } from '../../content/assets';
 
 export function renderStaffTab(state: GameState): string {
   const cap = state.currentChapter < 2 ? 1 : maxStaff(state.currentChapter);
@@ -32,7 +32,7 @@ export function renderStaffTab(state: GameState): string {
         <div class="item-meta">
           <div class="item-name">
             ${member.name}
-            ${member.rarity ? `<span class="gacha-rarity-pill ${member.rarity}">${member.rarity === 'SSR' ? '👑 SSR' : member.rarity}</span>` : ''}
+            ${member.rarity ? `<span class="gacha-rarity-pill ${member.rarity}">${member.rarity === 'SSR' ? `<img src="${ASSETS.icons.star}" class="badge-pixel-star-xs" alt="" /> SSR` : member.rarity}</span>` : ''}
             <span class="shelf-tag shelf-tag-role">${roleInfo ? roleInfo.name : member.role}</span>
           </div>
           ${member.title ? `<div class="staff-sub-title">"${member.title}" · <span class="gacha-stars-mini">${starsHtml}</span></div>` : ''}
@@ -40,13 +40,13 @@ export function renderStaffTab(state: GameState): string {
             Lương: <b>${(member.hourlyWage ?? (member as any).salary ?? 25000).toLocaleString('vi-VN')}đ/h</b> · Tâm trạng: <b>${member.mood}%</b>
           </div>
           <div class="staff-stats">
-            ⚡ Tốc độ: <b>${member.speed}</b> | 🎯 Tay nghề: <b>${member.skill}</b>
+            <img src="${ASSETS.icons.lightning}" class="btn-pixel-icon-xs" alt="" /> Tốc độ: <b>${member.speed}</b> | <img src="${ASSETS.icons.target}" class="btn-pixel-icon-xs" alt="" /> Tay nghề: <b>${member.skill}</b>
             ${member.laziness !== undefined ? ` | 💤 Lười: <b style="color:#f87171">${member.laziness}%</b>` : ''}
             ${member.errorRate !== undefined ? ` | ⚠️ Sai: <b style="color:#f87171">${member.errorRate}%</b>` : ''}
           </div>
-          <div class="staff-effect">⚙️ ${describeStaffEffect(member, state.staff)}</div>
-          ${member.passiveName ? `<div class="staff-passive">✨ <b>${member.passiveName}:</b> ${member.passiveDesc}</div>` : ''}
-          ${traitInfo ? `<div class="staff-trait">🌟 ${traitInfo.name}: ${traitInfo.desc}</div>` : ''}
+          <div class="staff-effect"><img src="${ASSETS.icons.settings}" class="btn-pixel-icon-xs" alt="" /> ${describeStaffEffect(member, state.staff)}</div>
+          ${member.passiveName ? `<div class="staff-passive"><img src="${ASSETS.icons.sparkle}" class="btn-pixel-icon-xs" alt="" /> <b>${member.passiveName}:</b> ${member.passiveDesc}</div>` : ''}
+          ${traitInfo ? `<div class="staff-trait"><img src="${ASSETS.icons.star}" class="btn-pixel-icon-xs" alt="" /> ${traitInfo.name}: ${traitInfo.desc}</div>` : ''}
         </div>
 
         <div class="btn-group">
@@ -69,7 +69,7 @@ export function renderStaffTab(state: GameState): string {
     <div class="gacha-recruitment-banner">
       <div class="gacha-banner-header">
         <div class="gacha-banner-title">
-          <span>📯 CHIÊU MỘ NHÂN TÀI GACHA</span>
+          <span><img src="${ASSETS.icons.newspaper}" class="pixel-card-title-icon" alt="" /> CHIÊU MỘ NHÂN TÀI GACHA</span>
         </div>
         <div style="font-size: 0.7rem; color: #cbd5e1;">
           Đã tuyển: <b>${totalRolls} lượt</b>
@@ -78,28 +78,28 @@ export function renderStaffTab(state: GameState): string {
 
       <div class="gacha-pity-hud">
         <div class="pity-badge">
-          🛡️ Bảo hiểm SR+: <b>${softPityRemaining}</b> lượt nữa
+          <img src="${ASSETS.icons.roleSecurity}" class="btn-pixel-icon-xs" alt="" /> Bảo hiểm SR+: <b>${softPityRemaining}</b> lượt nữa
         </div>
         <div class="pity-badge ssr">
-          👑 Bảo hiểm SSR: <b>${hardPityRemaining}</b> lượt nữa
+          <img src="${ASSETS.icons.trophy}" class="btn-pixel-icon-xs" alt="" /> Bảo hiểm SSR: <b>${hardPityRemaining}</b> lượt nữa
         </div>
       </div>
 
       <div class="gacha-actions-grid">
         <button id="btn-gacha-single" class="btn-gacha-roll btn-gacha-single" ${state.money < GACHA_PRICES.SINGLE_ROLL || full ? 'disabled' : ''}>
-          <span class="gacha-btn-name">📯 Phát Tờ Rơi Tuyển Dụng</span>
+          <span class="gacha-btn-name"><img src="${ASSETS.icons.newspaper}" class="btn-pixel-icon-sm" alt="" /> Phát Tờ Rơi Tuyển Dụng</span>
           <span class="gacha-btn-cost">${GACHA_PRICES.SINGLE_ROLL.toLocaleString('vi-VN')}đ</span>
           <span class="gacha-btn-tag" style="background:#0284c7">Ra 3 Ứng Viên · Chọn 1</span>
         </button>
 
         <button id="btn-gacha-ten" class="btn-gacha-roll btn-gacha-ten" ${state.money < GACHA_PRICES.TEN_ROLL || full ? 'disabled' : ''}>
-          <span class="gacha-btn-name">🌟 Đăng Tin Sàn Lớn x10</span>
+          <span class="gacha-btn-name"><img src="${ASSETS.icons.trophy}" class="btn-pixel-icon-sm" alt="" /> Đăng Tin Sàn Lớn x10</span>
           <span class="gacha-btn-cost">${GACHA_PRICES.TEN_ROLL.toLocaleString('vi-VN')}đ (-10%)</span>
           <span class="gacha-btn-tag">Cam Kết 1 SR+ · Chọn 1</span>
         </button>
       </div>
 
-      ${isChapter1 ? '<div style="color: #fef08a; font-size: 0.72rem; font-weight: 700; text-align: center; margin-top: 8px; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 6px;">🛵 <b>Xe Đẩy Chương 1:</b> Tối đa 1 bạn phụ việc. Đạt Chương 2 để mở rộng tới 4 nhân sự!</div>' : ''}
+      ${isChapter1 ? `<div style="color: #fef08a; font-size: 0.72rem; font-weight: 700; text-align: center; margin-top: 8px; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 6px;"><img src="${ASSETS.icons.scooter}" class="btn-pixel-icon-xs" alt="" /> <b>Xe Đẩy Chương 1:</b> Tối đa 1 bạn phụ việc. Đạt Chương 2 để mở rộng tới 4 nhân sự!</div>` : ''}
       ${full ? '<div style="color: #f87171; font-size: 0.72rem; font-weight: 750; text-align: center; margin-top: 8px;">⚠️ Tiệm đã đủ nhân viên tối đa! Hãy cho nghỉ bớt trước khi chiêu mộ thêm.</div>' : ''}
     </div>
 

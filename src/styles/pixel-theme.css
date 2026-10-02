@@ -1067,6 +1067,86 @@ body.selling-mode .toast {
   margin-right: 4px;
 }
 
+.item-pixel-thumb {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  display: block;
+  margin: auto;
+}
+
+.queue-num-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  font-size: 0.58rem;
+  font-weight: 900;
+  line-height: 1;
+  border-radius: 50%;
+  background: currentColor;
+  color: #fff;
+  margin-right: 2px;
+}
+.queue-pos-badge.next .queue-num-badge {
+  background: #0284c7;
+  color: #fff;
+}
+.queue-pos-badge.wait .queue-num-badge {
+  background: #64748b;
+  color: #fff;
+}
+
+/* Collapsible Chalkboard (Stardew Style) */
+.chalkboard {
+  position: relative;
+  transition: all 0.25s ease-out;
+}
+.chalkboard .board-compact-strip {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #faeed1;
+  background: rgba(43, 24, 16, 0.45);
+  border: 1px solid #7c4f32;
+  border-radius: 4px;
+  margin-top: 6px;
+}
+.chalkboard .board-compact-strip .sep {
+  opacity: 0.4;
+  margin: 0 4px;
+}
+.chalkboard .board-compact-strip .compact-status.ready {
+  color: #86efac;
+}
+.chalkboard.is-collapsed .board-collapsible-body {
+  display: none !important;
+}
+.chalkboard.is-collapsed .board-compact-strip {
+  display: flex !important;
+}
+.btn-chalkboard-toggle {
+  background: #5a3018;
+  color: #fef08a;
+  border: 1px solid #7c4f32;
+  padding: 3px 7px;
+  font-size: 0.7rem;
+  border-radius: 4px;
+  cursor: pointer;
+  line-height: 1;
+  transition: transform 0.15s;
+}
+.btn-chalkboard-toggle:active {
+  transform: scale(0.92);
+}
+
 /* Feature 51 aenhatrang.com: Vòng thời gian quanh khách (Circular patience ring) */
 .patience-ring-svg {
   position: absolute;
