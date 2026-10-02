@@ -555,8 +555,8 @@ class OvernightMonkey {
         return true;
       }
 
-      // 3. Phục vụ món cho khách (Nút 'LÊN MÓN' .btn-serve-cust hoặc #btn-serve-order)
-      const serveBtn = page.locator('.btn-serve-cust:not([disabled]), #btn-serve-order:not([disabled])');
+      // 3. Phục vụ món cho khách (Nút 'LÊN MÓN' .btn-serve-cust, #btn-serve-order hoặc Phiếu Gỗ Mini .wooden-order-ticket)
+      const serveBtn = page.locator('.wooden-order-ticket.is-ready-in-tray, .btn-serve-cust:not([disabled]), #btn-serve-order:not([disabled]), .wooden-order-ticket:not([disabled])');
       if (await serveBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
         await serveBtn.first().click({ force: true }).catch(() => {});
         return true;
@@ -672,6 +672,27 @@ class OvernightMonkey {
         }
       }
 
+      // 4. Thỉnh thoảng kiểm tra Hamburger Drawer và Bảng Mục Tiêu gập/mở
+      if (Math.random() < 0.08) {
+        const drawerBtn = page.locator('#btn-header-drawer');
+        if (await drawerBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+          await drawerBtn.first().click({ force: true }).catch(() => {});
+          await sleep(150);
+          const closeDrawer = page.locator('#btn-close-header-drawer, #btn-drawer-overlay');
+          if (await closeDrawer.first().isVisible({ timeout: 200 }).catch(() => false)) {
+            await closeDrawer.first().click({ force: true }).catch(() => {});
+            await sleep(100);
+          }
+        }
+      }
+      if (Math.random() < 0.05) {
+        const toggleChalk = page.locator('#btn-toggle-chalkboard');
+        if (await toggleChalk.first().isVisible({ timeout: 50 }).catch(() => false)) {
+          await toggleChalk.first().click({ force: true }).catch(() => {});
+          await sleep(100);
+        }
+      }
+
       log(`🍗 Bấm 'BẮT ĐẦU MỞ BÁN' Ngày ${this.daysCompleted + 1}...`);
       await page.locator('#btn-start-selling').first().click({ timeout: 2000 }).catch(() => {});
       await sleep(500);
@@ -747,11 +768,11 @@ class OvernightMonkey {
         if (tb instanceof HTMLElement) tb.click();
       }
 
-      const closeButtons = document.querySelectorAll('.dash-close-x, #btn-modal-close-icon, [id*="btn-close"], .btn-close, .modal-close');
+      const closeButtons = document.querySelectorAll('.dash-close-x, #btn-modal-close-icon, #btn-close-header-drawer, [id*="btn-close"], .btn-close, .modal-close');
       for (const btn of closeButtons) {
         if (btn instanceof HTMLElement) btn.click();
       }
-      const overlay = document.querySelector('.modal-overlay, #modal-overlay');
+      const overlay = document.querySelector('.modal-overlay, #modal-overlay, #btn-drawer-overlay');
       if (overlay instanceof HTMLElement) overlay.click();
 
       // Nếu đang kẹt trong màn bán hàng: hủy các đơn khách tồn đọng để kích hoạt lứa khách mới
