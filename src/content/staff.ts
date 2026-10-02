@@ -80,7 +80,8 @@ export const INITIAL_CANDIDATES: StaffMember[] = [
     traits: ['tiktok_idol'],
     hourlyWage: 27000,
     mood: 100,
-    shiftsWorked: 0
+    shiftsWorked: 0,
+    modelAsset: 'assets/staff/cashier_c1.png'
   },
   {
     id: 'staff_2',
@@ -94,7 +95,8 @@ export const INITIAL_CANDIDATES: StaffMember[] = [
     traits: ['night_owl'],
     hourlyWage: 30000,
     mood: 100,
-    shiftsWorked: 0
+    shiftsWorked: 0,
+    modelAsset: 'assets/staff/cook_c1.png'
   },
   {
     id: 'staff_3',
@@ -108,7 +110,8 @@ export const INITIAL_CANDIDATES: StaffMember[] = [
     traits: ['future_boss'],
     hourlyWage: 26000,
     mood: 100,
-    shiftsWorked: 0
+    shiftsWorked: 0,
+    modelAsset: 'assets/staff/waiter_c1.png'
   },
   {
     id: 'staff_4',
@@ -122,7 +125,8 @@ export const INITIAL_CANDIDATES: StaffMember[] = [
     traits: ['phone_addict'],
     hourlyWage: 28000,
     mood: 100,
-    shiftsWorked: 0
+    shiftsWorked: 0,
+    modelAsset: 'assets/staff/delivery_c1.png'
   },
   {
     id: 'staff_5',
@@ -136,7 +140,8 @@ export const INITIAL_CANDIDATES: StaffMember[] = [
     traits: ['night_owl'],
     hourlyWage: 25000,
     mood: 100,
-    shiftsWorked: 0
+    shiftsWorked: 0,
+    modelAsset: 'assets/staff/security_c1.png'
   }
 ];
 
@@ -170,6 +175,7 @@ export function generateCandidate(chapter: number): StaffMember {
     traits: [trait],
     hourlyWage,
     mood: 100,
-    shiftsWorked: 0
+    shiftsWorked: 0,
+    modelAsset: `assets/staff/${role}_c1.png`
   };
 }

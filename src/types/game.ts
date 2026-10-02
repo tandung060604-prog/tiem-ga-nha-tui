@@ -134,6 +134,7 @@ export interface StaffMember {
   passiveName?: string;     // Tên kỹ năng nội tại
   passiveDesc?: string;     // Mô tả hiệu ứng nội tại
   modelAsset?: string;      // Đường dẫn ảnh model nhân vật
+  originalTemplateId?: string; // ID gốc trong template pool (ví dụ cook_c1, cashier_sr2)
 }
 
 export interface StarRating {

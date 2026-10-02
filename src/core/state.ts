@@ -8,6 +8,7 @@ import { signSave, auditState, flagIntegrity } from './integrity';
 import { priceLimits } from './pricing';
 import { generateUniqueUserId } from './leaderboard';
 import { getOrCreatePetPatio } from './petPatioSystem';
+import { staffImage } from '../content/assets';
 
 const SAVE_KEY = 'tiem_ga_nha_tui_save_v2';
 const SIG_KEY = `${SAVE_KEY}_sig`;
@@ -296,6 +297,15 @@ export function migrateSave(raw: unknown): { state: GameState; repaired: string[
     state.cleanOilStreakDays = (state.dirtyOilViolations === 0 && (state.dirtyOilPenaltyDays ?? 0) === 0)
       ? Math.max(0, (state.day ?? 1) - 1)
       : 0;
+  }
+
+  // Cập nhật model 2D pixel cho nhân viên nếu thiếu trong save cũ
+  if (Array.isArray(state.staff)) {
+    state.staff.forEach(member => {
+      if (!member.modelAsset) {
+        member.modelAsset = staffImage(member);
+      }
+    });
   }
 
   // Thoát giữa ca bán: có ảnh chụp ca của đúng ngày này → tiếp tục ca; không có → về pha Chuẩn bị

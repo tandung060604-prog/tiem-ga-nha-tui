@@ -2,6 +2,7 @@ import { GameState } from '../../types/game';
 import { GachaRollResult, hireGachaCandidate } from '../../core/staffGacha';
 import { audio } from '../../core/audio';
 import confetti from 'canvas-confetti';
+import { staffImage } from '../../content/assets';
 
 export function openGachaResultModal(
   result: GachaRollResult,
@@ -33,7 +34,8 @@ export function openGachaResultModal(
   const cardsHtml = result.candidates.map((cand, idx) => {
     const starsHtml = '★'.repeat(cand.stars || 1) + '☆'.repeat(5 - (cand.stars || 1));
     const roleName = roleNameMap[cand.role] || cand.role;
-    const modelSrc = cand.modelAsset || `/assets/staff/${cand.id}.png`;
+    const modelSrc = staffImage(cand);
+    const fallbackSrc = staffImage({ role: cand.role, rarity: cand.rarity });
 
     return `
       <div class="gacha-card-wrapper" data-index="${idx}">
@@ -49,7 +51,7 @@ export function openGachaResultModal(
           <div class="gacha-card-front gacha-card rarity-${cand.rarity}" data-cand-index="${idx}">
             <div class="gacha-card-top">
               <div class="gacha-card-avatar-box">
-                <img class="gacha-card-avatar-img" src="${modelSrc}" alt="${cand.name}" onerror="this.src='/assets/characters/char_01_owner.png'"/>
+                <img class="gacha-card-avatar-img" src="${modelSrc}" alt="${cand.name}" onerror="this.onerror=null;this.src='${fallbackSrc}';"/>
               </div>
               <div class="gacha-card-info">
                 <div class="gacha-card-badge-row">

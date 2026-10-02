@@ -1,5 +1,6 @@
 import { GameState, StaffRarity, StaffRole } from '../types/game';
-import { GachaStaffCandidate, getStaffPoolByRarity } from '../content/gachaStaffPool';
+import { GachaStaffCandidate, getStaffPoolByRarity, GACHA_STAFF_POOL } from '../content/gachaStaffPool';
+import { staffImage } from '../content/assets';
 
 export const GACHA_PRICES = {
   SINGLE_ROLL: 200000,   // 200.000đ (x5: Phát tờ rơi tuyển dụng - Ra 3 ứng viên chọn 1)
@@ -71,20 +72,46 @@ export function determineRarity(
 }
 
 /**
- * Sinh 1 ứng viên cụ thể từ pool tương ứng với độ hiếm, có biến thiên chỉ số nhẹ
+ * Sinh 1 ứng viên cụ thể từ pool tương ứng với độ hiếm, có biến thiên chỉ số nhẹ,
+ * cam kết KHÔNG trùng tên hoặc model với các ứng viên đã bị loại trừ (excludeNames/excludeTemplateIds).
  */
 export function generateCandidateFromPool(
   rarity: StaffRarity,
   preferredRole?: StaffRole,
-  customRand?: () => number
+  customRand?: () => number,
+  excludeNames?: Set<string>,
+  excludeTemplateIds?: Set<string>
 ): GachaStaffCandidate {
   let pool = getStaffPoolByRarity(rarity);
+
+  // Lọc bỏ bất kỳ template nào đã có trong danh sách loại trừ (nhân viên đã tuyển hoặc đã ra trong lượt roll này)
+  if (excludeNames || excludeTemplateIds) {
+    const unpicked = pool.filter(c =>
+      (!excludeNames || !excludeNames.has(c.name)) &&
+      (!excludeTemplateIds || !excludeTemplateIds.has(c.id))
+    );
+    if (unpicked.length > 0) {
+      pool = unpicked;
+    } else {
+      // Nếu độ hiếm hiện tại đã hết nhân vật chưa xuất hiện (ví dụ đã sở hữu hết 6 SSR),
+      // mở rộng tìm kiếm sang toàn bộ GACHA_STAFF_POOL để đảm bảo 100% không bao giờ sinh trùng lặp
+      const anyUnpicked = GACHA_STAFF_POOL.filter(c =>
+        (!excludeNames || !excludeNames.has(c.name)) &&
+        (!excludeTemplateIds || !excludeTemplateIds.has(c.id))
+      );
+      if (anyUnpicked.length > 0) {
+        pool = anyUnpicked;
+      }
+    }
+  }
+
   if (preferredRole) {
     const rolePool = pool.filter(c => c.role === preferredRole);
     if (rolePool.length > 0) pool = rolePool;
   }
+
   if (!pool || pool.length === 0) {
-    pool = getStaffPoolByRarity('C');
+    pool = GACHA_STAFF_POOL;
   }
 
   const randFn = customRand || Math.random;
@@ -96,6 +123,7 @@ export function generateCandidateFromPool(
 
   const candidate: GachaStaffCandidate = {
     id: `staff_gacha_${Date.now()}_${Math.floor(randFn() * 10000)}`,
+    originalTemplateId: template.id,
     name: template.name,
     role: template.role,
     avatar: template.avatar,
@@ -109,7 +137,7 @@ export function generateCandidateFromPool(
     passiveName: template.passiveName,
     passiveDesc: template.passiveDesc,
     quote: template.quote,
-    modelAsset: template.modelAsset,
+    modelAsset: staffImage(template),
     speed: Math.max(40, Math.min(99, template.speed + delta())),
     skill: Math.max(40, Math.min(99, template.skill + delta())),
     attitude: Math.max(50, Math.min(100, template.attitude + delta())),
@@ -122,8 +150,8 @@ export function generateCandidateFromPool(
 }
 
 /**
- * Thực hiện lượt tuyển dụng 1 Roll (Phát tờ rơi - 40.000đ):
- * Sinh ra 3 ứng viên với độ hiếm ngẫu nhiên để người chơi chọn 1
+ * Thực hiện lượt tuyển dụng 1 Roll (Phát tờ rơi - 200.000đ):
+ * Sinh ra 3 ứng viên độc nhất (100% không trùng tên, không trùng nhân vật đã có) để người chơi chọn 1
  */
 export function performGachaRollSingle(
   state: GameState,
@@ -137,11 +165,26 @@ export function performGachaRollSingle(
   let hardPity = state.staffGachaSsrPity || 0;
   const candidates: GachaStaffCandidate[] = [];
 
-  // Tạo 3 ứng viên cho người chơi lựa chọn
+  // Tập hợp danh sách loại trừ: không bao giờ sinh ra nhân viên tiệm đã thuê
+  const excludeNames = new Set<string>();
+  const excludeTemplateIds = new Set<string>();
+
+  if (state.staff && Array.isArray(state.staff)) {
+    for (const member of state.staff) {
+      if (member.name) excludeNames.add(member.name);
+      if (member.originalTemplateId) excludeTemplateIds.add(member.originalTemplateId);
+      if (member.id) excludeTemplateIds.add(member.id);
+    }
+  }
+
+  // Tạo 3 ứng viên độc nhất cho người chơi lựa chọn
   for (let i = 0; i < 3; i++) {
     const rarity = determineRarity(softPity, hardPity, undefined, customRand);
-    const candidate = generateCandidateFromPool(rarity, undefined, customRand);
+    const candidate = generateCandidateFromPool(rarity, undefined, customRand, excludeNames, excludeTemplateIds);
     candidates.push(candidate);
+    excludeNames.add(candidate.name);
+    if (candidate.originalTemplateId) excludeTemplateIds.add(candidate.originalTemplateId);
+    excludeTemplateIds.add(candidate.id);
   }
 
   // Cập nhật bộ đếm Pity dựa trên lá bài cao nhất roll được
@@ -180,8 +223,8 @@ export function performGachaRollSingle(
 }
 
 /**
- * Thực hiện lượt tuyển dụng 10 Roll (Đăng tin báo lớn - 360.000đ):
- * Sinh ra 10 ứng viên (cam kết có ít nhất 1 SR+) để người chơi chọn 1
+ * Thực hiện lượt tuyển dụng 10 Roll (Đăng tin báo lớn - 1.800.000đ):
+ * Sinh ra 10 ứng viên độc nhất (cam kết có ít nhất 1 SR+, không trùng lặp) để người chơi chọn 1
  */
 export function performGachaRollTen(
   state: GameState,
@@ -195,11 +238,26 @@ export function performGachaRollTen(
   let hardPity = state.staffGachaSsrPity || 0;
   const candidates: GachaStaffCandidate[] = [];
 
-  // Roll 9 lá đầu bình thường
+  // Tập hợp danh sách loại trừ: không bao giờ sinh ra nhân viên tiệm đã thuê
+  const excludeNames = new Set<string>();
+  const excludeTemplateIds = new Set<string>();
+
+  if (state.staff && Array.isArray(state.staff)) {
+    for (const member of state.staff) {
+      if (member.name) excludeNames.add(member.name);
+      if (member.originalTemplateId) excludeTemplateIds.add(member.originalTemplateId);
+      if (member.id) excludeTemplateIds.add(member.id);
+    }
+  }
+
+  // Roll 9 lá đầu bình thường (độc nhất tuyệt đối)
   for (let i = 0; i < 9; i++) {
     const rarity = determineRarity(softPity, hardPity, undefined, customRand);
-    const candidate = generateCandidateFromPool(rarity, undefined, customRand);
+    const candidate = generateCandidateFromPool(rarity, undefined, customRand, excludeNames, excludeTemplateIds);
     candidates.push(candidate);
+    excludeNames.add(candidate.name);
+    if (candidate.originalTemplateId) excludeTemplateIds.add(candidate.originalTemplateId);
+    excludeTemplateIds.add(candidate.id);
     
     if (rarity === 'SSR') {
       hardPity = 0;
@@ -213,7 +271,7 @@ export function performGachaRollTen(
     }
   }
 
-  // Lá thứ 10: Bảo đảm tối thiểu 1 SR+ nếu 9 lá trước chưa có SR+ nào
+  // Lá thứ 10: Bảo đảm tối thiểu 1 SR+ nếu 9 lá trước chưa có SR+ nào (độc nhất)
   const hasSrOrSsr = candidates.some(c => c.rarity === 'SR' || c.rarity === 'SSR');
   const tenthRarity = determineRarity(
     softPity,
@@ -221,8 +279,11 @@ export function performGachaRollTen(
     hasSrOrSsr ? undefined : 'SR',
     customRand
   );
-  const tenthCandidate = generateCandidateFromPool(tenthRarity, undefined, customRand);
+  const tenthCandidate = generateCandidateFromPool(tenthRarity, undefined, customRand, excludeNames, excludeTemplateIds);
   candidates.push(tenthCandidate);
+  excludeNames.add(tenthCandidate.name);
+  if (tenthCandidate.originalTemplateId) excludeTemplateIds.add(tenthCandidate.originalTemplateId);
+  excludeTemplateIds.add(tenthCandidate.id);
 
   if (tenthRarity === 'SSR') {
     hardPity = 0;
@@ -267,6 +328,16 @@ export function hireGachaCandidate(
   // Giới hạn số lượng nhân viên tối đa của tiệm (ví dụ 8 nhân viên)
   if (state.staff.length >= 8) {
     return { success: false, error: 'Tiệm đã đủ tối đa 8 nhân viên! Hãy sa thải bớt nhân sự cũ trước.' };
+  }
+
+  // Chặn trường hợp trùng nhân viên đã tuyển
+  if (state.staff.some(s => s.name === candidate.name || (candidate.originalTemplateId && s.originalTemplateId === candidate.originalTemplateId))) {
+    return { success: false, error: `${candidate.name} đã là nhân viên của tiệm rồi!` };
+  }
+
+  // Bảo đảm candidate có modelAsset chuẩn
+  if (!candidate.modelAsset) {
+    candidate.modelAsset = staffImage(candidate);
   }
 
   // Ký hợp đồng: thêm vào danh sách nhân sự

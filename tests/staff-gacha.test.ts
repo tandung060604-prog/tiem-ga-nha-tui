@@ -11,6 +11,7 @@ import {
 } from '../src/core/staffGacha';
 import { createInitialState } from '../src/core/state';
 import { StaffRole } from '../src/types/game';
+import { staffImage } from '../src/content/assets';
 
 describe('Staff Gacha System - Comprehensive Tests', () => {
   it('phải có đúng 72 model nhân vật chia đều cho 6 vai trò (mỗi vai trò 12 model)', () => {
@@ -185,4 +186,109 @@ describe('Staff Gacha System - Comprehensive Tests', () => {
     expect(tenRoll.success).toBe(false);
     expect(tenRoll.error).toContain('Không đủ 1.800.000đ');
   });
+
+  it('tuyệt đối KHÔNG trùng nhân viên hoặc trùng tên trong cùng lượt roll (single và ten roll)', () => {
+    const state = createInitialState();
+    state.money = 100000000; // Vô hạn tiền test
+
+    // Kiểm tra 20 lần single roll (mỗi lần 3 thẻ)
+    for (let r = 0; r < 20; r++) {
+      const roll = performGachaRollSingle(state);
+      expect(roll.success).toBe(true);
+      const names = roll.result!.candidates.map(c => c.name);
+      const uniqueNames = new Set(names);
+      expect(uniqueNames.size).toBe(names.length); // 3/3 tên phải khác nhau
+
+      const templates = roll.result!.candidates.map(c => c.originalTemplateId);
+      const uniqueTemplates = new Set(templates);
+      expect(uniqueTemplates.size).toBe(templates.length);
+    }
+
+    // Kiểm tra 20 lần 10-roll (mỗi lần 10 thẻ)
+    for (let r = 0; r < 20; r++) {
+      const roll = performGachaRollTen(state);
+      expect(roll.success).toBe(true);
+      const names = roll.result!.candidates.map(c => c.name);
+      const uniqueNames = new Set(names);
+      expect(uniqueNames.size).toBe(names.length); // 10/10 tên phải khác nhau 100%
+
+      const templates = roll.result!.candidates.map(c => c.originalTemplateId);
+      const uniqueTemplates = new Set(templates);
+      expect(uniqueTemplates.size).toBe(templates.length);
+    }
+  });
+
+  it('tuyệt đối KHÔNG roll ra nhân viên mà tiệm đã tuyển dụng', () => {
+    const state = createInitialState();
+    state.money = 100000000;
+
+    // Giả lập tuyển dụng 3 nhân viên
+    const initialRoll = performGachaRollSingle(state);
+    const hired1 = initialRoll.result!.candidates[0];
+    const hired2 = initialRoll.result!.candidates[1];
+    hireGachaCandidate(state, hired1);
+    hireGachaCandidate(state, hired2);
+    expect(state.staff.length).toBe(2);
+
+    // Roll tiếp 10 lần 10-roll (100 ứng viên): Không ai được trùng với hired1 hoặc hired2
+    for (let r = 0; r < 10; r++) {
+      const roll = performGachaRollTen(state);
+      expect(roll.success).toBe(true);
+      roll.result!.candidates.forEach(c => {
+        expect(c.name).not.toBe(hired1.name);
+        expect(c.name).not.toBe(hired2.name);
+        expect(c.originalTemplateId).not.toBe(hired1.originalTemplateId);
+        expect(c.originalTemplateId).not.toBe(hired2.originalTemplateId);
+      });
+    }
+  });
+
+  it('100% ứng viên roll ra phải có modelAsset ảnh nhân vật 2D pixel hợp lệ', () => {
+    const state = createInitialState();
+    state.money = 10000000;
+
+    const roll = performGachaRollTen(state);
+    expect(roll.success).toBe(true);
+
+    roll.result!.candidates.forEach(cand => {
+      expect(cand.modelAsset).toBeDefined();
+      expect(typeof cand.modelAsset).toBe('string');
+      expect(cand.modelAsset).toMatch(/assets\/staff\/.+\.png$/);
+    });
+  });
+
+  it('hireGachaCandidate ngăn chặn tuyển dụng trùng lặp nhân viên đã có trong tiệm', () => {
+    const state = createInitialState();
+    state.money = 10000000;
+
+    const roll = performGachaRollSingle(state);
+    const candidate = roll.result!.candidates[0];
+
+    const hire1 = hireGachaCandidate(state, candidate);
+    expect(hire1.success).toBe(true);
+
+    // Tuyển lại cùng candidate đó
+    const hireDuplicate = hireGachaCandidate(state, candidate);
+    expect(hireDuplicate.success).toBe(false);
+    expect(hireDuplicate.error).toContain('đã là nhân viên của tiệm rồi');
+  });
+
+  it('staffImage xuất đường dẫn chuẩn xác, không 404 cho mọi loại nhân sự', () => {
+    // 1. Candidate từ pool
+    const img1 = staffImage({ id: 'cook_c1', modelAsset: 'assets/staff/cook_c1.png' });
+    expect(img1).toContain('assets/staff/cook_c1.png');
+
+    // 2. Candidate từ template id
+    const img2 = staffImage({ id: 'cashier_ssr' });
+    expect(img2).toContain('assets/staff/cashier_ssr.png');
+
+    // 3. Nhân sự cũ / ban đầu
+    const img3 = staffImage({ id: 'staff_1', role: 'cashier' });
+    expect(img3).toContain('assets/staff/cashier_c1.png');
+
+    // 4. Fallback theo role và rarity
+    const img4 = staffImage({ role: 'security', rarity: 'SR' });
+    expect(img4).toContain('assets/staff/security_sr1.png');
+  });
 });
+

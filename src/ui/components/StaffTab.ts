@@ -4,6 +4,7 @@ import { audio } from '../../core/audio';
 import { describeStaffEffect, maxStaff, severancePay } from '../../core/staff';
 import { performGachaRollSingle, performGachaRollTen, GACHA_PRICES } from '../../core/staffGacha';
 import { openGachaResultModal } from './GachaResultModal';
+import { staffImage } from '../../content/assets';
 
 export function renderStaffTab(state: GameState): string {
   const cap = state.currentChapter < 2 ? 1 : maxStaff(state.currentChapter);
@@ -19,12 +20,13 @@ export function renderStaffTab(state: GameState): string {
     const traitInfo = STAFF_TRAITS.find(t => (member.traits ?? []).includes(t.id));
     const rarityClass = member.rarity ? `rarity-${member.rarity}` : '';
     const starsHtml = member.stars ? ('★'.repeat(member.stars) + '☆'.repeat(5 - member.stars)) : '';
-    const modelSrc = member.modelAsset || `/assets/staff/${member.id}.png`;
+    const modelSrc = staffImage(member);
+    const fallbackSrc = staffImage({ role: member.role, rarity: member.rarity });
 
     return `
       <div class="item-row staff-item-row ${rarityClass}" data-staff-id="${member.id}">
         <div class="item-icon staff-avatar-frame">
-          <img src="${modelSrc}" alt="${member.name}" class="staff-avatar-mini" onerror="this.onerror=null;this.parentElement.innerHTML='${member.avatar}';"/>
+          <img src="${modelSrc}" alt="${member.name}" class="staff-avatar-mini" onerror="this.onerror=null;this.src='${fallbackSrc}';"/>
         </div>
 
         <div class="item-meta">
@@ -144,7 +146,7 @@ export function bindStaffEvents(
         showToast,
         () => {
           // Re-render view
-          const staffContainer = document.querySelector('.staff-screen, #tab-staff-content, .tab-pane.active');
+          const staffContainer = document.querySelector('.pane, .staff-screen, #tab-staff-content, .tab-pane.active');
           if (staffContainer) {
             staffContainer.innerHTML = renderStaffTab(state);
             bindStaffEvents(state, onUpdateState, showToast);
@@ -177,7 +179,7 @@ export function bindStaffEvents(
         onUpdateState,
         showToast,
         () => {
-          const staffContainer = document.querySelector('.staff-screen, #tab-staff-content, .tab-pane.active');
+          const staffContainer = document.querySelector('.pane, .staff-screen, #tab-staff-content, .tab-pane.active');
           if (staffContainer) {
             staffContainer.innerHTML = renderStaffTab(state);
             bindStaffEvents(state, onUpdateState, showToast);

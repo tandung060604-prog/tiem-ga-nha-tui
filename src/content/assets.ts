@@ -1,4 +1,4 @@
-import { QualityRating } from '../types/game';
+import { QualityRating, StaffRole, StaffRarity } from '../types/game';
 
 // Ghép BASE_URL của Vite: dev = '/', build GitHub Pages = './' (game nằm ở /tiem-ga-nha-tui/).
 // Đường dẫn tuyệt đối '/assets/…' từng làm mọi ảnh 404 trên trang live.
@@ -285,4 +285,54 @@ export function foodImage(menuItemId: string, quality: QualityRating): string | 
     default:
       return null;
   }
+}
+
+/**
+ * Chuẩn hóa và xuất đường dẫn ảnh pixel model cho nhân viên, tự động ghép BASE_URL an toàn.
+ */
+export function staffImage(memberOrCandidate?: {
+  id?: string;
+  modelAsset?: string;
+  role?: StaffRole;
+  rarity?: StaffRarity;
+  avatar?: string;
+} | null): string {
+  if (!memberOrCandidate) return url('assets/staff/cook_c1.png');
+
+  // 1. Nếu có modelAsset cụ thể
+  if (memberOrCandidate.modelAsset) {
+    const raw = memberOrCandidate.modelAsset;
+    if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('data:')) {
+      return raw;
+    }
+    // Gỡ bỏ tiền tố ./ hoặc / để url() ghép chuẩn BASE_URL
+    const clean = raw.replace(/^\.?\//, '');
+    return url(clean);
+  }
+
+  // 2. Nếu id khớp với mã model gacha 72 nhân vật hoặc initial candidates
+  if (memberOrCandidate.id) {
+    const cleanId = memberOrCandidate.id.toLowerCase();
+    const match = cleanId.match(/^(cook|waiter|cashier|delivery|manager|security)_(c[1-4]|r[1-4]|sr[1-3]|ssr|[cr]|sr)$/);
+    if (match) {
+      return url(`assets/staff/${cleanId}.png`);
+    }
+
+    const initialMap: Record<string, string> = {
+      staff_1: 'assets/staff/cashier_c1.png',
+      staff_2: 'assets/staff/cook_c1.png',
+      staff_3: 'assets/staff/waiter_c1.png',
+      staff_4: 'assets/staff/delivery_c1.png',
+      staff_5: 'assets/staff/security_c1.png'
+    };
+    if (initialMap[memberOrCandidate.id]) {
+      return url(initialMap[memberOrCandidate.id]!);
+    }
+  }
+
+  // 3. Fallback theo role và rarity
+  const role = memberOrCandidate.role || 'cook';
+  const rarity = (memberOrCandidate.rarity || 'C').toLowerCase();
+  const suffix = rarity === 'ssr' ? 'ssr' : rarity === 'sr' ? 'sr1' : rarity === 'r' ? 'r1' : 'c1';
+  return url(`assets/staff/${role}_${suffix}.png`);
 }

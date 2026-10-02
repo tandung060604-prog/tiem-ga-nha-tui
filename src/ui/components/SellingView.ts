@@ -3,7 +3,7 @@ import { GameState, CustomerOrder, QualityRating } from '../../types/game';
 import { cookingEngine } from '../../core/cooking';
 import { SellingSession, FxEvent } from '../../core/sellingSim';
 import { isRushHour } from '../../core/clock';
-import { foodImage, ASSETS } from '../../content/assets';
+import { foodImage, ASSETS, staffImage } from '../../content/assets';
 import { TIMER_RECIPES, TimerStationId, timerPhase, DRINK_RECIPES, DrinkId, ASSEMBLY_RECIPES, AssemblyId, assemblyBaseIndex } from '../../core/stations';
 import { stationOpen, perfectTip } from '../../core/day';
 import { escapeHtml } from '../escapeHtml';
@@ -1186,7 +1186,8 @@ function renderStaffStrip(state: GameState, session: SellingSession): string {
       security: '🛡️'
     };
     const roleIcon = roleIconMap[member.role] || '👤';
-    const modelSrc = member.modelAsset || `/assets/staff/${member.id}.png`;
+    const modelSrc = staffImage(member);
+    const fallbackSrc = staffImage({ role: member.role, rarity: member.rarity });
     const shortName = member.name.split(' ')[0] || member.name;
     const rarityClass = member.rarity ? `rarity-${member.rarity}` : '';
 
@@ -1216,9 +1217,9 @@ function renderStaffStrip(state: GameState, session: SellingSession): string {
     }
 
     return `
-      <div class="staff-chip ${isBusy ? 'busy' : ''} ${rarityClass}" title="${member.name} (${member.title || member.role})">
+      <div class="staff-chip ${isBusy ? 'busy' : ''} ${rarityClass}" title="${roleIcon} ${member.name} (${member.title || member.role})">
         <div class="staff-chip-avatar">
-          <img src="${modelSrc}" alt="${member.name}" class="staff-chip-img" onerror="this.onerror=null;this.parentElement.innerHTML='${roleIcon}';"/>
+          <img src="${modelSrc}" alt="${member.name}" class="staff-chip-img" onerror="this.onerror=null;this.src='${fallbackSrc}';"/>
         </div>
         <div class="staff-chip-info">
           <span class="staff-chip-name">${shortName}</span>
