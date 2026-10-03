@@ -60,7 +60,7 @@ for (const width of WIDTHS) {
   };
 
   console.log(`[ui-check] Đang kiểm tra viewport ${width}px...`);
-  await page.goto(TARGET);
+  await page.goto(TARGET, { waitUntil: 'domcontentloaded', timeout: 20000 });
 
   const dismissIntro = async () => {
     await page.evaluate(() => {
@@ -91,7 +91,9 @@ for (const width of WIDTHS) {
   await page.locator('#btn-welcome-start').click({ timeout: 5000 }).catch(() => {});
   console.log(`[ui-check ${width}px] Kiểm tra overflow màn Chuẩn bị...`);
   await checkOverflow('màn Chuẩn bị');
-  await page.screenshot({ path: `${OUT}/${width}-prep.png` });
+  try {
+    await page.screenshot({ path: `${OUT}/${width}-prep.png`, timeout: 10000, animations: 'disabled' });
+  } catch (_e) {}
 
   await dismissIntro();
 
@@ -153,7 +155,9 @@ for (const width of WIDTHS) {
   });
   record(crowded && crowded.over <= 0 && crowded.app <= width ? 'PASS' : 'FAIL', width, 'không tràn ngang (hàng 5 khách)',
     crowded ? `dư ${crowded.over}px, .app rộng ${crowded.app}px` : 'không có thẻ khách để thử');
-  await page.screenshot({ path: `${OUT}/${width}-selling.png` });
+  try {
+    await page.screenshot({ path: `${OUT}/${width}-selling.png`, timeout: 10000, animations: 'disabled' });
+  } catch (_e) {}
 
   record(errors.length ? 'FAIL' : 'PASS', width, 'không lỗi JS/console', errors.slice(0, 3).join(' | '));
   await page.context().close();

@@ -176,7 +176,7 @@ describe('4. Render Giao Diện Hiên Quán (renderDineInPatio)', () => {
 
     // Bàn 0: empty
     expect(html).toContain('patio-table empty');
-    expect(html).toContain('Sạch sẽ');
+    expect(html).toContain('patio-furniture-wrap');
 
     // Bàn 1: eating
     expect(html).toContain('patio-table eating');

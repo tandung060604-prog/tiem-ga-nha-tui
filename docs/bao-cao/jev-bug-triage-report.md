@@ -811,3 +811,13 @@
   - **Chiến lược Fix:** `contract_first_type_fix` (Độ tin cậy: 40.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
 ---
+
+### 🐞 [08:47:58 3/10/2026] (via Jev MCP) Intro Cinematic Overlay timeout during auto recovery in monkey test
+- **Triệu chứng:** locator.click: Timeout 2000ms exceeded waiting for locator('#btn-intro-start-game, #btn-intro-skip-top, #intro-cinematic-overlay, #intro-tap-prompt, .intro-tap-prompt')
+- **Vị trí:** `src/ui/components/IntroCinematicModal.ts` 
+- **Đánh giá Jev (442ms):**
+  - **Mức độ (Severity):** `p2_ui_friction` (Độ tin cậy: 99.0%)
+  - **Nguyên nhân gốc (Root Cause):** `ui_modal_stack` (Độ tin cậy: 76.0%)
+  - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 46.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `200` ngày chơi
+---

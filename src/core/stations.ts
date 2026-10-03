@@ -98,7 +98,7 @@ export interface DrinkRecipe { menuItemId: DrinkId; name: string; icon: string; 
 export const DRINK_RECIPES: Record<DrinkId, DrinkRecipe> = {
   soda: { menuItemId: 'soda', name: 'Nước Ngọt Coca', icon: '🥤', stock: 'soft_drink', chapter: 1, label: 'Coca' },
   seven_up: { menuItemId: 'seven_up', name: 'Nước Ngọt 7Up Chanh', icon: '🥤', stock: 'soft_drink', chapter: 1, label: '7Up' },
-  fanta_orange: { menuItemId: 'fanta_orange', name: 'Nước Ngọt Fanta Cam', icon: '🥤', stock: 'soft_drink', chapter: 2, label: 'Fanta' },
+  fanta_orange: { menuItemId: 'fanta_orange', name: 'Nước Ngọt Fanta Cam', icon: '🥤', stock: 'soft_drink', chapter: 1, label: 'Fanta' },
   peach_tea: { menuItemId: 'peach_tea', name: 'Trà Đào Hạt Chia', icon: '🍑', stock: 'dessert_pack', chapter: 3, label: 'Trà đào' },
   sundae_icecream: { menuItemId: 'sundae_icecream', name: 'Kem Sundae Sôcôla', icon: '🍨', stock: 'dessert_pack', chapter: 4, label: 'Kem' }
 };

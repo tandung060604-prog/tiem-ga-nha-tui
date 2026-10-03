@@ -24,16 +24,95 @@ export interface ChangelogRelease {
   }[];
 }
 
-export const CURRENT_GAME_VERSION = 'v2.8.0';
-export const CURRENT_VERSION_CODENAME = 'Bác Ba Trợ Giá Can Dầu, Sổ Tay Bếp Trưởng & Kênh Góp Ý Tester';
+export const CURRENT_GAME_VERSION = 'v2.9.0';
+export const CURRENT_VERSION_CODENAME = 'Smart Order Sorting, Quầy Khách Rộng Rãi, Fanta Cam & Bàn Ăn Pixel Art';
 export const CURRENT_BUILD_DATE = '03/10/2026';
 
 export const CHANGELOG_DATA: ChangelogRelease[] = [
   {
+    version: 'v2.9.0',
+    codename: 'Smart Order Sorting, Quầy Khách Rộng Rãi, Fanta Cam & Bàn Ăn Pixel Art',
+    releaseDate: '03/10/2026',
+    isLatest: true,
+    highlightSummary: 'Tối ưu trải nghiệm thao tác đỉnh cao cho người chơi: Sắp xếp đơn hàng thông minh đưa món chưa làm xong lên trên đầu danh sách, tự động thu gọn món đã xong dạng chip để không bao giờ bị trôi món làm mất khách; Mở rộng hàng đợi khách cho phép đọc trọn vẹn thông tin; Mở khóa Fanta Cam ngay từ Chương 1 giúp máy rót 3 vòi hoạt động đầy đủ; Dời thời tiết lên Header dạng mini pixel badge và lược bỏ biển hiệu vỉa hè thừa; Thay thế hoàn toàn ghế emoji bằng bàn ghế gỗ mộc Pixel Art retro Stardew Valley kèm animation nhai thức ăn và hơi khói ấm nóng!',
+    metrics: [
+      { icon: '📋', label: 'Order Sorting', value: 'Món Chưa Xong Lên Đầu' },
+      { icon: '🥤', label: 'Fanta Cam', value: 'Mở Ngay Ngày 1' },
+      { icon: '🚶', label: 'Hàng Đợi Khách', value: 'Mở Rộng 176px (+16px)' },
+      { icon: '🪑', label: 'Pixel Patio', value: 'Bàn Ghế Gỗ Mộc Stardew' },
+      { icon: '☀️', label: 'Header Weather', value: 'Pixel Badge Tiết Kiệm Chỗ' },
+      { icon: '🧪', label: 'Kiểm Định', value: '714 Tests PASS 100%' }
+    ],
+    categories: [
+      {
+        categoryName: 'Thao Tác Ca Bán & Giao Món Thông Minh',
+        categoryIcon: '📋',
+        items: [
+          {
+            tag: 'SMART SORTING',
+            tagColor: '#ea580c',
+            title: 'Tự Động Đẩy Món Chưa Xong Lên Trên Cùng',
+            desc: 'Giải quyết triệt để vấn đề khách gọi nhiều món khiến món chưa làm bị trôi xuống dưới đáy ticket:',
+            details: [
+              'Toàn bộ món chưa hoàn thành (pending items) luôn được ưu tiên nổi lên trên đầu danh sách, hiển thị to rõ kèm số lượng và trạng thái khay.',
+              'Món đã giao đủ (completed items) tự động thu gọn thành dải chip mini màu xanh bạc hà mờ, tiết kiệm 80% diện tích và có hiệu ứng popIn trực quan.'
+            ]
+          },
+          {
+            tag: 'FANTA CAM CHƯƠNG 1',
+            tagColor: '#f97316',
+            title: 'Kích Hoạt Thực Khách Gọi Nước Ngọt Fanta Cam',
+            desc: 'Khách đến quán giờ đây gọi đều đặn cả 3 vị nước ngọt có ga ngay từ Chương 1:',
+            details: [
+              'Chuyển fanta_orange từ Chương 2 về Chương 1 để đồng bộ hoàn toàn với máy rót nước ngọt 3 vòi (Cola, 7Up, Fanta) có sẵn tại quầy.',
+              'Tự động cập nhật save game cũ giúp người chơi thấy khách gọi Fanta Cam ngay lập tức.'
+            ]
+          }
+        ]
+      },
+      {
+        categoryName: 'Giao Diện & Pixel Art Aesthetic',
+        categoryIcon: '🎨',
+        items: [
+          {
+            tag: 'CUSTOMER LANE',
+            tagColor: '#2563eb',
+            title: 'Nới Rộng Quầy Khách Chờ & Thẻ Khách',
+            desc: 'Tăng diện tích hiển thị giúp thông tin khách hàng không còn bị che khuất:',
+            details: [
+              'Nới rộng chiều rộng thẻ khách từ 160px lên 176px và chiều cao lên 124px.',
+              'Tên khách, huy hiệu VIP, Cư Dân Hẻm và phiếu order hiển thị thoáng đãng, sắc nét.'
+            ]
+          },
+          {
+            tag: 'PATIO PIXEL ART',
+            tagColor: '#8b5a2b',
+            title: 'Bàn Ghế Gỗ Mộc Stardew Valley & Hoạt Họa Khách Ăn',
+            desc: 'Nâng cấp toàn diện mỹ thuật Bàn Ăn Hiên Quán:',
+            details: [
+              'Thay emoji ghế đơn sơ bằng Asset SVG Pixel Art bàn tròn gỗ sồi mộc mạc và 2 ghế đẩu retro Stardew Valley.',
+              'Bổ sung hoạt họa khách gật gù nhai thức ăn (chewHeadBob), đĩa đồ ăn bốc khói ấm nóng (♨️) và lược bỏ text rườm rà.'
+            ]
+          },
+          {
+            tag: 'HEADER WEATHER',
+            tagColor: '#d97706',
+            title: 'Huy Hiệu Pixel Thời Tiết Trên Header',
+            desc: 'Tiết kiệm không gian dọc màn hình bán hàng:',
+            details: [
+              'Dời dải thời tiết ca bán lên Header cạnh hiển thị Ngày, thiết kế mini badge pixel retro.',
+              'Bỏ biển hiệu tên quán thừa ở quầy bán vì đã có tên quán hiển thị trang trọng trên Header.'
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     version: 'v2.8.0',
     codename: 'Bác Ba Trợ Giá Can Dầu, Sổ Tay Bếp Trưởng & Kênh Góp Ý Tester',
     releaseDate: '03/10/2026',
-    isLatest: true,
+    isLatest: false,
     highlightSummary: 'Nâng cấp toàn diện trải nghiệm End-to-End sẵn sàng phát hành thử nghiệm: Bác Ba trợ giá miễn phí 100% can dầu sạch đầu tiên ở Ngày 1-3 giúp người chơi mới không bao giờ bị nghẽn vốn; Tích hợp Sổ Tay Bếp Trưởng tra nhanh công thức món ngay trong ca bán; Hệ thống cảnh báo kho thông minh chống hao hụt nguyên liệu hết hạn; Bảng hiệu mặt tiền cá nhân hóa tên quán; Hoạt họa chụp ảnh check-in sống ảo tại bàn hiên quán; và Kênh Góp Ý & Báo Lỗi Tester ngay trong phần Cài đặt!',
     metrics: [
       { icon: '🛢️', label: 'Trợ Giá Bác Ba', value: 'Miễn Phí Can Dầu 100%' },

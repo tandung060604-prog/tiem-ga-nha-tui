@@ -3,11 +3,13 @@ import { audio } from '../../core/audio';
 import { escapeHtml } from '../escapeHtml';
 import { ASSETS } from '../../content/assets';
 import { getActiveShopTheme } from '../../content/shopThemes';
+import { getWeatherForDay } from '../../content/saigonWeather';
 
 export function renderHeader(state: GameState, _onOpenSettings?: () => void): string {
   const phaseLabel = state.phase === 'prep' ? 'Chuẩn bị' : state.phase === 'selling' ? 'Mở bán' : 'Tổng kết';
   const soundIcon = audio.getMuted() ? ASSETS.icons.soundOff : ASSETS.icons.soundOn;
   const theme = getActiveShopTheme(state);
+  const weather = getWeatherForDay(state.day);
 
   // Format VNĐ e.g. 850.000đ
   const formattedMoney = state.money.toLocaleString('vi-VN') + 'đ';
@@ -24,6 +26,10 @@ export function renderHeader(state: GameState, _onOpenSettings?: () => void): st
       <div class="h-day-box">
         <b>Ngày ${state.day}</b>
         <small>${phaseLabel}</small>
+      </div>
+      <div class="h-weather-badge" title="${escapeHtml(weather.badgeText)} • ${escapeHtml(weather.flavorQuote)}">
+        <span class="h-weather-icon">${weather.icon}</span>
+        <span class="h-weather-text">${escapeHtml(weather.name.split(' ')[0] || weather.name)}</span>
       </div>
 
       <!-- Quick Utilities Dropdown Drawer -->

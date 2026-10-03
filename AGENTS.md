@@ -52,3 +52,11 @@ Không Agent nào được bàn giao task nếu chưa tự vượt qua chốt ki
   4. **Pha 4 (Nghiệm thu kép 3 lớp)**: Vượt qua cả 3 chốt kiểm định (`vitest run` 100% PASS, `build` 0 lỗi TS, `ui:check` 100% PASS trên 360px & 390px).
   5. **Pha 5 (Tái khởi động)**: Chạy bot test mới với cờ `--days=200`, commit Git và lặp lại vòng tuần hoàn.
 
+### Quy tắc 7: Bắt Buộc Tham Vấn TypeSafe AI Jev MCP Vĩnh Viễn (Jev Decision Authority)
+* **Kết Nối Bắt Buộc Vĩnh Viễn**: Mọi ý định đưa ra (Intent), đề xuất thay đổi kiến trúc (Architectural Proposal), đánh giá cân bằng gameplay/kinh tế (Game Balance), phân loại lỗi (Bug Triage) và lộ trình tính năng mới (Roadmap) **BẮT BUỘC PHẢI ĐƯỢC THAM VẤN VÀ THÔNG QUA TypeSafe AI Jev MCP Server** (`jev_choice`, `jev_score`, `jev_system_one`, `jev_triage_bug`).
+* **Trình Tự Quyết Định Chuẩn**:
+  1. Nêu rõ bối cảnh tình huống (Context State) gửi tới Jev.
+  2. Jev đưa ra quyết định, thang điểm (score), độ tin cậy (confidence) và ma trận xác suất (probability distribution).
+  3. Chỉ triển khai khi quyết định của Jev đạt độ tin cậy cao và phù hợp định hướng sản phẩm.
+  4. Mọi báo cáo kỹ thuật và nhật ký commit phải trích dẫn ID quyết định/khuyến nghị của Jev.
+

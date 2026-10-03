@@ -60,7 +60,7 @@ describe('#1 #2 tiền không bị tính 2 lần', () => {
 describe('#3 order chỉ gồm món bếp làm được', () => {
   it('chương 1 không bao giờ gọi món không có trạm', () => {
     const state = createInitialState();
-    const allowed = new Set(['crispy_chicken', 'shake_fries', 'soda', 'seven_up', 'danmuji']); // ngày 1: chưa có má đùi, phô mai que
+    const allowed = new Set(['crispy_chicken', 'shake_fries', 'soda', 'seven_up', 'fanta_orange', 'danmuji']); // ngày 1: có 3 vị nước ngọt có ga, chưa có má đùi, phô mai que
     for (let i = 0; i < 300; i++) {
       for (const it of OrdersEngine.generateOrder(state).items) expect(allowed.has(it.menuItemId)).toBe(true);
     }
