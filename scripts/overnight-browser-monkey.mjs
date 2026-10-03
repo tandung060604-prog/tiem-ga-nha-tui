@@ -279,10 +279,10 @@ class OvernightMonkey {
       return true;
     }
 
-    // 0e. Spotlight Tutorial Màn Chuẩn Bị (Prep Tutorial Spotlight)
-    const prepTutSkip = page.locator('#btn-tutorial-skip, #btn-bacba-understood');
+    // 0e. Spotlight Tutorial Màn Chuẩn Bị & Bác Ba Hướng Dẫn Tính Năng Mới
+    const prepTutSkip = page.locator('#btn-tutorial-skip, #btn-tutorial-next, #btn-bacba-understood');
     if (await prepTutSkip.first().isVisible({ timeout: 50 }).catch(() => false)) {
-      log(`💡 Đóng Spotlight Tutorial Bác Ba...`);
+      log(`💡 Chạm qua Spotlight Tutorial Bác Ba (#btn-tutorial-skip / #btn-tutorial-next)...`);
       await prepTutSkip.first().click({ force: true });
       await sleep(300);
       return true;
@@ -893,7 +893,7 @@ class OvernightMonkey {
       const gachaPick = document.querySelector('.btn-gacha-pick, #btn-gacha-dismiss');
       if (gachaPick instanceof HTMLElement) gachaPick.click();
 
-      const prepTut = document.querySelector('#btn-tutorial-skip, #btn-bacba-understood');
+      const prepTut = document.querySelector('#btn-tutorial-skip, #btn-tutorial-next, #btn-bacba-understood');
       if (prepTut instanceof HTMLElement) prepTut.click();
 
       const manualClose = document.querySelector('#btn-close-bacba-manual, #btn-close-loyalty-modal');
@@ -922,7 +922,7 @@ class OvernightMonkey {
       if (confirmOkBtn instanceof HTMLElement) confirmOkBtn.click();
 
       // Dọn dẹp tất cả modal truyện cư dân, minigame, hệ thống
-      const specialModals = document.querySelectorAll('#modal-character-story, #modal-char-reaction, #modal-thief-minigame, #modal-thief-result, #modal-night-radio, #modal-achievements-wall, #modal-shop-theme, #modal-endless-mode, #modal-memories-album, #modal-weekly-quests, #modal-leaderboard, #sauce-minigame-modal, .sauce-modal-overlay, #loyalty-handbook-modal, .loyalty-modal-overlay, #memory-gallery-modal, #tester-feedback-modal, #social-share-modal, .bunny-dialog-modal, #modal-bunny, .storylet-night-modal, #onboarding-guide-banner');
+      const specialModals = document.querySelectorAll('#modal-character-story, #modal-char-reaction, #modal-thief-minigame, #modal-thief-result, #modal-night-radio, #modal-achievements-wall, #modal-shop-theme, #modal-endless-mode, #modal-memories-album, #modal-weekly-quests, #modal-leaderboard, #sauce-minigame-modal, .sauce-modal-overlay, #loyalty-handbook-modal, .loyalty-modal-overlay, #memory-gallery-modal, #tester-feedback-modal, #social-share-modal, .bunny-dialog-modal, #modal-bunny, .storylet-night-modal, #onboarding-guide-banner, #tutorial-layer, #tutorial-spotlight');
       for (const sm of specialModals) {
         if (sm instanceof HTMLElement) sm.remove();
       }
