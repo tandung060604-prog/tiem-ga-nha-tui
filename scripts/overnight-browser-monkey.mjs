@@ -476,10 +476,10 @@ class OvernightMonkey {
       return true;
     }
 
-    // 16. Modal Cốt Truyện Visual Novel (Story VN & Ký Sự Cư Dân)
-    const storyChoice = page.locator('.dialogue-choice, .story-btn, #btn-story-next, #btn-story-close, #btn-story-choice-1, .btn-char-story-choice, #btn-dismiss-char-reaction, #btn-close-char-story, #btn-open-story-dialogue');
+    // 16. Modal Cốt Truyện Visual Novel (Story VN & Ký Sự Cư Dân & Ký Ức Đêm Storylet)
+    const storyChoice = page.locator('.storylet-choice-btn, .storylet-night-modal button, .dialogue-choice, .story-btn, #btn-story-next, #btn-story-close, #btn-story-choice-1, .btn-char-story-choice, #btn-dismiss-char-reaction, #btn-close-char-story, #btn-open-story-dialogue');
     if (await storyChoice.first().isVisible({ timeout: 50 }).catch(() => false)) {
-      log(`📖 Nhận diện thoại truyện cư dân -> Bấm lựa chọn / tiếp tục...`);
+      log(`📖 Nhận diện thoại truyện cư dân / Ký ức đêm -> Bấm lựa chọn / tiếp tục...`);
       await storyChoice.first().click({ force: true });
       await sleep(250);
       return true;
@@ -494,9 +494,10 @@ class OvernightMonkey {
       return true;
     }
 
-    // 16c. Các Modal Hệ Thống Khác (Radio, Bằng Khen, Thử Thách Tuần, Ca Đêm, Biển Hiệu, Kỷ Niệm, Lobby, Sổ Tay Bếp, Tester Feedback, Sổ Tay Tri Kỷ)
-    const extraModalClose = page.locator('#btn-close-loyalty-modal, .btn-claim-alley-gift, #btn-close-night-radio, #btn-close-achievements, .btn-claim-badge, #btn-close-weekly-quests, .btn-claim-quest, #btn-close-shop-theme, #btn-close-endless, #btn-close-memories, #btn-close-leaderboard, #btn-close-kitchen-guide, #btn-close-kitchen-guide-bottom, #btn-close-tester-feedback');
+    // 16c. Các Modal Hệ Thống Khác (Radio, Bằng Khen, Thử Thách Tuần, Ca Đêm, Biển Hiệu, Kỷ Niệm, Lobby, Sổ Tay Bếp, Tester Feedback, Sổ Tay Tri Kỷ, Phòng Lưu Niệm)
+    const extraModalClose = page.locator('#btn-close-gallery, #btn-close-loyalty-modal, .btn-claim-alley-gift, #btn-summary-open-loyalty, #btn-close-night-radio, #btn-close-achievements, .btn-claim-badge, #btn-close-weekly-quests, .btn-claim-quest, #btn-close-shop-theme, #btn-close-endless, #btn-close-memories, #btn-close-leaderboard, #btn-close-kitchen-guide, #btn-close-kitchen-guide-bottom, #btn-close-tester-feedback');
     if (await extraModalClose.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`🧩 Xử lý đóng modal hệ thống / Quà tri kỷ / Phòng lưu niệm...`);
       await extraModalClose.first().click({ force: true });
       await sleep(200);
       return true;
@@ -863,7 +864,7 @@ class OvernightMonkey {
       for (const sm of specialModals) {
         if (sm instanceof HTMLElement) sm.remove();
       }
-      const charChoice = document.querySelector('.btn-char-story-choice, #btn-dismiss-char-reaction, #btn-close-char-story');
+      const charChoice = document.querySelector('.storylet-choice-btn, .btn-char-story-choice, #btn-dismiss-char-reaction, #btn-close-char-story, #btn-close-gallery');
       if (charChoice instanceof HTMLElement) charChoice.click();
 
       const thiefActions = document.querySelectorAll('#btn-guard-instant-bust, #btn-thief-strike, #btn-thief-finish-success, #btn-thief-finish-failure');

@@ -851,3 +851,13 @@
   - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 95.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
 ---
+
+### 🐞 [16:01:38 3/10/2026] (via Jev MCP) Missing Storylet Choice Button in Overnight Monkey Script
+- **Triệu chứng:** Monkey test pauses after Day 1 summary because Night Storylet modal .storylet-choice-btn is not clicked by the monkey bot.
+- **Vị trí:** `scripts/overnight-browser-monkey.mjs` 
+- **Đánh giá Jev (937ms):**
+  - **Mức độ (Severity):** `p3_minor` (Độ tin cậy: 26.0%)
+  - **Nguyên nhân gốc (Root Cause):** `ui_modal_stack` (Độ tin cậy: 79.0%)
+  - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 95.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---
