@@ -47,6 +47,10 @@ export function renderHeader(state: GameState, _onOpenSettings?: () => void): st
             <span class="drawer-icon-emoji">🏆</span>
             <span class="drawer-label">Đua Top 4 Máy</span>
           </button>
+          <button id="btn-social-share-toggle" class="drawer-action-btn" title="Rủ bạn bè đua top (Chia sẻ link / QR)">
+            <span class="drawer-icon-emoji">👥</span>
+            <span class="drawer-label">Rủ bạn đua top</span>
+          </button>
           <button id="btn-changelog-toggle" class="drawer-action-btn" title="Xem bản cập nhật">
             <img src="${ASSETS.icons.book}" class="drawer-icon-img" alt="" />
             <span class="drawer-label">Bản tin cập nhật</span>
@@ -86,7 +90,8 @@ export function bindHeaderEvents(
   onOpenSettings: () => void,
   onOpenChangelog?: () => void,
   onOpenBacBaManual?: () => void,
-  onOpenLeaderboard?: () => void
+  onOpenLeaderboard?: () => void,
+  onOpenSocialShare?: () => void
 ) {
   const drawerBtn = document.getElementById('btn-header-drawer');
   const drawer = document.getElementById('header-quick-drawer');
@@ -146,6 +151,15 @@ export function bindHeaderEvents(
       closeDrawer();
       audio.playPop();
       onOpenLeaderboard();
+    };
+  }
+
+  const socialShareBtn = document.getElementById('btn-social-share-toggle');
+  if (socialShareBtn && onOpenSocialShare) {
+    socialShareBtn.onclick = () => {
+      closeDrawer();
+      audio.playPop();
+      onOpenSocialShare();
     };
   }
 

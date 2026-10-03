@@ -18,7 +18,50 @@ export const BASE_DAILY_INCIDENTS: DailyIncident[] = [
   // GIAI ĐOẠN 1: KHỞI NGHIỆP XE ĐẨY VỈA HÈ (CHƯƠNG 1, NGÀY 2 - 7)
   // =========================================================================
 
-  // 1. Mèo hoang lạc vào bếp (Ngày 2)
+  // 1. Đội Trật Tự Đô Thị & Y Tế Đi Tuần (Ngày 2)
+  {
+    id: 'incident_urban_patrol',
+    title: 'Đội Trật Tự Đô Thị & Y Tế Phường Đi Tuần',
+    categoryTag: 'KIỂM TRA ĐÔ THỊ',
+    icon: '🛵',
+    characterName: 'Chú Chín Trật Tự',
+    characterAvatar: '👮',
+    characterImg: charImg('char_08_grumpy_hai.png'),
+    emoteBubble: '📋',
+    characterRole: 'Cán Bộ Đô Thị Phường',
+    context: 'Chú Chín và cán bộ y tế phường đi xe máy tuần tra lề đường đầu hẻm 1102, dừng lại trước xe đẩy gà rán của bạn để kiểm tra trật tự lối đi và vệ sinh chảo dầu.',
+    dialogue: 'Xe gà rán mới mở hả cháu? Để chú kiểm tra xem có kê bàn lấn hẻm với chảo dầu có đạt chuẩn an toàn vệ sinh không nhé!',
+    phaseTiming: 'morning',
+    isSecurityRisk: false,
+    minChapter: 1,
+    minDay: 2,
+    rarity: 'common',
+    unlockHint: 'Mở khóa ở Ngày 2: Đội Trật tự đô thị & Y tế phường đi tuần tra đầu ngõ.',
+    choices: [
+      {
+        id: 'patrol_cooperative',
+        label: 'Dạ chú xem giúp con, xe đẩy con xếp gọn gàng!',
+        subDesc: 'Mời chú ly trà đá, cam kết giữ chảo dầu vàng óng sạch sẽ',
+        kicker: '🌟 XE ĐẨY GƯƠNG MẪU',
+        karmaDelta: { community: 20, craftsmanship: 15 },
+        moneyDelta: 0,
+        reactionTitle: 'Tuyên Dương Xe Đẩy Gương Mẫu!',
+        reactionNarrative: 'Chú Chín hài lòng gật gù: "Xe đẩy xếp nép sát tường gọn gàng, dầu sạch không khét, tốt lắm cháu! Cứ phát huy thế này thì bà con trong hẻm ủng hộ nhiệt tình!" Chiều hôm đó khách ghé đông hơn hẳn.'
+      },
+      {
+        id: 'patrol_neat_pledge',
+        label: 'Kê thêm dù bạt và dọn sạch bóng lề đường',
+        subDesc: 'Tốn 15k mua bao rác mới có nắp đậy, được bà con khen ngợi',
+        kicker: '🧹 VỆ SINH ĐẠT CHUẨN',
+        karmaDelta: { community: 15, craftsmanship: 20 },
+        moneyDelta: -15000,
+        reactionTitle: 'Góc Phố Sạch Đẹp',
+        reactionNarrative: 'Thùng rác có nắp đậy và mặt đường sạch bóng khiến cán bộ y tế chấm điểm tối đa. Xe gà của bạn trở thành điểm sáng văn hóa của tổ dân phố!'
+      }
+    ]
+  },
+
+  // 2. Mèo hoang lạc vào bếp (Ngày 8)
   {
     id: 'incident_cat_adopted',
     title: 'Bé Mèo Con Lạc Vào Chân Xe Đẩy',
@@ -34,9 +77,9 @@ export const BASE_DAILY_INCIDENTS: DailyIncident[] = [
     phaseTiming: 'morning',
     isSecurityRisk: false,
     minChapter: 1,
-    minDay: 2,
+    minDay: 8,
     rarity: 'common',
-    unlockHint: 'Mở khóa ở Ngày 2: Một vị khách bốn chân bé nhỏ bất ngờ ghé thăm xe đẩy.',
+    unlockHint: 'Mở khóa ở Ngày 8: Một vị khách bốn chân bé nhỏ bất ngờ ghé thăm xe đẩy.',
     choices: [
       {
         id: 'cat_adopt_mascot',

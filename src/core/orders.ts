@@ -224,15 +224,15 @@ export class OrdersEngine {
 
     return {
       id: 'ord_bunny_' + Date.now(),
-      customerName: 'Bé Thỏ Cam 🐰',
+      customerName: 'Bé Gà Bông 🐥',
       avatar: ASSETS.thocam.vui,
       isDelivery: false,
       isBunny: true,
       bunnyLetterId: letter ? letter.id : undefined,
       archetypeBadge: 'Khách Tri Kỷ',
       personality: 'generous',
-      personalityLabel: '🐰 Khách Tri Kỷ',
-      personalityDesc: 'Thỏ Cam đem theo thư và phần quà bất ngờ, thưởng tip hào phóng!',
+      personalityLabel: '🐥 Khách Tri Kỷ',
+      personalityDesc: 'Bé Gà Bông đem theo mảnh giấy ký ức và phần quà bất ngờ, thưởng tip hào phóng!',
       items: selectedItems,
       patienceMax: 65,
       patienceCurrent: 65,

@@ -74,18 +74,18 @@ export function upgradeEffects(upgrades?: Upgrades | null): UpgradeEffects {
       pestImmunity: false,
     };
   }
-  const { kitchen, space, operations, marketing, storage, service, hygiene } = upgrades;
+  const { kitchen, space, operations, marketing, storage, service, hygiene, cart } = upgrades;
 
   const autoDrink = getLevel(service) >= 2;
   const pestImmunity = getLevel(hygiene) >= 3;
   const ownDeliveryApp = getLevel(operations) >= 3;
 
   return {
-    fryRampPct: bestOwned(kitchen, 'speed', 'kitchen'),
-    tastePct: bestOwned(kitchen, 'taste', 'kitchen'),
+    fryRampPct: bestOwned(kitchen, 'speed', 'kitchen') + bestOwned(cart, 'speed', 'cart'),
+    tastePct: bestOwned(kitchen, 'taste', 'kitchen') + bestOwned(cart, 'taste', 'cart'),
     oilLifePct: bestOwned(hygiene, 'hygiene', 'hygiene'),
     patiencePct: bestOwned(operations, 'speed', 'operations'),
-    customersPct: bestOwned(marketing, 'customers', 'marketing'),
+    customersPct: bestOwned(marketing, 'customers', 'marketing') + bestOwned(cart, 'customers', 'cart'),
     autoLift: getLevel(kitchen) >= AUTO_LIFT_KITCHEN_LEVEL,
     pricePremiumPct: Math.min(MAX_PRICE_PREMIUM_PCT, Math.round(bestOwned(space, 'space', 'space') / 3)),
     traySlots: Math.min(3, capacitySlots(bestOwned(space, 'capacity', 'space'))),

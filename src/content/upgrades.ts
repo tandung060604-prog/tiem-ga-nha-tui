@@ -34,6 +34,43 @@ import { UpgradeBranch } from '../types/game';
 //    - Cấp 3: Hệ Thống Lọc Dầu Tuần Hoàn & Bẫy Sóng Âm (Dầu bền +100%, sao Vệ Sinh vững chắc, MIỄN NHIỄM 100% CHUỘT BỌ).
 
 export const INITIAL_UPGRADES: { [id: string]: UpgradeBranch } = {
+  cart: {
+    id: 'cart',
+    name: 'Đồ Nghề Xe Đẩy Vỉa Hè',
+    icon: '🛒',
+    currentLevel: 1,
+    tiers: [
+      {
+        level: 1,
+        name: 'Xe Đẩy Inox Cơ Bản',
+        cost: 0,
+        minChapter: 1,
+        minDay: 1,
+        description: 'Chiếc xe đẩy inox mộc mạc đầu hẻm 1102, che chắn tạm bợ.',
+        bonus: {}
+      },
+      {
+        level: 2,
+        name: 'Dù Bạt Che Mưa & Kẹp Gắp Inox Cách Nhiệt',
+        cost: 50000,
+        minChapter: 1,
+        minDay: 3,
+        unlockHint: 'Mở từ Ngày 3',
+        description: 'Dù bạt che mưa gió Sài Gòn, kẹp gắp inox chống bỏng giúp thao tác chiên nhanh +15% và giữ trọn hương vị +10%.',
+        bonus: { speed: 15, taste: 10 }
+      },
+      {
+        level: 3,
+        name: 'Dây Đèn Led Neon & Khay Lưới Róc Dầu',
+        cost: 120000,
+        minChapter: 1,
+        minDay: 5,
+        unlockHint: 'Mở từ Ngày 5',
+        description: 'Đèn led sáng rực đầu hẻm, khay lưới ráo dầu inox giúp gà ráo dầu giòn tan, đảm bảo vệ sinh ATTP (+10% Vệ Sinh, +20% Hương Vị).',
+        bonus: { speed: 25, taste: 20, hygiene: 10 }
+      }
+    ]
+  },
   kitchen: {
     id: 'kitchen',
     name: 'Thiết Bị Bếp Chiên',

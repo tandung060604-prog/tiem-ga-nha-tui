@@ -24,7 +24,7 @@ export function renderBunnyLetterModal(
       <div style="position: relative; width: 110px; height: 110px; margin: 0 auto 10px; border-radius: 50%; padding: 4px; background: linear-gradient(135deg, #ff9800, #ff5722, #f57c00); box-shadow: 0 6px 16px rgba(230, 81, 0, 0.35);">
         <img 
           src="${ASSETS.thocam.vui}" 
-          alt="Bé Thỏ Cam" 
+          alt="Bé Gà Bông" 
           style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; background: #fff; border: 3px solid #fff;"
         />
         <div style="position: absolute; bottom: 0; right: 0; background: #fff; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
@@ -33,15 +33,15 @@ export function renderBunnyLetterModal(
       </div>
 
       <h2 style="margin: 0 0 2px; font-size: 1.35rem; color: #bf360c; font-weight: 800; font-family: var(--font-display);">
-        Bé Thỏ Cam (Mimi)
+        Bé Gà Bông (Chicky)
       </h2>
       <div style="font-size: 0.78rem; color: var(--soft); margin-bottom: 12px;">
-        Vị khách thầm lặng kết nối yêu thương giữa các cư dân Hẻm 1102
+        Vị khách tri kỷ thầm lặng & Sứ giả gắn kết tình người Hẻm 1102
       </div>
 
       <!-- Dialogue Action Narration -->
       <div style="font-size: 0.8rem; font-style: italic; color: #6d4c41; background: #fff8e1; border-left: 3px solid #ffa000; padding: 8px 12px; border-radius: 8px; margin-bottom: 14px; text-align: left; line-height: 1.45;">
-        🐰 <i>Bé Thỏ nghiêng đầu chớp mắt hiền lành, hai tai khẽ rung rinh khi ngửi thấy mùi gà rán giòn rụm từ chiếc chảo gang. Bé rút từ túi chiếc áo len màu cam một mảnh giấy nhớ viết tay nắn nót trao cho bạn...</i>
+        🍗 <i>Bé Gà Bông khẽ nghiêng chiếc đầu mỏ tròn xoe, vỗ vỗ đôi cánh vụng về khi ngửi thấy mùi gà rán giòn rụm từ chiếc chảo gang. Bé rút từ túi chiếc khăn len màu cam một mảnh giấy nhớ viết tay nắn nót trao cho bạn...</i>
       </div>
 
       <!-- Orange Handwritten Memo Card -->
@@ -74,7 +74,7 @@ export function renderBunnyLetterModal(
         <div style="margin-top: 10px; background: #e8f5e9; border: 1.5px solid #a5d6a7; border-radius: 8px; padding: 8px 10px; font-size: 0.82rem; color: #2e7d32; display: flex; align-items: center; gap: 6px;">
           <span style="font-size: 1.2rem;">🎁</span>
           <div>
-            <b>Món quà từ Thỏ Cam:</b> ${letter.rewardText}
+            <b>Món quà từ Bé Gà Bông:</b> ${letter.rewardText}
           </div>
         </div>
       </div>
@@ -85,14 +85,14 @@ export function renderBunnyLetterModal(
           ${isClaimed ? '💖 ĐÃ TIẾP NHẬN BỨC THƯ & LỜI CHÚC' : '💖 NHẬN MẢNH GIẤY & GỬI LỜI CẢM ƠN'}
         </button>
         <button id="btn-open-bunny-album" class="btn-sm" style="background: #fff; border: 1.5px solid #ffb74d; color: #e65100; font-size: 0.82rem; padding: 6px 12px;">
-          📚 Mở Sổ Ký Ức Thư Của Bé Thỏ Cam
+          📚 Mở Sổ Ký Ức Mảnh Giấy Bé Gà Bông
         </button>
       </div>
     </div>
   `;
 }
 
-// Giao diện Sổ Ký Ức Thư Thỏ Cam (Memory Album)
+// Giao diện Sổ Ký Ức Mảnh Giấy Bé Gà Bông (Memory Album)
 export function renderBunnyAlbumModal(
   state: GameState,
   selectedLetterIdx: number = 0
@@ -124,9 +124,9 @@ export function renderBunnyAlbumModal(
       <!-- Header -->
       <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ffe0b2; padding-bottom: 8px;">
         <div style="display: flex; align-items: center; gap: 8px;">
-          <img src="${ASSETS.thocam.vui}" alt="Mimi" style="width: 36px; height: 36px; border-radius: 50%; border: 2px solid #ff9800; object-fit: cover;" />
+          <img src="${ASSETS.thocam.vui}" alt="Chicky" style="width: 36px; height: 36px; border-radius: 50%; border: 2px solid #ff9800; object-fit: cover;" />
           <div>
-            <h2 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #bf360c;">📜 Sổ Ký Ức Thỏ Cam</h2>
+            <h2 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #bf360c;">📜 Sổ Ký Ức Gà Bông</h2>
             <small style="color: var(--soft); font-size: 0.75rem;">Đã mở: <b>${unlockedIds.length}/${BUNNY_LETTERS.length}</b> mảnh giấy nhớ · Ghé thăm: <b>${state.bunnyVisitsCount || 0}</b> lần</small>
           </div>
         </div>
@@ -162,7 +162,7 @@ export function renderBunnyAlbumModal(
             <div style="font-size: 3rem; margin-bottom: 8px;">🔒</div>
             <div style="font-weight: 800; font-size: 1rem; color: var(--ink);">Mảnh Giấy Nhớ Chưa Được Khám Phá</div>
             <p style="font-size: 0.82rem; margin-top: 6px; line-height: 1.4;">
-              Bé Thỏ Cam sẽ ghé thăm và gửi tặng mảnh giấy này khi tiệm gom được <b>${Math.round(currentLetter.trigger.atProgress * 100)}% tiền cọc Chương ${currentLetter.trigger.chapter}</b>, lúc bạn phục vụ món <b>${currentLetter.preferredFood}</b> thơm ngon!
+              Bé Gà Bông sẽ ghé thăm và gửi tặng mảnh giấy này khi tiệm gom được <b>${Math.round(currentLetter.trigger.atProgress * 100)}% tiền cọc Chương ${currentLetter.trigger.chapter}</b>, lúc bạn phục vụ món <b>${currentLetter.preferredFood}</b> thơm ngon!
             </p>
           </div>
         `}

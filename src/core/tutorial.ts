@@ -185,16 +185,13 @@ export interface PrepTutorialHint {
 export const PREP_TUTORIAL_STEPS: PrepTutorialStep[] = [
   'prep-welcome',
   'prep-inventory',
-  'prep-upgrades',
-  'prep-staff',
-  'prep-reviews',
   'prep-menu',
   'prep-start'
 ];
 
 export const PREP_TUTORIAL_TEXT: Record<PrepTutorialStep, Omit<PrepTutorialHint, 'step'>> = {
   'prep-welcome': {
-    text: 'Mèn đét ơi mừng con khai trương tiệm gà mới nghen! Bác Ba đứng đây chỉ con từ A tới Z: cách mua thịt gà trữ kho, sắm thêm bàn ghế cho khách ngồi, nâng cấp chảo xịn, mướn nhân viên với coi nhật ký đánh giá của thực khách nè!',
+    text: 'Mèn đét ơi mừng con khai trương tiệm gà mới nghen! Bác Ba đứng đây chỉ con cách chuẩn bị: mua thịt gà trữ trong Kho Hàng, coi lại giá bán trong Sổ Tay, rồi bắt đầu mở bán đón khách Hẻm 1102 nghen con!',
     target: '.chalkboard',
     button: 'Dạ, Bác Ba chỉ con với!'
   },

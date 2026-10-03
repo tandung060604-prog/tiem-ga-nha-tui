@@ -9,8 +9,8 @@ export const STORY_ENDINGS: Record<StoryEndingId, StoryEnding> = {
     icon: '👑',
     title: 'BẾP LỬA HẺM 1102 & CHUỖI GÀ TRI KỶ',
     tagline: 'Khi mùi thơm gà rán hòa cùng nghĩa tình Sài Gòn, không đế chế nào có thể đánh bại bạn.',
-    excerpt: 'Mimi đứng trên sân khấu trao giải Gà Vàng, từ từ tháo chiếc đầu mascot Thỏ Cam. Dưới ánh đèn rực rỡ, cô gái nở nụ cười rạng rỡ. Bác Ba trao lại cho bạn chiếc vá gỗ gia truyền của tiệm Gà Chợ Lớn năm 1990. Hẻm 1102 tối nay sáng rực ánh đèn mừng ngày hội ngộ.',
-    conditionDescription: '❤️ Tình thân hẻm ≥ 75 · 🔥 Tay nghề ≥ 75 · Mở khóa trọn vẹn 6 thư Thỏ Cam · Gắn bó tiệm ≥ 100 ngày',
+    excerpt: 'An đứng trên sân khấu trao giải Gà Vàng, từ từ tháo chiếc đầu mascot Gà Bông. Dưới ánh đèn rực rỡ, cô gái nở nụ cười rạng rỡ. Bác Ba trao lại cho bạn chiếc vá gỗ gia truyền của tiệm Gà Chợ Lớn năm 1990. Hẻm 1102 tối nay sáng rực ánh đèn mừng ngày hội ngộ.',
+    conditionDescription: '❤️ Tình thân hẻm ≥ 75 · 🔥 Tay nghề ≥ 75 · Mở khóa ≥ 6 Mảnh giấy nhớ Gà Bông · Gắn bó tiệm ≥ 100 ngày',
     karma: { community: 95, craftsmanship: 88, ambition: 72 }
   },
   open: {
@@ -20,7 +20,7 @@ export const STORY_ENDINGS: Record<StoryEndingId, StoryEnding> = {
     icon: '🏡',
     title: 'GIÓ HẺM THỔI MÃI',
     tagline: 'Không cần trở thành đế chế triệu đô, bình yên dưới mái hiên số 14 đã là một hạnh phúc trọn vẹn.',
-    excerpt: 'Tiệm số 14 vẫn mở cửa đón gió chiều mát rượi. Na và Dũng đều đậu vào trường đại học mơ ước. Mimi không còn phải mặc đồ thú bông đi phát tờ rơi nữa, mà trở thành thực khách thân quen mỗi chiều thứ Bảy bên đĩa khoai lắc vàng giòn.',
+    excerpt: 'Tiệm số 14 vẫn mở cửa đón gió chiều mát rượi. Na và Dũng đều đậu vào trường đại học mơ ước. An không còn phải mặc đồ thú bông đi phát tờ rơi nữa, mà trở thành thực khách thân quen mỗi chiều thứ Bảy bên đĩa khoai lắc vàng giòn.',
     conditionDescription: 'Giữ quán gà ấm cúng, cân bằng cuộc sống và giữ trọn tình làng nghĩa xóm.',
     karma: { community: 80, craftsmanship: 75, ambition: 45 }
   },
@@ -42,7 +42,7 @@ export const STORY_ENDINGS: Record<StoryEndingId, StoryEnding> = {
     icon: '🏢',
     title: 'CỖ MÁY GÀ VÔ HỒN',
     tagline: 'Bạn có được triệu đô, nhưng đã đánh mất tất cả những gì làm nên hương vị của một con hẻm.',
-    excerpt: 'Bán 49% cổ phần cho MegaChicken, bạn ngồi trong phòng máy lạnh tầng 30 ngắm nhìn 50 chi nhánh nhượng quyền. Nhưng gà giờ đây dùng bột công nghiệp và thịt đông lạnh nguội ngắt. Bác Ba lặng lẽ bỏ về quê; Thỏ Cam không bao giờ xuất hiện nữa.',
+    excerpt: 'Bán 49% cổ phần cho MegaChicken, bạn ngồi trong phòng máy lạnh tầng 30 ngắm nhìn 50 chi nhánh nhượng quyền. Nhưng gà giờ đây dùng bột công nghiệp và thịt đông lạnh nguội ngắt. Bác Ba lặng lẽ bỏ về quê; Bé Gà Bông không bao giờ xuất hiện nữa.',
     conditionDescription: '💼 Tham vọng quy mô ≥ 85 · ❤️ Tình thân hẻm < 40 (Chạy theo lợi nhuận mù quáng).',
     karma: { community: 20, craftsmanship: 30, ambition: 98 }
   },

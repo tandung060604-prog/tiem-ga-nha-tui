@@ -181,6 +181,10 @@ export function createInitialState(): GameState {
     dineInTables: createDefaultDineInTables(),
     freeOilFilterUsed: false,
     testerFeedbackSubmissions: [],
+    seenStoryletIds: [],
+    onboardingGuideStep: 1,
+    onboardingGuideDismissed: false,
+    day3FeedbackPrompted: false,
   };
   getOrCreatePetPatio(state);
   Object.values(state.inventory).forEach(ensureBatches);
@@ -226,6 +230,18 @@ export function migrateSave(raw: unknown): { state: GameState; repaired: string[
   }
   if (!Array.isArray(state.testerFeedbackSubmissions)) {
     state.testerFeedbackSubmissions = [];
+  }
+  if (!Array.isArray(state.seenStoryletIds)) {
+    state.seenStoryletIds = [];
+  }
+  if (typeof state.onboardingGuideDismissed !== 'boolean') {
+    state.onboardingGuideDismissed = typeof src.day === 'number' && src.day > 1;
+  }
+  if (typeof state.onboardingGuideStep !== 'number') {
+    state.onboardingGuideStep = state.day === 1 && !state.onboardingGuideDismissed ? 1 : 0;
+  }
+  if (typeof state.day3FeedbackPrompted !== 'boolean') {
+    state.day3FeedbackPrompted = false;
   }
   // Save từ trước khi có hướng dẫn: đã qua ngày 1 thì coi như đã học, không bật lại
   if (typeof src.tutorialDone !== 'boolean') state.tutorialDone = typeof src.day === 'number' && src.day > 1;

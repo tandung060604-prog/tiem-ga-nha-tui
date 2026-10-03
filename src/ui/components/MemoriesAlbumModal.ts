@@ -74,7 +74,7 @@ export function renderMemoriesAlbumModal(
               🏆 Kết Cục (${achievedEndings.size}/6)
             </button>
             <button class="tab-memories-btn ${activeTab === 'bunny' ? 'active' : ''}" data-tab="bunny">
-              💌 Thư Thỏ Cam (${receivedLetters.size}/6)
+              💌 Thư Thỏ Cam & Gà Bông (${receivedLetters.size}/${BUNNY_LETTERS.length})
             </button>
           </div>
           <div class="memories-tabs-scroll-hint" title="Cuộn sang để xem thêm tab">›</div>
@@ -419,7 +419,7 @@ function renderBunnyLettersTab(state: GameState): string {
   const currentChapter = state.currentChapter || 1;
   const received = new Set(state.unlockedBunnyLetters ?? []);
 
-  const cards = BUNNY_LETTERS.map(letItem => {
+  const cards = BUNNY_LETTERS.map((letItem, idx) => {
     const chapter = letItem.trigger.chapter;
     const isUnlocked = received.has(letItem.id) || currentChapter >= chapter;
 
@@ -428,8 +428,8 @@ function renderBunnyLettersTab(state: GameState): string {
         <div style="background: #f5ebe0; border: 1.5px dashed #c49a6c; border-radius: 8px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; opacity: 0.65;">
           <span style="font-size: 1.2rem;">🔒</span>
           <div>
-            <div style="font-size: 0.78rem; font-weight: 800; color: #78350f;">Thư Thỏ Cam #${chapter}</div>
-            <div style="font-size: 0.68rem; color: #a16207;">Sẽ gửi đến khi mở khóa Chương ${chapter}</div>
+            <div style="font-size: 0.78rem; font-weight: 800; color: #78350f;">Thư Gà Bông #${idx + 1}</div>
+            <div style="font-size: 0.68rem; color: #a16207;">Sẽ gửi đến trong Chương ${chapter}</div>
           </div>
         </div>
       `;
@@ -440,7 +440,7 @@ function renderBunnyLettersTab(state: GameState): string {
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div style="display: flex; align-items: center; gap: 6px;">
             <img src="${ASSETS.ui.bunnyNote}" style="width: 22px; height: 22px;" alt="" />
-            <span style="font-size: 0.84rem; font-weight: 800; color: #78350f;">Lá Thư #${chapter}: ${escapeHtml(letItem.title)}</span>
+            <span style="font-size: 0.84rem; font-weight: 800; color: #78350f;">Lá Thư #${idx + 1}: ${escapeHtml(letItem.title)}</span>
           </div>
           <span style="font-size: 0.65rem; background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 4px; font-weight: 700;">Chương ${chapter}</span>
         </div>
@@ -459,7 +459,7 @@ function renderBunnyLettersTab(state: GameState): string {
 
   return `
     <div style="font-size: 0.72rem; color: #78350f; font-style: italic; text-align: center; margin-bottom: 4px;">
-      💌 Những dòng tâm thư ấm áp từ vị khách Thỏ Cam bí ẩn gửi lại mỗi khi tiệm gà bước sang chương mới.
+      🍗 Những dòng tâm thư ấm áp từ Bé Gà Bông (Thư Thỏ Cam / An) gửi lại qua từng chặng đường phát triển của tiệm gà Hẻm 1102.
     </div>
     <div style="display: flex; flex-direction: column; gap: 8px;">
       ${cards}

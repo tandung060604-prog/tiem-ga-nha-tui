@@ -55,7 +55,7 @@ describe('thư Thỏ Cam theo tiến độ chương (không lộ chuyện chươ
   });
 
   it('thư lễ Gà Vàng chỉ đến ở chương 5', () => {
-    const award = BUNNY_LETTERS.find(l => l.id === 'bunny_letter_6')!;
+    const award = BUNNY_LETTERS.find(l => l.id === 'bunny_letter_18')!;
     expect(award.trigger.chapter).toBe(5);
     for (let ch = 1; ch <= 4; ch++) expect(isTriggered(award.trigger, at(ch, 1e12))).toBe(false);
   });

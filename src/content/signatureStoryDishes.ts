@@ -17,9 +17,9 @@ export const SIGNATURE_STORY_DISHES: SignatureStoryDish[] = [
   },
   {
     id: 'dish_ga_lac_thocam',
-    name: 'Gà Lắc Phô Mai Mật Ong Thỏ Cam',
-    storyContext: 'Món ăn do Mimi và chủ quán cùng sáng tạo kỷ niệm ngày Mimi đỗ thủ khoa.',
-    associatedCharacter: 'Bé Thỏ Cam (Mimi)',
+    name: 'Gà Lắc Phô Mai Mật Ong Thỏ Cam (Gà Bông)',
+    storyContext: 'Món ăn do An (Bé Thỏ Cam / Gà Bông) và chủ quán cùng sáng tạo kỷ niệm ngày quán đoạt Cúp Gà Vàng.',
+    associatedCharacter: 'Bé Thỏ Cam (Gà Bông / An)',
     recipeDescription: 'Miếng gà giòn rụm áo lớp phô mai béo ngậy và sốt mật ong hoa cà phê ngọt ngào.',
     priceBonusPercent: 25,
     unlockedByFlag: 'bunny_study_abroad_success',

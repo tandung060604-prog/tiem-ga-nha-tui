@@ -115,12 +115,12 @@ for (const width of WIDTHS) {
   // Bấm nút thật + món trong khay nhìn thấy được
   try {
     await page.evaluate(() => {
-      const b = document.querySelector('#btn-tutorial-skip, #btn-bacba-understood, #btn-tutorial-next');
+      const b = document.querySelector('#btn-tutorial-skip, #btn-bacba-understood, #btn-tutorial-next, #btn-skip-onboarding');
       if (b instanceof HTMLElement) b.click();
     }).catch(() => {});
-    const tutNext = page.locator('#btn-tutorial-next, #btn-bacba-understood');
+    const tutNext = page.locator('#btn-tutorial-next, #btn-bacba-understood, #btn-skip-onboarding');
     if (await tutNext.isVisible().catch(() => false)) await tutNext.click({ force: true }).catch(() => {});
-    const tutSkip = page.locator('#btn-tutorial-skip, #btn-bacba-understood');
+    const tutSkip = page.locator('#btn-tutorial-skip, #btn-bacba-understood, #btn-skip-onboarding');
     if (await tutSkip.isVisible().catch(() => false)) await tutSkip.click({ force: true }).catch(() => {});
     await page.waitForTimeout(300);
     await page.locator('#btn-add-drink').click({ timeout: 5000, force: true });

@@ -63,6 +63,12 @@ import { ShareCardEngine } from './ui/components/ShareCard';
 import { ASSETS } from './content/assets';
 import { pickDailyIncident, resolveIncidentChoice } from './core/dailyIncidentsEngine';
 import { DAILY_INCIDENTS } from './content/dailyIncidents';
+import { renderSocialShareModal } from './ui/components/SocialShareModal';
+import { renderStoryletModal } from './ui/components/StoryletModal';
+import { NIGHT_STORYLETS } from './content/storylets';
+import { pickNightStorylet, applyStoryletChoice } from './core/storyletEngine';
+import { getInviteUrl } from './core/leaderboard';
+import { Storylet } from './types/game';
 import { renderIncidentPrompt, renderIncidentConfirmPrompt, renderIncidentReaction, renderIncidentAlbumModal } from './ui/components/DailyIncidentModal';
 import { openSecretSauceModal } from './ui/components/SecretSauceModal';
 import { openOilFilterModal } from './ui/components/OilFilterModal';
@@ -894,7 +900,7 @@ class AppController {
     bindBunnyModalEvents(
       () => {
         this.closeModal();
-        this.showToast('Đã lưu mảnh giấy vào Sổ Ký Ức Thỏ Cam! 📜✨');
+        this.showToast('Đã lưu mảnh giấy vào Sổ Ký Ức Gà Bông! 📜✨');
       },
       () => {
         this.openBunnyAlbumDialog();
@@ -942,15 +948,15 @@ class AppController {
     const html = `
       <div style="text-align: center; padding: 10px 4px;">
         <div style="position: relative; width: 100px; height: 100px; margin: 0 auto 10px; border-radius: 50%; padding: 3px; background: linear-gradient(135deg, #ff9800, #f57c00); box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);">
-          <img src="${ASSETS.thocam.vui}" alt="Bé Thỏ Cam" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; background: #fff;" />
+          <img src="${ASSETS.thocam.vui}" alt="Bé Gà Bông" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; background: #fff;" />
         </div>
-        <div style="font-size: 0.75rem; color: #e65100; font-weight: 800; text-transform: uppercase;">🐰 KHÁCH TRI KỶ ĐANG CHỜ MÓN 🐰</div>
-        <h2 style="margin: 4px 0 8px; font-size: 1.3rem; color: #bf360c; font-weight: 800;">Bé Thỏ Cam</h2>
+        <div style="font-size: 0.75rem; color: #e65100; font-weight: 800; text-transform: uppercase;">🐥 KHÁCH TRI KỶ ĐANG CHỜ MÓN 🐥</div>
+        <h2 style="margin: 4px 0 8px; font-size: 1.3rem; color: #bf360c; font-weight: 800;">Bé Gà Bông (An / Chicky)</h2>
         <div style="background: #fff8e1; border: 1.5px dashed #ffb74d; border-radius: 10px; padding: 12px; margin-bottom: 14px; font-size: 0.85rem; color: #4e342e; font-style: italic; line-height: 1.5;">
           ${quote}
         </div>
         <button id="btn-close-bunny-greet" class="btn-big-open" style="width: 100%; padding: 10px; font-size: 0.95rem; background: linear-gradient(135deg, #ff9800, #f57c00); box-shadow: 0 4px 0 #e65100;">
-          🍗 Chiên Món Thật Ngon Đãi Bé Thỏ!
+          🍗 Chiên Món Thật Ngon Đãi Gà Bông!
         </button>
       </div>
     `;
@@ -1473,7 +1479,8 @@ class AppController {
         () => this.openSettings(),
         () => this.openUpdateDashboardModal(),
         () => openBacBaManualModal(),
-        () => this.openLeaderboard()
+        () => this.openLeaderboard(),
+        () => this.openSocialShareModal()
       );
     }
 
@@ -1529,24 +1536,39 @@ class AppController {
 
     const chalkboardHtml = renderChalkboard(state, this.currentEvent.title);
 
+    const isReviewsUnlocked = state.day >= 2 || state.currentChapter >= 2;
+    const isUpgradesUnlocked = state.day >= 3 || state.currentChapter >= 2;
+    const isStaffUnlocked = state.currentChapter >= 2 || state.day >= 10;
+
+    // Safety fallback: nếu tab hiện tại chưa mở thì tự chuyển về kho hàng
+    if (this.activeTab === 'reviews' && !isReviewsUnlocked) this.activeTab = 'inventory';
+    if (this.activeTab === 'upgrades' && !isUpgradesUnlocked) this.activeTab = 'inventory';
+    if (this.activeTab === 'staff' && !isStaffUnlocked) this.activeTab = 'inventory';
+
     const tabsBarHtml = `
       <div class="tabs-bar">
         <button class="tab-btn ${this.activeTab === 'inventory' ? 'active' : ''}" data-tab="inventory">
           <img src="${ASSETS.icons.inventory}" class="tab-pixel-icon" alt="" />
           <span>Kho hàng</span>
         </button>
-        <button class="tab-btn ${this.activeTab === 'upgrades' ? 'active' : ''}" data-tab="upgrades">
-          <img src="${ASSETS.icons.upgrade}" class="tab-pixel-icon" alt="" />
-          <span>Nâng cấp</span>
-        </button>
-        <button class="tab-btn ${this.activeTab === 'staff' ? 'active' : ''}" data-tab="staff">
-          <img src="${ASSETS.icons.staff}" class="tab-pixel-icon" alt="" />
-          <span>Nhân viên</span>
-        </button>
-        <button class="tab-btn ${this.activeTab === 'reviews' ? 'active' : ''}" data-tab="reviews">
-          <img src="${ASSETS.icons.reviews}" class="tab-pixel-icon" alt="" />
-          <span>Đánh giá (${state.ratings.overall.toFixed(1)}★ · ${state.totalReviewsCount ?? state.recentReviews.length})</span>
-        </button>
+        ${isUpgradesUnlocked ? `
+          <button class="tab-btn ${this.activeTab === 'upgrades' ? 'active' : ''}" data-tab="upgrades">
+            <img src="${ASSETS.icons.upgrade}" class="tab-pixel-icon" alt="" />
+            <span>Nâng cấp${state.day === 3 ? ' <span class="tab-badge-new">MỚI</span>' : ''}</span>
+          </button>
+        ` : ''}
+        ${isStaffUnlocked ? `
+          <button class="tab-btn ${this.activeTab === 'staff' ? 'active' : ''}" data-tab="staff">
+            <img src="${ASSETS.icons.staff}" class="tab-pixel-icon" alt="" />
+            <span>Nhân viên</span>
+          </button>
+        ` : ''}
+        ${isReviewsUnlocked ? `
+          <button class="tab-btn ${this.activeTab === 'reviews' ? 'active' : ''}" data-tab="reviews">
+            <img src="${ASSETS.icons.reviews}" class="tab-pixel-icon" alt="" />
+            <span>Đánh giá (${state.ratings.overall.toFixed(1)}★ · ${state.totalReviewsCount ?? state.recentReviews.length})${state.day === 2 ? ' <span class="tab-badge-new">MỚI</span>' : ''}</span>
+          </button>
+        ` : ''}
         <button class="tab-btn ${this.activeTab === 'menu' ? 'active' : ''}" data-tab="menu">
           <img src="${ASSETS.icons.book}" class="tab-pixel-icon" alt="" />
           <span>Sổ tay</span>
@@ -1867,7 +1889,7 @@ class AppController {
                 return;
               }
 
-              this.showToast('Hết gà với hết vốn rồi… Bác Ba đã giúp một lần trong chương này rồi. Bán bớt đồ hoặc nhận thưởng Thỏ Cam đi con.');
+              this.showToast('Hết gà với hết vốn rồi… Bác Ba đã giúp một lần trong chương này rồi. Bán bớt đồ hoặc nhận thưởng Gà Bông đi con.');
               this.activeTab = 'inventory';
               this.render();
               return;
@@ -2421,6 +2443,19 @@ class AppController {
   private handleSellingClick(target: Element) {
     if (!this.sellingSession) return;
 
+    // Bỏ qua hướng dẫn ngày đầu (Day 1 Onboarding Guide)
+    const skipOnboardingBtn = target.closest<HTMLElement>('#btn-skip-onboarding');
+    if (skipOnboardingBtn) {
+      Haptics.tap();
+      stateManager.update(draft => {
+        draft.onboardingGuideDismissed = true;
+        draft.onboardingGuideStep = 0;
+      });
+      document.getElementById('onboarding-guide-banner')?.remove();
+      this.showToast('Đã tắt hướng dẫn ngày đầu! Chúc quán khai trương đại phát! 🍗✨');
+      return;
+    }
+
     // Bắt quả tang tên trộm rình mò
     const thiefBanner = target.closest<HTMLElement>('#btn-open-thief-bust, .thief-alert-strip');
     if (thiefBanner && this.sellingSession.activeThief) {
@@ -2595,6 +2630,9 @@ class AppController {
         audio.playCrispyDrop();
         Haptics.tap();
         if (action === 'fry-chicken') {
+          if (stateManager.getState().day === 1 && stateManager.getState().onboardingGuideStep === 1) {
+            stateManager.update(draft => { draft.onboardingGuideStep = 2; });
+          }
           const s = cookingEngine.getActiveSeasoning();
           if (s === 'spicy') {
             this.showToast('🔥 Đang chiên Cánh Gà Sốt Cay Yangnyeom thơm nức mũi! Chờ chín vàng rồi vớt!');
@@ -2702,6 +2740,9 @@ class AppController {
         }
         const result = cookingEngine.liftFryer();
         this.onFryerLifted(result);
+        if (stateManager.getState().day === 1 && stateManager.getState().onboardingGuideStep === 2) {
+          stateManager.update(draft => { draft.onboardingGuideStep = 3; });
+        }
         const toast: Record<typeof result.quality, string> = {
           perfect: '✨ VÀNG GIÒN PERFECT! +Hương vị!',
           raw: '⚠️ Vớt sớm quá, gà còn sống! Khách sẽ không nhận đâu.',
@@ -2871,6 +2912,13 @@ class AppController {
       }
       case 'complete':
         Haptics.serveSuccess();
+        if (curState.day === 1 && (curState.onboardingGuideStep ?? 0) >= 1) {
+          stateManager.update(draft => {
+            draft.onboardingGuideStep = 0;
+            draft.onboardingGuideDismissed = true;
+          });
+          document.getElementById('onboarding-guide-banner')?.remove();
+        }
         break;
       default:
         this.render();
@@ -2995,10 +3043,10 @@ class AppController {
       setTimeout(() => {
         audio.playPerfect();
         if (letter) this.openBunnyLetterDialog(letter, true);
-      }, 750); // Đệm trễ 750ms để người chơi ngắm trọn vẹn cử chỉ nhận đồ và vẫy tai chào của Bé Thỏ Cam!
+      }, 750); // Đệm trễ 750ms để người chơi ngắm trọn vẹn cử chỉ nhận đồ và vẫy cánh chào của Bé Gà Bông!
     } else if (order.isBunny) {
       audio.playCash();
-      this.showToast(`🐰 Bé Thỏ Cam gật gù hạnh phúc, tip thêm ${BUNNY_VISIT_TIP.toLocaleString('vi-VN')}đ và vẫy tai chào! 💖`);
+      this.showToast(`🐥 Bé Gà Bông gật gù hạnh phúc, tip thêm ${BUNNY_VISIT_TIP.toLocaleString('vi-VN')}đ và vẫy cánh chào! 💖`);
     } else if (seatedAtTable) {
       audio.playCash();
       if (order.isCriticVip) {
@@ -3480,6 +3528,14 @@ class AppController {
           this.showRentModal(rentDue, ledger, review, advisorTip);
           return;
         }
+
+        // Kiểm tra Ký ức đêm Hẻm 1102 (QBN Night Storylet)
+        const nightStorylet = pickNightStorylet(stateManager.getState(), NIGHT_STORYLETS);
+        if (nightStorylet) {
+          this.openStoryletModal(nightStorylet, () => this.proceedToNextDay());
+          return;
+        }
+
         this.proceedToNextDay();
       };
     }
@@ -3589,6 +3645,15 @@ class AppController {
     this.setPhase('prep');
     this.showToast(`Chào buổi sáng Ngày ${stateManager.getState().day}! Chuẩn bị hàng nào! ☀️`);
     void syncToLeaderboard(stateManager.getState());
+
+    // Mời Tester Feedback khi bước sang Ngày 3+
+    const curSt = stateManager.getState();
+    if (curSt.day >= 3 && !curSt.day3FeedbackPrompted) {
+      stateManager.update(draft => { draft.day3FeedbackPrompted = true; });
+      setTimeout(() => {
+        this.showToast('💬 Bạn đã đồng hành 3 ngày! Vào Cài đặt ➔ [💬 Góp ý & Báo lỗi] để gửi cảm nhận nha! 🎁');
+      }, 2500);
+    }
 
     // Thông báo hàng hết hạn bị hủy nếu có
     const expiredNotice = stateManager.getState().expiredWasteNotification;
@@ -4231,6 +4296,128 @@ class AppController {
           this.openWeeklyQuests();
         } else {
           this.showToast(res.message);
+        }
+      };
+    });
+  }
+
+  public openSocialShareModal(): void {
+    audio.playPop();
+    const state = stateManager.getState();
+    const html = renderSocialShareModal(state);
+    this.openModal(html);
+
+    const closeBtn = document.getElementById('btn-close-social-share');
+    if (closeBtn) closeBtn.onclick = () => this.closeModal();
+
+    // 1-Click Native Share (Zalo/Messenger/Web Share)
+    const nativeShareBtn = document.getElementById('btn-native-share-room');
+    if (nativeShareBtn) {
+      nativeShareBtn.onclick = async () => {
+        audio.playPop();
+        const roomId = (state.roomId || 'HEM1102').toUpperCase();
+        const inviteUrl = getInviteUrl(roomId);
+        if (typeof navigator !== 'undefined' && navigator.share) {
+          try {
+            await navigator.share({
+              title: 'Tiệm Gà Nhà Tui',
+              text: `Vào phòng ${roomId} đua top doanh thu tiệm gà với tui nè! 🍗🏆`,
+              url: inviteUrl
+            });
+            this.showToast('Đã mở menu chia sẻ thành công!');
+          } catch {
+            // Cancelled
+          }
+        } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
+          await navigator.clipboard.writeText(inviteUrl);
+          audio.playCoinChing();
+          this.showToast(`📋 Đã sao chép link mời phòng ${roomId}!`);
+        }
+      };
+    }
+
+    // Sao chép đường link
+    const copyBtn = document.getElementById('btn-copy-room-link');
+    if (copyBtn) {
+      copyBtn.onclick = async () => {
+        audio.playPop();
+        const roomId = (state.roomId || 'HEM1102').toUpperCase();
+        const inviteUrl = getInviteUrl(roomId);
+        if (typeof navigator !== 'undefined' && navigator.clipboard) {
+          await navigator.clipboard.writeText(inviteUrl);
+          audio.playCoinChing();
+          this.showToast(`📋 Đã sao chép link mời phòng ${roomId}!`);
+        }
+      };
+    }
+
+    // Toggle switch room box
+    const openChangeBtn = document.getElementById('btn-open-change-room');
+    const switchBox = document.getElementById('switch-room-container');
+    if (openChangeBtn && switchBox) {
+      openChangeBtn.onclick = () => {
+        audio.playPop();
+        const isHidden = switchBox.style.display === 'none';
+        switchBox.style.display = isHidden ? 'flex' : 'none';
+      };
+    }
+
+    // Confirm switch room
+    const confirmSwitchBtn = document.getElementById('btn-confirm-switch-room');
+    const newRoomInput = document.getElementById('input-new-room-id') as HTMLInputElement;
+    if (confirmSwitchBtn && newRoomInput) {
+      confirmSwitchBtn.onclick = () => {
+        const newRoom = (newRoomInput.value || '').trim().toUpperCase();
+        if (newRoom) {
+          state.roomId = newRoom;
+          setCurrentRoomId(newRoom);
+          stateManager.saveState();
+          audio.playCoinChing();
+          this.showToast(`Đã chuyển sang phòng ${newRoom}!`);
+          this.openSocialShareModal();
+        }
+      };
+    }
+
+    // Download poster PNG
+    const downloadPosterBtn = document.getElementById('btn-download-room-poster');
+    if (downloadPosterBtn) {
+      downloadPosterBtn.onclick = async () => {
+        audio.playPop();
+        this.showToast('Đang xuất poster 9:16 sắc nét... 🖼️');
+        try {
+          await downloadLobbyPoster({ state, roomId: state.roomId || 'HEM1102' });
+          audio.playServingBell();
+          this.showToast('Đã tải poster về máy thành công!');
+        } catch (err) {
+          console.error(err);
+          this.showToast('Không thể tạo poster lúc này!');
+        }
+      };
+    }
+  }
+
+  public openStoryletModal(storylet: Storylet, onDone?: () => void): void {
+    audio.playServingBell();
+    const html = renderStoryletModal(storylet);
+    this.openModal(html);
+
+    const choiceBtns = document.querySelectorAll('.storylet-choice-btn');
+    choiceBtns.forEach(btn => {
+      (btn as HTMLElement).onclick = () => {
+        const choiceId = (btn as HTMLElement).dataset.choiceId;
+        if (!choiceId) return;
+
+        audio.playCoinChing();
+        const { effect } = applyStoryletChoice(stateManager.getState(), storylet, choiceId);
+        stateManager.saveState();
+
+        this.closeModal();
+        if (effect.reactionNarrative) {
+          this.showToast(`✨ ${effect.reactionNarrative}`);
+        }
+        if (onDone) {
+          setTimeout(() => onDone(), 800);
         }
       };
     });

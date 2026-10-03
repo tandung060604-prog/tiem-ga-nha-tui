@@ -5,6 +5,7 @@ import { ASSETS } from '../../content/assets';
 import { PRICE_BANDS, PRICE_STEP, adjustPrice, averagePriceRatio, communityDriftFromPrice, customerMultiplierFromPrice, priceBand, priceLimits, priceRatio, pricingTarget } from '../../core/pricing';
 import { canMake } from '../../core/orders';
 import { SIGNATURE_STORY_DISHES, getUnlockedSignatureDishes } from '../../content/signatureStoryDishes';
+import { BUNNY_LETTERS } from '../../content/mysteryBunny';
 
 export function renderMenuTab(state: GameState): string {
   const currentChapter = state.currentChapter;
@@ -135,24 +136,24 @@ export function renderMenuTab(state: GameState): string {
       ${signatureDishesHtml}
     </div>
 
-    <!-- Khách Bí Ẩn Kết Nối Cốt Truyện: Bé Thỏ Cam -->
+    <!-- Khách Bí Ẩn Kết Nối Cốt Truyện: Bé Gà Bông -->
     <div class="sec-title" style="margin-top: 16px; border-top: 1px solid var(--line); padding-top: 10px;">
-      <span>🐰 Sứ Giả Hẻm 1102: Bé Thỏ Cam (Khách Tri Kỷ)</span>
+      <span>🍗 Sứ Giả Hẻm 1102: Bé Gà Bông (Khách Tri Kỷ)</span>
     </div>
     <div style="background: linear-gradient(135deg, #fffbf5, #fff3e0); border: 2px solid #ffb74d; border-radius: 12px; padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(255, 152, 0, 0.15);">
       <div style="display: flex; gap: 12px; align-items: center;">
-        <img src="${ASSETS.thocam.vui}" alt="Bé Thỏ Cam" style="width: 58px; height: 58px; border-radius: 50%; object-fit: cover; border: 2.5px solid #ff9800; background: #fff; box-shadow: 0 2px 8px rgba(230, 81, 0, 0.25); flex-shrink: 0;" />
+        <img src="${ASSETS.thocam.vui}" alt="Bé Gà Bông" style="width: 58px; height: 58px; border-radius: 50%; object-fit: cover; border: 2.5px solid #ff9800; background: #fff; box-shadow: 0 2px 8px rgba(230, 81, 0, 0.25); flex-shrink: 0;" />
         <div style="flex: 1; min-width: 0;">
           <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-            <b style="font-size: 0.92rem; color: #bf360c;">Bé Thỏ Cam (Mimi)</b>
+            <b style="font-size: 0.92rem; color: #bf360c;">Bé Gà Bông (Chicky / An)</b>
             <span style="background: #e65100; color: #fff; font-size: 0.65rem; font-weight: 800; padding: 2px 6px; border-radius: 6px;">SỨ GIẢ TRI KỶ HẺM 1102</span>
           </div>
           <div style="font-size: 0.74rem; color: #5d4037; margin-top: 3px; line-height: 1.4; font-style: italic;">
-            "Vị khách nhỏ khoác áo len cam ấm áp, miệng chữ x lặng lẽ nhưng lắng nghe vạn tâm tình. Thường xuyên ghé ăn gà giòn và gửi tặng những mẩu giấy nhớ kết nối số phận 12 cư dân Hẻm 1102."
+            "Vị khách nhỏ trong bộ mascot gà bông quàng khăn len cam ấm áp, thầm lặng lắng nghe vạn tâm tình. Thường xuyên ghé ăn gà giòn và gửi tặng những mẩu giấy nhớ kết nối số phận 12 cư dân Hẻm 1102."
           </div>
           <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
             <button id="btn-menu-bunny-album" class="btn-sm" style="background: #ff9800; color: #fff; font-size: 0.72rem; padding: 4px 10px; font-weight: 800; border: none; box-shadow: 0 2px 4px rgba(230, 81, 0, 0.3);">
-              📜 Mở Sổ Ký Ức (${(state.unlockedBunnyLetters || []).length}/6 Thư)
+              📜 Mở Sổ Ký Ức (${(state.unlockedBunnyLetters || []).length}/${BUNNY_LETTERS.length} Thư)
             </button>
             <button id="btn-menu-story-novel" class="btn-sm" style="background: #fff; border: 1.5px solid #ff9800; color: #e65100; font-size: 0.72rem; padding: 4px 10px; font-weight: 800;">
               📖 Đọc Tiểu Thuyết Hẻm 1102

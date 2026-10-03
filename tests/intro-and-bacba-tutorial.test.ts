@@ -57,22 +57,19 @@ describe('Intro Cinematic Modal & Bac Ba Manual Modal UI', () => {
   });
 });
 
-describe('Bác Ba Prep Screen Tutorial (Kho, Bàn Ghế, Nâng Cấp, Nhân Viên, Đánh Giá, Mở Bán)', () => {
-  it('đầy đủ 7 bước chuẩn bị với đúng target selector và hướng dẫn', async () => {
+describe('Bác Ba Prep Screen Tutorial (Kho, Sổ Tay, Mở Bán & Các Tab Mở Dần)', () => {
+  it('đầy đủ 4 bước chuẩn bị cốt lõi Ngày 1 với đúng target selector và hướng dẫn', async () => {
     const { PREP_TUTORIAL_STEPS, PREP_TUTORIAL_TEXT, prepTutorialHint } = await import('../src/core/tutorial');
     expect(PREP_TUTORIAL_STEPS).toEqual([
       'prep-welcome',
       'prep-inventory',
-      'prep-upgrades',
-      'prep-staff',
-      'prep-reviews',
       'prep-menu',
       'prep-start'
     ]);
 
     // Kiểm tra bước 1: Chào mừng
     const welcome = prepTutorialHint('prep-welcome');
-    expect(welcome.text).toContain('Bác Ba đứng đây chỉ con từ A tới Z');
+    expect(welcome.text).toContain('Bác Ba đứng đây chỉ con');
     expect(welcome.target).toBeDefined();
 
     // Kiểm tra bước 2: Kho hàng
@@ -81,37 +78,22 @@ describe('Bác Ba Prep Screen Tutorial (Kho, Bàn Ghế, Nâng Cấp, Nhân Viê
     expect(inv.target).toContain('data-tab="inventory"');
     expect(inv.tabToSwitch).toBe('inventory');
 
-    // Kiểm tra bước 3: Nâng cấp bàn ghế
-    const upg = prepTutorialHint('prep-upgrades');
-    expect(upg.text).toContain('Bàn Ghế');
-    expect(upg.text).toContain('4 bộ bàn gỗ');
-    expect(upg.target).toContain('data-tab="upgrades"');
-    expect(upg.tabToSwitch).toBe('upgrades');
-
-    // Kiểm tra bước 4: Nhân viên
-    const staff = prepTutorialHint('prep-staff');
-    expect(staff.text).toContain('Bé Linh');
-    expect(staff.target).toContain('data-tab="staff"');
-    expect(staff.tabToSwitch).toBe('staff');
-
-    // Kiểm tra bước 5: Đánh giá review
-    const rev = prepTutorialHint('prep-reviews');
-    expect(rev.text).toContain('Đánh giá');
-    expect(rev.text).toContain('Tình Hẻm');
-    expect(rev.target).toContain('data-tab="reviews"');
-    expect(rev.tabToSwitch).toBe('reviews');
-
-    // Kiểm tra bước 6: Sổ tay
+    // Kiểm tra bước 3: Sổ tay
     const menu = prepTutorialHint('prep-menu');
     expect(menu.text).toContain('Sổ tay');
     expect(menu.target).toContain('data-tab="menu"');
     expect(menu.tabToSwitch).toBe('menu');
 
-    // Kiểm tra bước 7: Mở bán
+    // Kiểm tra bước 4: Mở bán
     const start = prepTutorialHint('prep-start');
     expect(start.text).toContain('BẮT ĐẦU MỞ BÁN');
     expect(start.target).toBe('#btn-start-selling');
     expect(start.button).toContain('MỞ CỬA BÁN LIỀN');
+
+    // Kiểm tra các bước nâng cao vẫn lưu trữ sẵn trong từ điển văn bản
+    expect(PREP_TUTORIAL_TEXT['prep-upgrades'].text).toContain('Bàn Ghế');
+    expect(PREP_TUTORIAL_TEXT['prep-staff'].text).toContain('Bé Linh');
+    expect(PREP_TUTORIAL_TEXT['prep-reviews'].text).toContain('Đánh giá');
   });
 
   it('shouldRunPrepTutorial chỉ chạy ở Ngày 1 khi chưa hoàn thành', async () => {

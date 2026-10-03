@@ -9,6 +9,7 @@ import { stationOpen, perfectTip } from '../../core/day';
 import { escapeHtml } from '../escapeHtml';
 import { renderPrepStation, prepStationKey } from './PrepStation';
 import { CHARACTERS_36 } from '../../content/characters36';
+import { renderOnboardingGuide } from './OnboardingGuide';
 
 export type { SellingSession };
 
@@ -568,13 +569,13 @@ function getBadgeClassForChar(category?: string, id?: string): string {
 
 export function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
   // 1. Nhân vật đặc biệt & Cốt truyện
-  if (order.isBunny || order.customerName.includes('Thỏ Cam')) {
+  if (order.isBunny || order.customerName.includes('Thỏ Cam') || order.customerName.includes('Gà Bông')) {
     return {
       stand: ASSETS.thocam.front,
       walk: ASSETS.thocam.side,
       angry: ASSETS.thocam.buon,
       leave: ASSETS.thocam.vui,
-      name: 'Bé Thỏ Cam 🐰',
+      name: 'Bé Gà Bông 🐥',
       badge: 'Khách Tri Kỷ',
       badgeClass: 'bunny-badge'
     };
@@ -1433,6 +1434,9 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <span id="ticker-live-text" class="ticker-text">Hẻm 1102: Mùi gà rán thơm giòn nức mũi • Khách đang tấp nập ghé tiệm • Chúc bà con ngon miệng!</span>
         </div>
       </div>
+
+      <!-- Onboarding 3-Step Spotlight Guide (Day 1) -->
+      ${renderOnboardingGuide(state)}
     </div>
   `;
 }

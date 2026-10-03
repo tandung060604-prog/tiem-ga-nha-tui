@@ -89,7 +89,7 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
                   <img src="${ASSETS.icons.book}" class="btn-pixel-icon-xs" alt="" /> Ký Sự & Kỷ Niệm
                 </div>
                 <div class="drawer-actions">
-                  <button id="btn-open-memories" class="btn-sm btn-toolbox" title="Sổ Tay Kỷ Niệm: 36 Cư Dân, Tủ Kỷ Vật, 6 Kết Cục & Thư Thỏ Cam">
+                  <button id="btn-open-memories" class="btn-sm btn-toolbox" title="Sổ Tay Kỷ Niệm: Cư Dân Hẻm, Tủ Kỷ Vật, 6 Kết Cục & 18 Mảnh Giấy Nhớ Gà Bông">
                     <img src="${ASSETS.icons.heart}" class="btn-pixel-icon-xs" alt="" /> Kỷ Niệm Hẻm
                   </button>
                   ${(day >= 2 || chapter >= 2) ? `
@@ -104,19 +104,16 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
                 </div>
               </div>
 
+              ${(day >= 2 || chapter >= 2) ? `
               <!-- Ngăn 2: Bếp Nghệ Nhân & Decor -->
               <div class="toolbox-drawer drawer-kitchen">
                 <div class="drawer-header">
                   <img src="${ASSETS.icons.sauce}" class="btn-pixel-icon-xs" alt="" /> Bếp & Không Gian
                 </div>
                 <div class="drawer-actions">
-                  ${(day >= 2 || chapter >= 2) ? `
-                    <button id="btn-secret-sauce" class="btn-sm btn-toolbox btn-sauce-card ${state.secretSauceDay?.buffActive ? 'is-active' : ''}" title="Pha nồi sốt bí truyền nhận Buff Vàng (+3k tip & +0.25★ Hương vị)">
-                      <img src="${ASSETS.icons.sauce}" class="btn-pixel-icon-xs" alt="" /> ${state.secretSauceDay?.buffActive ? '✨ Sốt Thần Thánh' : 'Nấu Sốt Bí Truyền'}
-                    </button>
-                  ` : `
-                    <span class="drawer-locked-hint">🔒 Sốt bí truyền (Ngày 2)</span>
-                  `}
+                  <button id="btn-secret-sauce" class="btn-sm btn-toolbox btn-sauce-card ${state.secretSauceDay?.buffActive ? 'is-active' : ''}" title="Pha nồi sốt bí truyền nhận Buff Vàng (+3k tip & +0.25★ Hương vị)">
+                    <img src="${ASSETS.icons.sauce}" class="btn-pixel-icon-xs" alt="" /> ${state.secretSauceDay?.buffActive ? '✨ Sốt Thần Thánh' : 'Nấu Sốt Bí Truyền'}
+                  </button>
                   ${(day >= 5 || chapter >= 2) ? `
                     <button id="btn-open-shop-themes" class="btn-sm btn-toolbox" title="Biển Hiệu Vintage & Đổi Giao Diện Quán">
                       <img src="${ASSETS.icons.upgrade}" class="btn-pixel-icon-xs" alt="" /> Biển Hiệu Vintage
@@ -126,20 +123,18 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
                   `}
                 </div>
               </div>
+              ` : ''}
 
+              ${(day >= 3 || chapter >= 2) ? `
               <!-- Ngăn 3: Chốn Bình Yên Hẻm -->
               <div class="toolbox-drawer drawer-cozy">
                 <div class="drawer-header">
                   <img src="${ASSETS.icons.radio}" class="btn-pixel-icon-xs" alt="" /> Chốn Nghỉ Hẻm
                 </div>
                 <div class="drawer-actions">
-                  ${(day >= 3 || chapter >= 2) ? `
-                    <button id="btn-open-night-radio" class="btn-sm btn-toolbox" title="Đài Phát Thanh Đêm Sài Gòn (FM 99.9 MHz)">
-                      <img src="${ASSETS.icons.radio}" class="btn-pixel-icon-xs" alt="" /> Đài Đêm FM 99.9
-                    </button>
-                  ` : `
-                    <span class="drawer-locked-hint">🔒 Đài đêm (Ngày 3)</span>
-                  `}
+                  <button id="btn-open-night-radio" class="btn-sm btn-toolbox" title="Đài Phát Thanh Đêm Sài Gòn (FM 99.9 MHz)">
+                    <img src="${ASSETS.icons.radio}" class="btn-pixel-icon-xs" alt="" /> Đài Đêm FM 99.9
+                  </button>
                   ${hasPet ? `
                     <button id="btn-open-pet-patio" class="btn-sm btn-toolbox" title="Góc Thú Cưng Hiên Quán (Cậu Vàng & Bé Mướp)">
                       <img src="${ASSETS.icons.cat}" class="btn-pixel-icon-xs" alt="" /> Thú Cưng Hiên Quán
@@ -149,20 +144,18 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
                   `}
                 </div>
               </div>
+              ` : ''}
 
+              ${(day >= 3 || chapter >= 2) ? `
               <!-- Ngăn 4: Thử Thách & Đua Top -->
               <div class="toolbox-drawer drawer-arena">
                 <div class="drawer-header">
                   <img src="${ASSETS.icons.target}" class="btn-pixel-icon-xs" alt="" /> Thử Thách & Đua Top
                 </div>
                 <div class="drawer-actions">
-                  ${(day >= 3 || chapter >= 2) ? `
-                    <button id="btn-weekly-quests" class="btn-sm btn-toolbox" title="Nhiệm vụ tuần nhận thưởng tiền mặt và danh hiệu">
-                      <img src="${ASSETS.icons.target}" class="btn-pixel-icon-xs" alt="" /> Thử Thách Tuần
-                    </button>
-                  ` : `
-                    <span class="drawer-locked-hint">🔒 Thử thách (Ngày 3)</span>
-                  `}
+                  <button id="btn-weekly-quests" class="btn-sm btn-toolbox" title="Nhiệm vụ tuần nhận thưởng tiền mặt và danh hiệu">
+                    <img src="${ASSETS.icons.target}" class="btn-pixel-icon-xs" alt="" /> Thử Thách Tuần
+                  </button>
                   ${(day >= 4 || chapter >= 2) ? `
                     <button id="btn-open-endless-mode" class="btn-sm btn-toolbox" title="Thử thách sinh tồn bếp dồn dập (Rush Hour Wave Survival)">
                       <img src="${ASSETS.icons.fireRush}" class="btn-pixel-icon-xs" alt="" /> Ca Đêm Bất Tận
@@ -172,6 +165,7 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
                   `}
                 </div>
               </div>
+              ` : ''}
             </div>
           </div>
         </div>

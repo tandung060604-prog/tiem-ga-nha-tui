@@ -1,15 +1,39 @@
 import { GameState, StoryEndingId } from '../../types/game';
 import { STORY_ENDINGS } from '../../content/endings';
+import { BUNNY_LETTERS } from '../../content/mysteryBunny';
 import { audio } from '../../core/audio';
 
-export function renderEndingModal(state: GameState, endingId?: StoryEndingId): string {
+export function renderEndingModal(stateOrEnding: any, endingOrState?: any): string {
+  let state: GameState;
+  let endingId: StoryEndingId | undefined;
+
+  if (stateOrEnding && typeof stateOrEnding === 'object' && ('unlockedBunnyLetters' in stateOrEnding || 'day' in stateOrEnding || 'phase' in stateOrEnding)) {
+    state = stateOrEnding as GameState;
+    if (typeof endingOrState === 'string') {
+      endingId = endingOrState as StoryEndingId;
+    } else if (endingOrState && typeof endingOrState === 'object' && 'id' in endingOrState) {
+      endingId = endingOrState.id;
+    }
+  } else if (endingOrState && typeof endingOrState === 'object' && ('unlockedBunnyLetters' in endingOrState || 'day' in endingOrState || 'phase' in endingOrState)) {
+    state = endingOrState as GameState;
+    if (typeof stateOrEnding === 'string') {
+      endingId = stateOrEnding as StoryEndingId;
+    } else if (stateOrEnding && typeof stateOrEnding === 'object' && 'id' in stateOrEnding) {
+      endingId = stateOrEnding.id;
+    }
+  } else {
+    state = (stateOrEnding || endingOrState || {}) as GameState;
+    endingId = typeof stateOrEnding === 'string' ? (stateOrEnding as StoryEndingId) : (typeof endingOrState === 'string' ? (endingOrState as StoryEndingId) : undefined);
+  }
+
   const currentEndingId = endingId || state.activeEnding || 'open';
   const data = STORY_ENDINGS[currentEndingId] || STORY_ENDINGS.open;
   const karma = state.karma || { community: 50, craftsmanship: 50, ambition: 50 };
 
-  const totalRev = (state.lifetimeStats.totalRevenue || 0).toLocaleString('vi-VN') + 'đ';
-  const stars = (state.ratings.overall || 4.0).toFixed(2) + '⭐';
-  const bunnyNotes = `${(state.unlockedBunnyLetters || []).length}/6`;
+  const dayVal = state.day !== undefined ? `${state.day} Ngày` : 'Vinh Quang';
+  const totalRev = (state.lifetimeStats?.totalRevenue || 0).toLocaleString('vi-VN') + 'đ';
+  const stars = (state.ratings?.overall || 4.0).toFixed(2) + '⭐';
+  const bunnyNotes = `${(state.unlockedBunnyLetters || []).length}/${BUNNY_LETTERS.length}`;
 
   return `
     <div class="ending-modal-container" style="max-height: 85vh; overflow-y: auto;">
@@ -70,7 +94,7 @@ export function renderEndingModal(state: GameState, endingId?: StoryEndingId): s
           <!-- Thống Kê Sự Nghiệp -->
           <div class="ending-stats-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px;">
             <div class="ending-stat-box" style="background: #f5f5f5; border-radius: 8px; padding: 8px 10px; text-align: center;">
-              <div class="ending-stat-val" style="font-weight: 800; font-size: 1rem; color: var(--ink);">${state.day} Ngày</div>
+              <div class="ending-stat-val" style="font-weight: 800; font-size: 1rem; color: var(--ink);">${dayVal}</div>
               <div class="ending-stat-lbl" style="font-size: 0.68rem; color: var(--soft);">Thời Gian Vận Hành</div>
             </div>
             <div class="ending-stat-box" style="background: #f5f5f5; border-radius: 8px; padding: 8px 10px; text-align: center;">
@@ -83,7 +107,7 @@ export function renderEndingModal(state: GameState, endingId?: StoryEndingId): s
             </div>
             <div class="ending-stat-box" style="background: #f5f5f5; border-radius: 8px; padding: 8px 10px; text-align: center;">
               <div class="ending-stat-val" style="font-weight: 800; font-size: 1rem; color: #6a1b9a;">${bunnyNotes} Thư</div>
-              <div class="ending-stat-lbl" style="font-size: 0.68rem; color: var(--soft);">Kỷ Niệm Thỏ Cam</div>
+              <div class="ending-stat-lbl" style="font-size: 0.68rem; color: var(--soft);">Kỷ Niệm Gà Bông</div>
             </div>
           </div>
 

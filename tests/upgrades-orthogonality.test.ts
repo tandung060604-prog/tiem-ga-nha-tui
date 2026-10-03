@@ -5,6 +5,7 @@ import { createInitialState } from '../src/core/state';
 
 describe('Đảm bảo nội tại các nhánh nâng cấp không bị trùng lặp (Strict Passive Orthogonality)', () => {
   const ALLOWED_BRANCH_BONUSES: Record<string, string[]> = {
+    cart: ['speed', 'taste', 'hygiene'],
     kitchen: ['speed', 'taste'],
     space: ['space', 'capacity'],
     operations: ['speed'],

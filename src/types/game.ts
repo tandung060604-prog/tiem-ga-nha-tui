@@ -101,7 +101,7 @@ export interface UpgradeTier {
 }
 
 export interface UpgradeBranch {
-  id: 'kitchen' | 'space' | 'operations' | 'marketing' | 'storage' | 'service' | 'hygiene';
+  id: 'cart' | 'kitchen' | 'space' | 'operations' | 'marketing' | 'storage' | 'service' | 'hygiene';
   name: string;
   icon: string;
   currentLevel: number;
@@ -465,6 +465,50 @@ export interface CharacterProfile {
   incidentIds: string[];
 }
 
+export interface StoryletRequirement {
+  minDay?: number;
+  maxDay?: number;
+  minKarma?: Partial<KarmaState>;
+  minMoney?: number;
+  minPerfectFries?: number;
+  requiredCharacterMet?: string;
+  cleanOilStreak?: number;
+  chapter?: number;
+  minChapter?: number;
+  requiredFlags?: string[];
+  characterAffinity?: { characterId: string; minLevel: number };
+}
+
+export interface StoryletEffect {
+  karmaDelta?: Partial<KarmaState>;
+  moneyDelta?: number;
+  reputationDelta?: number;
+  reactionNarrative: string;
+  bonusItem?: { id: string; amount: number };
+}
+
+export interface StoryletChoice {
+  id: string;
+  label: string;
+  kicker?: string;
+  subDesc?: string;
+  effect: StoryletEffect;
+}
+
+export interface Storylet {
+  id: string;
+  title: string;
+  characterId: CharacterId | string;
+  characterName: string;
+  characterAvatar: string;
+  characterRole?: string;
+  setting: string;
+  narrativeLines: string[];
+  choices: StoryletChoice[];
+  requirements: StoryletRequirement;
+  oneShot?: boolean;
+}
+
 export interface GameState {
   version: number;
   day: number;
@@ -572,6 +616,11 @@ export interface GameState {
   dineInTables?: DineInTable[];
   freeOilFilterUsed?: boolean;       // Bác Ba trợ giá miễn phí 1 lần thay dầu đầu tiên ở Ngày 1-3 khi dầu bẩn
   testerFeedbackSubmissions?: Array<{ id: string; stars: number; category: string; comment: string; timestamp: string }>;
+  seenStoryletIds?: string[];        // Ký ức đêm Hẻm 1102 (Storylet) đã đọc/trải nghiệm
+  onboardingGuideStep?: number;      // Bác Ba spotlight 3 bước ngày đầu: 1: Thả gà, 2: Vớt khay, 3: Lên món, 0/undefined: Xong
+  onboardingGuideDismissed?: boolean; // Người chơi chủ động bấm Bỏ qua hướng dẫn
+  day3FeedbackPrompted?: boolean;    // Đã hiện lời mời tester chấm sao & góp ý sau Ngày 2/3 chưa
+  storyFlags?: string[];             // Danh sách các cờ sự kiện cốt truyện đã kích hoạt
 }
 
 export interface BargainWholesaler {
