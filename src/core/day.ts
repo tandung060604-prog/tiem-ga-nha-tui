@@ -35,21 +35,9 @@ export function perfectTip(streak: number): number {
 export const BUNNY_VISIT_TIP = 35000;
 export const CONDIMENT_TIP = 2000;
 
-// Quầy tương: xịt lên món trong khay. Ưu tiên món khách đầu hàng dặn đúng loại tương này; không ai dặn thì
-// xịt lên món chiên đầu tiên chưa có tương (không có tip). Trả về món vừa xịt, hoặc null nếu không có món.
-export function squeezeCondiment(tray: TrayItem[], orders: readonly CustomerOrder[], sauce: Condiment): { item: TrayItem; requested: boolean } | null {
-  const fried = (t: TrayItem) => !!FRY_RECIPES[t.menuItemId] && !t.condiment && t.quality !== 'raw';
-  for (const order of orders.slice(0, 2)) {
-    for (const line of order.items) {
-      if (line.condiment !== sauce || (line.condimentServed ?? 0) >= line.count) continue;
-      const item = tray.find(t => fried(t) && t.menuItemId === line.menuItemId);
-      if (item) { item.condiment = sauce; return { item, requested: true }; }
-    }
-  }
-  const item = tray.find(fried);
-  if (!item) return null;
-  item.condiment = sauce;
-  return { item, requested: false };
+// Quầy tương: Đã gỡ bỏ khỏi cơ chế game theo yêu cầu v3.0.0
+export function squeezeCondiment(_tray: TrayItem[], _orders: readonly CustomerOrder[], _sauce: Condiment): { item: TrayItem; requested: boolean } | null {
+  return null;
 }
 
 export function eventForDay(day: number): GameEvent {
@@ -529,21 +517,17 @@ export function serveFirstOrder(
     }
     OrdersEngine.matchItemToOrder(order, item.menuItemId);
     (session.soldCounts ??= {})[item.menuItemId] = (session.soldCounts[item.menuItemId] ?? 0) + 1;
+    if (item.condiment) {
+      session.squirts = (session.squirts ?? 0) + 1;
+    }
     if (item.quality === 'burnt') {
       const penaltyRate = order.personality === 'foodie' ? 1.0 : 0.5;
       order.burntPenalty = (order.burntPenalty ?? 0) + Math.round(prices(item.menuItemId) * penaltyRate);
     }
-    if (item.quality === 'perfect') order.perfectBonus = (order.perfectBonus ?? 0) + perfectTip(session.perfectStreak);
-    // Tip tương: chỉ khi khách DẶN đúng loại đó cho món này (cộng thêm bonus từ Quầy Sốt Dịch Vụ)
-    const wantsSauce = item.condiment && order.items.find(it => it.menuItemId === item.menuItemId && it.condiment === item.condiment && (it.condimentServed ?? 0) < it.count);
-    if (wantsSauce) {
-      wantsSauce.condimentServed = (wantsSauce.condimentServed ?? 0) + 1;
-      if (order.personality !== 'frugal') {
-        const sauceBonus = upgrades ? (upgradeEffects(upgrades).sauceTipBonus || 0) : 0;
-        order.perfectBonus = (order.perfectBonus ?? 0) + CONDIMENT_TIP + sauceBonus;
-      }
+    if (item.quality === 'perfect') {
+      const serviceBonus = upgrades ? (upgradeEffects(upgrades).sauceTipBonus || 0) : 0;
+      order.perfectBonus = (order.perfectBonus ?? 0) + perfectTip(session.perfectStreak) + serviceBonus;
     }
-    if (item.condiment) session.squirts = (session.squirts ?? 0) + 1;
     removeAt(i);
     matched = true;
   }

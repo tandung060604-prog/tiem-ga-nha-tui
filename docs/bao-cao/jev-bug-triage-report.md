@@ -821,3 +821,13 @@
   - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 46.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `200` ngày chơi
 ---
+
+### 🐞 [10:51:50 3/10/2026] (via Jev MCP) Quá nhiều khách xử lý không kịp bị ẩn hết các món ăn khách order (Customer Order Item Overflow & Truncation)
+- **Triệu chứng:** Customers waiting in queue have their order items clipped or completely hidden when there are multiple items or multiple customers, so the player cannot see what food to prepare or serve.
+- **Vị trí:** `src/ui/components/SellingView.ts and src/styles/customers.css` 
+- **Đánh giá Jev (416ms):**
+  - **Mức độ (Severity):** `p2_ui_friction` (Độ tin cậy: 91.0%)
+  - **Nguyên nhân gốc (Root Cause):** `ui_modal_stack` (Độ tin cậy: 85.0%)
+  - **Chiến lược Fix:** `contract_first_type_fix` (Độ tin cậy: 21.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---

@@ -1008,7 +1008,7 @@
   margin-bottom: 0 !important;
 }
 
-/* Khay Inox GN (Gastronorm Pan) */
+/* Khay Pan Đựng Món & Nguyên Liệu (Bỏ khung bạc thô kệch, tôn vinh hình dáng pan nghệ thuật) */
 .gn-pan {
   position: relative !important;
   display: flex !important;
@@ -1019,17 +1019,17 @@
   min-width: 48px !important;
   min-height: 44px !important;
   height: 44px !important;
-  padding: 1px 1px !important;
-  border-radius: 4px;
-  border: 1.5px solid #a8b0b8;
-  background: linear-gradient(145deg, #ffffff 0%, #edf0f2 60%, #e2e6ea 100%);
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9), inset 0 -1px 2px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 1px !important;
+  border: none !important;
+  border-radius: 6px !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: none !important;
   cursor: pointer;
   box-sizing: border-box;
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
-  transition: transform 0.12s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.12s ease, filter 0.15s ease;
   overflow: visible !important;
   line-height: 1 !important;
   font-size: 0.58rem !important;
@@ -1039,19 +1039,25 @@
 .gn-pan[data-pan="1-3"] {
   min-height: 46px !important;
   height: 46px !important;
-  border-color: #9aa2aa;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.14), inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* Khay nông GN 1/6 (hàng trên - sốt & đồ kèm) */
 .gn-pan[data-pan="1-6"] {
   min-height: 44px !important;
   height: 44px !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.gn-pan:hover:not(:disabled) .gn-pan-img {
+  filter: drop-shadow(0 2px 6px rgba(245, 158, 11, 0.45));
 }
 
 .gn-pan:active:not(:disabled) {
-  transform: translateY(2px) scale(0.93) !important;
-  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.28) !important;
+  transform: translateY(1px) scale(0.92) !important;
+  box-shadow: none !important;
   filter: brightness(0.96);
   transition: transform 60ms cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -3417,77 +3423,188 @@
   }
 }
 
-/* STAFF VISUAL ON KITCHEN (P0 JEV MCP DECISION - 99% CONFIDENCE) */
-.kitchen-staff-actor {
+/* UNIFIED STAFF ROSTER CARDS ON PREP SHELF (REPLACES 3 OLD LAYERS) */
+.staff-roster-shelf {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(35, 20, 12, 0.95);
-  border: 1.5px solid #d4a373;
-  border-radius: 10px;
-  padding: 4px 8px;
-  margin: 4px 0 6px 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  animation: popIn 0.3s ease-out;
+  overflow-x: auto;
+  max-width: 100%;
+  padding: 4px 6px 2px;
+  scrollbar-width: none;
 }
 
-.kitchen-staff-actor.is-busy {
-  border-color: #fb923c;
-  background: rgba(60, 25, 12, 0.98);
+.staff-roster-shelf::-webkit-scrollbar {
+  display: none;
 }
 
-.kitchen-staff-actor-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 1.5px solid #fef08a;
-  overflow: hidden;
+.staff-roster-empty-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #78350f;
+  background: #fef3c7;
+  border: 1px dashed #d97706;
+  border-radius: 999px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.staff-round-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 36px;
   flex-shrink: 0;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.15s ease;
+  margin-top: 10px;
 }
 
-.kitchen-staff-actor-avatar img {
+.staff-round-card:hover,
+.staff-round-card:active {
+  transform: scale(1.08);
+}
+
+.staff-head-status {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.staff-head-status .head-badge {
+  font-size: 0.52rem;
+  font-weight: 900;
+  padding: 1px 4px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 1.5px;
+  line-height: 1.2;
+}
+
+.staff-head-status .head-badge.busy {
+  background: #ea580c;
+  color: #ffffff;
+  border: 1px solid #c2410c;
+  animation: pulseHeadBadge 0.9s infinite alternate;
+}
+
+.staff-head-status .head-badge.idle {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+.staff-head-status .head-badge.slacking {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+  animation: slackBob 1.5s infinite alternate ease-in-out;
+}
+
+.staff-head-status .head-badge.waiter {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #7dd3fc;
+}
+
+.staff-head-status .head-badge.cashier {
+  background: #fef9c3;
+  color: #854d0e;
+  border: 1px solid #facc15;
+}
+
+.staff-head-status .head-badge.delivery {
+  background: #ede9fe;
+  color: #6d28d9;
+  border: 1px solid #ddd6fe;
+}
+
+.staff-head-status .head-badge.manager {
+  background: #fae8ff;
+  color: #86198f;
+  border: 1px solid #f5d0fe;
+}
+
+.staff-head-status .head-badge.security {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+@keyframes pulseHeadBadge {
+  0% { transform: scale(0.96); }
+  100% { transform: scale(1.05); }
+}
+
+@keyframes slackBob {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-2px); }
+}
+
+.staff-circle-avatar {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #8b5a2b;
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.staff-circle-avatar img {
   width: 100%;
   height: 100%;
+  border-radius: 50%;
   object-fit: cover;
 }
 
-.kitchen-staff-actor-info {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  flex: 1;
+.staff-circle-avatar.robot-avatar {
+  background: #f1f5f9;
+  font-size: 1.1rem;
 }
 
-.kitchen-staff-actor-name {
-  font-weight: 800;
-  font-size: 0.7rem;
-  color: #fef08a;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+.staff-round-card.is-busy .staff-circle-avatar {
+  border-color: #ea580c;
+  box-shadow: 0 0 8px rgba(234, 88, 12, 0.5);
 }
 
-.kitchen-staff-actor-status {
-  font-size: 0.64rem;
-  color: #cbd5e1;
+.staff-round-card.is-slacking .staff-circle-avatar {
+  border-color: #ef4444;
+  opacity: 0.85;
+}
+
+.staff-role-mini-badge {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  font-size: 0.6rem;
+  background: #ffffff;
+  border-radius: 50%;
+  border: 1px solid #d97706;
+  width: 14px;
+  height: 14px;
   display: flex;
   align-items: center;
-  gap: 3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  line-height: 1;
 }
 
-.kitchen-staff-actor-status.busy {
-  color: #fb923c;
-  font-weight: 800;
-}
-
-.kitchen-staff-actor-status.idle {
-  color: #86efac;
-}
+/* Legacy staff styles */
+.kitchen-staff-actor { display: none; }
+.staff-corner-card { display: none; }
 
 

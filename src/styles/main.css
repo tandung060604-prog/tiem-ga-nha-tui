@@ -239,11 +239,22 @@ body.selling-mode .app {
 }
 
 .h-r {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
   text-align: right;
   font-weight: 700;
   line-height: 1.15;
   min-width: 0;
   flex-shrink: 0;
+}
+
+.h-stars-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .h-r .stars {

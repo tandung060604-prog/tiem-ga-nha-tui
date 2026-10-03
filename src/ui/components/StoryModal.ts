@@ -4,6 +4,7 @@ import { audio } from '../../core/audio';
 import { chapterProgress } from '../../core/progression';
 import { canNarrate } from '../../core/music';
 import { ASSETS } from '../../content/assets';
+import { bacBaVoice } from '../../core/bacBaVoice';
 
 export function getCharacterPortrait(name: string): string {
   if (name.includes('Bác Ba')) return ASSETS.bacba.front;
@@ -188,6 +189,10 @@ export function bindStoryEvents(
     btn.addEventListener('click', (e) => {
       const idx = parseInt((e.currentTarget as HTMLElement).getAttribute('data-act-idx') || '0', 10);
       audio.playWoodClick();
+      const act = STORY_ACTS[idx];
+      if (act && (act.title.includes('Bác Ba') || act.characters.some(c => c.includes('Bác Ba')))) {
+        bacBaVoice.speak('story');
+      }
       onOpenStoryWithIndex(idx);
     });
   });

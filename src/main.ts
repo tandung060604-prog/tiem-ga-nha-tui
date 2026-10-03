@@ -58,6 +58,7 @@ import { renderStoryModal, bindStoryEvents, revealedStory } from './ui/component
 import { renderBunnyLetterModal, renderBunnyAlbumModal, bindBunnyModalEvents } from './ui/components/BunnyModal';
 import { renderEndingModal, bindEndingEvents } from './ui/components/EndingModal';
 import { evaluateEnding } from './content/endings';
+import { bacBaVoice, BacBaVoiceContext } from './core/bacBaVoice';
 import { BUNNY_LETTERS, BunnyLetter, MysteryBunnyEngine } from './content/mysteryBunny';
 import { ShareCardEngine } from './ui/components/ShareCard';
 import { ASSETS } from './content/assets';
@@ -151,7 +152,7 @@ export function updateThemeColor(color: string) {
 
 const SELLING_ACTIONS = [
   'toggle-fast', 'fry-chicken', 'fry-fries', 'fry-popcorn', 'fry-thigh', 'fry-cheese',
-  'add-drink', 'pour-coca', 'pour-7up', 'pour-fanta', 'squeeze-ketchup', 'squeeze-chili',
+  'add-drink', 'pour-coca', 'pour-7up', 'pour-fanta',
   'fry-pot', 'change-oil', 'season-spicy', 'season-honey', 'serve-order'
 ] as const;
 type SellingAction = typeof SELLING_ACTIONS[number];
@@ -381,6 +382,7 @@ class AppController {
     const screenEl = document.getElementById('title-screen');
     const onFirstUserTap = () => {
       music.unlock();
+      void bacBaVoice.preload();
       if (music.isEnabled() && !this.titleDismissed) {
         music.start('title');
       }
@@ -623,6 +625,7 @@ class AppController {
     `;
 
     audio.playPop();
+    bacBaVoice.speak(tip.trigger as BacBaVoiceContext, tip.text);
     banner.classList.add('show');
 
     const closeBtn = banner.querySelector('.bacba-tip-banner-close');
@@ -1480,7 +1483,15 @@ class AppController {
         () => this.openUpdateDashboardModal(),
         () => openBacBaManualModal(),
         () => this.openLeaderboard(),
-        () => this.openSocialShareModal()
+        () => this.openSocialShareModal(),
+        () => {
+          if (state.phase === 'selling') {
+            this.openKitchenGuideModal();
+          } else {
+            this.activeTab = 'menu';
+            this.render();
+          }
+        }
       );
     }
 
@@ -1571,7 +1582,7 @@ class AppController {
         ` : ''}
         <button class="tab-btn ${this.activeTab === 'menu' ? 'active' : ''}" data-tab="menu">
           <img src="${ASSETS.icons.book}" class="tab-pixel-icon" alt="" />
-          <span>Sổ tay</span>
+          <span>Thực đơn</span>
         </button>
       </div>
     `;
@@ -2712,23 +2723,6 @@ class AppController {
         audio.playPourFizz();
         Haptics.pourDrink();
         this.showToast('🍊 Đang rót đầy ly Fanta Cam bùng nổ sảng khoái!');
-        break;
-      }
-
-      case 'squeeze-ketchup':
-      case 'squeeze-chili': {
-        const sauce = action === 'squeeze-ketchup' ? 'ketchup' : 'chili';
-        const sauceName = sauce === 'ketchup' ? 'Tương Cà' : 'Tương Ớt';
-        // Luật ở core/day.ts: ưu tiên món khách dặn đúng loại tương; chỉ món được dặn mới có tip
-        const squeezed = squeezeCondiment(cookingEngine.getTray(), session.orders, sauce);
-        if (!squeezed) {
-          this.showToast(`Chưa có món chiên nào trong khay để xịt ${sauceName}!`);
-          return;
-        }
-        audio.playPop();
-        this.showToast(squeezed.requested
-          ? `${sauce === 'ketchup' ? '🍅' : '🌶️'} Xịt ${sauceName} lên ${squeezed.item.name} đúng ý khách! (+tip)`
-          : `${sauce === 'ketchup' ? '🍅' : '🌶️'} Đã xịt ${sauceName} lên ${squeezed.item.name} (khách không dặn, không có tip)`);
         break;
       }
 

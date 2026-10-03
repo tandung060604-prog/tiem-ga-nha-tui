@@ -208,7 +208,8 @@ export const ASSETS = {
     stickerLantern: url('assets/ui/sticker_lantern.png'),
     stickerDaisy: url('assets/ui/sticker_daisy.png'),
     landingVnBg: url('assets/ui/landing_vn_bg_clean.jpg'),
-    bannerStardewChicken: url('assets/ui/banner_stardew_chicken.png')
+    bannerStardewChicken: url('assets/ui/banner_stardew_chicken.png'),
+    patioBistroBg: url('assets/ui/patio_bistro_bg.jpg')
   },
   intro: {
     poster: url('assets/intro/veo_intro_cinematic.jpg'),

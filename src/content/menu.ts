@@ -4,7 +4,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   // CHƯƠNG 1
   {
     id: 'crispy_chicken',
-    name: 'Gà Rán Giòn Truyền Thống',
+    name: 'Gà Giòn',
     basePrice: 35000,
     currentPrice: 35000,
     chapter: 1,
@@ -17,7 +17,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   },
   {
     id: 'shake_fries',
-    name: 'Khoai Lắc Phô Mai',
+    name: 'Khoai Lắc',
     basePrice: 25000,
     currentPrice: 25000,
     chapter: 1,
@@ -30,7 +30,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   },
   {
     id: 'soda',
-    name: 'Nước Ngọt Coca',
+    name: 'Coca Đá',
     basePrice: 15000,
     currentPrice: 15000,
     chapter: 1,
@@ -43,7 +43,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   },
   {
     id: 'seven_up',
-    name: 'Nước Ngọt 7Up Chanh',
+    name: '7Up Chanh',
     basePrice: 15000,
     currentPrice: 15000,
     chapter: 1,
@@ -56,7 +56,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   },
   {
     id: 'fanta_orange',
-    name: 'Nước Ngọt Fanta Cam',
+    name: 'Fanta Cam',
     basePrice: 15000,
     currentPrice: 15000,
     chapter: 1,
@@ -71,7 +71,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
 
   {
     id: 'danmuji',
-    name: 'Củ Cải Vàng Muối Chua Ngọt',
+    name: 'Củ Cải Muối',
     basePrice: 10000,
     currentPrice: 10000,
     chapter: 1,
@@ -84,7 +84,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   },
   {
     id: 'spicy_thigh',
-    name: 'Má Đùi Gà Rán Giòn Cay',
+    name: 'Má Đùi Cay',
     basePrice: 39000,
     currentPrice: 39000,
     chapter: 1,
@@ -98,7 +98,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   },
   {
     id: 'cheese_stick',
-    name: 'Phô Mai Que Kéo Sợi',
+    name: 'Phô Mai Que',
     basePrice: 20000,
     currentPrice: 20000,
     chapter: 1,
@@ -114,7 +114,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   // CHƯƠNG 2
   {
     id: 'spicy_chicken',
-    name: 'Cánh Gà Sốt Cay Yangnyeom',
+    name: 'Cánh Cay',
     basePrice: 42000,
     currentPrice: 42000,
     chapter: 1,
@@ -128,7 +128,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   },
   {
     id: 'honey_garlic_chicken',
-    name: 'Gà Sốt Bơ Tỏi Đậu Nành',
+    name: 'Gà Bơ Tỏi',
     basePrice: 45000,
     currentPrice: 45000,
     chapter: 1,
@@ -142,7 +142,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   },
   {
     id: 'pasta_beef',
-    name: 'Mì Ý Sốt Bò Ngọt',
+    name: 'Mì Ý Bò',
     basePrice: 39000,
     currentPrice: 39000,
     chapter: 2,
@@ -155,7 +155,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   },
   {
     id: 'combo_duo',
-    name: 'Combo Cặp Đôi Hẹn Hò',
+    name: 'Combo Đôi',
     basePrice: 95000,
     currentPrice: 95000,
     chapter: 2,
@@ -169,7 +169,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
 
   {
     id: 'coleslaw',
-    name: 'Bắp Cải Trộn Sốt Mè Rang',
+    name: 'Bắp Cải Trộn',
     basePrice: 12000,
     currentPrice: 12000,
     chapter: 2,
@@ -184,7 +184,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   // CHƯƠNG 3
   {
     id: 'biscuit_honey',
-    name: 'Bánh Quy Bơ Mật',
+    name: 'Bánh Bơ Mật',
     basePrice: 18000,
     currentPrice: 18000,
     chapter: 3,
@@ -197,7 +197,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   },
   {
     id: 'chicken_burger',
-    name: 'Burger Gà Giòn',
+    name: 'Burger Gà',
     basePrice: 59000,
     currentPrice: 59000,
     chapter: 3,
@@ -210,7 +210,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   },
   {
     id: 'popcorn_chicken',
-    name: 'Gà Viên Popcorn',
+    name: 'Gà Popcorn',
     basePrice: 32000,
     currentPrice: 32000,
     chapter: 1,
@@ -224,7 +224,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   },
   {
     id: 'peach_tea',
-    name: 'Trà Đào Hạt Chia',
+    name: 'Trà Đào',
     basePrice: 22000,
     currentPrice: 22000,
     chapter: 3,
@@ -239,7 +239,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   // CHƯƠNG 4
   {
     id: 'chicken_rice',
-    name: 'Cơm Gà Sốt Đặc Biệt',
+    name: 'Cơm Gà',
     basePrice: 49000,
     currentPrice: 49000,
     chapter: 4,
@@ -252,7 +252,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   },
   {
     id: 'korean_tokbokki_chicken',
-    name: 'Gà Trộn Tokbokki Phô Mai',
+    name: 'Gà Tokbokki',
     basePrice: 69000,
     currentPrice: 69000,
     chapter: 4,
@@ -265,7 +265,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   },
   {
     id: 'sundae_icecream',
-    name: 'Kem Sundae Sôcôla',
+    name: 'Kem Sundae',
     basePrice: 18000,
     currentPrice: 18000,
     chapter: 4,
@@ -280,7 +280,7 @@ export const INITIAL_MENU: (MenuItem & { id: BaseMenuItemId })[] = [
   // COMBO ĐẶC BIỆT CHƯƠNG 3+
   {
     id: 'family_bucket',
-    name: 'Bucket Đại Tiệc Gia Đình',
+    name: 'Bucket Gia Đình',
     basePrice: 189000,
     currentPrice: 189000,
     chapter: 3,

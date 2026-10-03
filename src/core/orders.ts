@@ -1,4 +1,4 @@
-import { staffEffects, FRY_RECIPES } from './staff';
+import { staffEffects } from './staff';
 import { karmaEffects } from './karmaEffects';
 import { demandWeight, patienceFactorFromPrice, priceRatio } from './pricing';
 
@@ -112,14 +112,7 @@ export class OrdersEngine {
       if (random() < (dayOne ? DAY_ONE_CHANCE.drink : basketChance(BASKET_RULE.drinkChance, state.currentChapter))) pickFrom(drinks);
       if (random() < BASKET_RULE.dessertChance) pickFrom(byRole('dessert'));
     }
-    // Khách dặn thêm tương cho món chiên (từ ngày 2: ngày đầu Bác Ba đang dạy thao tác cơ bản)
-    if (state.day > 1) {
-      for (const it of selectedItems) {
-        if (FRY_RECIPES[it.menuItemId] && random() < CONDIMENT_REQUEST_CHANCE) {
-          it.condiment = it.menuItemId === 'shake_fries' || random() < 0.5 ? 'ketchup' : 'chili';
-        }
-      }
-    }
+    // Cơ chế tương ớt & tương cà đã được gỡ bỏ hoàn toàn khỏi game
     const extraItems = selectedItems.reduce((n, it) => n + it.count, 0) - 1;
 
     // VIP Critic xuất hiện khi không phải đơn app / không phải mua nước gấp, từ Ngày 2 trở đi với tỷ lệ 15%

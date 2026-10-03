@@ -82,8 +82,8 @@
   gap: 8px;
   overflow-x: auto;
   padding: 4px 6px;
-  min-height: 114px;
-  max-height: 126px;
+  min-height: 140px;
+  max-height: 168px;
   background: transparent;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
@@ -114,9 +114,9 @@
 }
 
 .customer-card {
-  flex: 0 0 176px;
-  min-height: 112px;
-  max-height: 124px;
+  flex: 0 0 184px;
+  min-height: 138px;
+  max-height: 165px;
   box-sizing: border-box;
   background: var(--panel);
   border: 1.5px solid var(--line);
@@ -665,21 +665,33 @@
 .speech-bubble {
   background: #f7ede0;
   border-radius: 6px;
-  padding: 3px 5px;
+  padding: 4px 6px;
   font-size: 0.66rem;
   display: flex;
   flex-direction: column;
   position: relative;
   gap: 2px;
   flex: 1 0 auto;
-  min-height: 32px;
-  max-height: 62px;
+  min-height: 48px;
+  max-height: 98px;
   overflow-y: auto;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: #d97706 #fef3c7;
 }
 
 .speech-bubble::-webkit-scrollbar {
-  display: none;
+  width: 4px;
+  display: block;
+}
+
+.speech-bubble::-webkit-scrollbar-track {
+  background: #fef3c7;
+  border-radius: 4px;
+}
+
+.speech-bubble::-webkit-scrollbar-thumb {
+  background: #d97706;
+  border-radius: 4px;
 }
 
 .order-combo {
@@ -1319,61 +1331,90 @@
   50% { transform: scale(1.05); }
 }
 
-/* --- GÓC BÀN ĂN HIÊN QUÁN (DINE-IN PATIO TABLES) --- */
-.dine-in-patio-container {
-  margin: 2px 6px 4px;
-  padding: 4px 6px;
-  background: rgba(254, 243, 199, 0.65);
-  border: 1px solid rgba(217, 119, 6, 0.3);
-  border-radius: 8px;
+/* --- GÓC BÀN ĂN HIÊN QUÁN (DINE-IN PATIO TABLES) - STREET BISTRO TERRACE --- */
+.dine-in-patio-container,
+.dine-in-patio-terrace {
+  margin: 3px 6px 5px;
+  padding: 6px 8px;
+  background: linear-gradient(rgba(35, 18, 10, 0.45), rgba(35, 18, 10, 0.65)), url('/assets/ui/patio_bistro_bg.jpg') center/cover no-repeat, #78350f;
+  border: 1.5px solid #b45309;
+  border-radius: 12px;
   box-sizing: border-box;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35), 0 3px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
 }
 
-.patio-header {
+.patio-header,
+.patio-terrace-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 3px;
+  margin-bottom: 5px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid rgba(254, 240, 138, 0.25);
 }
 
-.patio-title {
-  font-size: 0.62rem;
-  font-weight: 800;
-  color: #78350f;
+.patio-title,
+.patio-terrace-title {
+  font-size: 0.64rem;
+  font-weight: 900;
+  color: #fef08a;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.4px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.patio-lantern-icon {
+  font-size: 0.75rem;
+  animation: lanternSway 3s ease-in-out infinite alternate;
 }
 
 .patio-tables-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
+  gap: 6px;
 }
 
-.patio-table {
-  background: #fff;
-  border: 1.5px solid #d6d3d1;
-  border-radius: 6px;
-  padding: 4px 2px;
-  min-height: 52px;
+.patio-table,
+.patio-bistro-table {
+  background: rgba(255, 253, 248, 0.92);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  border: 1.5px solid #d97706;
+  border-radius: 14px;
+  padding: 5px 3px;
+  min-height: 56px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-  transition: transform 0.15s ease, border-color 0.15s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s ease;
   user-select: none;
   box-sizing: border-box;
   text-align: center;
 }
 
-.patio-table.empty {
+.patio-table.empty,
+.patio-bistro-table.empty {
   border-style: dashed;
-  border-color: #cbd5e1;
-  background: #f8fafc;
+  border-color: rgba(254, 215, 170, 0.75);
+  background: rgba(254, 243, 199, 0.55);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.patio-table-name {
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: #78350f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .patio-table-inner {

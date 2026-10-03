@@ -112,7 +112,7 @@ describe('máy nước, gà viên, combo', () => {
     const s = fullyStocked(3);
     const combos = Array.from({ length: 400 }, () => OrdersEngine.generateOrder(s)).filter(o => o.comboName);
     expect(combos.length).toBeGreaterThan(0);
-    const duo = combos.find(o => o.comboName === 'Combo Cặp Đôi Hẹn Hò');
+    const duo = combos.find(o => o.comboName === 'Combo Đôi' || o.comboName === 'Combo Cặp Đôi Hẹn Hò');
     expect(duo?.items).toEqual(expect.arrayContaining([
       expect.objectContaining({ menuItemId: 'crispy_chicken', count: 2 }),
       expect.objectContaining({ menuItemId: 'soda', count: 2 })
@@ -124,6 +124,6 @@ describe('máy nước, gà viên, combo', () => {
     seedRandom(12);
     const s = fullyStocked(2);
     const names = new Set(Array.from({ length: 400 }, () => OrdersEngine.generateOrder(s).comboName));
-    expect(names.has('Bucket Đại Tiệc Gia Đình')).toBe(false);
+    expect(names.has('Bucket Gia Đình') || names.has('Bucket Đại Tiệc Gia Đình')).toBe(false);
   });
 });

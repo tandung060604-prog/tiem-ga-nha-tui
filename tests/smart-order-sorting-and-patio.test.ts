@@ -161,17 +161,12 @@ describe('Smart Order Sorting & Patio Visual Juice Features', () => {
 
     const html = renderSellingView(state, mockSession);
 
-    // 1. Staff Corner Card trên thanh HUD
-    expect(html).toContain('staff-corner-card');
+    // 1. Unified Staff Roster Card trên kệ sơ chế thay thế 3 layer cũ
+    expect(html).toContain('staff-roster-shelf');
+    expect(html).toContain('staff-round-card');
+    expect(html).toContain('staff-head-status');
+    expect(html).toContain('helper-progress');
     expect(html).toContain('Bé Linh Phụ Bếp');
-    expect(html).toContain('staff-corner-avatars-stack');
-
-    // 2. Kitchen Staff Actor bên quầy bếp chiên
-    expect(html).toContain('kitchen-staff-actor');
-    expect(html).toContain('kitchen-staff-actor-avatar');
-    expect(html).toContain('kitchen-staff-actor-name');
-    expect(html).toContain('Bé Linh Phụ Bếp · Phụ bếp');
-    expect(html).toContain('Phụ chiên:');
   });
 });
 

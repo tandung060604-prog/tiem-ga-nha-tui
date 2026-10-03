@@ -601,12 +601,11 @@ class OvernightMonkey {
         return true;
       }
 
-      // 6. Xịt tương cà / tương ớt lên món trong khay
-      if (Math.random() < 0.3) {
-        const sauceBtn = page.locator('#btn-squeeze-ketchup, #btn-squeeze-chili');
-        if (await sauceBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
-          await sauceBtn.first().click({ force: true }).catch(() => {});
-          return true;
+      // 6. Tương cà/ớt đã được loại bỏ theo v3.0.0; kiểm tra khay ra món hoặc nhân sự
+      if (Math.random() < 0.2) {
+        const staffEl = page.locator('.staff-round-card');
+        if (await staffEl.first().isVisible({ timeout: 30 }).catch(() => false)) {
+          await staffEl.first().click({ force: true }).catch(() => {});
         }
       }
 

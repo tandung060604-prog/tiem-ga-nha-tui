@@ -62,49 +62,27 @@ const order = (lines: CustomerOrder['items']): CustomerOrder => ({
   patienceMax: 40, patienceCurrent: 10, totalPrice: 50000, startTime: 0
 });
 
-describe('quầy tương: chỉ tip khi khách dặn đúng loại', () => {
-  it('xịt bừa lên món khách không dặn → không có tip (trước: +2.000đ mọi món có tương)', () => {
+describe('quầy tương: đã bỏ hẳn phần tương ớt và tương cà khỏi cơ chế game', () => {
+  it('không còn xịt tương và không tính tip tương', () => {
     const session = createSellingSession();
     session.orders = [order([{ menuItemId: 'crispy_chicken', count: 1, served: 0, completed: false }])];
-    const t = tray({ condiment: 'ketchup' });
+    const t = tray({ menuItemId: 'crispy_chicken' });
     const r = serveFirstOrder(session, t, () => 35000, i => t.splice(i, 1));
-    expect(r.kind === 'complete' && r.tip).toBe(0);
+    expect(r.kind).toBe('complete');
+    if (r.kind === 'complete') expect(r.tip).toBe(0);
+    expect(squeezeCondiment(t, session.orders, 'chili')).toBeNull();
   });
 
-  it('khách dặn tương ớt, xịt đúng tương ớt → +tip; xịt nhầm tương cà → không', () => {
-    const run = (sauce: 'ketchup' | 'chili') => {
-      const session = createSellingSession();
-      session.orders = [order([{ menuItemId: 'crispy_chicken', count: 1, served: 0, completed: false, condiment: 'chili' }])];
-      const t = tray({ condiment: sauce });
-      const r = serveFirstOrder(session, t, () => 35000, i => t.splice(i, 1));
-      return r.kind === 'complete' ? r.tip : -1;
-    };
-    expect(run('chili')).toBe(CONDIMENT_TIP);
-    expect(run('ketchup')).toBe(0);
-  });
-
-  it('xịt ưu tiên đúng món khách dặn; không xịt lên nước, gà sống', () => {
-    const t = tray({ menuItemId: 'soda', name: 'Nước' }, { menuItemId: 'crispy_chicken', quality: 'raw' }, { menuItemId: 'shake_fries' }, { menuItemId: 'crispy_chicken' });
-    const orders = [order([{ menuItemId: 'crispy_chicken', count: 1, served: 0, completed: false, condiment: 'chili' }])];
-    expect(squeezeCondiment(t, orders, 'chili')).toMatchObject({ requested: true, item: { id: 't3' } });
-    expect(squeezeCondiment(t, orders, 'ketchup')).toMatchObject({ requested: false, item: { id: 't2' } });
-    expect(squeezeCondiment(t, orders, 'ketchup')).toBeNull(); // hết món chiên chưa có tương
-  });
-
-  it('khách chỉ dặn tương cho món chiên, và không dặn trong ngày 1 (Bác Ba đang dạy)', () => {
+  it('khách không bao giờ dặn tương trong bất kỳ ngày nào', () => {
     const s = createInitialState();
     seedRandom(3);
-    for (let i = 0; i < 50; i++) expect(OrdersEngine.generateOrder(s).items.some(it => it.condiment)).toBe(false);
-    s.day = 5;
-    let asked = 0, lines = 0;
-    for (let i = 0; i < 300; i++) {
-      for (const it of OrdersEngine.generateOrder(s).items) {
-        if (it.condiment) { asked++; expect(FRY_RECIPES[it.menuItemId]).toBeDefined(); }
-        if (FRY_RECIPES[it.menuItemId]) lines++; // chỉ món chiên mới được dặn tương
+    for (let day = 1; day <= 10; day++) {
+      s.day = day;
+      for (let i = 0; i < 20; i++) {
+        const ord = OrdersEngine.generateOrder(s);
+        expect(ord.items.some(it => it.condiment)).toBe(false);
       }
     }
-    expect(asked / lines).toBeGreaterThan(CONDIMENT_REQUEST_CHANCE - 0.1);
-    expect(asked / lines).toBeLessThan(CONDIMENT_REQUEST_CHANCE + 0.1);
   });
 
   it('tip Perfect vẫn giữ nguyên cách tính', () => {

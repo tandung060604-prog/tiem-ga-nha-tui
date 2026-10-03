@@ -43,13 +43,13 @@ export const FRY_RECIPES: Record<string, FryRecipe> = {
   cheese_stick: { type: 'cheese', sauce: null, stock: ['cheese_stick_raw'] }
 };
 export const FRY_LOOK: Record<string, { name: string; icon: string }> = {
-  crispy_chicken: { name: 'Gà Rán Giòn Truyền Thống', icon: '🍗' },
-  spicy_chicken: { name: 'Cánh Gà Sốt Cay Yangnyeom', icon: '🌶️' },
-  honey_garlic_chicken: { name: 'Gà Sốt Bơ Tỏi Đậu Nành', icon: '🍯' },
-  shake_fries: { name: 'Khoai Lắc Phô Mai', icon: '🍟' },
-  popcorn_chicken: { name: 'Gà Viên Popcorn', icon: '🍿' },
-  spicy_thigh: { name: 'Má Đùi Gà Rán Giòn Cay', icon: '🍗' },
-  cheese_stick: { name: 'Phô Mai Que Kéo Sợi', icon: '🧀' }
+  crispy_chicken: { name: 'Gà Giòn', icon: '🍗' },
+  spicy_chicken: { name: 'Cánh Cay', icon: '🌶️' },
+  honey_garlic_chicken: { name: 'Gà Bơ Tỏi', icon: '🍯' },
+  shake_fries: { name: 'Khoai Lắc', icon: '🍟' },
+  popcorn_chicken: { name: 'Gà Popcorn', icon: '🍿' },
+  spicy_thigh: { name: 'Má Đùi Cay', icon: '🍗' },
+  cheese_stick: { name: 'Phô Mai Que', icon: '🧀' }
 };
 
 // Món ra khỏi chảo: loại mẻ + sốt (sốt chỉ phủ lên gà miếng). Cũng là món đang trong chảo của người chơi
@@ -78,20 +78,7 @@ export function missingItems(order: CustomerOrder, tray: readonly TrayItem[]): s
  * Kiểm tra xem khách có món nào dặn tương (condiment) mà trong khay CHƯA CÓ món chín cùng loại đã được xịt tương hay không.
  * Trả về loại tương đang còn thiếu, hoặc null nếu khách không dặn tương hoặc khay đã có đủ món xịt tương.
  */
-export function orderPendingCondiment(order: CustomerOrder, tray: readonly TrayItem[]): Condiment | null {
-  for (const it of order.items) {
-    if (!it.condiment) continue;
-    const needed = it.count - (it.condimentServed ?? 0);
-    if (needed <= 0) continue;
-
-    const matchingSauced = tray.filter(
-      t => t.quality !== 'raw' && t.menuItemId === it.menuItemId && t.condiment === it.condiment
-    ).length;
-
-    if (matchingSauced < needed) {
-      return it.condiment;
-    }
-  }
+export function orderPendingCondiment(_order: CustomerOrder, _tray: readonly TrayItem[]): Condiment | null {
   return null;
 }
 

@@ -1,4 +1,5 @@
 import { ASSETS } from '../../content/assets';
+import { bacBaVoice } from '../../core/bacBaVoice';
 
 export function renderBacBaManualModal(): string {
   return `
@@ -95,6 +96,7 @@ export function renderBacBaManualModal(): string {
 }
 
 export function openBacBaManualModal(): void {
+  bacBaVoice.speak('manual');
   document.getElementById('bacba-manual-overlay')?.remove();
   document.body.insertAdjacentHTML('beforeend', renderBacBaManualModal());
   const overlay = document.getElementById('bacba-manual-overlay');

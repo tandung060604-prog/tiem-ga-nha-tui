@@ -90,8 +90,6 @@ await page.locator('#btn-fry-pot').click();
 await page.waitForTimeout(300);
 await page.locator('#btn-add-drink').click();
 await page.waitForTimeout(300);
-await page.locator('#btn-squeeze-ketchup').click();
-await page.waitForTimeout(300);
 
 // Phục vụ khách hàng
 await page.locator('#btn-serve-order').click();

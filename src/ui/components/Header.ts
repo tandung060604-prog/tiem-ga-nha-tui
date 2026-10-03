@@ -75,11 +75,19 @@ export function renderHeader(state: GameState, _onOpenSettings?: () => void): st
     </div>
 
     <div class="h-r">
-      <span class="stars">
-        <img src="${ASSETS.icons.star}" class="h-pixel-star" alt="Sao" />
-        <b>${state.ratings.overall.toFixed(1)}★</b>
-      </span>
-      <small>${reviewCount} lượt</small>
+      <button id="btn-header-handbook" class="h-btn btn-header-handbook" aria-label="Sổ tay" title="Sổ tay cẩm nang & công thức quán">
+        <img src="${ASSETS.icons.book}" class="h-pixel-icon" alt="Sổ tay" />
+      </button>
+      <button id="btn-header-settings" class="h-btn btn-header-settings" aria-label="Cài đặt" title="Cài đặt tiệm">
+        <img src="${ASSETS.icons.settings}" class="h-pixel-icon" alt="Cài đặt" />
+      </button>
+      <div class="h-stars-box">
+        <span class="stars">
+          <img src="${ASSETS.icons.star}" class="h-pixel-star" alt="Sao" />
+          <b>${state.ratings.overall.toFixed(1)}★</b>
+        </span>
+        <small>${reviewCount} lượt</small>
+      </div>
     </div>
   `;
 }
@@ -91,7 +99,8 @@ export function bindHeaderEvents(
   onOpenChangelog?: () => void,
   onOpenBacBaManual?: () => void,
   onOpenLeaderboard?: () => void,
-  onOpenSocialShare?: () => void
+  onOpenSocialShare?: () => void,
+  onOpenHandbook?: () => void
 ) {
   const drawerBtn = document.getElementById('btn-header-drawer');
   const drawer = document.getElementById('header-quick-drawer');
@@ -133,6 +142,22 @@ export function bindHeaderEvents(
     audioBtn.onclick = () => {
       audio.toggleMute();
       onRefresh();
+    };
+  }
+
+  const headerHandbookBtn = document.getElementById('btn-header-handbook');
+  if (headerHandbookBtn && onOpenHandbook) {
+    headerHandbookBtn.onclick = () => {
+      audio.playPop();
+      onOpenHandbook();
+    };
+  }
+
+  const headerSettingsBtn = document.getElementById('btn-header-settings');
+  if (headerSettingsBtn) {
+    headerSettingsBtn.onclick = () => {
+      audio.playPop();
+      onOpenSettings();
     };
   }
 

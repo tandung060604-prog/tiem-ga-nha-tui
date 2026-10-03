@@ -75,7 +75,7 @@ describe('món mới ở bếp', () => {
     delete (old.inventory as Record<string, unknown>).chicken_thigh;
     const { state } = migrateSave(JSON.parse(JSON.stringify(old)))!;
     const chicken = state.menu.find(m => m.id === 'crispy_chicken')!;
-    expect(chicken.name).toBe('Gà Rán Giòn Truyền Thống');
+    expect(chicken.name).toBe('Gà Giòn');
     expect(chicken.currentPrice).toBe(38000);
     expect(state.menu.some(m => m.id === 'danmuji')).toBe(true);
     expect(state.inventory.chicken_thigh).toBeDefined();

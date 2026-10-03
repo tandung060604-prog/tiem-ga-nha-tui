@@ -255,16 +255,22 @@ console.log(`\n--- Tối ưu hóa & nén palette toàn bộ ${allPngs.length} PN
 let savedBytes = 0;
 let totalBytes = 0;
 for (const p of allPngs) {
-  const orig = statSync(p).size;
-  const opt = await sharp(p)
-    .png({ palette: true, quality: 75, colours: 192, effort: 9 })
-    .toBuffer();
-  if (opt.length < orig) {
-    writeFileSync(p, opt);
-    savedBytes += (orig - opt.length);
-    totalBytes += opt.length;
-  } else {
-    totalBytes += orig;
+  try {
+    const origBuf = readFileSync(p);
+    const orig = origBuf.length;
+    const opt = await sharp(origBuf)
+      .png({ palette: true, quality: 75, colours: 192, effort: 9 })
+      .toBuffer();
+    if (opt.length < orig) {
+      writeFileSync(p, opt);
+      savedBytes += (orig - opt.length);
+      totalBytes += opt.length;
+    } else {
+      totalBytes += orig;
+    }
+  } catch (err) {
+    // Nếu có file bị lock trên Windows, ghi nhận và tiếp tục
+    totalBytes += statSync(p).size;
   }
 }
 console.log(`✓ Đã nén giảm ${(savedBytes / 1024 / 1024).toFixed(2)} MB. Tổng kích thước PNG: ${(totalBytes / 1024 / 1024).toFixed(2)} MB\n`);

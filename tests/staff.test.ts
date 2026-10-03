@@ -236,48 +236,35 @@ describe('sau mỗi ca / giới hạn', () => {
 });
 
 describe('bảo vệ tương & bưng món của phục vụ (Waiter Condiment Safety)', () => {
-  it('orderPendingCondiment phát hiện món dặn tương chưa được xịt', () => {
+  it('orderPendingCondiment luôn trả về null vì đã bỏ cơ chế tương', () => {
     const o: CustomerOrder = {
       id: 'o_cond', customerName: 'Khách Tương Ớt', avatar: '🙂', isDelivery: false,
       items: [{ menuItemId: 'crispy_chicken', count: 1, served: 0, completed: false, condiment: 'chili' }],
       patienceMax: 60, patienceCurrent: 60, totalPrice: 40000, startTime: 0
     };
-    // Khay có gà giòn chín nhưng chưa có tương
     const trayWithoutCondiment = [{ id: 't1', menuItemId: 'crispy_chicken', name: 'Gà', icon: '🍗', quality: 'perfect' as const }];
-    expect(orderPendingCondiment(o, trayWithoutCondiment)).toBe('chili');
-
-    // Khay đã có gà giòn xịt tương ớt
-    const trayWithCondiment = [{ id: 't1', menuItemId: 'crispy_chicken', name: 'Gà', icon: '🍗', quality: 'perfect' as const, condiment: 'chili' as const }];
-    expect(orderPendingCondiment(o, trayWithCondiment)).toBeNull();
+    expect(orderPendingCondiment(o, trayWithoutCondiment)).toBeNull();
   });
 
-  it('phục vụ KHÔNG tự bưng đơn khi khách dặn tương mà khay chưa xịt tương', () => {
+  it('phục vụ tự động hỗ trợ rót nước cho khách khi khay còn chỗ', () => {
     const session = createSellingSession(1);
     const o: CustomerOrder = {
-      id: 'o_wait', customerName: 'Khách Tương Cà', avatar: '🙂', isDelivery: false,
-      items: [{ menuItemId: 'crispy_chicken', count: 1, served: 0, completed: false, condiment: 'ketchup' }],
-      patienceMax: 60, patienceCurrent: 60, totalPrice: 40000, startTime: 0
+      id: 'o_wait', customerName: 'Khách Uống Nước', avatar: '🙂', isDelivery: false,
+      items: [{ menuItemId: 'soda', count: 1, served: 0, completed: false }],
+      patienceMax: 60, patienceCurrent: 60, totalPrice: 15000, startTime: 0
     };
     session.orders = [o];
     const tray = [{ id: 't1', menuItemId: 'crispy_chicken', name: 'Gà', icon: '🍗', quality: 'perfect' as const }];
     const waiter = member('waiter', { speed: 100, mood: 100 });
     const eff = staffEffects([waiter]);
 
-    let servedCalled = false;
-    let squeezeCalledWith: string | null = null;
+    let pourCalledWith: string | null = null;
     const hooks: StaffHooks = {
-      serve: () => { servedCalled = true; },
-      squeeze: (sauce) => { squeezeCalledWith = sauce; return true; }
+      pour: (drink) => { pourCalledWith = drink; return true; }
     };
 
-    // Chạy tickStaff thời gian vừa đủ
-    const events = tickStaff(session, tray, 5000, eff, null, hooks);
-    
-    // Tuyệt đối không được bưng đơn đi khi chưa xịt tương!
-    expect(servedCalled).toBe(false);
-    expect(events.some(e => e.type === 'waiterServed')).toBe(false);
-    // Thay vào đó, phục vụ thông minh sẽ tự động gọi hook squeeze tương cà giùm người chơi
-    expect(squeezeCalledWith).toBe('ketchup');
+    tickStaff(session, tray, 5000, eff, null, hooks);
+    expect(pourCalledWith).toBe('soda');
   });
 
   it('nhân viên cấp dưới (rarity C / kỹ năng thấp) có thể lơ đễnh hoặc làm nhầm món', () => {

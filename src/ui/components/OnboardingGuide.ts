@@ -1,6 +1,9 @@
 import { GameState } from '../../types/game';
 import { ASSETS } from '../../content/assets';
 import { escapeHtml } from '../escapeHtml';
+import { bacBaVoice } from '../../core/bacBaVoice';
+
+let lastSpokenOnboardingStep = 0;
 
 export interface OnboardingStepInfo {
   step: number;
@@ -45,6 +48,11 @@ export function renderOnboardingGuide(state: GameState): string {
     targetSelector: '#btn-fry-chicken'
   };
   const stepInfo: OnboardingStepInfo = ONBOARDING_STEPS[currentStep] || ONBOARDING_STEPS[1] || defaultStep;
+
+  if (currentStep !== lastSpokenOnboardingStep) {
+    lastSpokenOnboardingStep = currentStep;
+    bacBaVoice.speak('instruction', stepInfo.instruction);
+  }
 
   return `
     <div id="onboarding-guide-banner" class="onboarding-guide-banner" style="position: fixed; bottom: 8px; left: 8px; right: 8px; z-index: 9999; background: #fffcf0; border: 3px solid #b45309; border-radius: 12px; padding: 10px 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: space-between; gap: 10px; animation: slideUp 0.3s ease; pointer-events: none;">
