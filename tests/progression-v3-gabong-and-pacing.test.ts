@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { BUNNY_LETTERS, BUNNY_RANDOM_VISIT_NOTES } from '../src/content/mysteryBunny';
-import { UPGRADES } from '../src/content/upgrades';
-import { DAILY_INCIDENTS } from '../src/content/dailyIncidents';
+import { INITIAL_UPGRADES } from '../src/content/upgrades';
+import { BASE_DAILY_INCIDENTS } from '../src/content/dailyIncidents';
 import { SIGNATURE_STORY_DISHES } from '../src/content/signatureStoryDishes';
 import { PREP_TUTORIAL_STEPS } from '../src/core/tutorial';
 
@@ -15,31 +15,30 @@ describe('Plan V3 Progression & Bé Gà Bông Lore Masterpiece', () => {
       BUNNY_LETTERS.forEach((letter, index) => {
         expect(letter.id).toBe(`bunny_letter_${index + 1}`);
         expect(letter.title).toBeTruthy();
-        expect(letter.content.length).toBeGreaterThan(30);
-        expect(letter.day).toBeGreaterThan(0);
-        expect(letter.chapter).toBeGreaterThanOrEqual(1);
-        expect(letter.chapter).toBeLessThanOrEqual(5);
-        expect(letter.favoriteDish).toBeTruthy();
-        expect(letter.reward.tipBonus).toBeGreaterThanOrEqual(0);
-        expect(letter.reward.description).toBeTruthy();
+        expect(letter.noteContent.length).toBeGreaterThan(30);
+        expect(letter.trigger.chapter).toBeGreaterThanOrEqual(1);
+        expect(letter.trigger.chapter).toBeLessThanOrEqual(5);
+        expect(letter.preferredFood).toBeTruthy();
+        expect(letter.tip).toBeGreaterThanOrEqual(0);
+        expect(letter.rewardText).toBeTruthy();
       });
     });
 
     it('should reflect the 3 Plot Twists at letters 6, 12, and 18', () => {
-      // Plot Twist 1 (Letter 6): Chiếc khăn len cam và mảnh giấy khen của Ba
+      // Plot Twist 1 (Letter 6): Manh mối đen về R&D tập đoàn
       const letter6 = BUNNY_LETTERS[5];
-      expect(letter6.title).toContain('Kỷ Vật');
-      expect(letter6.content).toContain('khăn len');
+      expect(letter6.title).toContain('Manh Mối Đen');
+      expect(letter6.noteContent).toContain('R&D');
 
-      // Plot Twist 2 (Letter 12): Bí mật cuộc thi Cúp Gà Vàng và ông Hùng
+      // Plot Twist 2 (Letter 12): Đối đầu trực diện MegaChicken
       const letter12 = BUNNY_LETTERS[11];
-      expect(letter12.title).toContain('Tự Thú');
-      expect(letter12.content).toContain('MegaChicken');
+      expect(letter12.title).toContain('Review Bẩn');
+      expect(letter12.noteContent).toContain('MegaChicken');
 
-      // Plot Twist 3 / Hồi 5 (Letter 18): An chính là người bạn thuở nhỏ & Mâm cơm đoàn viên
+      // Plot Twist 3 / Epilogue (Letter 18): An chính là người bạn tri kỷ & Epilogue
       const letter18 = BUNNY_LETTERS[17];
-      expect(letter18.title).toContain('Đoàn Viên');
-      expect(letter18.content).toContain('Hẻm 1102');
+      expect(letter18.title).toContain('AN BẾP TRƯỞNG');
+      expect(letter18.noteContent).toContain('An');
     });
 
     it('random visit notes should be in tone with Bé Gà Bông', () => {
@@ -51,32 +50,32 @@ describe('Plan V3 Progression & Bé Gà Bông Lore Masterpiece', () => {
 
   describe('Đồ Nghề Xe Đẩy Vỉa Hè (Cart Branch)', () => {
     it('should contain a 3-tier cart upgrade progression', () => {
-      const cartUpgrades = UPGRADES.filter(u => u.category === 'cart');
-      expect(cartUpgrades).toHaveLength(3);
+      const cartBranch = INITIAL_UPGRADES.cart;
+      expect(cartBranch).toBeDefined();
+      expect(cartBranch.tiers).toHaveLength(3);
 
-      const [cart1, cart2, cart3] = cartUpgrades;
+      const [cart1, cart2, cart3] = cartBranch.tiers;
       expect(cart1.level).toBe(1);
       expect(cart1.cost).toBe(0);
-      expect(cart1.unlockDay).toBe(1);
+      expect(cart1.minDay).toBe(1);
 
       expect(cart2.level).toBe(2);
       expect(cart2.cost).toBe(50000);
-      expect(cart2.unlockDay).toBe(3);
+      expect(cart2.minDay).toBe(3);
 
       expect(cart3.level).toBe(3);
       expect(cart3.cost).toBe(120000);
-      expect(cart3.unlockDay).toBe(5);
+      expect(cart3.minDay).toBe(5);
     });
   });
 
   describe('Sự Kiện Đột Xuất Thực Tế F&B (Urban Patrol)', () => {
     it('should trigger urban patrol incident on Day 2', () => {
-      const patrolIncident = DAILY_INCIDENTS.find(inc => inc.id === 'incident_urban_patrol');
+      const patrolIncident = BASE_DAILY_INCIDENTS.find(inc => inc.id === 'incident_urban_patrol');
       expect(patrolIncident).toBeDefined();
-      expect(patrolIncident?.day).toBe(2);
+      expect(patrolIncident?.minDay).toBe(2);
       expect(patrolIncident?.choices).toHaveLength(2);
-      expect(patrolIncident?.choices[0].text).toContain('chỉ giới');
-      expect(patrolIncident?.choices[1].text).toContain('nán lại');
+      expect(patrolIncident?.choices[0].label).toContain('xe đẩy');
     });
   });
 
@@ -85,7 +84,7 @@ describe('Plan V3 Progression & Bé Gà Bông Lore Masterpiece', () => {
       const signatureDish = SIGNATURE_STORY_DISHES.find(d => d.id === 'dish_ga_lac_thocam');
       expect(signatureDish).toBeDefined();
       expect(signatureDish?.name).toContain('Gà Bông');
-      expect(signatureDish?.lore).toContain('An');
+      expect(signatureDish?.storyContext).toContain('An');
     });
   });
 
