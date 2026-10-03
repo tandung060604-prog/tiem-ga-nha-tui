@@ -21,6 +21,7 @@ import { auditState, flagIntegrity } from './integrity';
 import { SellingSession, pushFx } from './sellingSim';
 import { random } from './rng';
 import { weekdayOf } from './clock';
+import { checkDietaryFulfillment } from './loyaltyEngine';
 
 // Luật của một ngày (sự kiện, khách, giao món, chốt sổ), không DOM/âm thanh.
 // main.ts và mô phỏng cân bằng (scripts/balance-sim.ts) gọi CÙNG các hàm này.
@@ -508,6 +509,7 @@ export function serveFirstOrder(
 
   let matched = false;
   let rejectedRaw = false;
+  const matchedItems: TrayItem[] = [];
   for (let i = tray.length - 1; i >= 0; i--) {
     const item = tray[i];
     if (!item || !order.items.some(it => it.menuItemId === item.menuItemId && !it.completed)) continue;
@@ -515,6 +517,7 @@ export function serveFirstOrder(
       rejectedRaw = true;
       continue;
     }
+    matchedItems.push(item);
     OrdersEngine.matchItemToOrder(order, item.menuItemId);
     (session.soldCounts ??= {})[item.menuItemId] = (session.soldCounts[item.menuItemId] ?? 0) + 1;
     if (item.condiment) {
@@ -574,10 +577,24 @@ export function serveFirstOrder(
     }
 
     const paid = Math.max(0, order.totalPrice - (order.burntPenalty ?? 0));
-    const { tip, feedbackNotes } = calculateCustomerTip(order, secretSauceBuff, relics, signatureDishes);
+    const { tip: baseTip, feedbackNotes } = calculateCustomerTip(order, secretSauceBuff, relics, signatureDishes);
     if (secretSauceBuff && order.personality !== 'frugal') {
       session.secretSauceTip = (session.secretSauceTip ?? 0) + 3000;
     }
+
+    // Đối soát Khẩu Vị Ruột (Dietary Preference) của Cư Dân Hẻm 1102
+    let dietaryBonusTip = 0;
+    if (order.dietaryPreference) {
+      const patiencePercent = order.patienceMax > 0 ? (order.patienceCurrent / order.patienceMax) * 100 : 50;
+      const dRes = checkDietaryFulfillment(order, matchedItems, (session as any).oilCondition ?? 'clean', patiencePercent);
+      if (dRes.fulfilled) {
+        order.dietaryFulfilled = true;
+        dietaryBonusTip = dRes.bonusTip;
+        feedbackNotes.push(`💖 Khẩu vị ruột: ${dRes.feedbackText} (+${(dRes.bonusTip / 1000).toLocaleString('vi-VN')}k)`);
+      }
+    }
+
+    const tip = baseTip + dietaryBonusTip;
     session.grossRevenue += paid;
     session.tips += tip;
     recordOrderBooks(session, order, paid);

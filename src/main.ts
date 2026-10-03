@@ -23,6 +23,7 @@ import { showPrepLoadingModal } from './ui/components/PrepLoadingModal';
 import { openBacBaManualModal } from './ui/components/BacBaManualModal';
 import { renderChalkboard } from './ui/components/Chalkboard';
 import { renderInventoryTab, bindInventoryEvents } from './ui/components/InventoryTab';
+import { renderMemoryGalleryModal, bindMemoryGalleryEvents, GalleryTab } from './ui/components/MemoryGalleryModal';
 import { renderUpgradesTab, bindUpgradesEvents } from './ui/components/UpgradesTab';
 import { renderStaffTab, bindStaffEvents } from './ui/components/StaffTab';
 import { renderReviewsTab, bindReviewsEvents } from './ui/components/ReviewsTab';
@@ -77,6 +78,8 @@ import { getTodayWholesaler, executeBargain, BargainTactic } from './core/market
 import { renderMarketBargainModal } from './ui/components/MarketBargainModal';
 import { DeliveryRunnerEngine, DeliveryRunState } from './core/deliveryRunner';
 import { renderDeliveryPromptModal, renderDeliveryRunnerGame, renderDeliveryResultModal } from './ui/components/DeliveryRunnerModal';
+import { recordCustomerLoyaltyVisit, ensureLoyaltyState, HEART_LEVEL_TITLES } from './core/loyaltyEngine';
+import { openLoyaltyHandbookModal } from './ui/components/LoyaltyHandbookModal';
 import {
   syncToLeaderboard,
   fetchLeaderboard,
@@ -873,7 +876,8 @@ class AppController {
       stateManager.flush();
     }
     const state = stateManager.getState();
-    const html = renderEndingModal(state, endingId);
+    const currentEndingId = endingId || state.activeEnding || 'open';
+    const html = renderEndingModal(state, currentEndingId);
     this.openModal(html);
     bindEndingEvents(
       () => {
@@ -892,8 +896,30 @@ class AppController {
             window.location.reload();
           }
         });
-      }
+      },
+      () => {
+        this.openMemoryGalleryModal('endings');
+      },
+      currentEndingId
     );
+  }
+
+  // Phòng Lưu Niệm Ký Ức Hẻm 1102 (Bảo Tàng Thành Tựu & 6 Đại Kết Cục)
+  public openMemoryGalleryModal(initialTab: GalleryTab = 'endings') {
+    audio.playPop();
+    const render = (tab: GalleryTab) => {
+      const state = stateManager.getState();
+      const html = renderMemoryGalleryModal(state, tab);
+      this.openModal(html);
+      bindMemoryGalleryEvents(
+        (nextTab) => render(nextTab),
+        (eid) => {
+          this.openEndingModal(eid, false);
+        },
+        () => this.closeModal()
+      );
+    };
+    render(initialTab);
   }
 
   public openBunnyLetterDialog(letter: BunnyLetter, isClaimed: boolean = false) {
@@ -1488,10 +1514,10 @@ class AppController {
           if (state.phase === 'selling') {
             this.openKitchenGuideModal();
           } else {
-            this.activeTab = 'menu';
-            this.render();
+            this.openLoyaltyHandbookModal();
           }
-        }
+        },
+        () => this.openLoyaltyHandbookModal()
       );
     }
 
@@ -1764,6 +1790,14 @@ class AppController {
       openMemoriesBtn.onclick = () => {
         audio.playPop();
         this.openMemoriesAlbumModal('residents', 'all');
+      };
+    }
+
+    const openLoyaltyBtn = document.getElementById('btn-open-loyalty-handbook');
+    if (openLoyaltyBtn) {
+      openLoyaltyBtn.onclick = () => {
+        audio.playPop();
+        this.openLoyaltyHandbookModal();
       };
     }
 
@@ -2996,6 +3030,45 @@ class AppController {
       this.handlePoliceInspection(policeInsp);
     }
 
+    // Tích lũy Điểm Thân Thiết & Quà Quê Tri Kỷ Hẻm 1102
+    if (order.characterId) {
+      let leveledUp = false;
+      let newLevel = 0;
+      let giftNotice: string | undefined;
+
+      stateManager.update(draft => {
+        const loyalty = ensureLoyaltyState(draft);
+        const expGained = order.dietaryFulfilled ? 45 : (isPerfect ? 30 : 15);
+        const lRes = recordCustomerLoyaltyVisit(
+          loyalty,
+          order.characterId!,
+          draft.day,
+          isPerfect,
+          !!order.dietaryFulfilled,
+          expGained
+        );
+        leveledUp = lRes.leveledUp;
+        newLevel = lRes.newHeartLevel;
+        if (lRes.newGift) {
+          giftNotice = lRes.newGift.giftLabel;
+        }
+      });
+
+      if (order.dietaryFulfilled) {
+        audio.playCoinChing();
+        Haptics.combo();
+        this.showToast(`💖 ĐÚNG GU HẺM 1102! ${order.customerName} khen nức nở (+${(order.dietaryPreference?.bonusTip ?? 0).toLocaleString('vi-VN')}đ tip)!`);
+      }
+
+      if (leveledUp) {
+        audio.playGoldChime();
+        this.showToast(`✨ THÂN THIẾT CẤP ${newLevel} ❤️! ${order.customerName} đã trở thành ${HEART_LEVEL_TITLES[newLevel]}!`);
+        if (giftNotice) {
+          this.showToast(`🎁 ${order.customerName} gửi tặng tiệm Quà Quê (${giftNotice}), hãy kiểm tra vào sáng mai nhé!`);
+        }
+      }
+    }
+
     // Nếu khách chọn ngồi ăn tại bàn hiên quán (Dine-In) và có bàn trống
     let seatedAtTable: DineInTable | null = null;
     if (this.sellingSession && order.isDineIn && this.sellingSession.dineInTables) {
@@ -3489,6 +3562,19 @@ class AppController {
       };
     }
 
+    // Nút Mở Quà Quê Tri Kỷ Hẻm 1102 từ màn Tổng Kết Cuối Ngày
+    const summaryLoyaltyBtn = document.getElementById('btn-summary-open-loyalty');
+    if (summaryLoyaltyBtn) {
+      summaryLoyaltyBtn.onclick = () => {
+        audio.playPop();
+        openLoyaltyHandbookModal(stateManager.getState(), () => {
+          stateManager.saveState();
+          this.openModal(renderSummaryModal(stateManager.getState(), ledger, review, advisorTip));
+          this.bindSummaryEvents(ledger, review, advisorTip, rentDue);
+        });
+      };
+    }
+
     // Nút Lọc Cặn Dầu & Vớt Bột Cháy Cuối Ngày
     const oilFilterBtn = document.getElementById('btn-open-oil-filter');
     if (oilFilterBtn) {
@@ -3836,15 +3922,7 @@ class AppController {
     const viewEndingBtn = document.getElementById('btn-view-ending');
     if (viewEndingBtn) {
       viewEndingBtn.onclick = () => {
-        audio.playPop();
-        // Chỉ xem lại kết thúc ĐÃ đạt; không cho soi trước kết thúc hay điều kiện của chúng
-        const achieved = state.achievedEndings ?? [];
-        const last = achieved[achieved.length - 1];
-        if (!last) {
-          this.showToast('Chưa có kết thúc nào. Hành trình của tiệm còn dài lắm! 🍗');
-          return;
-        }
-        this.openEndingModal(last, false);
+        this.openMemoryGalleryModal('endings');
       };
     }
 
@@ -3893,6 +3971,16 @@ class AppController {
 
     const closeBtn2 = document.getElementById('btn-close-kitchen-guide-bottom');
     if (closeBtn2) closeBtn2.onclick = () => this.closeModal();
+  }
+
+  // Sổ tay Tri Kỷ Hẻm 1102 & Bưu Kiện Quà Tiếp Tế
+  public openLoyaltyHandbookModal() {
+    audio.playPop();
+    const state = stateManager.getState();
+    openLoyaltyHandbookModal(state, () => {
+      stateManager.saveState();
+      this.render();
+    });
   }
 
   // Modal góp ý & báo lỗi dành cho Tester trải nghiệm

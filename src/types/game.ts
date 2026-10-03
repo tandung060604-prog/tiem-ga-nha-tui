@@ -267,6 +267,9 @@ export interface CustomerOrder {
   burntPenalty?: number; // tiền bị trừ vì giao gà cháy (nửa giá mỗi món cháy)
   perfectBonus?: number; // tip thêm cho mỗi món Perfect
   startTime: number;
+  // Khẩu vị ruột & yêu cầu đặc biệt của cư dân Hẻm 1102
+  dietaryPreference?: DietaryPreference;
+  dietaryFulfilled?: boolean;
 }
 
 export interface TrayItem {
@@ -621,6 +624,7 @@ export interface GameState {
   onboardingGuideDismissed?: boolean; // Người chơi chủ động bấm Bỏ qua hướng dẫn
   day3FeedbackPrompted?: boolean;    // Đã hiện lời mời tester chấm sao & góp ý sau Ngày 2/3 chưa
   storyFlags?: string[];             // Danh sách các cờ sự kiện cốt truyện đã kích hoạt
+  loyaltyState?: CustomerLoyaltyState; // Hệ thống Tri Kỷ Hẻm 1102 & Khẩu Vị Ruột
 }
 
 export interface BargainWholesaler {
@@ -1001,5 +1005,57 @@ export interface EndlessRunState {
   maxFailedAllowed: number;       // Số khách bỏ đi tối đa trong 1 wave trước khi Game Over
   isGameOver: boolean;
   totalMoneyEarned: number;
+}
+
+// ============================================================================
+// HỆ THỐNG TRI KỶ HẺM 1102 & KHẨU VỊ RUỘT (ALLEY LOYALTY & CUSTOM DIETARY ORDERS)
+// ============================================================================
+
+export type DietaryPreferenceId = 
+  | 'crisp_perfection'    // Chiên Vàng Giòn chuẩn Perfect
+  | 'extra_sauce'          // Đẫm sốt đậm đà (sốt cay, sốt tỏi, hoặc lắc phô mai)
+  | 'clean_oil_only'       // Dầu chiên vàng trong sạch
+  | 'side_pickle_pair'     // Kèm đồ chua củ cải hoặc bắp cải
+  | 'extra_chilled_drink'  // Nước ngọt thật lạnh giải nhiệt
+  | 'speedy_serve';        // Phục vụ nhanh trong >60% thời gian kiên nhẫn
+
+export interface DietaryPreference {
+  id: DietaryPreferenceId;
+  label: string;           // Ví dụ: "🌟 Giòn Rụm", "🍯 Đẫm Sốt", "🌿 Dầu Sạch", "🥢 Thêm Đồ Chua", "🧊 Thật Lạnh", "⚡ Nhanh Gọn"
+  hint: string;            // Lời dặn nhẹ của khách
+  bonusTip: number;        // Tiền thưởng khi đáp ứng đúng (+5.000đ -> +15.000đ)
+  loyaltyExp: number;      // EXP cộng thêm (+25 -> +50 EXP)
+}
+
+export interface CustomerLoyaltyEntry {
+  characterId: string;
+  heartLevel: number;      // 0 đến 5 tim (0: Khách Mới -> 1: Quen Mặt -> 2: Bạn Hẻm -> 3: Hợp Gu -> 4: Tri Kỷ -> 5: Người Nhà 1102)
+  exp: number;             // Điểm thân thiết tích lũy
+  totalVisits: number;     // Số lần ghé quán
+  perfectDishesServed: number; // Số món Perfect đã phục vụ cho người này
+  specialRequestsFulfilled: number; // Số lần thỏa mãn khẩu vị ruột
+  unlockedGifts: number[]; // Các mốc cấp độ tim đã nhận quà (ví dụ [1, 2, 3])
+  lastVisitDay?: number;
+}
+
+export type AlleyGiftType = 'cash' | 'oil_restore' | 'inventory_stock' | 'reputation_boost' | 'vip_attract';
+
+export interface AlleyResidentGift {
+  id: string;
+  characterId: string;
+  senderName: string;
+  day: number;
+  heartLevel: number;
+  giftType: AlleyGiftType;
+  giftLabel: string;
+  giftValue: number;
+  letterContent: string;
+  claimed: boolean;
+}
+
+export interface CustomerLoyaltyState {
+  residents: Record<string, CustomerLoyaltyEntry>;
+  pendingAlleyGifts: AlleyResidentGift[];
+  claimedAlleyGiftsHistory: AlleyResidentGift[];
 }
 

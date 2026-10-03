@@ -107,6 +107,22 @@ export function renderSummaryModal(
         </div>
       ` : ''}
 
+      ${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0) > 0 ? `
+        <!-- Bưu Kiện Quà Quê Cư Dân Hẻm 1102 -->
+        <div style="background: linear-gradient(135deg, #fffbeb, #fef3c7); border: 2px dashed #f59e0b; border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.5rem;">🎁</span>
+            <div>
+              <span style="font-weight: 800; color: #b45309;">Quà Quê Tri Kỷ Hẻm 1102!</span>
+              <div style="font-size: 0.74rem; color: #78350f;">Bạn có <b>${state.loyaltyState!.pendingAlleyGifts.length} bưu kiện</b> gửi tặng quán đang chờ mở!</div>
+            </div>
+          </div>
+          <button id="btn-summary-open-loyalty" style="background: #f59e0b; color: #fff; border: 1px solid #b45309; border-radius: 6px; padding: 6px 10px; font-weight: 800; font-size: 0.74rem; cursor: pointer; min-height: 38px;">
+            MỞ QUÀ 💖
+          </button>
+        </div>
+      ` : ''}
+
       ${wrapped ? `
         <!-- Gà Wrapped Cuối Tuần (Viral Threads Feature từ GDD) -->
         <div style="background: linear-gradient(135deg, #ff7675, #d63031); color: #fff; border-radius: var(--radius-md); padding: 14px; box-shadow: 0 4px 14px rgba(214, 48, 49, 0.35); text-align: left; margin-bottom: 8px;">

@@ -135,10 +135,10 @@ export function renderSettingsModal(state: GameState): string {
         </button>
       </div>
 
-      <!-- Story Ending Preview -->
+      <!-- Story Ending & Memory Gallery Preview -->
       <div style="border-top: 1px dashed var(--line); padding-top: 10px; text-align: center;">
-        <button id="btn-view-ending" class="btn-sm" style="width: 100%; padding: 8px; font-weight: 800; background: linear-gradient(135deg, #ffd166, #f4a261); border-color: #e76f51; color: #431407;">
-          🏆 Kết thúc đã đạt (${(state.achievedEndings ?? []).length}/6)
+        <button id="btn-view-ending" class="btn-sm" style="width: 100%; min-height: 44px; padding: 10px; font-weight: 800; background: linear-gradient(135deg, #fef3c7, #fde68a); border: 1.5px solid #d4a373; color: #78350f; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          🏛️ <span>Phòng Lưu Niệm Ký Ức Hẻm (${(state.achievedEndings ?? []).length}/6 Kết Cục)</span>
         </button>
       </div>
 

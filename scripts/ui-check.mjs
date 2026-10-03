@@ -72,6 +72,13 @@ for (const width of WIDTHS) {
         overlay.click();
         overlay.remove();
       }
+      document.querySelectorAll('#btn-skip-onboarding, .bacba-tip-banner-close, #btn-tutorial-skip, #btn-bacba-understood, #btn-tutorial-next').forEach(el => {
+        if (el instanceof HTMLElement) el.click();
+      });
+      const bacba = document.getElementById('bacba-tip-banner');
+      if (bacba) bacba.remove();
+      const guide = document.getElementById('onboarding-guide-banner');
+      if (guide) guide.remove();
     }).catch(() => {});
   };
 
@@ -83,6 +90,8 @@ for (const width of WIDTHS) {
     await page.waitForTimeout(600);
   }
   await dismissIntro();
+
+  page.on('dialog', d => d.accept().catch(() => {}));
 
   console.log(`[ui-check ${width}px] Bấm #btn-title-play...`);
   await page.locator('#btn-title-play').click(); // màn tiêu đề (chạm đầu tiên bật âm thanh iOS)
@@ -98,11 +107,15 @@ for (const width of WIDTHS) {
 
   await dismissIntro();
 
+  console.log(`[ui-check ${width}px] Bấm #btn-start-selling...`);
   await page.locator('#btn-start-selling').click({ force: true });
+  console.log(`[ui-check ${width}px] Chờ .selling-screen...`);
   await page.locator('.selling-screen').waitFor({ timeout: 10000 });
+  console.log(`[ui-check ${width}px] Kiểm tra overflow ca bán...`);
   await checkOverflow('vào ca bán');
 
   // Thanh đo 5 vùng đúng tỉ lệ
+  console.log(`[ui-check ${width}px] Kiểm tra thanh đo 5 vùng...`);
   const zones = await page.locator('.cook-gauge-zones > div').evaluateAll(els => {
     const total = els.reduce((s, e) => s + e.getBoundingClientRect().width, 0);
     return els.map(e => [e.classList[0], total ? (e.getBoundingClientRect().width / total) * 100 : 0]);
@@ -165,11 +178,15 @@ for (const width of WIDTHS) {
   } catch (_e) {}
 
   record(errors.length ? 'FAIL' : 'PASS', width, 'không lỗi JS/console', errors.slice(0, 3).join(' | '));
-  await page.context().close();
+  await page.context().close().catch(() => {});
 }
-await browser.close();
 
 for (const r of results) console.log(`${r.status.padEnd(4)} [${r.width}px] ${r.name}${r.detail ? ' — ' + r.detail : ''}`);
 const failed = results.filter(r => r.status === 'FAIL').length;
 console.log(`\n${failed ? `${failed} FAIL` : 'Tất cả PASS'} · ảnh chụp: ${OUT}/`);
+
+try {
+  await Promise.race([browser.close(), new Promise(r => setTimeout(r, 1000))]);
+} catch (_e) {}
 process.exit(failed ? 1 : 0);
+

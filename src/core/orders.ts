@@ -11,6 +11,7 @@ import { upgradeEffects } from './upgrades';
 import { random, weightedPick } from './rng';
 import { ASSETS } from '../content/assets';
 import { getWeatherForDay, SAIGON_WEATHERS } from '../content/saigonWeather';
+import { assignDietaryPreference } from './loyaltyEngine';
 
 // Món khách được gọi = món có trạm trong bếp (đọc từ content, không từ save cũ).
 // Nước/sốt còn cần chương mở trạm: sốt mở từ chương 2.
@@ -170,6 +171,15 @@ export class OrdersEngine {
     if (state.petPatio?.pets?.some(p => p.pettedToday)) {
       patienceMax += 2;
     }
+
+    // Hiệp đồng Tri Kỷ Hẻm 1102: Khách quen (Level >= 1) tăng 15% kiên nhẫn
+    const loyaltyEntry = state.loyaltyState?.residents[char.id];
+    const heartLevel = loyaltyEntry?.heartLevel ?? 0;
+    if (heartLevel >= 1) {
+      patienceMax = Math.round(patienceMax * 1.15);
+    }
+    const dietaryPreference = assignDietaryPreference(char.id, heartLevel);
+
     patienceMax = Math.max(12, patienceMax);
 
     return {
@@ -195,6 +205,7 @@ export class OrdersEngine {
       items: selectedItems,
       ...(comboName ? { comboName } : {}),
       ...(isWalkupDrink ? { isWalkupDrink } : {}),
+      ...(dietaryPreference ? { dietaryPreference } : {}),
       patienceMax,
       patienceCurrent: patienceMax,
       totalPrice,

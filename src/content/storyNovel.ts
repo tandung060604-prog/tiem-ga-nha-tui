@@ -163,37 +163,39 @@ Thấy hoàn cảnh éo le của hai mẹ con, Anh Tuấn Shipper – người c
     chapterRequirement: 4,
     title: 'Hồi 4: Cơn Sóng Ngầm MegaChicken & Lửa Thử Vàng',
     subtitle: 'Cuộc chiến giữa chuỗi tập đoàn tỷ đô và sự công tâm của người tiêu dùng',
-    characters: ['Chủ Tiệm Gà', 'Chị Lan Karen', 'Khánh Vy TikToker', 'Chú Hai Soi Vệ Sinh', 'Chú Nam Công An', 'Bác Hải Trật Tự', 'Bác Béo Hoàn Lương'],
-    excerpt: 'Khi truyền thông bẩn bủa vây, sự thật chính là ngọn lửa vàng không sợ thử thách...',
+    characters: ['Chủ Tiệm Gà', 'Mr. Mega Peter Hoàng', 'Chị Lan Karen', 'Khánh Vy TikToker', 'Bác Ba Tổ Trưởng', 'Bé Gà Bông An'],
+    excerpt: 'Khi truyền thông bẩn bủa vây và lời đề nghị 500 triệu đồng được đặt lên bàn, ngọn lửa nghề đứng trước thử thách nghiệt ngã nhất...',
     fullStory: `
-Khi Tiệm Gà Nhà Tui trở thành hiện tượng ẩm thực quận, sóng gió thực sự bắt đầu ập tới. Tập đoàn đồ ăn nhanh đa quốc gia "MegaChicken" mở một chi nhánh hoành tráng ba tầng ngay đối diện, chi hàng trăm triệu đồng chạy quảng cáo và tung ra chương trình gà rán giảm giá 50%.
+Khi Tiệm Gà Nhà Tui trở thành hiện tượng ẩm thực quận, sóng gió thực sự bắt đầu ập tới. Tập đoàn đồ ăn nhanh đa quốc gia "MegaChicken" mở một chi nhánh ba tầng hoành tráng ngay mặt tiền đối diện, chi hàng trăm triệu đồng chạy quảng cáo và tung ra chương trình gà rán giảm giá 50%.
 
-Chưa dừng lại ở đó, đối thủ thuê một đội ngũ truyền thông ngầm tung tin đồn thất thiệt rằng tiệm dùng "dầu chiên đen như hắc ín" và "thịt gà đông lạnh thải loại". Chị Lan (người vẫn thường bị gán biệt danh "khách Karen khó tính") đã nổi giận đùng đùng đến quán, quay video livestream yêu cầu chủ tiệm giải thích vì tin lời đồn trên mạng:
+Chưa dừng lại ở đó, trưa thứ Ba oi ả, một chiếc xe hơi đen bóng đỗ xịch trước tiệm. Người bước xuống là Peter Hoàng – Giám đốc phát triển vùng của MegaChicken, theo sau là hai vệ sĩ mặc âu phục. Đẩy chiếc vali da lên mặt bàn gỗ sồi mộc mạc của quán, Peter nhếch mép:
 
-"Tôi ăn ở đây bao lâu nay, nếu các người thực sự dùng dầu bẩn hại sức khỏe thì tôi sẽ kiện tiệm sập tiệm!"
+"Năm trăm triệu đồng tiền mặt để mua đứt công thức tẩm bột và nhượng quyền độc quyền thương hiệu. Cậu sẽ về làm Trưởng phòng bếp của MegaChicken với lương 60 triệu một tháng. Bằng không, đội truyền thông của chúng tôi sẽ dập tắt tiệm này trong vòng một tuần bằng tin đồn dầu đen và thịt gà phế loại."
+
+Bác Ba đứng cạnh chảo dầu, đôi bàn tay gân guốc siết chặt cán vá gỗ. Cùng lúc đó, Chị Lan (khách quen khó tính) và Khánh Vy TikToker ập vào quán với điện thoại đang livestream: "Cả mạng xã hội đang rầm rộ tin tiệm dùng dầu đen thải loại, các người giải thích thế nào?!"
     `,
-    dilemmaPrompt: 'Khi MegaChicken dùng truyền thông bẩn bôi nhọ tiệm dùng dầu đen và thịt thải loại, bạn phản đòn thế nào?',
+    dilemmaPrompt: 'Đứng trước chiếc vali 500 triệu của MegaChicken và vòng vây livestream nghi vấn dầu đen, bạn sẽ quyết định ra sao?',
     options: [
       {
         id: 'act4_opt_community',
-        label: 'Mở toang cửa bếp mời bà con hẻm, chị Lan và reviewer cùng vào kiểm chứng nguồn dầu sạch',
+        label: 'Mở toang cửa bếp mời bà con Hẻm 1102, chị Lan và reviewer cùng vào kiểm chứng nguồn dầu sạch',
         kicker: '❤️ MINH BẠCH LÒNG TIN',
-        karmaEffect: { community: 15, craftsmanship: 15 },
-        reactionNarrative: 'Video trực tiếp bếp sạch 4h sáng đạt 5 triệu view, người dân Hẻm 1102 đồng loạt lên tiếng bảo vệ tiệm gà chân chính.'
+        karmaEffect: { community: 20, craftsmanship: 15, ambition: -5 },
+        reactionNarrative: 'Livestream kiểm tra bếp lúc 4h sáng thu hút hơn 5 triệu lượt xem. Bà con Hẻm 1102 và các thực khách ruột đồng loạt tràn vào bình luận bảo vệ tiệm, biến khủng hoảng thành làn sóng ủng hộ chưa từng có!'
       },
       {
         id: 'act4_opt_ambition',
-        label: 'Cùng Đức Huy lần theo IP đối thủ, tổ chức họp báo truyền thông vạch trần chiêu trò MegaChicken',
-        kicker: '💼 ĐẤU PHÁP BẢN LĨNH',
-        karmaEffect: { ambition: 20, craftsmanship: 5 },
-        reactionNarrative: 'MegaChicken bị dư luận lên án dữ dội, thương hiệu Tiệm Gà Nhà Tui bước lên trang nhất các báo lớn.'
+        label: 'Tổ chức cuộc thi "Thử mù hương vị" (Blind Taste Test) công khai giữa gà thủ công tiệm và gà MegaChicken',
+        kicker: '🔥 ĐẤU PHÁP NGHỆ NHÂN',
+        karmaEffect: { craftsmanship: 20, ambition: 10, community: 5 },
+        reactionNarrative: '92/100 thực khách ngẫu nhiên đã bình chọn miếng gà thủ công của tiệm giòn ngọt vượt trội so với gà công nghiệp MegaChicken. Peter Hoàng muối mặt rời khỏi con hẻm!'
       },
       {
         id: 'act4_opt_corporate',
-        label: 'Ngồi xuống nghe MegaChicken ra giá: một khoản tiền lớn để đổi lấy bí quyết của tiệm',
+        label: 'Nhận chiếc vali 500 triệu đồng và ký hợp đồng cung ứng bí mật cho tập đoàn MegaChicken',
         kicker: '💔 THƯƠNG MẠI HÓA',
-        karmaEffect: { ambition: 30, community: -25, craftsmanship: -20 },
-        reactionNarrative: 'Bác Ba nhìn bạn thở dài thất vọng. Hương vị quán bắt đầu vương mùi toan tính đồng tiền lạnh lẽo.'
+        karmaEffect: { ambition: 35, community: -30, craftsmanship: -25 },
+        reactionNarrative: 'Bác Ba nhìn chiếc vali tiền rồi lặng lẽ cởi tạp dề bước ra khỏi tiệm trong màn mưa. Gian bếp bỗng lạnh ngắt, mùi thơm quen thuộc của con hẻm dường như đã biến mất...'
       }
     ]
   },
@@ -201,31 +203,42 @@ Chưa dừng lại ở đó, đối thủ thuê một đội ngũ truyền thôn
     act: 5,
     chapterRequirement: 5,
     title: 'Hồi 5: Khải Hoàn "Gà Vàng Quốc Dân"',
-    subtitle: 'Năm chi nhánh rực rỡ và chiếc thìa vàng truyền thống trao tay',
-    characters: ['Toàn Thể 36 Nhân Vật Hẻm 1102', 'Bác Ba', 'Mimi Thỏ Cam'],
-    excerpt: 'Hành trình từ chiếc xe đẩy 850 ngàn đồng đến chiếc cúp danh dự ẩm thực đất nước...',
+    subtitle: 'Đêm vinh danh trên đỉnh cao và nụ cười rạng rỡ sau lớp mặt nạ mascot',
+    characters: ['Toàn Thể Cư Dân Hẻm 1102', 'Bác Ba', 'Mimi An Thỏ Cam', 'Tuấn Shipper'],
+    excerpt: 'Hành trình từ chiếc xe đẩy 850 ngàn đồng vỉa hè đến sân khấu danh giá nhất nền ẩm thực đường phố...',
     fullStory: `
-Đại sảnh Trung tâm Hội nghị Quốc gia rực rỡ ánh đèn. Đêm trao giải thưởng ẩm thực thường niên "Gà Vàng Quốc Dân" diễn ra trong sự hồi hộp của hàng ngàn chuyên gia và thực khách.
+Đại sảnh Trung tâm Hội nghị Quốc gia rực rỡ ánh đèn pha. Đêm trao giải thưởng thường niên "Gà Vàng Quốc Dân" diễn ra trong sự hồi hộp của hàng ngàn chuyên gia ẩm thực, nhà phê bình và thực khách khắp mọi miền đất nước.
 
-Từ một chiếc xe đẩy vỉa hè gom từng đồng bạc lẻ, Tiệm Gà Nhà Tui giờ đây đã là một hệ thống 5 chi nhánh khang trang, một bếp trung tâm điều phối nguyên liệu sạch chuẩn VietGAP, tạo công ăn việc làm ổn định cho hơn 30 nhân viên với mức lương đàng hoàng.
+Từ một chiếc xe đẩy vỉa hè ọp ẹp gom từng đồng bạc lẻ dưới cơn mưa tháng Chín năm nào, Tiệm Gà Nhà Tui giờ đây đã đứng sừng sững như một biểu tượng của lòng kiên trì và nghĩa tình Sài Gòn.
 
-Khi cái tên "TIỆM GÀ NHÀ TUI" được xướng lên ở hạng mục danh giá nhất, cả hội trường như vỡ òa.
+"Và giải thưởng cao quý nhất — CHIẾC THÌA VÀNG DI SẢN ẨM THỰC NĂM NAY — xin được vinh danh: TIỆM GÀ NHÀ TUI HẺM 1102!"
+
+Tiếng vỗ tay bùng nổ như sấm dậy. Trên sân khấu, Bé Gà Bông bước lên cùng bạn và Bác Ba. Trước hàng ngàn ống kính truyền hình trực tiếp, cô gái từ từ nhấc chiếc mũ mascot thú bông nặng trịch ra. Mái tóc buông xõa, đôi mắt long lanh ngấn lệ – đó là An, cô cháu gái thất lạc bấy lâu của tiệm Gà Chợ Lớn năm 1990.
+
+Bác Ba run run nâng niu chiếc vá gỗ gia truyền trao vào tay bạn: "Cảm ơn con... đã giữ lại ngọn lửa ấm này cho con hẻm của chúng ta."
     `,
-    dilemmaPrompt: 'Đứng trước sân khấu giải Gà Vàng Quốc Dân, bạn công bố sứ mệnh tương lai của tiệm gà là gì?',
+    dilemmaPrompt: 'Đứng trước hàng ngàn tràng pháo tay tại Lễ Trao Giải Gà Vàng, bạn công bố sứ mệnh tương lai của tiệm gà là gì?',
     options: [
       {
         id: 'act5_opt_community',
-        label: 'Cùng Mimi và Bác Ba giơ cao chiếc vá gỗ gia truyền, giữ vững tiệm gà như một mái ấm tri kỷ',
+        label: 'Cùng An và Bác Ba giữ vững mái ấm Hẻm 1102, trao quyền cho các bạn trẻ trong hẻm làm chủ cơ nghiệp',
         kicker: '👑 DI SẢN TRI KỶ',
-        karmaEffect: { community: 20, craftsmanship: 20 },
-        reactionNarrative: 'Cả hội trường đứng dậy vỗ tay vang dội. Bạn đã chứng minh tình người và hương vị nguyên bản là vô giá!'
+        karmaEffect: { community: 25, craftsmanship: 20 },
+        reactionNarrative: 'Cả hội trường đứng dậy hoan hô không dứt. Tiệm gà trở thành ngôi nhà chung ấm áp của những phận đời cần lao!'
+      },
+      {
+        id: 'act5_opt_craft',
+        label: 'Thành lập Quỹ Nghệ Nhân Bếp Lửa, truyền dạy bí quyết chiên gà chuẩn vị truyền thống miễn phí cho thanh niên nghèo',
+        kicker: '🔥 ĐẠO NGHỀ BẤT DIỆT',
+        karmaEffect: { craftsmanship: 30, community: 15 },
+        reactionNarrative: 'Bác Ba mỉm cười mãn nguyện, chiếc vá gỗ được tôn vinh như một bảo vật sống của ẩm thực dân gian.'
       },
       {
         id: 'act5_opt_ambition',
-        label: 'Công bố mở rộng 50 chi nhánh toàn quốc, đưa thương hiệu lên sàn chứng khoán',
-        kicker: '💼 TẬP ĐOÀN ĐẠI CHÚNG',
-        karmaEffect: { ambition: 25, community: 5 },
-        reactionNarrative: 'Các quỹ đầu tư lớn tranh nhau ký hợp đồng nhượng quyền, mở ra một kỷ nguyên kinh doanh quy mô tỷ đô.'
+        label: 'Công bố lộ trình niêm yết sàn chứng khoán, mở rộng 100 chi nhánh nhượng quyền thần tốc',
+        kicker: '💼 ĐẾ CHẾ TOÀN QUỐC',
+        karmaEffect: { ambition: 30, community: 5 },
+        reactionNarrative: 'Các quỹ đầu tư lớn xếp hàng tranh nhau rót vốn. Một trang sử kinh doanh triệu đô chính thức mở ra!'
       }
     ]
   }

@@ -8,11 +8,13 @@ import { bacBaVoice } from '../../core/bacBaVoice';
 
 export function getCharacterPortrait(name: string): string {
   if (name.includes('Bác Ba')) return ASSETS.bacba.front;
-  if (name.includes('Thỏ Cam')) return ASSETS.thocam.front;
+  if (name.includes('Mega') || name.includes('Peter')) return ASSETS.characters?.char_10_winner_hung || ASSETS.vanphong.stand;
+  if (name.includes('Vy') || name.includes('TikTok')) return ASSETS.characters?.char_07_trendy_vy || ASSETS.vanphong.stand;
+  if (name.includes('Thỏ Cam') || name.includes('Mimi') || name.includes('Bé Gà Bông') || name.includes('An')) return ASSETS.gabong.front;
   if (name.includes('Học Sinh') || name.includes('Trí')) return ASSETS.hocsinh.stand;
   if (name.includes('Văn Phòng') || name.includes('Châu')) return ASSETS.vanphong.stand;
-  if (name.includes('Karen') || name.includes('Khó Tính')) return ASSETS.karen.stand;
-  if (name.includes('Shipper')) return ASSETS.shipper.stand;
+  if (name.includes('Karen') || name.includes('Khó Tính') || name.includes('Chị Lan')) return ASSETS.karen.stand;
+  if (name.includes('Shipper') || name.includes('Tuấn')) return ASSETS.shipper.stand;
   if (name.includes('Game') || name.includes('Cú Đêm')) return ASSETS.gamethu.stand;
   return ASSETS.gabong.front;
 }

@@ -51,6 +51,10 @@ export function renderHeader(state: GameState, _onOpenSettings?: () => void): st
             <span class="drawer-icon-emoji">👥</span>
             <span class="drawer-label">Rủ bạn đua top</span>
           </button>
+          <button id="btn-loyalty-handbook-toggle" class="drawer-action-btn" title="Sổ Tay Tri Kỷ Hẻm 1102 & Quà Tiếp Tế">
+            <span class="drawer-icon-emoji">💖</span>
+            <span class="drawer-label">Sổ Tay Tri Kỷ Hẻm ${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0) > 0 ? `(${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0)} 🎁)` : ''}</span>
+          </button>
           <button id="btn-changelog-toggle" class="drawer-action-btn" title="Xem bản cập nhật">
             <img src="${ASSETS.icons.book}" class="drawer-icon-img" alt="" />
             <span class="drawer-label">Bản tin cập nhật</span>
@@ -75,8 +79,9 @@ export function renderHeader(state: GameState, _onOpenSettings?: () => void): st
     </div>
 
     <div class="h-r">
-      <button id="btn-header-handbook" class="h-btn btn-header-handbook" aria-label="Sổ tay" title="Sổ tay cẩm nang & công thức quán">
+      <button id="btn-header-handbook" class="h-btn btn-header-handbook ${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0) > 0 ? 'has-gift' : ''}" aria-label="Sổ tay" title="Sổ tay Tri Kỷ Hẻm 1102 & Cẩm nang quán">
         <img src="${ASSETS.icons.book}" class="h-pixel-icon" alt="Sổ tay" />
+        ${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0) > 0 ? '<span class="header-gift-badge">🎁</span>' : ''}
       </button>
       <button id="btn-header-settings" class="h-btn btn-header-settings" aria-label="Cài đặt" title="Cài đặt tiệm">
         <img src="${ASSETS.icons.settings}" class="h-pixel-icon" alt="Cài đặt" />
@@ -100,7 +105,8 @@ export function bindHeaderEvents(
   onOpenBacBaManual?: () => void,
   onOpenLeaderboard?: () => void,
   onOpenSocialShare?: () => void,
-  onOpenHandbook?: () => void
+  onOpenHandbook?: () => void,
+  onOpenLoyaltyHandbook?: () => void
 ) {
   const drawerBtn = document.getElementById('btn-header-drawer');
   const drawer = document.getElementById('header-quick-drawer');
@@ -185,6 +191,15 @@ export function bindHeaderEvents(
       closeDrawer();
       audio.playPop();
       onOpenSocialShare();
+    };
+  }
+
+  const loyaltyBtn = document.getElementById('btn-loyalty-handbook-toggle');
+  if (loyaltyBtn && onOpenLoyaltyHandbook) {
+    loyaltyBtn.onclick = () => {
+      closeDrawer();
+      audio.playPop();
+      onOpenLoyaltyHandbook();
     };
   }
 

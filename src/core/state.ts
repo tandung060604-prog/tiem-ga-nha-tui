@@ -9,6 +9,7 @@ import { priceLimits } from './pricing';
 import { generateUniqueUserId } from './leaderboard';
 import { getOrCreatePetPatio } from './petPatioSystem';
 import { staffImage } from '../content/assets';
+import { createInitialLoyaltyState, ensureLoyaltyState } from './loyaltyEngine';
 
 const SAVE_KEY = 'tiem_ga_nha_tui_save_v2';
 const SIG_KEY = `${SAVE_KEY}_sig`;
@@ -185,8 +186,10 @@ export function createInitialState(): GameState {
     onboardingGuideStep: 1,
     onboardingGuideDismissed: false,
     day3FeedbackPrompted: false,
+    loyaltyState: createInitialLoyaltyState(),
   };
   getOrCreatePetPatio(state);
+  ensureLoyaltyState(state);
   Object.values(state.inventory).forEach(ensureBatches);
   return state;
 }
@@ -351,6 +354,7 @@ export function migrateSave(raw: unknown): { state: GameState; repaired: string[
   if (!shiftValid) state.pausedShift = null;
   else if (shift && !shift.session.timers) shift.session.timers = { noodle: null, oven: null };
   state.phase = shiftValid ? 'selling' : 'prep';
+  ensureLoyaltyState(state);
   return { state, repaired };
 }
 

@@ -1,4 +1,5 @@
 import { CustomerReview, GameState, DayLedger } from '../../types/game';
+import { ASSETS } from '../../content/assets';
 
 export class ShareCardEngine {
   public static async generateReviewCardBlob(
@@ -37,15 +38,34 @@ export class ShareCardEngine {
       ctx.fillRect(x, 37, stripeWidth, awningHeight);
     }
 
-    // 3. Header Shop Name & Mascot
-    ctx.fillStyle = '#3d2c2e';
-    ctx.font = 'bold 54px "Baloo 2", sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(`🍗 ${state.shopName}`, width / 2, 190);
+    // 3. Header Shop Name & Mascot Logo
+    try {
+      const logo = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = ASSETS.ui.changChickenLogo;
+      });
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(width / 2, 130, 42, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(logo, width / 2 - 42, 88, 84, 84);
+      ctx.restore();
+    } catch {
+      // fallback if image not loaded
+    }
 
-    ctx.font = '600 32px "Be Vietnam Pro", sans-serif';
+    ctx.fillStyle = '#3d2c2e';
+    ctx.font = 'bold 50px "Baloo 2", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${state.shopName}`, width / 2, 218);
+
+    ctx.font = '600 30px "Be Vietnam Pro", sans-serif';
     ctx.fillStyle = '#8a6452';
-    ctx.fillText(`Tổng kết Ngày ${state.day} · Chương ${state.currentChapter}`, width / 2, 245);
+    ctx.fillText(`Tổng kết Ngày ${state.day} · Chương ${state.currentChapter}`, width / 2, 260);
 
     // 4. Highlight Review Box
     const boxX = 80;

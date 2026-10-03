@@ -2,6 +2,7 @@ import { GameState, StoryEndingId } from '../../types/game';
 import { STORY_ENDINGS } from '../../content/endings';
 import { BUNNY_LETTERS } from '../../content/mysteryBunny';
 import { audio } from '../../core/audio';
+import confetti from 'canvas-confetti';
 
 export function renderEndingModal(stateOrEnding: any, endingOrState?: any): string {
   let state: GameState;
@@ -111,13 +112,18 @@ export function renderEndingModal(stateOrEnding: any, endingOrState?: any): stri
             </div>
           </div>
 
-          <div style="display: flex; gap: 8px;">
-            <button id="btn-close-ending" style="flex: 1; padding: 10px; border-radius: 10px; border: 2px solid var(--line); background: #fff; font-weight: 800; font-size: 0.85rem; cursor: pointer;">
-              Đóng Xem Lại
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button id="btn-open-gallery-from-ending" style="width: 100%; min-height: 44px; padding: 10px; border-radius: 10px; border: 1.5px solid #d4a373; background: linear-gradient(135deg, #fef3c7, #fde68a); color: #78350f; font-weight: 800; font-size: 0.88rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              🏛️ <span>Xem Phòng Ký Ức Hẻm 1102</span>
             </button>
-            <button id="btn-restart-game" style="flex: 1; padding: 10px; border-radius: 10px; border: 2px solid var(--red); background: var(--red); color: #fff; font-weight: 800; font-size: 0.85rem; cursor: pointer;">
-              🔄 Chơi Lại Mới
-            </button>
+            <div style="display: flex; gap: 8px;">
+              <button id="btn-close-ending" style="flex: 1; min-height: 44px; padding: 10px; border-radius: 10px; border: 2px solid var(--line); background: #fff; font-weight: 800; font-size: 0.85rem; cursor: pointer;">
+                Đóng Xem Lại
+              </button>
+              <button id="btn-restart-game" style="flex: 1; min-height: 44px; padding: 10px; border-radius: 10px; border: 2px solid var(--red); background: var(--red); color: #fff; font-weight: 800; font-size: 0.85rem; cursor: pointer;">
+                🔄 Chơi Lại Mới
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -127,8 +133,32 @@ export function renderEndingModal(stateOrEnding: any, endingOrState?: any): stri
 
 export function bindEndingEvents(
   onClose: () => void,
-  onRestart: () => void
+  onRestart: () => void,
+  onOpenGallery?: () => void,
+  endingId?: StoryEndingId
 ) {
+  if (typeof document === 'undefined') return;
+
+  // Bắn pháo hoa ăn mừng khi mở Happy Ending, Open Ending hoặc Secret Ending
+  if (endingId === 'happy' || endingId === 'secret' || endingId === 'open') {
+    try {
+      confetti({ particleCount: 70, spread: 80, origin: { y: 0.5 } });
+      if (endingId === 'secret' || endingId === 'happy') {
+        setTimeout(() => {
+          confetti({ particleCount: 50, spread: 100, origin: { y: 0.4 } });
+        }, 300);
+      }
+    } catch {}
+  }
+
+  const galleryBtn = document.getElementById('btn-open-gallery-from-ending');
+  if (galleryBtn && onOpenGallery) {
+    galleryBtn.onclick = () => {
+      audio.playPop();
+      onOpenGallery();
+    };
+  }
+
   const closeBtn = document.getElementById('btn-close-ending');
   if (closeBtn) {
     closeBtn.onclick = () => {

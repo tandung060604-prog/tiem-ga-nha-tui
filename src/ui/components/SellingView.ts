@@ -994,7 +994,14 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       </div>
     ` : '';
 
-    const itemsHtml = comboHtml + pendingHtml + completedHtml;
+    const dietaryHtml = ord.dietaryPreference ? `
+      <div class="order-dietary-row ${ord.dietaryFulfilled ? 'is-fulfilled' : ''}" title="${escapeHtml(ord.dietaryPreference.hint)}">
+        <span class="dietary-label-pill">${ord.dietaryPreference.label}</span>
+        <span class="dietary-hint-text">${escapeHtml(ord.dietaryPreference.hint)}</span>
+      </div>
+    ` : '';
+
+    const itemsHtml = comboHtml + dietaryHtml + pendingHtml + completedHtml;
 
     const isFirstInQueue = idx === 0;
     const alleySlotClass = isFirstInQueue ? 'at-counter' : idx === 1 ? 'waiting-slot-1' : 'waiting-slot-2';
@@ -1066,6 +1073,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             <div class="cust-badges-row">
               <span class="queue-pos-badge ${isFirstInQueue ? 'first' : 'wait'}">${queuePosText}</span>
               ${ord.isVip ? '<span class="cust-badge vip-gold-badge">👑 VIP</span>' : ord.isCriticVip ? '<span class="cust-badge critic-gold-badge">⭐ PHÊ BÌNH</span>' : ord.isDineIn ? '<span class="cust-badge dine-in-tag">🍽️ Bàn Quán</span>' : `<span class="cust-badge ${visual.badgeClass}">${visual.badge}</span>`}
+              ${ord.dietaryPreference ? `<span class="cust-badge dietary-tag ${ord.dietaryFulfilled ? 'fulfilled' : ''}" title="${escapeHtml(ord.dietaryPreference.hint)}">${ord.dietaryPreference.label}</span>` : ''}
             </div>
           </div>
         </div>

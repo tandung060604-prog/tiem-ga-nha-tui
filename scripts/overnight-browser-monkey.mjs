@@ -487,8 +487,8 @@ class OvernightMonkey {
       return true;
     }
 
-    // 16c. Các Modal Hệ Thống Khác (Radio, Bằng Khen, Thử Thách Tuần, Ca Đêm, Biển Hiệu, Kỷ Niệm, Lobby, Sổ Tay Bếp, Tester Feedback)
-    const extraModalClose = page.locator('#btn-close-night-radio, #btn-close-achievements, .btn-claim-badge, #btn-close-weekly-quests, .btn-claim-quest, #btn-close-shop-theme, #btn-close-endless, #btn-close-memories, #btn-close-leaderboard, #btn-close-kitchen-guide, #btn-close-kitchen-guide-bottom, #btn-close-tester-feedback');
+    // 16c. Các Modal Hệ Thống Khác (Radio, Bằng Khen, Thử Thách Tuần, Ca Đêm, Biển Hiệu, Kỷ Niệm, Lobby, Sổ Tay Bếp, Tester Feedback, Sổ Tay Tri Kỷ)
+    const extraModalClose = page.locator('#btn-close-loyalty-modal, .btn-claim-alley-gift, #btn-close-night-radio, #btn-close-achievements, .btn-claim-badge, #btn-close-weekly-quests, .btn-claim-quest, #btn-close-shop-theme, #btn-close-endless, #btn-close-memories, #btn-close-leaderboard, #btn-close-kitchen-guide, #btn-close-kitchen-guide-bottom, #btn-close-tester-feedback');
     if (await extraModalClose.first().isVisible({ timeout: 50 }).catch(() => false)) {
       await extraModalClose.first().click({ force: true });
       await sleep(200);
@@ -638,7 +638,7 @@ class OvernightMonkey {
 
     // C. PHA CHUẨN BỊ (PREPARATION SCREEN)
     // Nếu đang có modal mở trên màn hình, không cố bấm vào màn hình chuẩn bị
-    const hasModal = await page.locator('#modal-container:not([hidden]), #sauce-minigame-modal, .sauce-modal-overlay').isVisible({ timeout: 40 }).catch(() => false);
+    const hasModal = await page.locator('#modal-container:not([hidden]), #sauce-minigame-modal, .sauce-modal-overlay, #loyalty-handbook-modal, .loyalty-modal-overlay').isVisible({ timeout: 40 }).catch(() => false);
     if (hasModal) return false;
 
     const openBarBtn = page.locator('#btn-start-selling');
@@ -826,7 +826,7 @@ class OvernightMonkey {
       const prepTut = document.querySelector('#btn-tutorial-skip, #btn-bacba-understood');
       if (prepTut instanceof HTMLElement) prepTut.click();
 
-      const manualClose = document.querySelector('#btn-close-bacba-manual');
+      const manualClose = document.querySelector('#btn-close-bacba-manual, #btn-close-loyalty-modal');
       if (manualClose instanceof HTMLElement) manualClose.click();
 
       const titleBtn = document.getElementById('btn-title-play');

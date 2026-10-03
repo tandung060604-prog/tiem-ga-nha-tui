@@ -92,6 +92,9 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
                   <button id="btn-open-memories" class="btn-sm btn-toolbox" title="Sổ Tay Kỷ Niệm: Cư Dân Hẻm, Tủ Kỷ Vật, 6 Kết Cục & 18 Mảnh Giấy Nhớ Gà Bông">
                     <img src="${ASSETS.icons.heart}" class="btn-pixel-icon-xs" alt="" /> Kỷ Niệm Hẻm
                   </button>
+                  <button id="btn-open-loyalty-handbook" class="btn-sm btn-toolbox ${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0) > 0 ? 'has-gift' : ''}" title="Sổ Tay Tri Kỷ Hẻm 1102 & Quà Tiếp Tế Cư Dân">
+                    <img src="${ASSETS.icons.heart}" class="btn-pixel-icon-xs" alt="" /> Tri Kỷ Hẻm ${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0) > 0 ? '<span class="badge-dot-pulse">🎁</span>' : ''}
+                  </button>
                   ${(day >= 2 || chapter >= 2) ? `
                     <button id="btn-open-achievements" class="btn-sm btn-toolbox ${claimableBadges > 0 ? 'has-badge' : ''}" title="Bức Tường Bằng Khen Tổ Dân Phố Hẻm 1102">
                       <img src="${ASSETS.icons.trophy}" class="btn-pixel-icon-xs" alt="" /> Bằng Khen
