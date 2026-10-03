@@ -1,6 +1,5 @@
 import { ASSETS } from '../../content/assets';
 import { music } from '../../core/music';
-import { bacBaVoice } from '../../core/bacBaVoice';
 export const INTRO_DURATION_SECONDS = 12;
 
 export interface IntroCinematicOptions {
@@ -47,15 +46,15 @@ export function renderIntroCinematicModal(): string {
     <div id="intro-cinematic-overlay" class="intro-cinematic-overlay intro-cinematic-minimal" role="dialog" aria-modal="true" aria-label="Video mở màn 3D Pixel Tiệm Gà Nhà Tui" tabindex="0">
       <div class="intro-cinematic-card">
         <!-- Nút bật/tắt âm thanh video nổi bật ở góc trên bên phải -->
-        <button id="btn-intro-sound" class="btn-intro-sound" type="button" aria-label="Bật hoặc tắt âm thanh video" title="Bật/Tắt âm thanh">
+        <button id="btn-intro-sound" class="btn-intro-sound is-unmuted" type="button" aria-label="Bật hoặc tắt âm thanh video" title="Bật/Tắt âm thanh video">
           <span class="intro-sound-icon" id="intro-sound-icon">🔊</span>
-          <span class="intro-sound-text" id="intro-sound-text">Bật tiếng</span>
+          <span class="intro-sound-text" id="intro-sound-text">Tiếng video</span>
         </button>
 
         <!-- Khung chiếu video lấp kín 100% màn hình điện thoại dọc (Edge-to-Edge Portrait Fullscreen Viewport) -->
         <div class="intro-screen-viewport" id="intro-3d-viewport">
           <div class="intro-cinematic-stage" id="intro-3d-stage">
-            <video id="intro-video-element" class="intro-cinematic-video" playsinline autoplay loop poster="${poster}" preload="auto">
+            <video id="intro-video-element" class="intro-cinematic-video" playsinline webkit-playsinline autoplay loop poster="${poster}" preload="auto">
               <source src="${videoSrc}" type="video/mp4" />
             </video>
             <img src="${poster}" alt="Góc phố Hẻm 1102 3D Pixel Diorama buổi sớm náo nhiệt" class="intro-cinematic-img animate-voxel-3d" id="intro-cinematic-img" />
@@ -70,19 +69,6 @@ export function renderIntroCinematicModal(): string {
             <div class="steam-particle sp-3"></div>
             <div class="gold-sparkle-3d gs-1"></div>
             <div class="gold-sparkle-3d gs-2"></div>
-          </div>
-        </div>
-
-        <!-- Lời chào Bác Ba Nam Bộ mở màn Hẻm 1102 -->
-        <div class="intro-bacba-speech-container" id="intro-bacba-speech">
-          <div class="intro-bacba-bubble">
-            <img src="${ASSETS.bacba.front}" alt="Bác Ba" class="intro-bacba-avatar" />
-            <div class="intro-bacba-text-wrap">
-              <div class="intro-bacba-speaker">👴 BÁC BA NGHỆ NHÂN CHỢ LỚN</div>
-              <div class="intro-bacba-text">
-                “Mèn đét ơi! Sáng sớm mà Hẻm 1102 đã thơm phức mùi gà chiên giòn rụm rồi nghen! Nhào vô phụ Bác Ba một tay đặng tiệm mình khai trương hồng phát nghen con! 🍗✨”
-              </div>
-            </div>
           </div>
         </div>
 
@@ -132,7 +118,7 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
         soundBtn.classList.add('is-muted');
         soundBtn.classList.remove('is-unmuted');
         if (soundIcon) soundIcon.textContent = '🔇';
-        if (soundText) soundText.textContent = 'Chạm bật tiếng';
+        if (soundText) soundText.textContent = 'Bật tiếng';
       } else {
         soundBtn.classList.remove('is-muted');
         soundBtn.classList.add('is-unmuted');
@@ -153,16 +139,18 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
       videoEl.style.display = 'block';
       if (imgEl) imgEl.style.display = 'none';
 
-      // Luôn tắt tiếng video gốc (triệt tiêu triệt để tạp âm / tiếng nước ngoài từ mô hình AI Veo)
-      videoEl.muted = true;
-      videoEl.play().catch(() => {});
-
-      // Đồng bộ trạng thái âm thanh game thuần Việt
-      if (music.isEnabled()) {
-        music.start('title');
-        updateSoundUI(false);
-      } else {
-        updateSoundUI(true);
+      // Ưu tiên phát video CÓ TIẾNG gốc của video
+      videoEl.muted = false;
+      const playPromise = videoEl.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          updateSoundUI(false);
+        }).catch(() => {
+          // Trình duyệt chặn unmuted autoplay trước cử chỉ người dùng -> fallback muted tạm thời
+          videoEl.muted = true;
+          updateSoundUI(true);
+          videoEl.play().catch(() => {});
+        });
       }
     };
 
@@ -185,22 +173,18 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
     };
   }
 
-  // Tương tác bật/tắt tiếng qua nút âm thanh
+  // Tương tác bật/tắt tiếng qua nút âm thanh video
   const toggleSound = (e: Event) => {
     e.stopPropagation();
     e.preventDefault();
     if (!videoEl) return;
 
-    if (music.isEnabled()) {
-      music.setEnabled(false);
-      music.stop();
-      updateSoundUI(true);
-    } else {
-      music.setEnabled(true);
-      music.start('title');
-      bacBaVoice.speak('instruction');
-      updateSoundUI(false);
+    videoEl.muted = !videoEl.muted;
+    videoEl.volume = 1.0;
+    if (videoEl.paused) {
+      videoEl.play().catch(() => {});
     }
+    updateSoundUI(videoEl.muted);
   };
 
   soundBtn?.addEventListener('click', toggleSound);
@@ -231,7 +215,10 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
     window.removeEventListener('keydown', handleKeyDown);
 
     if (videoEl) {
-      try { videoEl.pause(); } catch {}
+      try { 
+        videoEl.pause(); 
+        videoEl.currentTime = 0;
+      } catch {}
     }
 
     if (music.isEnabled()) {
@@ -258,22 +245,16 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
       return; // Không đóng màn hình khi bấm nút âm thanh
     }
 
-    // Nếu người chơi chạm vào thanh đáy "CHẠM VÀO MÀN HÌNH ĐỂ VÀO GAME": luôn vào game ngay
-    if (target?.closest('#intro-tap-prompt, .intro-tap-prompt-container')) {
-      closeAndProceed();
-      return;
-    }
-
-    // Nếu âm thanh đang tắt, chạm lần đầu sẽ kích hoạt âm thanh game thuần Việt & cất giọng Bác Ba
-    if (!music.isEnabled()) {
-      music.setEnabled(true);
-      music.start('title');
-      bacBaVoice.speak('instruction');
+    // Nếu video đang bị muted (do chính sách autoplay ban đầu), chạm vào màn hình sẽ bật tiếng video ngay
+    if (videoEl && videoEl.muted && !target?.closest('#intro-tap-prompt, .intro-tap-prompt-container')) {
+      videoEl.muted = false;
+      videoEl.volume = 1.0;
+      videoEl.play().catch(() => {});
       updateSoundUI(false);
       return;
     }
 
-    // Khi âm thanh đã bật hoặc chạm tiếp: vào game
+    // Khi âm thanh video đã bật hoặc chạm tiếp: vào game
     closeAndProceed();
   };
 

@@ -891,3 +891,13 @@
   - **Chiến lược Fix:** `defensive_nullcheck_fallback` (Độ tin cậy: 41.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
 ---
+
+### 🐞 [19:00:20 3/10/2026] (via Jev MCP) Video Intro bị mất tiếng và thoại Bác Ba mở game không cần thiết
+- **Triệu chứng:** Video mở màn bị mute tiếng, bong bóng thoại và âm thanh Bác Ba xuất hiện lúc mở đầu game che mất trải nghiệm video và gây khó chịu cho người chơi.
+- **Vị trí:** `src/ui/components/IntroCinematicModal.ts, src/main.ts` 
+- **Đánh giá Jev (610ms):**
+  - **Mức độ (Severity):** `p2_ui_friction` (Độ tin cậy: 66.0%)
+  - **Nguyên nhân gốc (Root Cause):** `ui_modal_stack` (Độ tin cậy: 89.0%)
+  - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 20.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `50` ngày chơi
+---
