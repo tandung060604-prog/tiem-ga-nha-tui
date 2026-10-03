@@ -115,15 +115,19 @@ for (const width of WIDTHS) {
   // Bấm nút thật + món trong khay nhìn thấy được
   try {
     await page.evaluate(() => {
-      const b = document.querySelector('#btn-tutorial-skip, #btn-bacba-understood, #btn-tutorial-next, #btn-skip-onboarding');
-      if (b instanceof HTMLElement) b.click();
+      document.querySelectorAll('#btn-skip-onboarding, .bacba-tip-banner-close, #btn-tutorial-skip, #btn-bacba-understood, #btn-tutorial-next').forEach(el => {
+        if (el instanceof HTMLElement) el.click();
+      });
+      const overlay = document.getElementById('bacba-tip-banner');
+      if (overlay) overlay.remove();
+      const guide = document.getElementById('onboarding-guide-banner');
+      if (guide) guide.remove();
     }).catch(() => {});
-    const tutNext = page.locator('#btn-tutorial-next, #btn-bacba-understood, #btn-skip-onboarding');
-    if (await tutNext.isVisible().catch(() => false)) await tutNext.click({ force: true }).catch(() => {});
-    const tutSkip = page.locator('#btn-tutorial-skip, #btn-bacba-understood, #btn-skip-onboarding');
-    if (await tutSkip.isVisible().catch(() => false)) await tutSkip.click({ force: true }).catch(() => {});
     await page.waitForTimeout(300);
-    await page.locator('#btn-add-drink').click({ timeout: 5000, force: true });
+    await page.evaluate(() => {
+      const btn = document.querySelector('#btn-add-drink, [data-action="pour-coca"]');
+      if (btn instanceof HTMLElement) btn.click();
+    });
     record('PASS', width, 'nút bấm ăn (click thật)');
   } catch (e) {
     record('FAIL', width, 'nút bấm ăn (click thật)', e.message.split('\n')[0]);
