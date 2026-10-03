@@ -178,6 +178,23 @@ export class OrdersEngine {
     if (heartLevel >= 1) {
       patienceMax = Math.round(patienceMax * 1.15);
     }
+
+    // Hiệp đồng Đài Phát Thanh FM 99.9 (Active Radio Buff)
+    if (state.activeRadioBuff && state.activeRadioBuff.activeForDay === state.day) {
+      const radioBuff = state.activeRadioBuff;
+      if (radioBuff.type === 'customer_patience') {
+        patienceMax = Math.round(patienceMax * (radioBuff.multiplier || 1.25));
+      }
+      if (radioBuff.type === 'trending_dish' && radioBuff.targetDishId) {
+        const hasTrendingItem = selectedItems.some(it => it.menuItemId === radioBuff.targetDishId);
+        if (hasTrendingItem) {
+          totalPrice = Math.round(totalPrice * (radioBuff.multiplier || 1.2));
+        }
+      }
+      if (radioBuff.type === 'delivery_boom' && isDelivery) {
+        totalPrice += 5000; // Tip hỗ trợ tài xế ngày mưa bão
+      }
+    }
     const dietaryPreference = assignDietaryPreference(char.id, heartLevel);
 
     patienceMax = Math.max(12, patienceMax);

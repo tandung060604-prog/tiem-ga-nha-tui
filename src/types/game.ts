@@ -230,6 +230,10 @@ export interface DineInTable {
   eatingDurationSec: number;
   tipAmount: number;
   isCritic?: boolean;
+  cleanProgress?: number;       // Tiến trình lau bàn 0 -> 100%
+  isBeingCleaned?: boolean;     // Đang được lau (người chơi chà tay hoặc Waiter lau)
+  cleanedByStaff?: boolean;     // Có nhân viên Phục Vụ đang hỗ trợ lau
+  staffCleanerName?: string;    // Tên của nhân viên Phục Vụ đang lau
 }
 
 export interface CustomerOrder {
@@ -609,6 +613,7 @@ export interface GameState {
   residentAffinityLevels?: Record<string, number>; // characterId -> rank (1-5)
   lastRadioBroadcastDay?: number;
   heardRadioBroadcastIds?: string[];
+  activeRadioBuff?: RadioBuff | null;
   customSignatureDishesUnlocked?: string[];
   todayWeather?: SaigonWeatherId;
   petPatio?: PetPatioState;
@@ -860,7 +865,27 @@ export interface ResidentAffinity {
   specialPerkDesc?: string;
 }
 
-// --- BẢN TIN PHÁT THANH ĐÊM SÀI GÒN (LATE NIGHT RADIO CASSETTE) ---
+// --- BẢN TIN PHÁT THANH ĐÊM SÀI GÒN (LATE NIGHT RADIO CASSETTE & DAILY BUFFS) ---
+export type RadioBuffType = 
+  | 'staff_speed'        // 🎵 Nhạc Lofi Sài Gòn: Nhân viên nhanh nhẹn +20%
+  | 'trending_dish'       // 🍗 Xu Hướng Ẩm Thực: Món ăn hot tăng +20% giá bán & khách gọi nhiều hơn
+  | 'listener_gift'       // 🎁 Quà Thính Giả: Tặng 1 can dầu sạch / 5 bột chiên hoặc tiền tip
+  | 'chef_wisdom'        // 💡 Mẹo Bếp Trưởng Bác Ba: Mẻ gà đầu tiên trong ngày tự động Perfect
+  | 'delivery_boom'      // 🛵 Sóng Radio Giờ Cao Điểm: Khách đặt giao hàng tăng +25%
+  | 'customer_patience'; // 🌸 Giai Điệu Dịu Êm: Khách kiên nhẫn hơn +25% không bỏ về
+
+export interface RadioBuff {
+  id: string;
+  type: RadioBuffType;
+  title: string;
+  description: string;
+  targetDishId?: string; // Món được buff (vd: 'crispy_chicken', 'shake_fries', 'spicy_chicken')
+  multiplier?: number;   // Hệ số nhân (vd: 1.2 cho tốc độ / giá bán)
+  bonusMoney?: number;   // Tiền quà thính giả gửi tặng
+  bonusItem?: { id: string; amount: number }; // Vật phẩm quà tặng vào kho
+  activeForDay: number;  // Ngày áp dụng hiệu lực
+}
+
 export interface NightRadioBroadcast {
   id: string;
   chapter: number;
@@ -871,6 +896,9 @@ export interface NightRadioBroadcast {
   audioTranscript: string;
   weatherCondition: string;
   streetRumor: string;
+  musicTrackName?: string;     // Bản nhạc cassette phát kèm (vd: 'Sài Gòn Đêm Mưa Lofi - Băng Cũ')
+  forecastTomorrow?: string;   // Dự báo thời tiết & xu hướng buôn bán ngày mai
+  buff?: RadioBuff;           // Buff thực tế nhận được khi bật đài nghe bản tin
   requiredFlag?: string;
 }
 

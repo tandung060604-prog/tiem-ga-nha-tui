@@ -232,7 +232,8 @@ export function sellingStructureKey(state: GameState, session: SellingSession): 
     Boolean(session.activeThief),
     stationStripKey(state, session),
     staffStripKey(state, session),
-    prepStationKey(state)
+    prepStationKey(state),
+    state.activeRadioBuff?.id
   ]);
 }
 
@@ -522,6 +523,50 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
   const thiefTimerEl = root.querySelector('#thief-banner-time');
   if (thiefTimerEl && session.activeThief) {
     thiefTimerEl.textContent = `⏳ ${Math.ceil(session.activeThief.timeRemaining)}s`;
+  }
+
+  // Cập nhật thời gian thực bàn ăn hiên quán (Patio Tables - ăn & chà lau)
+  if (session.dineInTables && session.dineInTables.length > 0) {
+    for (const table of session.dineInTables) {
+      if (table.status === 'eating') {
+        const eatingBar = root.querySelector<HTMLElement>(`.patio-table[data-table-idx="${table.tableIndex}"] .patio-progress-fill`);
+        if (eatingBar) {
+          const progressPct = Math.round((table.eatingTimerSec / Math.max(1, table.eatingDurationSec)) * 100);
+          eatingBar.style.width = `${progressPct}%`;
+        }
+      } else if (table.status === 'dirty') {
+        const cleanFill = root.querySelector<HTMLElement>(`.patio-table[data-table-idx="${table.tableIndex}"] .patio-table-clean-fill`);
+        const cleanText = root.querySelector<HTMLElement>(`.patio-table[data-table-idx="${table.tableIndex}"] .patio-clean-text`);
+        const cleanBtn = root.querySelector<HTMLElement>(`.patio-table[data-table-idx="${table.tableIndex}"] .btn-clean-table`);
+        const tableCard = root.querySelector<HTMLElement>(`.patio-table[data-table-idx="${table.tableIndex}"]`);
+
+        const progress = Math.min(100, Math.max(0, Math.round(table.cleanProgress || 0)));
+        if (cleanFill) {
+          cleanFill.style.width = `${progress}%`;
+        }
+        if (cleanText) {
+          const isStaff = !!table.cleanedByStaff;
+          const isCleaning = !!table.isBeingCleaned;
+          const newText = isStaff
+            ? `🧹 ${table.staffCleanerName || 'Phục vụ'} lau (${progress}%)`
+            : isCleaning
+            ? `🧼 Đang chà... (${progress}%)`
+            : progress > 0
+            ? `🧼 Chà tiếp (${progress}%)`
+            : '🧼 Chà lau';
+          if (cleanText.textContent?.trim() !== newText.trim()) {
+            cleanText.textContent = newText;
+          }
+        }
+        if (cleanBtn) {
+          cleanBtn.classList.toggle('is-scrubbing', !!table.isBeingCleaned);
+          cleanBtn.classList.toggle('by-staff', !!table.cleanedByStaff);
+        }
+        if (tableCard) {
+          tableCard.classList.toggle('is-being-cleaned', !!table.isBeingCleaned);
+        }
+      }
+    }
   }
 }
 
@@ -1206,6 +1251,11 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         </div>
         ${rush ? `<span class="rush-badge"><img src="${ASSETS.icons.fireRush}" class="hud-pixel-icon" alt="" /> CA CAO ĐIỂM!</span>` : `<span class="session-ambience">${timePeriodLabel}</span>`}
         ${state.secretSauceDay?.buffActive ? `<span class="sauce-buff-hud-badge" title="Sốt Bí Truyền đang kích hoạt: +3k tip mỗi đơn!"><img src="${ASSETS.icons.sauce}" class="hud-pixel-icon" alt="" /> Sốt Vàng</span>` : ''}
+        ${(state.activeRadioBuff && state.activeRadioBuff.activeForDay === state.day) ? `
+          <span class="radio-buff-hud-badge" style="background: #fef08a; color: #854d0e; border: 1px solid #eab308; border-radius: 12px; padding: 2px 7px; font-size: 0.68rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;" title="${escapeHtml(state.activeRadioBuff.description)}">
+            <span>📻</span> ${escapeHtml(state.activeRadioBuff.title)}
+          </span>
+        ` : ''}
         <div class="hud-actions" style="display: flex; gap: 5px; align-items: center;">
           <button id="btn-open-kitchen-guide" class="btn-sm" style="display: none !important;" aria-hidden="true" title="Sổ Tay Bếp Trưởng"></button>
           <button id="btn-toggle-fast" class="btn-sm btn-toggle-fast">
@@ -1702,6 +1752,39 @@ function renderPatioWoodTableSvg(): string {
   `;
 }
 
+export function renderPatioWipingRagSvg(): string {
+  return `
+    <svg class="patio-rag-svg" viewBox="0 0 32 32" width="28" height="28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <!-- Bóng đổ mềm dưới khăn lau -->
+      <ellipse cx="16" cy="27" rx="11" ry="3.5" fill="#1e293b" opacity="0.25"/>
+      
+      <!-- Lớp vải khăn dệt nếp gấp chính (Màu vàng ngà Bistro ấm áp) -->
+      <path d="M7 10C7 7.5 9 6 12 6H21C23.5 6 25 7.5 25 10L26 21C26 23.5 24 25 21 25H11C8.5 25 7 23.5 7 21L7 10Z" fill="#fbbf24" stroke="#d97706" stroke-width="1.2" stroke-linejoin="round"/>
+      
+      <!-- Họa tiết dệt carô sọc ca-rô cam đất retro -->
+      <path d="M12 6.5V24.5M17 6.5V24.5M22 6.5V24.5" stroke="#f59e0b" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M7.5 11H24.5M7.5 16H24.5M7.5 21H24.5" stroke="#f59e0b" stroke-width="1.2" stroke-linecap="round"/>
+
+      <!-- Nếp gấp viền khăn mềm mại 3D -->
+      <path d="M7 10L10 14L15 9L20 13L25 10" stroke="#fef3c7" stroke-width="1" stroke-linecap="round" opacity="0.8"/>
+      
+      <!-- Bọt xà phòng trắng bóng lấp lánh quanh khăn -->
+      <circle cx="8" cy="8" r="2.2" fill="#ffffff" stroke="#93c5fd" stroke-width="0.6"/>
+      <circle cx="7.5" cy="7.5" r="0.8" fill="#ffffff"/>
+      
+      <circle cx="24" cy="7" r="1.8" fill="#ffffff" stroke="#93c5fd" stroke-width="0.5"/>
+      <circle cx="23.5" cy="6.8" r="0.6" fill="#ffffff"/>
+      
+      <circle cx="25" cy="22" r="2.4" fill="#ffffff" stroke="#93c5fd" stroke-width="0.6"/>
+      <circle cx="24.3" cy="21.5" r="0.8" fill="#ffffff"/>
+
+      <!-- Tia sáng bóng lấp lánh (Sparkle clean) -->
+      <path d="M16 2L17 4.5L19.5 5.5L17 6.5L16 9L15 6.5L12.5 5.5L15 4.5L16 2Z" fill="#38bdf8"/>
+      <circle cx="16" cy="5.5" r="0.8" fill="#ffffff"/>
+    </svg>
+  `;
+}
+
 export function renderDineInPatio(tables?: DineInTable[]): string {
   if (!tables || tables.length === 0) return '';
   const tablesHtml = tables.map(table => {
@@ -1739,17 +1822,36 @@ export function renderDineInPatio(tables?: DineInTable[]): string {
         </div>
       `;
     }
-    // dirty
+    // dirty table: Chà khăn lau 3-4s hoặc Waiter tự động dọn
     const tip = table.tipAmount || 2000;
     const tipK = Math.round(tip / 1000);
+    const progress = Math.min(100, Math.max(0, Math.round(table.cleanProgress || 0)));
+    const isCleaning = !!table.isBeingCleaned;
+    const isStaff = !!table.cleanedByStaff;
+
     return `
-      <div class="patio-table dirty patio-bistro-table ${table.isCritic ? 'critic' : ''}" data-table-idx="${table.tableIndex}" title="Khách đã ăn xong! Chạm dọn bàn để thu ${tip.toLocaleString('vi-VN')}đ tiền tip">
+      <div class="patio-table dirty patio-bistro-table ${table.isCritic ? 'critic' : ''} ${isCleaning ? 'is-being-cleaned' : ''}" data-table-idx="${table.tableIndex}" title="Khách đã ăn xong! Chà tay lên bàn 3-4s để lau sạch và thu ${tip.toLocaleString('vi-VN')}đ tiền tip">
         <div class="patio-table-inner">
           <div class="patio-dirty-icon-wrap">
             <span class="patio-tip-tag">+${tipK}k 🪙</span>
           </div>
-          <button class="btn-clean-table" data-table-idx="${table.tableIndex}" title="Dọn bàn và thu ${tip.toLocaleString('vi-VN')}đ tiền tip">
-            🧹 Dọn
+          <button class="btn-clean-table ${isCleaning ? 'is-scrubbing' : ''} ${isStaff ? 'by-staff' : ''}" data-table-idx="${table.tableIndex}" aria-label="Chà lau bàn sạch">
+            <div class="patio-rag-motion-wrap">
+              ${renderPatioWipingRagSvg()}
+              ${isCleaning ? `
+                <span class="scrub-bubble bubble-1" aria-hidden="true">🫧</span>
+                <span class="scrub-bubble bubble-2" aria-hidden="true">🫧</span>
+                <span class="scrub-sparkle" aria-hidden="true">✨</span>
+              ` : ''}
+            </div>
+            <div class="patio-clean-label-group">
+              <span class="patio-clean-text">
+                ${isStaff ? `🧹 ${escapeHtml(table.staffCleanerName || 'Phục vụ')} lau` : isCleaning ? '🧼 Đang chà...' : (progress > 0 ? '🧼 Chà tiếp' : '🧼 Chà lau')}
+              </span>
+              <div class="patio-table-clean-bar" title="Tiến trình lau: ${progress}%">
+                <div class="patio-table-clean-fill" style="width: ${progress}%;"></div>
+              </div>
+            </div>
           </button>
         </div>
       </div>

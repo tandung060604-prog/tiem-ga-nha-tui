@@ -102,6 +102,7 @@ export interface StaffEffects {
   deliveryPatiencePct: number;
   commissionRate: number;
   waiterServeMs: number | null; // null = không có phục vụ
+  waiterCleanMs: number | null; // Thời gian dọn 1 bàn của phục vụ (null nếu không có)
   hygienePerDay: number;
   customersPct: number;
   hasSecurity: boolean;
@@ -167,6 +168,11 @@ export function staffEffects(staff: readonly StaffMember[], gameHour = 12, upgra
     ? Math.round(Math.max(500, (2600 - 1600 * fastestWaiter) / (up?.selfServe ? 1.5 : 1)))
     : up?.selfServe ? SELF_SERVE_MS : null;
 
+  // Phục vụ dọn bàn bẩn: Tốc độ theo chỉ số speed (4.0s ở cấp 1 giảm dần xuống 1.5s ở cấp 5)
+  const waiterCleanMs = waiters.length
+    ? Math.round(Math.max(1500, (4000 - 2500 * fastestWaiter) / (up?.selfServe ? 1.3 : 1)))
+    : null;
+
   // Thu ngân giúp khách tại quán kiên nhẫn hơn & có tỷ lệ gợi ý món (upsell)
   const walkInPatiencePct = Math.min(45, sum(cashiers.map(m => 25 * power(m, 'attitude', boost))));
   const upsellChance = Math.min(0.35, sum(cashiers.map(m => 0.20 * power(m, 'skill', boost))));
@@ -206,6 +212,7 @@ export function staffEffects(staff: readonly StaffMember[], gameHour = 12, upgra
     deliveryPatiencePct,
     commissionRate,
     waiterServeMs,
+    waiterCleanMs,
     hygienePerDay,
     customersPct,
     hasSecurity: hasSec,
@@ -218,7 +225,7 @@ export function staffEffects(staff: readonly StaffMember[], gameHour = 12, upgra
 }
 
 // Có ai tự làm việc trong ca không (phụ bếp, robot, phục vụ, kiosk) → khỏi chạy tickStaff khi không có
-export const hasAutoWork = (eff: StaffEffects) => eff.cooks.length > 0 || eff.waiterServeMs !== null;
+export const hasAutoWork = (eff: StaffEffects) => eff.cooks.length > 0 || eff.waiterServeMs !== null || eff.waiterCleanMs !== null;
 
 // Một dòng mô tả tác dụng cho tab Nhân viên (tính với cả đội hiện tại, có quản lý hay không)
 export function describeStaffEffect(member: StaffMember, team: readonly StaffMember[]): string {
@@ -233,7 +240,7 @@ export function describeStaffEffect(member: StaffMember, team: readonly StaffMem
         : `Chỉ ${MAX_HELPER_FRYERS} phụ bếp giỏi nhất được đứng chảo`;
     }
     case 'waiter':
-      return `Rót nước, tự lên món sau ${((eff.waiterServeMs ?? 0) / 1000).toFixed(1)}s khi khay đủ · +${eff.hygienePerDay.toFixed(2)}⭐ Vệ sinh · +${Math.round(eff.dineInTipBonus)}% Tip tại bàn`;
+      return `Rót nước, tự lên món sau ${((eff.waiterServeMs ?? 0) / 1000).toFixed(1)}s khi khay đủ · Tự lau bàn sạch sau ${((eff.waiterCleanMs ?? 3500) / 1000).toFixed(1)}s · +${eff.hygienePerDay.toFixed(2)}⭐ Vệ sinh · +${Math.round(eff.dineInTipBonus)}% Tip tại bàn`;
     case 'cashier':
       return `Khách tại quán chờ lâu hơn ${Math.round(eff.walkInPatiencePct)}% · Gợi ý thêm món (+${Math.round(eff.upsellChance * 100)}% upsell) · Hóa giải tiền giả/tranh chấp`;
     case 'delivery':
@@ -256,6 +263,7 @@ export interface HelperFry { menuItemId: string; elapsedMs: number }
 export type StaffEvent =
   | { type: 'helperDone'; item: TrayItem; cook: string }
   | { type: 'autoServe' }
+  | { type: 'waiterCleanDone'; tableIndex: number; tipCollected: number; tableName: string; staffName: string }
   | { type: 'staffSlacking'; staffName: string; reason: string }
   | { type: 'staffMistake'; staffName: string; detail: string; item: TrayItem };
 
@@ -263,6 +271,7 @@ export interface StaffSession {
   helpers: (HelperFry | null)[];
   waiterMs: number;
   pourMs?: number; // phục vụ rót nước: thời gian từ ly trước
+  cleaningTableIndex?: number | null; // chỉ số bàn phục vụ đang dọn
   orders: CustomerOrder[];
   totalFriedCount: number;
 }
@@ -273,6 +282,8 @@ export interface StaffHooks {
   pour: (drink: DrinkId) => boolean;           // phục vụ rót nước (trừ kho, đặt vào khay)
   scoop?: (side: ScoopId) => boolean;          // phục vụ múc món kèm từ khay inox (củ cải, bắp cải)
   squeeze?: (condiment: Condiment) => boolean;  // phục vụ xịt tương dặn kèm lên món trong khay
+  cleanTable?: (tableIndex: number, deltaMs: number, staffName: string) => { completed: boolean; tipCollected?: number; tableName?: string } | null;
+  dirtyTableIndices?: () => number[];
   traySize: number;
 }
 
@@ -431,6 +442,34 @@ export function tickStaff(
   } else {
     session.waiterMs = 0;
   }
+
+  // Phục vụ: Dọn dẹp bàn ăn bẩn khi rảnh tay (không có món đang cần lên tức thì cho khách đầu)
+  if (eff.waiterCleanMs !== null && !isOrderFullyReady && hooks.cleanTable && hooks.dirtyTableIndices) {
+    const dirtyIndices = hooks.dirtyTableIndices();
+    if (dirtyIndices.length > 0) {
+      let targetIdx = session.cleaningTableIndex;
+      if (targetIdx == null || !dirtyIndices.includes(targetIdx)) {
+        targetIdx = dirtyIndices[0];
+        session.cleaningTableIndex = targetIdx;
+      }
+      if (targetIdx != null) {
+        const cleanRes = hooks.cleanTable(targetIdx, gameDt, eff.waiterName || 'Phục vụ');
+        if (cleanRes && cleanRes.completed) {
+          session.cleaningTableIndex = null;
+          events.push({
+            type: 'waiterCleanDone',
+            tableIndex: targetIdx,
+            tipCollected: cleanRes.tipCollected || 0,
+            tableName: cleanRes.tableName || `Bàn ${targetIdx + 1}`,
+            staffName: eff.waiterName || 'Phục vụ'
+          });
+        }
+      }
+    } else {
+      session.cleaningTableIndex = null;
+    }
+  }
+
   return events;
 }
 

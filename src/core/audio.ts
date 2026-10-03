@@ -955,6 +955,24 @@ class AudioManager {
   public playComboFanfare() {
     this.playZzfx(0.3, 0.02, 659, 0.01, 0.08, 0.22, 1, 1.3, 4, 0, 180, 0.04, 0, 0, 0, 0, 0.05, 0.8, 0.03, 0);
   }
+
+  // 8. Tiếng 'tít tít' gõ từng chữ nhẹ nhàng ấm áp cho hội thoại Ký Sự Hẻm 1102 (Retro VN dialogue blip)
+  public playTextBlip(pitchMod = 0) {
+    if (this.isMuted) return;
+    // Tần số giao động vi mô 520Hz - 620Hz tạo độ tự nhiên, volume êm ái
+    const freq = 560 + (pitchMod % 5) * 20;
+    this.playZzfx(0.08, 0.01, freq, 0.005, 0.01, 0.02, 1, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.3, 0.01, 0);
+  }
+
+  // 9. Tiếng rè sóng radio cassette khi dò tần số FM 99.9 MHz
+  public playRadioTuning() {
+    this.playZzfx(0.18, 0.2, 280, 0.02, 0.08, 0.15, 4, 1.2, 0, 0, 0, 0, 0, 0.9, 0, 0, 0, 0.4, 0.03, 0.2);
+  }
+
+  // 10. Giai điệu jingle FM 99.9 ấm áp vui tươi
+  public playRadioJingle() {
+    this.playZzfx(0.25, 0.02, 880, 0.01, 0.12, 0.25, 0, 1.2, 3, 0, 220, 0.05, 0, 0, 0, 0, 0.06, 0.8, 0.02, 0);
+  }
 }
 
 export const audio = new AudioManager();

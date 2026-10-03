@@ -31,7 +31,16 @@ import { renderReviewReplyModal } from './ui/components/ReviewReplyModal';
 import { ReviewsEngine } from './core/reviewsEngine';
 import { renderMenuTab, bindMenuEvents } from './ui/components/MenuTab';
 import { renderSellingView, patchSellingView, sellingStructureKey, renderFx } from './ui/components/SellingView';
-import { SellingSession, createSellingSession, gameDeltaMs, tickSelling, drainFx, cleanDineInTable } from './core/sellingSim';
+import {
+  SellingSession,
+  createSellingSession,
+  gameDeltaMs,
+  tickSelling,
+  drainFx,
+  scrubDineInTable,
+  stopScrubbingDineInTable,
+  waiterCleanDineInTable
+} from './core/sellingSim';
 import { OPEN_HOUR, CLOSE_HOUR } from './core/clock';
 import type { ShiftSnapshot } from './core/sellingSim';
 import { DRINK_RECIPES, TIMER_RECIPES, timerPhase, TimerStationId, AssemblyId, DrinkId, isTimerStationId, isAssemblyId, isDrinkId, ScoopId, isScoopId } from './core/stations';
@@ -66,7 +75,6 @@ import { ASSETS } from './content/assets';
 import { pickDailyIncident, resolveIncidentChoice } from './core/dailyIncidentsEngine';
 import { DAILY_INCIDENTS } from './content/dailyIncidents';
 import { renderSocialShareModal } from './ui/components/SocialShareModal';
-import { renderStoryletModal } from './ui/components/StoryletModal';
 import { NIGHT_STORYLETS } from './content/storylets';
 import { pickNightStorylet, applyStoryletChoice } from './core/storyletEngine';
 import { getInviteUrl } from './core/leaderboard';
@@ -111,10 +119,13 @@ import {
 } from './core/characterNarrativeEngine';
 import {
   renderCharacterEpisodeModal,
-  renderCharacterEpisodeReactionModal
+  renderCharacterEpisodeReactionModal,
+  bindCharacterEpisodeTypewriter,
+  bindReactionEpisodeTypewriter
 } from './ui/components/CharacterStoryModal';
+import { renderStoryletModal, bindStoryletTypewriter } from './ui/components/StoryletModal';
 import { renderNightRadioModal } from './ui/components/NightRadioModal';
-import { getTonightRadioBroadcast } from './content/nightRadio';
+import { getTonightRadioBroadcast, activateRadioBroadcastBuff } from './content/nightRadio';
 import { getUnlockedCurios } from './content/curiosAndRelics';
 import { getUnlockedSignatureDishes } from './content/signatureStoryDishes';
 import { getWeatherForDay } from './content/saigonWeather';
@@ -212,6 +223,10 @@ class AppController {
   private toastQueue: string[] = [];
   private isToastActive = false;
   private toastTimer: number | null = null;
+  private scrubbingTableIndex: number | null = null;
+  private scrubIntervalId: number | null = null;
+  private lastScrubPos: { x: number; y: number } = { x: 0, y: 0 };
+  private lastSummaryData: { ledger: DayLedger; review: CustomerReview; advisorTip: string; rentDue?: DayResult['rentDue'] } | null = null;
 
   constructor() {
     if (import.meta.env?.DEV) {
@@ -245,11 +260,39 @@ class AppController {
     // Pick today's random event based on day
     this.pickDailyEvent();
 
-    document.getElementById('main-view')?.addEventListener('click', e => {
-      if (stateManager.getState().phase === 'selling' && e.target instanceof Element) {
-        this.handleSellingClick(e.target);
-      }
-    });
+    const mainViewEl = document.getElementById('main-view');
+    if (mainViewEl) {
+      mainViewEl.addEventListener('click', e => {
+        if (stateManager.getState().phase === 'selling' && e.target instanceof Element) {
+          this.handleSellingClick(e.target);
+        }
+      });
+
+      // Thao tác cọ xát / chà tay lên bàn ăn hiên quán (3-4s sạch bóng)
+      mainViewEl.addEventListener('pointerdown', e => {
+        if (stateManager.getState().phase !== 'selling' || !(e.target instanceof Element)) return;
+        const cleanTableBtn = e.target.closest<HTMLElement>('.btn-clean-table, .patio-table.dirty');
+        if (!cleanTableBtn) return;
+        const idxStr = cleanTableBtn.dataset.tableIdx ?? cleanTableBtn.getAttribute('data-table-idx');
+        if (idxStr !== null && idxStr !== undefined) {
+          this.startScrubbingPatioTable(Number(idxStr), e.clientX, e.clientY);
+        }
+      });
+
+      mainViewEl.addEventListener('pointermove', e => {
+        if (this.scrubbingTableIndex === null) return;
+        this.onPointerMoveScrub(e.clientX, e.clientY);
+      });
+
+      const stopScrub = () => {
+        if (this.scrubbingTableIndex !== null) {
+          this.stopScrubbingPatioTable();
+        }
+      };
+      mainViewEl.addEventListener('pointerup', stopScrub);
+      mainViewEl.addEventListener('pointercancel', stopScrub);
+      window.addEventListener('pointerup', stopScrub);
+    }
 
     // Subscribe to state updates
     stateManager.subscribe(() => {
@@ -1043,6 +1086,11 @@ class AppController {
     const html = renderCharacterEpisodeModal(state, episode);
     this.openModal(html);
 
+    const modalBox = document.getElementById('modal-character-story') || document.getElementById('modal-content');
+    if (modalBox) {
+      bindCharacterEpisodeTypewriter(modalBox);
+    }
+
     const closeBtn = document.getElementById('btn-close-char-story');
     if (closeBtn) {
       closeBtn.onclick = () => {
@@ -1070,6 +1118,11 @@ class AppController {
           confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
           this.openModal(renderCharacterEpisodeReactionModal(episode, choice));
 
+          const reactionBox = document.getElementById('modal-char-reaction') || document.getElementById('modal-content');
+          if (reactionBox) {
+            bindReactionEpisodeTypewriter(reactionBox);
+          }
+
           const finishBtn = document.getElementById('btn-finish-char-reaction') || document.getElementById('btn-dismiss-char-reaction');
           if (finishBtn) {
             finishBtn.onclick = () => {
@@ -1089,15 +1142,33 @@ class AppController {
     const broadcast = getTonightRadioBroadcast(state);
     if (!broadcast) return;
 
-    audio.playPop();
+    audio.playRadioTuning();
     const html = renderNightRadioModal(state, broadcast);
     this.openModal(html);
+
+    const claimBtn = document.getElementById('btn-claim-radio-buff');
+    if (claimBtn) {
+      claimBtn.onclick = () => {
+        audio.playRadioTuning();
+        setTimeout(() => audio.playRadioJingle(), 180);
+        const res = activateRadioBroadcastBuff(stateManager.getState(), broadcast);
+        stateManager.saveState();
+        confetti({ particleCount: 40, spread: 60, origin: { y: 0.6 } });
+        this.showToast(res.message);
+        this.openNightRadioModal();
+      };
+    }
 
     const closeBtn = document.getElementById('btn-close-night-radio');
     if (closeBtn) {
       closeBtn.onclick = () => {
         audio.playPop();
         this.closeModal();
+        const st = stateManager.getState();
+        if (st.phase === 'summary' && this.lastSummaryData) {
+          this.openModal(renderSummaryModal(st, this.lastSummaryData.ledger, this.lastSummaryData.review, this.lastSummaryData.advisorTip));
+          this.bindSummaryEvents(this.lastSummaryData.ledger, this.lastSummaryData.review, this.lastSummaryData.advisorTip, this.lastSummaryData.rentDue);
+        }
       };
     }
   }
@@ -2340,6 +2411,18 @@ class AppController {
         }
         return false;
       },
+      cleanTable: (tableIdx, dtMs, staffName) => {
+        const res = waiterCleanDineInTable(session, tableIdx, dtMs, eff.waiterCleanMs ?? 3500, staffName);
+        if (res.completed) {
+          return { completed: true, tipCollected: res.tipCollected, tableName: res.tableName };
+        }
+        return { completed: false };
+      },
+      dirtyTableIndices: () => {
+        return (session.dineInTables || [])
+          .filter(t => t.status === 'dirty')
+          .map(t => t.tableIndex);
+      },
       traySize: cookingEngine.getTraySize()
     });
     for (const ev of events) {
@@ -2354,6 +2437,15 @@ class AppController {
         case 'autoServe':
           this.serveCurrentCustomer();
           break;
+        case 'waiterCleanDone': {
+          audio.playWoodClean();
+          audio.playCoinChing();
+          Haptics.cleanTable();
+          this.showToast(`🧹 ${ev.staffName} đã lau sạch ${ev.tableName}! Thu gom +${ev.tipCollected.toLocaleString('vi-VN')}đ tiền tip 🪙✨`);
+          this.sellingStructureKey = '';
+          this.render();
+          break;
+        }
         case 'staffSlacking':
           this.showToast(`⚠️ Nhân viên ${ev.staffName} ${ev.reason}!`);
           break;
@@ -2840,19 +2932,88 @@ class AppController {
     }
   }
 
-  // Dọn dẹp bàn ăn hiên quán và thu gom tiền tip
+  // Dọn dẹp bàn ăn hiên quán: hỗ trợ chà khăn lau bằng tay hoặc tap liên tục
   private cleanPatioTable(tableIndex: number) {
     const session = this.sellingSession;
     if (!session) return;
-    const res = cleanDineInTable(session, tableIndex);
-    if (res.success) {
-      audio.playWoodClean();
-      audio.playCoinChing();
-      Haptics.cleanTable();
-      this.showToast(`🧹 Đã dọn sạch ${res.tableName}! Thu gom +${res.tipCollected.toLocaleString('vi-VN')}đ tiền tip 🪙✨`);
-      this.sellingStructureKey = '';
-      this.render();
+    // Mỗi cú tap cọ xát một nhịp (~600ms tương đương ~18% tiến trình)
+    const res = scrubDineInTable(session, tableIndex, 600, false);
+    if (res.completed) {
+      this.onTableCleanCompleted(tableIndex, res.tipCollected ?? 0, res.tableName ?? `Bàn ${tableIndex + 1}`);
+    } else {
+      Haptics.tap();
+      audio.playPop();
+      this.showToast(`🧼 Chà ngón tay qua lại trên bàn 3-4s để lau sạch bong nhé! (${res.progress}%)`);
     }
+  }
+
+  // Khởi động thao tác cọ xát / chà khăn lau bàn bằng cử chỉ chạm giữ
+  private startScrubbingPatioTable(tableIndex: number, clientX: number, clientY: number) {
+    const session = this.sellingSession;
+    if (!session) return;
+    this.scrubbingTableIndex = tableIndex;
+    this.lastScrubPos = { x: clientX, y: clientY };
+
+    // Kích hoạt ngay một nhịp cọ ban đầu
+    const res = scrubDineInTable(session, tableIndex, 100, false);
+    if (res.completed) {
+      this.onTableCleanCompleted(tableIndex, res.tipCollected ?? 0, res.tableName ?? `Bàn ${tableIndex + 1}`);
+      this.stopScrubbingPatioTable();
+      return;
+    }
+
+    if (this.scrubIntervalId) clearInterval(this.scrubIntervalId);
+    this.scrubIntervalId = window.setInterval(() => {
+      if (this.scrubbingTableIndex === null || !this.sellingSession) {
+        this.stopScrubbingPatioTable();
+        return;
+      }
+      const tickRes = scrubDineInTable(this.sellingSession, this.scrubbingTableIndex, 80, false);
+      if (tickRes.completed) {
+        this.onTableCleanCompleted(this.scrubbingTableIndex, tickRes.tipCollected ?? 0, tickRes.tableName ?? `Bàn ${this.scrubbingTableIndex + 1}`);
+        this.stopScrubbingPatioTable();
+      }
+    }, 80);
+  }
+
+  // Xử lý cử chỉ di chuyển ngón tay chà qua lại (Vigorous rubbing acceleration)
+  private onPointerMoveScrub(clientX: number, clientY: number) {
+    if (this.scrubbingTableIndex === null || !this.sellingSession) return;
+    const dx = clientX - this.lastScrubPos.x;
+    const dy = clientY - this.lastScrubPos.y;
+    const dist = Math.hypot(dx, dy);
+
+    // Người chơi di chuyển chà ngón tay: gia tốc tốc độ lau gấp ~1.85 lần (chỉ mất ~1.8s - 2.0s)
+    if (dist >= 6) {
+      this.lastScrubPos = { x: clientX, y: clientY };
+      const res = scrubDineInTable(this.sellingSession, this.scrubbingTableIndex, 120, true);
+      if (res.completed) {
+        this.onTableCleanCompleted(this.scrubbingTableIndex, res.tipCollected ?? 0, res.tableName ?? `Bàn ${this.scrubbingTableIndex + 1}`);
+        this.stopScrubbingPatioTable();
+      }
+    }
+  }
+
+  // Ngừng cọ xát khi nhấc ngón tay ra
+  private stopScrubbingPatioTable() {
+    if (this.scrubIntervalId) {
+      clearInterval(this.scrubIntervalId);
+      this.scrubIntervalId = null;
+    }
+    if (this.scrubbingTableIndex !== null && this.sellingSession) {
+      stopScrubbingDineInTable(this.sellingSession, this.scrubbingTableIndex);
+      this.scrubbingTableIndex = null;
+    }
+  }
+
+  // Hoàn tất dọn bàn: âm thanh, haptic và thu tiền tip
+  private onTableCleanCompleted(_tableIndex: number, tipCollected: number, tableName: string) {
+    audio.playWoodClean();
+    audio.playCoinChing();
+    Haptics.cleanTable();
+    this.showToast(`✨ Đã lau sạch bóng ${tableName}! Thu gom +${tipCollected.toLocaleString('vi-VN')}đ tiền tip 🪙🫧`);
+    this.sellingStructureKey = '';
+    this.render();
   }
 
   // Giao món cho khách trong hàng đợi (ưu tiên khách đầu hoặc khách có món khớp)
@@ -3599,6 +3760,16 @@ class AppController {
             this.bindSummaryEvents(ledger, review, advisorTip, rentDue);
           }
         });
+      };
+    }
+
+    // Nút Bật Đài Phát Thanh Đêm FM 99.9 từ màn Tổng Kết Cuối Ngày
+    this.lastSummaryData = { ledger, review, advisorTip, rentDue };
+    const summaryRadioBtn = document.getElementById('btn-summary-open-radio');
+    if (summaryRadioBtn) {
+      summaryRadioBtn.onclick = () => {
+        audio.playPop();
+        this.openNightRadioModal();
       };
     }
 
@@ -4486,6 +4657,11 @@ class AppController {
     audio.playServingBell();
     const html = renderStoryletModal(storylet);
     this.openModal(html);
+
+    const modalBox = document.getElementById('modal-storylet-night') || document.getElementById('modal-content');
+    if (modalBox) {
+      bindStoryletTypewriter(modalBox);
+    }
 
     const choiceBtns = document.querySelectorAll('.storylet-choice-btn');
     choiceBtns.forEach(btn => {

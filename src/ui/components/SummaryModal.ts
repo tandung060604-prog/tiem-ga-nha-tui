@@ -280,6 +280,22 @@ export function renderSummaryModal(
         <div><b>Cố vấn gợi ý:</b> ${advisorTip}</div>
       </div>
 
+      <!-- Đài Phát Thanh Đêm Sài Gòn FM 99.9 (Nhận Buff Cho Ngày Mai) -->
+      <div style="background: linear-gradient(135deg, #2b1d0c, #451a03); border: 1.5px solid #b45309; border-radius: var(--radius-md); padding: 10px 12px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.25);">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.4rem;">📻</span>
+          <div>
+            <div style="font-weight: 800; font-size: 0.85rem; color: #fde047;">Đài Phát Thanh Đêm FM 99.9</div>
+            <div style="font-size: 0.72rem; color: #fef08a;">
+              ${state.lastRadioBroadcastDay === state.day && state.activeRadioBuff ? '✨ Đã tiếp nhận Buff cho Ngày ' + (state.day + 1) + '!' : 'Nghe bản tin Sài Gòn & nhận Buff ngày mai'}
+            </div>
+          </div>
+        </div>
+        <button id="btn-summary-open-radio" class="btn-sm" style="background: #eab308; color: #451a03; border: 1px solid #fef08a; padding: 6px 12px; font-weight: 800; font-size: 0.75rem; border-radius: 6px; cursor: pointer; min-height: 38px;">
+          ${state.lastRadioBroadcastDay === state.day && state.activeRadioBuff ? 'XEM LẠI 📻' : 'BẬT ĐÀI ✨'}
+        </button>
+      </div>
+
       <div id="wrapped-preview"></div>
 
       <!-- Action Buttons -->

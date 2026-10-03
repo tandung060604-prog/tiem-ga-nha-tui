@@ -56,7 +56,7 @@ export const NIGHT_STORYLETS: Storylet[] = [
     title: 'Vị Khách Bốn Chân Mái Tôn',
     characterId: 'pet_02_cat_muop',
     characterName: 'Mèo Mướp Hẻm Sâu',
-    characterAvatar: '🐱',
+    characterAvatar: ASSETS.characters.pet_02_cat_muop,
     characterRole: 'Cư Dân Tự Do Mái Hiên',
     setting: 'Mái tôn sau bếp tiệm gà · Tiếng mưa lất phất gõ nhịp lách tách',
     narrativeLines: [
@@ -183,7 +183,7 @@ export const NIGHT_STORYLETS: Storylet[] = [
     title: 'Ngọn Đèn Tuần Đêm An Bình',
     characterId: 'char_25_police_nam',
     characterName: 'Đồng Chí Nam Cảnh Sát',
-    characterAvatar: '👮',
+    characterAvatar: ASSETS.characters.char_25_police_nam,
     characterRole: 'Cảnh Sát Khu Vực Hẻm 1102',
     setting: 'Đầu hẻm 1102 giao lộ đường lớn · Tiếng bước chân tuần tra đều đặn',
     narrativeLines: [
@@ -225,7 +225,7 @@ export const NIGHT_STORYLETS: Storylet[] = [
     title: 'Những Tờ Vé Số Cuối Ngày',
     characterId: 'char_02_lottery_lady',
     characterName: 'Cô Bảy Bán Vé Số',
-    characterAvatar: '👵',
+    characterAvatar: ASSETS.characters.char_02_lottery_lady,
     characterRole: 'Người Mưu Sinh Hẻm Sâu',
     setting: 'Bậc tam cấp trước tiệm · Ánh sáng mờ từ chiếc nón lá rách vành',
     narrativeLines: [
@@ -260,6 +260,48 @@ export const NIGHT_STORYLETS: Storylet[] = [
     requirements: {
       minDay: 6,
       minMoney: 100000
+    },
+    oneShot: true
+  },
+  {
+    id: 'storylet_night_07_trendy_vy',
+    title: 'Ánh Đèn Flash Lúc 0 Giờ',
+    characterId: 'char_07_trendy_vy',
+    characterName: 'Vy Vy Sành Điệu',
+    characterAvatar: ASSETS.characters.char_07_trendy_vy,
+    characterRole: 'Tiktoker Ẩm Thực Hẻm Sâu',
+    setting: 'Quầy bar hiên quán lúc nửa đêm · Ánh đèn neon phản chiếu trên ly nước',
+    narrativeLines: [
+      'Vy Vy tháo chiếc kính râm thời trang, ngắm nhìn chiếc xe đẩy đã lau chùi sáng bóng dưới ánh trăng khuya.',
+      '"Đi quay review cả ngày ở mấy quán sang chảnh ngoài quận Nhất, về tới đầu hẻm ngửi mùi gà thơm của quán mình mới thấy ấm bụng đó anh chủ.',
+      'Người trẻ tụi em mê cái gì chân thật, giản dị mà ngon đỉnh chóp như vầy nè!"'
+    ],
+    choices: [
+      {
+        id: 'opt_vy_collab_recipe',
+        label: 'Giao lưu ý tưởng sáng tạo món ăn theo trào lưu GenZ',
+        kicker: 'BẮT TREND THỜI THƯỢNG',
+        subDesc: 'Tăng chỉ số Ambition, Vy Vy đăng video viral kéo khách',
+        effect: {
+          karmaDelta: { ambition: 2.5 },
+          reputationDelta: 0.3,
+          reactionNarrative: 'Vy Vy giơ ngón tay cái tán thưởng: "Ý tưởng tuyệt cú mèo! Sáng mai em lên clip triệu view giới thiệu quán cho cả trường em ghé!"'
+        }
+      },
+      {
+        id: 'opt_vy_warm_wings',
+        label: 'Tặng cô nàng một phần cánh gà sốt cay ấm nồng lót dạ khuya',
+        kicker: 'HIẾU KHÁCH CHÂN THÀNH',
+        subDesc: 'Tăng tình nghĩa xóm giềng Hẻm 1102',
+        effect: {
+          karmaDelta: { community: 2.0 },
+          moneyDelta: 20000,
+          reactionNarrative: 'Vy Vy nếm thử miếng cánh gà cay xé lưỡi mà xuýt xoa khen ngợi: "Ngon nhức nách! Tiền tip gửi anh chủ mai nhập ớt tươi nghen!"'
+        }
+      }
+    ],
+    requirements: {
+      minDay: 7
     },
     oneShot: true
   }

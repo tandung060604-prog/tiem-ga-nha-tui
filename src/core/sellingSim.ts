@@ -160,8 +160,112 @@ export function cleanDineInTable(session: SellingSession, tableIndex: number): {
   table.eatingTimerSec = 0;
   table.eatingDurationSec = 0;
   table.isCritic = false;
+  table.cleanProgress = 0;
+  table.isBeingCleaned = false;
+  table.cleanedByStaff = false;
+  table.staffCleanerName = undefined;
 
   return { success: true, tipCollected, tableName: table.name };
+}
+
+export interface ScrubResult {
+  completed: boolean;
+  progress: number;
+  tipCollected?: number;
+  tableName?: string;
+}
+
+/**
+ * Thao tác chà / lau bàn bằng tay của người chơi:
+ * - baseScrubMs: thời gian mặc định để chà sạch (~3500ms = 3.5s)
+ * - isVigorous: cọ xát ngón tay di chuyển qua lại (tăng tốc độ lên ~1.85x, chỉ mất ~1.8s - 2.0s)
+ */
+export function scrubDineInTable(
+  session: SellingSession,
+  tableIndex: number,
+  deltaMs: number,
+  isVigorous = false
+): ScrubResult {
+  if (!session.dineInTables) return { completed: false, progress: 0 };
+  const table = session.dineInTables.find(t => t.tableIndex === tableIndex) || session.dineInTables[tableIndex];
+  if (!table || table.status !== 'dirty') {
+    return { completed: false, progress: 0 };
+  }
+
+  table.isBeingCleaned = true;
+  const baseTimeMs = 3500;
+  const speedMultiplier = isVigorous ? 1.85 : 1.0;
+  const progressGain = (deltaMs / baseTimeMs) * 100 * speedMultiplier;
+
+  table.cleanProgress = Math.min(100, (table.cleanProgress || 0) + progressGain);
+
+  if (table.cleanProgress >= 100) {
+    const res = cleanDineInTable(session, tableIndex);
+    return {
+      completed: true,
+      progress: 100,
+      tipCollected: res.tipCollected,
+      tableName: res.tableName
+    };
+  }
+
+  return {
+    completed: false,
+    progress: Math.min(99, Math.round(table.cleanProgress))
+  };
+}
+
+/**
+ * Người chơi nhấc tay ra khỏi bàn: dừng cọ xát thủ công
+ */
+export function stopScrubbingDineInTable(session: SellingSession, tableIndex: number): void {
+  if (!session.dineInTables) return;
+  const table = session.dineInTables.find(t => t.tableIndex === tableIndex) || session.dineInTables[tableIndex];
+  if (!table) return;
+  if (!table.cleanedByStaff) {
+    table.isBeingCleaned = false;
+  }
+}
+
+/**
+ * Nhân viên Phục Vụ (Waiter) tự động lau bàn bẩn khi rảnh tay:
+ * - waiterCleanMs: Thời gian Waiter cần để dọn xong 1 bàn (cấp 1 ~4.0s, cấp 5 ~1.5s)
+ */
+export function waiterCleanDineInTable(
+  session: SellingSession,
+  tableIndex: number,
+  deltaMs: number,
+  waiterCleanMs: number,
+  staffName?: string
+): ScrubResult {
+  if (!session.dineInTables) return { completed: false, progress: 0 };
+  const table = session.dineInTables.find(t => t.tableIndex === tableIndex) || session.dineInTables[tableIndex];
+  if (!table || table.status !== 'dirty') {
+    return { completed: false, progress: 0 };
+  }
+
+  table.isBeingCleaned = true;
+  table.cleanedByStaff = true;
+  table.staffCleanerName = staffName || 'Phục vụ';
+
+  const cleanTime = Math.max(1000, waiterCleanMs);
+  const progressGain = (deltaMs / cleanTime) * 100;
+  table.cleanProgress = Math.min(100, (table.cleanProgress || 0) + progressGain);
+
+  if (table.cleanProgress >= 100) {
+    const res = cleanDineInTable(session, tableIndex);
+    return {
+      completed: true,
+      progress: 100,
+      tipCollected: res.tipCollected,
+      tableName: res.tableName
+    };
+  }
+
+  return {
+    completed: false,
+    progress: Math.min(99, Math.round(table.cleanProgress))
+  };
 }
 
 // Ca bán dở được lưu vào save để thoát app giữa ca không mất gì (và không chơi lại được ngày đó)

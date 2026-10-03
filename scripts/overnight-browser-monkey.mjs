@@ -630,10 +630,22 @@ class OvernightMonkey {
         }
       }
 
-      // 1b. Dọn dẹp bàn ăn hiên quán (Dine-In Patio) và thu gom tiền tip
+      // 1b. Dọn dẹp bàn ăn hiên quán (Dine-In Patio) - Thao tác chà khăn lau bàn 3-4s hoặc cọ xát
       const cleanTableBtn = page.locator('.btn-clean-table:not([disabled]), .patio-table.dirty');
       if (await cleanTableBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
-        await cleanTableBtn.first().click({ force: true }).catch(() => {});
+        const box = await cleanTableBtn.first().boundingBox().catch(() => null);
+        if (box) {
+          const cx = box.x + box.width / 2;
+          const cy = box.y + box.height / 2;
+          await page.mouse.move(cx, cy);
+          await page.mouse.down();
+          await page.mouse.move(cx + 10, cy + 4, { steps: 3 });
+          await page.mouse.move(cx - 10, cy - 4, { steps: 3 });
+          await sleep(200);
+          await page.mouse.up();
+        } else {
+          await cleanTableBtn.first().click({ force: true }).catch(() => {});
+        }
         return true;
       }
 

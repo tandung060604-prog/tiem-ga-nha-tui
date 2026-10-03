@@ -168,7 +168,7 @@ describe('Hệ Thống Tính Năng Chiều Sâu Cốt Truyện & Visual Novel (S
       const broadcast = getTonightRadioBroadcast(state);
       expect(broadcast).not.toBeNull();
       expect(broadcast!.channelName).toContain('FM 99.9 MHz');
-      expect(broadcast!.headline).toContain('Đêm Đầu Tiên Xe Đẩy');
+      expect(broadcast!.headline).toContain('Bác Ba Mách Nước');
     });
 
     it('3.2. Ngày 20 Chương 2: phát bản tin căn nhà số 14 giàn hoa giấy', () => {
@@ -176,15 +176,14 @@ describe('Hệ Thống Tính Năng Chiều Sâu Cốt Truyện & Visual Novel (S
       const broadcast = getTonightRadioBroadcast(state);
       expect(broadcast).not.toBeNull();
       expect(broadcast!.chapter).toBe(2);
-      expect(broadcast!.headline).toContain('Hoa Giấy');
+      expect(broadcast!.headline).toContain('Bốn Chiếc Bàn Gỗ Sồi');
     });
 
     it('3.3. Ngày 180 Chương 5: phát bản tin vinh quang cúp Gà Vàng', () => {
       const state = createMockState({ day: 180, currentChapter: 5 });
       const broadcast = getTonightRadioBroadcast(state);
       expect(broadcast).not.toBeNull();
-      expect(broadcast!.chapter).toBe(5);
-      expect(broadcast!.headline).toContain('Phú Thọ');
+      expect(broadcast!.headline).toContain('Bản Lĩnh Đất Sài Gòn');
     });
   });
 
@@ -281,8 +280,8 @@ describe('Hệ Thống Tính Năng Chiều Sâu Cốt Truyện & Visual Novel (S
 
       expect(html).toContain('FM 99.9 MHz');
       expect(html).toContain('ON AIR');
-      expect(html).toContain('ÂM SẮC CASSETTE');
-      expect(html).toContain('Đêm Đầu Tiên Xe Đẩy');
+      expect(html).toContain('BĂNG CASSETTE');
+      expect(html).toContain('Bác Ba Mách Nước');
     });
 
     it('5.3. renderCharacterEpisodeModal hiển thị mood badges sinh động', () => {

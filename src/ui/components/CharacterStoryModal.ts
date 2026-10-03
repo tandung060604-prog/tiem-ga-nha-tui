@@ -1,9 +1,12 @@
 import { GameState, CharacterEpisode, CharacterStoryChoice } from '../../types/game';
 import { escapeHtml } from '../escapeHtml';
+import { playDialogueSequence, TypewriterPlayer } from '../typewriter';
 
 /**
  * Modal Ký Sự Hẻm 1102 (Character Narrative Episode Modal)
  * Nâng cấp trải nghiệm Visual Novel Mini:
+ * - Hiệu ứng Typewriter gõ từng chữ từ từ kèm âm thanh 'tít tít' (ZzFX retro blip)
+ * - Nút '⏩ Hiện Hết' để xem nhanh nếu người chơi muốn đọc lẹ
  * - Chân dung cảm xúc (Mood badge: 😊 Vui Vẻ, 🥺 Xúc Động, ⚡ Căng Thẳng, 💖 Nghẹn Ngào)
  * - Tách biệt rõ nét bong bóng thoại người chơi vs nhân vật
  * - Kicker lựa chọn phân nhánh rõ ràng
@@ -25,16 +28,19 @@ export function renderCharacterEpisodeModal(
     else if (line.mood === 'tense') moodBadge = '<span style="font-size: 0.65rem; background: #fee2e2; color: #991b1b; padding: 1px 5px; border-radius: 4px; font-weight: 800;">⚡ Căng Thẳng</span>';
     else if (line.mood === 'touched') moodBadge = '<span style="font-size: 0.65rem; background: #fce7f3; color: #9d174d; padding: 1px 5px; border-radius: 4px; font-weight: 800;">💖 Nghẹn Ngào</span>';
 
+    // Dòng đầu tiên hiện sẵn, các dòng sau xuất hiện dần theo nhịp typewriter
+    const initialDisplay = idx === 0 ? 'flex' : 'none';
+
     return `
-      <div class="vn-dialogue-row" data-line-index="${idx}" style="display: flex; flex-direction: column; align-self: ${alignSelf}; max-width: 92%; margin-bottom: 10px; animation: popIn 0.25s ease-out;">
+      <div class="vn-dialogue-row" data-line-index="${idx}" style="display: ${initialDisplay}; flex-direction: column; align-self: ${alignSelf}; max-width: 92%; margin-bottom: 10px; animation: popIn 0.2s ease-out;">
         <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px; ${isPlayer ? 'justify-content: flex-end;' : ''}">
           <span style="font-size: 0.72rem; font-weight: 900; color: ${isPlayer ? '#1d4ed8' : '#b45309'};">
             ${escapeHtml(line.speaker)}
           </span>
           ${moodBadge}
         </div>
-        <div style="background: ${bubbleBg}; border: 1.5px solid ${borderCol}; border-radius: ${isPlayer ? '12px 12px 2px 12px' : '12px 12px 12px 2px'}; padding: 9px 12px; font-size: 0.82rem; line-height: 1.4; color: #1f2937; box-shadow: 0 2px 6px rgba(0,0,0,0.06); position: relative;">
-          "${escapeHtml(line.text)}"
+        <div class="vn-bubble-box" style="background: ${bubbleBg}; border: 1.5px solid ${borderCol}; border-radius: ${isPlayer ? '12px 12px 2px 12px' : '12px 12px 12px 2px'}; padding: 9px 12px; font-size: 0.82rem; line-height: 1.45; color: #1f2937; box-shadow: 0 2px 6px rgba(0,0,0,0.06); position: relative;">
+          "<span class="vn-bubble-text" data-full-text="${escapeHtml(line.text)}">${escapeHtml(line.text)}</span>"
         </div>
       </div>
     `;
@@ -85,23 +91,27 @@ export function renderCharacterEpisodeModal(
               ${escapeHtml(episode.subtitle)}
             </div>
           </div>
+          <!-- Nút Skip Typewriter -->
+          <button id="btn-skip-char-typewriter" class="btn-sm" style="background: rgba(254, 240, 138, 0.2); color: #fef08a; border: 1px solid #fef08a; font-size: 0.68rem; font-weight: 800; padding: 4px 8px; border-radius: 6px; cursor: pointer; flex-shrink: 0;" title="Hiện nhanh toàn bộ đoạn hội thoại">
+            ⏩ Hiện Hết
+          </button>
         </div>
 
         <!-- Body Scrollable -->
-        <div style="padding: 12px 14px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px;">
+        <div id="vn-dialogue-scroll-panel" style="padding: 12px 14px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; cursor: pointer;">
           
           <!-- Bối cảnh dẫn nhập -->
           <div style="background: #fefce8; border-left: 3.5px solid #eab308; padding: 8px 10px; border-radius: 4px; font-size: 0.78rem; line-height: 1.4; color: #713f12; font-style: italic;">
             ${escapeHtml(episode.narrativeIntro)}
           </div>
 
-          <!-- Đoạn hội thoại Visual Novel -->
-          <div style="display: flex; flex-direction: column; margin-top: 4px;">
+          <!-- Đoạn hội thoại Visual Novel (Gõ chữ từng chữ một) -->
+          <div id="vn-dialogue-list" style="display: flex; flex-direction: column; margin-top: 4px;">
             ${dialogueHtml}
           </div>
 
           <!-- Hộp câu hỏi nan giải -->
-          <div style="background: #fafaf9; border: 1.5px dashed #a8a29e; border-radius: 8px; padding: 8px 10px; text-align: center;">
+          <div id="vn-dilemma-container" style="background: #fafaf9; border: 1.5px dashed #a8a29e; border-radius: 8px; padding: 8px 10px; text-align: center; opacity: 0.35; transition: opacity 0.4s ease;">
             <div style="font-size: 0.72rem; font-weight: 800; color: #78350f; text-transform: uppercase; margin-bottom: 2px;">
               🤔 LỰA CHỌN CỦA CHỦ TIỆM GÀ
             </div>
@@ -111,7 +121,7 @@ export function renderCharacterEpisodeModal(
           </div>
 
           <!-- Danh sách lựa chọn phân nhánh -->
-          <div style="display: flex; flex-direction: column; margin-top: 2px;">
+          <div id="vn-choices-container" style="display: flex; flex-direction: column; margin-top: 2px; opacity: 0.35; pointer-events: none; transition: opacity 0.4s ease;">
             ${choicesHtml}
           </div>
 
@@ -127,6 +137,73 @@ export function renderCharacterEpisodeModal(
       </div>
     </div>
   `;
+}
+
+/**
+ * Khởi động hiệu ứng Typewriter cho Modal Ký Sự Hẻm 1102
+ */
+export function bindCharacterEpisodeTypewriter(
+  modalEl: HTMLElement,
+  onFinished?: () => void
+): { skipAll: () => void } {
+  const scrollPanel = modalEl.querySelector<HTMLElement>('#vn-dialogue-scroll-panel');
+  const textElements = Array.from(modalEl.querySelectorAll<HTMLElement>('.vn-bubble-text'));
+  const dilemmaBox = modalEl.querySelector<HTMLElement>('#vn-dilemma-container');
+  const choicesBox = modalEl.querySelector<HTMLElement>('#vn-choices-container');
+  const skipBtn = modalEl.querySelector<HTMLElement>('#btn-skip-char-typewriter');
+
+  const lines = textElements.map(el => ({
+    textEl: el,
+    fullText: el.getAttribute('data-full-text') || el.textContent || ''
+  }));
+
+  // Xóa nội dung ban đầu để chuẩn bị gõ từ từ
+  lines.forEach(l => {
+    l.textEl.textContent = '';
+  });
+
+  const activateChoices = () => {
+    if (dilemmaBox) dilemmaBox.style.opacity = '1';
+    if (choicesBox) {
+      choicesBox.style.opacity = '1';
+      choicesBox.style.pointerEvents = 'auto';
+    }
+    if (scrollPanel) {
+      scrollPanel.scrollTop = scrollPanel.scrollHeight;
+    }
+    if (onFinished) onFinished();
+  };
+
+  let skipController: (() => void) | null = null;
+
+  void playDialogueSequence(lines, {
+    containerEl: scrollPanel || undefined,
+    onAllDone: activateChoices
+  }).then(ctrl => {
+    skipController = ctrl.skipAll;
+  });
+
+  const doSkip = () => {
+    if (skipController) {
+      skipController();
+    } else {
+      lines.forEach(l => {
+        l.textEl.textContent = l.fullText;
+        const row = l.textEl.closest<HTMLElement>('.vn-dialogue-row');
+        if (row) row.style.display = 'flex';
+      });
+      activateChoices();
+    }
+  };
+
+  if (skipBtn) {
+    skipBtn.onclick = (e) => {
+      e.stopPropagation();
+      doSkip();
+    };
+  }
+
+  return { skipAll: doSkip };
 }
 
 /**
@@ -152,8 +229,8 @@ export function renderCharacterEpisodeReactionModal(
         <div style="padding: 16px 14px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;">
           <img src="${episode.avatar}" alt="${escapeHtml(episode.characterName)}" style="width: 68px; height: 68px; border-radius: 50%; object-fit: cover; border: 2.5px solid #16a34a; background: #dcfce7;" />
           
-          <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 10px; padding: 12px; font-size: 0.84rem; line-height: 1.45; color: #14532d; font-style: italic;">
-            "${escapeHtml(choice.reactionDialogue)}"
+          <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 10px; padding: 12px; font-size: 0.84rem; line-height: 1.45; color: #14532d; font-style: italic; width: 100%; min-height: 48px;">
+            "<span id="vn-reaction-text" data-full-text="${escapeHtml(choice.reactionDialogue)}">${escapeHtml(choice.reactionDialogue)}</span>"
           </div>
 
           ${choice.causalityNotice ? `
@@ -174,4 +251,19 @@ export function renderCharacterEpisodeReactionModal(
       </div>
     </div>
   `;
+}
+
+/**
+ * Kích hoạt hiệu ứng Typewriter cho modal phản hồi của nhân vật
+ */
+export function bindReactionEpisodeTypewriter(modalEl: HTMLElement): void {
+  const textEl = modalEl.querySelector<HTMLElement>('#vn-reaction-text');
+  if (!textEl) return;
+  const fullText = textEl.getAttribute('data-full-text') || textEl.textContent || '';
+  const player = new TypewriterPlayer(textEl, fullText, { speedMs: 22, soundInterval: 2 });
+  void player.start();
+
+  modalEl.onclick = () => {
+    player.skip();
+  };
 }

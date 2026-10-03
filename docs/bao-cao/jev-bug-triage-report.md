@@ -871,3 +871,13 @@
   - **Chiến lược Fix:** `defensive_nullcheck_fallback` (Độ tin cậy: 31.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
 ---
+
+### 🐞 [17:48:38 3/10/2026] (via Jev MCP) Missing character model assets in Night Storylets (Ký Ức Đêm Hẻm 1102)
+- **Triệu chứng:** Certain night dialogues lack 2D character model illustrations, breaking visual immersion and visual novel aesthetics.
+- **Vị trí:** `src/content/storylets.ts and src/ui/components/StoryletModal.ts` 
+- **Đánh giá Jev (457ms):**
+  - **Mức độ (Severity):** `p3_minor` (Độ tin cậy: 70.0%)
+  - **Nguyên nhân gốc (Root Cause):** `content_mislabel` (Độ tin cậy: 84.0%)
+  - **Chiến lược Fix:** `contract_first_type_fix` (Độ tin cậy: 73.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---
