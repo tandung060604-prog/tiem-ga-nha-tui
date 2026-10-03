@@ -859,7 +859,7 @@ class OvernightMonkey {
       if (confirmOkBtn instanceof HTMLElement) confirmOkBtn.click();
 
       // Dọn dẹp tất cả modal truyện cư dân, minigame, hệ thống
-      const specialModals = document.querySelectorAll('#modal-character-story, #modal-char-reaction, #modal-thief-minigame, #modal-thief-result, #modal-night-radio, #modal-achievements-wall, #modal-shop-theme, #modal-endless-mode, #modal-memories-album, #modal-weekly-quests, #modal-leaderboard, #sauce-minigame-modal, .sauce-modal-overlay');
+      const specialModals = document.querySelectorAll('#modal-character-story, #modal-char-reaction, #modal-thief-minigame, #modal-thief-result, #modal-night-radio, #modal-achievements-wall, #modal-shop-theme, #modal-endless-mode, #modal-memories-album, #modal-weekly-quests, #modal-leaderboard, #sauce-minigame-modal, .sauce-modal-overlay, #loyalty-handbook-modal, .loyalty-modal-overlay, #memory-gallery-modal');
       for (const sm of specialModals) {
         if (sm instanceof HTMLElement) sm.remove();
       }

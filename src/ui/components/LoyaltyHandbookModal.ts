@@ -210,18 +210,24 @@ export function openLoyaltyHandbookModal(state: GameState, onUpdate: () => void)
   }
 
   function bindEvents(): void {
+    const closeModal = () => {
+      audio.playPop();
+      modalOverlay.remove();
+      try {
+        onUpdate();
+      } catch {
+        // ignore
+      }
+    };
+
     const closeBtn = modalOverlay.querySelector<HTMLButtonElement>('#btn-close-loyalty-modal');
     if (closeBtn) {
-      closeBtn.onclick = () => {
-        audio.playPop();
-        modalOverlay.remove();
-      };
+      closeBtn.onclick = closeModal;
     }
 
     modalOverlay.onclick = (e) => {
       if (e.target === modalOverlay) {
-        audio.playPop();
-        modalOverlay.remove();
+        closeModal();
       }
     };
 
