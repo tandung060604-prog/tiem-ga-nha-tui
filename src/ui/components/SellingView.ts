@@ -26,6 +26,15 @@ function patienceLevel(order: CustomerOrder): { percent: number; cls: '' | 'mid'
 
 export type CustomerMood = 'happy' | 'waiting' | 'impatient' | 'leaving';
 
+export function shortFoodName(name: string): string {
+  if (!name) return '';
+  return name
+    .replace(/^Gà Rán\s+/i, 'Gà ')
+    .replace(/^Mì Ý\s+/i, 'Mì ')
+    .replace(/\s+\(.*\)$/, '')
+    .trim();
+}
+
 export function getCustomerMood(order: CustomerOrder): CustomerMood {
   const p = patienceLevel(order);
   if (p.angry) return 'leaving';
@@ -63,9 +72,9 @@ export function getMoodThought(mood: CustomerMood, order?: CustomerOrder, state?
     }
   }
 
-  // Ngữ cảnh dặn kèm tương dặn
-  if (order?.items?.some(it => it.condiment) && mood === 'waiting' && Math.random() < 0.35) {
-    return 'Nhớ xịt đúng tương dặn kèm nha, thiếu tương là hờn á 🍅!';
+  // Ngữ cảnh phong vị Bistro ấm cúng
+  if (mood === 'waiting' && Math.random() < 0.3) {
+    return 'Gà vừa chiên xong bốc khói nghi ngút, thơm nức cả con hẻm luôn nè! 🍗✨';
   }
 
   if (order?.isBunny) {
@@ -953,6 +962,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
     const pendingHtml = pendingItems.map(it => {
       const menuItem = state.menu.find(m => m.id === it.menuItemId);
       const name = menuItem ? menuItem.name : it.menuItemId;
+      const shortName = shortFoodName(name);
       const img = foodImage(it.menuItemId, 'perfect');
       const qtyText = it.count > 1 ? (it.served > 0 ? `${it.served}/${it.count}` : `${it.count}×`) : '1×';
       const isItemInTray = tray.some(t => t.menuItemId === it.menuItemId && !it.completed);
@@ -962,8 +972,8 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         <div class="order-row ${isItemInTray ? 'is-ready-in-tray' : ''}" data-item-id="${it.menuItemId}">
           <span class="order-item-title">
             ${img ? `<img src="${img}" class="order-food-thumb ${isItemInTray ? 'pulse-thumb' : ''}" alt="${escapeHtml(name)}" width="24" height="24" />` : `<span class="order-food-emoji">${menuItem ? menuItem.icon : '🍗'}</span>`}
-            <span class="order-qty">${qtyText}</span>
-            <span class="order-food-name">${escapeHtml(name)}</span>
+            <span class="order-qty order-qty-pill">${qtyText}</span>
+            <span class="order-food-name">${escapeHtml(shortName)}</span>
           </span>
           <span class="order-check ${statusClass}" title="${isItemInTray ? 'Khay đã có sẵn món này, chạm để giao ngay!' : 'Đang chờ món này'}">${statusText}</span>
         </div>
@@ -977,7 +987,8 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           ${completedItems.map(it => {
             const menuItem = state.menu.find(m => m.id === it.menuItemId);
             const name = menuItem ? menuItem.name : it.menuItemId;
-            return `<span class="completed-chip" title="Đã giao đủ ${it.count} phần ${escapeHtml(name)}">✓ ${escapeHtml(name)}</span>`;
+            const shortName = shortFoodName(name);
+            return `<span class="completed-chip" title="Đã giao đủ ${it.count} phần ${escapeHtml(name)}">✓ ${escapeHtml(shortName)}</span>`;
           }).join('')}
         </div>
       </div>
@@ -1155,20 +1166,21 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         : 'ƯỚP LẠNH ❄️';
       const qText = isDrink ? drinkTag : TRAY_QUALITY_LABEL[item.quality];
       const drinkClass = item.menuItemId === 'soda' ? 'drink-coca' : item.menuItemId === 'seven_up' ? 'drink-7up' : item.menuItemId === 'fanta_orange' ? 'drink-fanta' : '';
+      const shortName = shortFoodName(item.name);
       return `
-        <div class="tray-item ${drinkClass}" data-tray-idx="${slotIdx}" title="Bấm để vớt hoặc vứt">
+        <div class="tray-item ceramic-plate ${drinkClass}" data-tray-idx="${slotIdx}" title="Bấm để vớt hoặc vứt">
           <div class="tray-food-frame">
-            ${img ? `<img class="t-icon t-img" src="${img}" alt="${item.name}" width="52" height="52" />` : `<span class="t-icon">${item.icon}</span>`}
+            ${img ? `<img class="t-icon t-img" src="${img}" alt="${escapeHtml(item.name)}" width="52" height="52" />` : `<span class="t-icon">${item.icon}</span>`}
           </div>
-          <span class="t-name">${item.name}</span>
+          <span class="t-name">${escapeHtml(shortName)}</span>
           <span class="t-quality ${qClass}">${qText}</span>
         </div>
       `;
     }
     return `
-      <div class="tray-slot-empty">
-        <span class="empty-wire-icon">▤</span>
-        <span class="empty-wire-label">Vỉ ráo dầu</span>
+      <div class="tray-slot-empty ceramic-empty">
+        <span class="empty-wire-icon">🍽️</span>
+        <span class="empty-wire-label">Đĩa trống</span>
       </div>
     `;
   }).join('');

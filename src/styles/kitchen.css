@@ -756,10 +756,10 @@
 }
 
 .tray-item {
-  background: #ffffff;
-  border-radius: 8px;
-  border: 1.5px solid #e2d2c0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.07);
+  background: linear-gradient(180deg, #ffffff 0%, #fffdf8 60%, #faecd9 100%);
+  border-radius: 9px;
+  border: 1.5px solid #d4a373;
+  box-shadow: 0 2px 5px rgba(180, 83, 9, 0.12), inset 0 1px 0 #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -771,6 +771,11 @@
   animation: trayPopIn 0.22s var(--ease-spring);
   cursor: pointer;
   transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.tray-item.ceramic-plate {
+  background: linear-gradient(180deg, #ffffff 0%, #fffdf8 55%, #f7ede0 100%);
+  border: 1.5px solid #d4a373;
 }
 
 .tray-item:active {
@@ -867,17 +872,23 @@
 }
 
 .tray-slot-empty {
-  background: rgba(255, 255, 255, 0.45);
-  border: 1.5px dashed #d5c2ad;
-  border-radius: 8px;
+  background: rgba(255, 251, 245, 0.65);
+  border: 1.5px dashed #d4a373;
+  border-radius: 9px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 80px;
   gap: 2px;
-  color: #a8947f;
+  color: #9a6b3e;
   box-sizing: border-box;
+}
+
+.tray-slot-empty.ceramic-empty {
+  background: rgba(255, 251, 245, 0.65);
+  border: 1.5px dashed #d4a373;
+  color: #9a6b3e;
 }
 
 .empty-wire-icon {

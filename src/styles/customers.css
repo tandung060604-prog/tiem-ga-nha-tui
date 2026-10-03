@@ -673,7 +673,7 @@
   gap: 2px;
   flex: 1 0 auto;
   min-height: 48px;
-  max-height: 98px;
+  max-height: 124px;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: #d97706 #fef3c7;
@@ -710,8 +710,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 3px;
-  min-height: 21px;
-  height: 21px;
+  min-height: 24px;
+  height: auto;
+  padding: 1px 0;
   min-width: 0;
   width: 100%;
   flex-shrink: 0;
@@ -754,6 +755,23 @@
   color: var(--ink);
   flex: none;
   white-space: nowrap;
+}
+
+.order-qty-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 5px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+  border-radius: 4px;
+  font-size: 0.64rem;
+  font-weight: 800;
+  min-width: 18px;
+  text-align: center;
+  line-height: 1.1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .order-food-name {
@@ -1162,12 +1180,12 @@
   }
   .speech-bubble {
     padding: 2px 3px;
-    max-height: 46px;
+    max-height: 58px;
     gap: 1px;
   }
   .order-row {
-    min-height: 19px;
-    height: 19px;
+    min-height: 20px;
+    height: auto;
   }
   .order-item-title {
     gap: 2px;

@@ -238,10 +238,6 @@ await smoothTap('#btn-fry-pot', 500);
 console.log('🥤 Rót Coca sủi bọt có đá...');
 await smoothTap('#btn-add-drink', 500);
 
-// Xịt thêm tương cà / tương ớt tặng tip
-console.log('🍅 Xịt tương sốt...');
-await smoothTap('#btn-squeeze-ketchup', 500);
-
 // Bấm KENG! LÊN MÓN phục vụ khách
 console.log('🛎️ Phục vụ khách hàng đầu tiên!');
 await page.evaluate(() => window.updateShowcaseHud?.('🛎️', 'KENG! LÊN MÓN • Tiền Bay (+35k), Tip & Chuỗi Perfect 🔥'));
