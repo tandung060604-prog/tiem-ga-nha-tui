@@ -76,7 +76,11 @@ export const CHANGELOG_DATA: ChangelogRelease[] = [
             tag: 'ECONOMY FX',
             tagColor: '#3b82f6',
             title: 'Quỹ Đạo Tiền Bán & Tiền Bo Bay Parabol',
-            desc: 'Hiệu ứng nhận tiền bay cong mượt mà theo đường cong Bezier về góc trên Header kèm âm thanh rổn rảng vui tai, tạo dopamine cao khi hoàn thành đơn.'
+            desc: 'Hiệu ứng nhận tiền bay cong mượt mà theo đường cong Bezier về góc trên Header kèm âm thanh rổn rảng vui tai, tạo dopamine cao khi hoàn thành đơn.',
+            details: [
+              'Quỹ đạo parabol uốn lượn: Tiền bán (+Xđ) và tiền bo (+Yđ tip) bay từ vị trí phục vụ về thẳng widget ngân khố trên Header.',
+              'Âm thanh procedual đồng xu leng keng cùng hiệu ứng lấp lánh khi tiền đáp xuống ví.'
+            ]
           }
         ]
       },

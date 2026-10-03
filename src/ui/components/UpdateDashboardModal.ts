@@ -20,9 +20,11 @@ export function renderUpdateDashboardModal(): string {
           <h4 class="dash-item-title">${escapeHtml(item.title)}</h4>
         </div>
         <p class="dash-item-desc">${escapeHtml(item.desc)}</p>
-        <ul class="dash-item-bullets">
-          ${item.details.map(d => `<li>${escapeHtml(d)}</li>`).join('')}
-        </ul>
+        ${(item.details && item.details.length > 0) ? `
+          <ul class="dash-item-bullets">
+            ${item.details.map(d => `<li>${escapeHtml(d)}</li>`).join('')}
+          </ul>
+        ` : ''}
       </div>
     `).join('');
 
