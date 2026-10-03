@@ -2961,3 +2961,89 @@ body.selling-mode .toast {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.75; }
 }
+
+/* ==========================================================================
+   VISUAL NOVEL DIALOGUE THEATRE & CHOICE CARDS (COFFEE TALK x STARDEW VALLEY)
+   ========================================================================== */
+.vn-dialogue-theatre {
+  animation: vnTheatreFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@keyframes vnTheatreFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.vn-dialogue-box {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.vn-dialogue-box:hover {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.25), inset 0 0 16px rgba(0, 0, 0, 0.7) !important;
+}
+
+.vn-choice-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.vn-choice-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: #f59e0b;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.vn-choice-card:hover,
+.vn-choice-card:focus-visible {
+  transform: translateY(-2px) scale(1.01) !important;
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.45) !important;
+  border-color: #fde047 !important;
+}
+
+.vn-choice-card:hover::before,
+.vn-choice-card:focus-visible::before {
+  opacity: 1;
+}
+
+.vn-choice-card:active {
+  transform: translateY(1px) scale(0.99) !important;
+}
+
+.vn-cursor-indicator {
+  display: inline-block;
+  margin-left: 6px;
+  color: #fde047;
+  font-size: 0.8rem;
+  animation: vnCursorBlink 0.65s infinite ease-in-out;
+  vertical-align: middle;
+}
+
+@keyframes vnCursorBlink {
+  0%, 100% { opacity: 1; transform: translateY(0); }
+  50% { opacity: 0.2; transform: translateY(3px); }
+}
+
+@keyframes choiceSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

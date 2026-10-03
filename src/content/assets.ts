@@ -270,7 +270,10 @@ export const ASSETS = {
     emoteAnger: url('assets/icons/emote_anger.png'),
     emoteQuestion: url('assets/icons/emote_question.png'),
     emoteMoney: url('assets/icons/emote_money.png'),
-    emoteOilAlert: url('assets/icons/emote_oil_alert.png')
+    emoteOilAlert: url('assets/icons/emote_oil_alert.png'),
+    emoteHeart: url('assets/icons/emote_heart.png'),
+    emoteDogBark: url('assets/icons/emote_dog_bark.png'),
+    emoteCatPurr: url('assets/icons/emote_cat_purr.png')
   }
 } as const;
 

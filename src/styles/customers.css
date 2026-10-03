@@ -134,21 +134,26 @@
   contain: layout;
 }
 
-/* Stardew Floating Emote Bubble */
+/* Stardew Floating Emote Bubble (Bong bóng cảm xúc Retro Pixel Art 16-bit) */
 .stardew-emote-bubble {
   position: absolute;
-  top: -10px;
-  right: -4px;
-  background: #ffffff;
-  border: 1.5px solid var(--pixel-wood-dark);
-  border-radius: 4px;
-  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
-  font-size: 13px;
-  line-height: 1;
-  padding: 2px 4px;
+  top: -14px;
+  right: -6px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
   animation: emoteBounce 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 6;
   pointer-events: none;
+}
+
+.stardew-emote-bubble .emote-pixel-img {
+  width: 26px;
+  height: 26px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
 }
 
 @keyframes emoteBounce {
@@ -1201,12 +1206,20 @@
   }
 }
 
-/* Decorative Alley Living Pets & Pests (Chó Vàng, Mèo Mướp, Chuột Cống) */
+/* Decorative & Interactive Alley Living Pets (Chó Vàng, Mèo Mướp) */
 .alley-pet-actor {
   position: absolute;
   bottom: 4px;
-  z-index: 4;
-  pointer-events: none;
+  z-index: 5;
+  pointer-events: auto;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transition: transform 0.15s ease;
+}
+
+.alley-pet-actor:active {
+  transform: scale(0.9);
 }
 
 .alley-pet-actor.dog {
@@ -1214,10 +1227,73 @@
   animation: petDogTrot 4s infinite alternate ease-in-out;
 }
 
+.alley-pet-actor.dog.pet-tail-wag {
+  animation: petTailWag 0.25s infinite alternate ease-in-out !important;
+}
+
 .alley-pet-actor.cat {
   top: 4px;
   right: 28px;
   animation: petCatLaze 3.5s infinite alternate ease-in-out;
+}
+
+.alley-pet-actor.cat.pet-stretch {
+  animation: petCatStretch 0.75s ease-in-out !important;
+}
+
+.pet-adopted-badge {
+  position: absolute;
+  top: -8px;
+  right: -6px;
+  background: #fbbf24;
+  color: #78350f;
+  font-size: 0.58rem;
+  font-weight: 900;
+  border-radius: 4px;
+  padding: 1px 3px;
+  border: 1px solid #d97706;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  pointer-events: none;
+}
+
+.pet-reaction-bubble {
+  position: absolute;
+  bottom: 26px;
+  right: -8px;
+  background: rgba(254, 243, 199, 0.96);
+  border: 1.5px solid #d97706;
+  border-radius: 8px;
+  padding: 3px 6px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #78350f;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+
+.pet-reaction-bubble .pet-emote-icon {
+  width: 20px;
+  height: 20px;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+
+@keyframes petTailWag {
+  0% { transform: rotate(-10deg) scale(1.08); }
+  100% { transform: rotate(10deg) scale(1.08); }
+}
+
+@keyframes petCatStretch {
+  0% { transform: scaleX(1) scaleY(1); }
+  40% { transform: scaleX(1.18) scaleY(0.82) translateY(2px); }
+  100% { transform: scaleX(1) scaleY(1); }
 }
 
 .alley-pest-actor.rat {
