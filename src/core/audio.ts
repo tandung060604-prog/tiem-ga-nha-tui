@@ -1,4 +1,122 @@
-// Sound Engine using procedural Web Audio API (No external sound file loading required)
+// Sound Engine using procedural Web Audio API & ZzFX Micro-Synthesizer (No external sound file loading required)
+
+/**
+ * ZzFX Micro-Synthesizer for Tiệm Gà Nhà Tui
+ * Generates procedural retro sound waves directly in AudioBuffer with ZERO latency & 0 download size.
+ * Adapted from Frank Force's ZzFX (MIT License)
+ */
+export function zzfxGenerate(
+  volume = 1,
+  randomness = 0.05,
+  frequency = 220,
+  attack = 0,
+  sustain = 0,
+  release = 0.1,
+  shape = 0, // 0: sine, 1: triangle, 2: sawtooth, 3: square, 4: noise
+  shapeCurve = 1,
+  slide = 0,
+  deltaSlide = 0,
+  pitchJump = 0,
+  pitchJumpTime = 0,
+  repeatTime = 0,
+  noise = 0,
+  _modulation = 0,
+  _bitCrush = 0,
+  delay = 0,
+  sustainVolume = 1,
+  decay = 0,
+  tremolo = 0,
+  sampleRate = 44100
+): number[] {
+  let b = 2 * Math.PI,
+    f = 0,
+    r = 0;
+
+  frequency *= 1 + (Math.random() * 2 - 1) * randomness;
+  slide *= 1 + (Math.random() * 2 - 1) * randomness;
+
+  const totalLength = Math.max(1, Math.floor((attack + decay + sustain + release + delay) * sampleRate));
+  const samples: number[] = new Array(totalLength);
+
+  const attackSamples = attack * sampleRate;
+  const decaySamples = decay * sampleRate;
+  const sustainSamples = sustain * sampleRate;
+  const releaseSamples = release * sampleRate;
+  const delaySamples = delay * sampleRate;
+
+  for (let t = 0; t < totalLength; ++t) {
+    if (t < delaySamples) {
+      samples[t] = 0;
+      continue;
+    }
+
+    const currentT = t - delaySamples;
+
+    if (pitchJumpTime && currentT >= pitchJumpTime * sampleRate) {
+      frequency += pitchJump;
+      pitchJump = 0;
+    }
+
+    frequency += slide;
+    slide += deltaSlide;
+    f += frequency;
+
+    if (repeatTime && ++r >= repeatTime * sampleRate) {
+      f = 0;
+      r = 0;
+    }
+
+    let vol = 0;
+    if (currentT < attackSamples) {
+      vol = currentT / Math.max(1, attackSamples);
+    } else if (currentT < attackSamples + decaySamples) {
+      vol = 1 - ((currentT - attackSamples) / Math.max(1, decaySamples)) * (1 - sustainVolume);
+    } else if (currentT < attackSamples + decaySamples + sustainSamples) {
+      vol = sustainVolume;
+    } else if (currentT < attackSamples + decaySamples + sustainSamples + releaseSamples) {
+      vol = sustainVolume * (1 - (currentT - attackSamples - decaySamples - sustainSamples) / Math.max(1, releaseSamples));
+    }
+
+    const phase = (f * b) / sampleRate;
+    let wave = 0;
+    switch (shape) {
+      case 0:
+        wave = Math.sin(phase);
+        break;
+      case 1:
+        wave = Math.asin(Math.sin(phase)) * (2 / Math.PI);
+        break;
+      case 2:
+        wave = (f / sampleRate) % 1;
+        wave = 2 * (wave - Math.floor(wave + 0.5));
+        break;
+      case 3:
+        wave = Math.sin(phase) > 0 ? 1 : -1;
+        break;
+      case 4:
+        wave = Math.random() * 2 - 1;
+        break;
+      default:
+        wave = Math.sin(phase);
+    }
+
+    if (shapeCurve !== 1 && wave !== 0) {
+      wave = Math.sign(wave) * Math.pow(Math.abs(wave), shapeCurve);
+    }
+
+    if (noise) {
+      wave = wave * (1 - noise) + (Math.random() * 2 - 1) * noise;
+    }
+
+    if (tremolo) {
+      vol *= 1 - tremolo * (0.5 + 0.5 * Math.sin((currentT * b * 10) / sampleRate));
+    }
+
+    samples[t] = Math.max(-1, Math.min(1, wave * vol * volume));
+  }
+
+  return samples;
+}
 
 class AudioManager {
   private ctx: AudioContext | null = null;
@@ -25,8 +143,9 @@ class AudioManager {
 
   private unsupported = false;
 
-  // Không có Web Audio (trình duyệt nhúng, máy cũ, chế độ hạn chế): game vẫn chạy, chỉ im lặng
+  // Không có Web Audio (trình duyệt nhúng, máy cũ, chế độ hạn chế, Node test): game vẫn chạy, chỉ im lặng
   private initContext() {
+    if (typeof window === 'undefined') return;
     if (!this.ctx && !this.unsupported) {
       const AudioCtx = window.AudioContext
         || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
@@ -748,6 +867,95 @@ class AudioManager {
     osc.start(now);
     osc.stop(now + 0.08);
   }
+
+  // ---------------------------------------------------------------------------
+  // ZzFX Procedural Sound Effects Engine (Tiệm Gà Nhà Tui 16-bit Retro SFX)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Phát âm thanh tổng hợp thời gian thực bằng thuật toán ZzFX Micro-Synthesizer
+   */
+  public playZzfx(
+    volume = 1,
+    randomness = 0.05,
+    frequency = 220,
+    attack = 0,
+    sustain = 0,
+    release = 0.1,
+    shape = 0,
+    shapeCurve = 1,
+    slide = 0,
+    deltaSlide = 0,
+    pitchJump = 0,
+    pitchJumpTime = 0,
+    repeatTime = 0,
+    noise = 0,
+    modulation = 0,
+    bitCrush = 0,
+    delay = 0,
+    sustainVolume = 1,
+    decay = 0,
+    tremolo = 0
+  ) {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    try {
+      const sampleRate = this.ctx.sampleRate || 44100;
+      const samples = zzfxGenerate(
+        volume, randomness, frequency, attack, sustain, release,
+        shape, shapeCurve, slide, deltaSlide, pitchJump, pitchJumpTime,
+        repeatTime, noise, modulation, bitCrush, delay, sustainVolume,
+        decay, tremolo, sampleRate
+      );
+      const buffer = this.ctx.createBuffer(1, samples.length, sampleRate);
+      buffer.getChannelData(0).set(samples);
+
+      const source = this.ctx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(this.dest());
+      source.start();
+    } catch {
+      // Safe fallback if context is suspended or blocked
+    }
+  }
+
+  // 1. Tiếng tiền xu rơi leng keng vui tai khi nhận tiền tip hoặc hoàn tiền nguyên liệu
+  public playCoinChing() {
+    this.playZzfx(0.3, 0.05, 1200, 0.01, 0.08, 0.2, 1, 1.2, 0, 0, 300, 0.04, 0, 0, 0, 0, 0.06, 0.7, 0.03, 0);
+  }
+
+  // 2. Tiếng rót nước ngọt sủi bọt ga phì phì tươi mát
+  public playPourFizz() {
+    this.playZzfx(0.22, 0.1, 750, 0.01, 0.06, 0.1, 0, 1.5, -2, 0, 0, 0, 0, 0.25, 0, 0, 0, 0.4, 0.02, 0.15);
+  }
+
+  // 3. Tiếng thả mẻ gà sống vào chảo sôi xèo xèo giòn rụm
+  public playCrispyDrop() {
+    this.playZzfx(0.28, 0.15, 320, 0.01, 0.15, 0.22, 4, 1, 0, 0, 0, 0, 0, 0.8, 0, 0, 0, 0.6, 0.05, 0);
+  }
+
+  // 4. Tiếng chuông keng nhà hàng lên món ra khay hoàng kim
+  public playServingBell() {
+    this.playZzfx(0.35, 0.02, 1760, 0.01, 0.25, 0.35, 1, 1.1, 0, 0, 0, 0, 0, 0, 0, 0, 0.1, 0.8, 0.02, 0);
+  }
+
+  // 5. Tiếng cạch cạch gỗ mộc ấm áp khi chạm dọn bàn ăn hiên quán
+  public playWoodClean() {
+    this.playZzfx(0.25, 0.05, 400, 0.01, 0.06, 0.1, 1, 1.5, -3, 0, 0, 0, 0, 0.3, 0, 0, 0, 0.5, 0.02, 0);
+  }
+
+  // 6. Tiếng còi cảnh sát huýt sắc nhọn khi tóm sống kẻ gian đóng giả khách
+  public playThiefBusted() {
+    this.playZzfx(0.35, 0, 580, 0.01, 0.1, 0.25, 3, 1.8, 8, 0, 250, 0.06, 0, 0, 0, 0, 0, 0.7, 0.04, 0);
+  }
+
+  // 7. Tiếng đàn 8-bit thăng hoa khi đạt chuỗi x2, x3, x5 Perfect
+  public playComboFanfare() {
+    this.playZzfx(0.3, 0.02, 659, 0.01, 0.08, 0.22, 1, 1.3, 4, 0, 180, 0.04, 0, 0, 0, 0, 0.05, 0.8, 0.03, 0);
+  }
 }
 
 export const audio = new AudioManager();
+

@@ -1361,7 +1361,9 @@ class AppController {
           cancelAnimationFrame(this.thiefAnimId);
           this.thiefAnimId = null;
         }
-        audio.playCash();
+        audio.playThiefBusted();
+        audio.playCoinChing();
+        Haptics.thiefBusted();
         const result = resolveThiefCaught(stateManager.getState(), encounter, true);
         confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
         this.openModal(renderThiefCaughtModal(stateManager.getState(), encounter, result.rewardMoney));
@@ -1383,7 +1385,9 @@ class AppController {
         const isHit = needlePos >= greenLeft && needlePos <= (greenLeft + greenWidth);
         if (isHit) {
           // Bắt được!
-          audio.playCash();
+          audio.playThiefBusted();
+          audio.playCoinChing();
+          Haptics.thiefBusted();
           const result = resolveThiefCaught(stateManager.getState(), encounter, false);
           confetti({ particleCount: 70, spread: 80, origin: { y: 0.6 } });
           this.openModal(renderThiefCaughtModal(stateManager.getState(), encounter, result.rewardMoney));
@@ -1391,6 +1395,7 @@ class AppController {
         } else {
           // Trượt! Tên trộm cuỗm đồ phóng chạy
           audio.playBurnt();
+          Haptics.warning();
           resolveThiefEscaped(stateManager.getState(), encounter);
           this.openModal(renderThiefEscapedModal(stateManager.getState(), encounter));
           this.bindThiefEscapedFailure(encounter);
@@ -2313,11 +2318,19 @@ class AppController {
     });
     if (!result.trayItem) this.showToast('Khay đầy, món vừa vớt bị bỏ!');
     if (result.quality === 'perfect') {
-      Haptics.perfect();
+      audio.playServingBell();
+      if ((this.sellingSession?.perfectStreak ?? 0) >= 2) {
+        audio.playComboFanfare();
+        Haptics.combo();
+      } else {
+        Haptics.perfect();
+      }
       recordWeeklyQuestProgress(stateManager.getState(), 'perfect_fry', 1);
     } else if (result.quality === 'burnt') {
+      audio.playBurnt();
       Haptics.warning();
     } else {
+      audio.playPop();
       Haptics.tap();
     }
   }
@@ -2579,6 +2592,8 @@ class AppController {
         }
         session.totalFriedCount += 1;
         cookingEngine.startFrying(recipe.type);
+        audio.playCrispyDrop();
+        Haptics.tap();
         if (action === 'fry-chicken') {
           const s = cookingEngine.getActiveSeasoning();
           if (s === 'spicy') {
@@ -2606,7 +2621,8 @@ class AppController {
         const drinkType: DrinkId = missingDrink ?? 'soda';
         cookingEngine.addDrink(drinkType);
         this.triggerDrinkPourAnimation(drinkType);
-        audio.playPop();
+        audio.playPourFizz();
+        Haptics.pourDrink();
         break;
       }
 
@@ -2621,7 +2637,8 @@ class AppController {
         }
         cookingEngine.addDrink('soda');
         this.triggerDrinkPourAnimation('soda');
-        audio.playPop();
+        audio.playPourFizz();
+        Haptics.pourDrink();
         this.showToast('🥤 Đang rót đầy ly Coca sủi bọt caramel mát lạnh!');
         break;
       }
@@ -2637,7 +2654,8 @@ class AppController {
         }
         cookingEngine.addDrink('seven_up');
         this.triggerDrinkPourAnimation('seven_up');
-        audio.playPop();
+        audio.playPourFizz();
+        Haptics.pourDrink();
         this.showToast('🍋 Đang rót đầy ly 7Up Chanh đá sảng khoái!');
         break;
       }
@@ -2653,7 +2671,8 @@ class AppController {
         }
         cookingEngine.addDrink('fanta_orange');
         this.triggerDrinkPourAnimation('fanta_orange');
-        audio.playPop();
+        audio.playPourFizz();
+        Haptics.pourDrink();
         this.showToast('🍊 Đang rót đầy ly Fanta Cam bùng nổ sảng khoái!');
         break;
       }
@@ -2757,8 +2776,9 @@ class AppController {
     if (!session) return;
     const res = cleanDineInTable(session, tableIndex);
     if (res.success) {
-      audio.playCash();
-      Haptics.serveSuccess();
+      audio.playWoodClean();
+      audio.playCoinChing();
+      Haptics.cleanTable();
       this.showToast(`🧹 Đã dọn sạch ${res.tableName}! Thu gom +${res.tipCollected.toLocaleString('vi-VN')}đ tiền tip 🪙✨`);
       this.sellingStructureKey = '';
       this.render();
