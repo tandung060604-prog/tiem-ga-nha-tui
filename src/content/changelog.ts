@@ -24,16 +24,111 @@ export interface ChangelogRelease {
   }[];
 }
 
-export const CURRENT_GAME_VERSION = 'v2.9.0';
-export const CURRENT_VERSION_CODENAME = 'Smart Order Sorting, Quầy Khách Rộng Rãi, Fanta Cam & Bàn Ăn Pixel Art';
+export const CURRENT_GAME_VERSION = 'v3.1.0';
+export const CURRENT_VERSION_CODENAME = 'Sài Gòn Bistro, Khách Quen Hẻm 1102 & Khẩu Vị Ruột';
 export const CURRENT_BUILD_DATE = '03/10/2026';
 
 export const CHANGELOG_DATA: ChangelogRelease[] = [
   {
+    version: 'v3.1.0',
+    codename: 'Sài Gòn Bistro, Khách Quen Hẻm 1102 & Khẩu Vị Ruột',
+    releaseDate: '03/10/2026',
+    isLatest: true,
+    highlightSummary: 'Bước chuyển mình rực rỡ sang phong cách Sài Gòn Retro Bistro: Giọng nói Bác Ba Nam Bộ tương tác chạm; Đại tu khay ra món đĩa gốm sứ 4 ô men ngà; Tinh giản tên món và badge số lượng chống tràn; Mở rộng quầy sơ chế 12 khay cân đối; Hệ thống Khách Quen Hẻm 1102 tích lũy 5 cấp tim thân thiết với Khẩu Vị Ruột tặng Tip khủng & Bưu Kiện Quà Quê mỗi sáng; Phòng Lưu Niệm Ký Ức Hẻm 1102 & Cao Trào Tuyến Truyện Visual Novel!',
+    metrics: [
+      { icon: '💖', label: 'Khách Quen', value: '5 Cấp Tim Tri Kỷ' },
+      { icon: '🎁', label: 'Bưu Kiện Quà', value: 'Tiếp Tế Mỗi Sáng' },
+      { icon: '🍱', label: 'Quầy Sơ Chế', value: '12 Khay Cân Đối' },
+      { icon: '👴', label: 'Tiếng Bác Ba', value: 'Web Audio Voice' },
+      { icon: '🏛️', label: 'Phòng Lưu Niệm', value: 'Bảo Tàng Ký Ức' },
+      { icon: '🍽️', label: 'Sài Gòn Bistro', value: 'Đĩa Sứ Gốm Ấm' }
+    ],
+    categories: [
+      {
+        categoryName: 'Khách Quen Hẻm 1102 & Khẩu Vị Ruột',
+        categoryIcon: '💖',
+        items: [
+          {
+            tag: 'ALLEY LOYALTY',
+            tagColor: '#ec4899',
+            title: 'Hệ Thống 5 Cấp Tim Thân Thiết Cư Dân',
+            desc: 'Gắn kết tình làng nghĩa xóm sâu sắc với 12 cư dân Hẻm 1102:',
+            details: [
+              'Tích lũy điểm thân thiết qua mỗi lần ghé quán: Khách Vãng Lai (1★) → Khách Quen (2★) → Bạn Tâm Giao (3★) → Ruột Thịt Hẻm (4★) → Tri Kỷ Muôn Đời (5★).',
+              'Khách gửi Bưu Kiện Quà Quê tiếp tế tiền vốn và nguyên liệu tươi ngon vào đầu ngày mới.'
+            ]
+          },
+          {
+            tag: 'DIETARY ORDERS',
+            tagColor: '#f59e0b',
+            title: 'Phục Vụ Đúng Khẩu Vị Ruột & Tip Khủng',
+            desc: 'Mỗi cư dân có sở thích ăn uống và dặn dò riêng biệt:',
+            details: [
+              'Thẻ order hiển thị pill dặn dò khẩu vị ruột (ít đá, nhiều sốt, chiên kỹ...) với hiệu ứng nhấp nháy êm dịu.',
+              'Phục vụ đúng gu ruột thưởng ngay tiền Tip hậu hĩnh và tăng vọt điểm thân thiết.'
+            ]
+          }
+        ]
+      },
+      {
+        categoryName: 'Đại Tu Giao Diện Sài Gòn Retro Bistro',
+        categoryIcon: '🎨',
+        items: [
+          {
+            tag: 'CERAMIC DISHES',
+            tagColor: '#d97706',
+            title: 'Đĩa Gốm Sứ Men Ngà Thay Vỉ Kim Loại',
+            desc: 'Thay thế hoàn toàn khay kim loại công nghiệp bằng đĩa sứ gốm nung men ngà ấm áp:',
+            details: [
+              'Bố cục 4 ô đĩa sứ (2x2) men ngà viền đất nung thủ công, hiển thị món ăn ngon mắt.',
+              'Gỡ bỏ hoàn toàn 2 chai tương cà/ớt rườm rà, tập trung trọn vẹn vào nghệ thuật chiên gà.'
+            ]
+          },
+          {
+            tag: 'PREP 12 TRAYS',
+            tagColor: '#10b981',
+            title: 'Lấp Đầy 12 Khay Sơ Chế Phủ Kín Quầy Bếp',
+            desc: 'Mở rộng bố cục 2 hàng × 6 khay cân đối, chuẩn bị cho tương lai phát triển quán:',
+            details: [
+              'Hàng trên: Củ cải muối, Salad bắp cải, Sốt cay ngọt, Sốt tỏi tương, Nồi mì Ý, Lò nướng.',
+              'Hàng dưới: Gà truyền thống, Đùi góc tư, Khoai tây, Gà viên, Phô mai que, Bàn ráp Burger.'
+            ]
+          },
+          {
+            tag: 'BAC BA AUDIO',
+            tagColor: '#6366f1',
+            title: 'Tiếng Bác Ba Nam Bộ Thật & Âm Thanh Bistro',
+            desc: 'Nạp âm thanh WAV thật của Bác Ba tổ trưởng qua Web Audio API:',
+            details: [
+              'Tự động resume audio context ngay tại cử chỉ chạm đầu tiên; chạm Bác Ba ở Title Screen để nghe tiếng chào ấm áp.',
+              'Bộ font chữ Cozy Bistro Tiny5 Duo + Baloo 2 + Be Vietnam Pro chuẩn hóa 100% tiếng Việt không lỗi dấu.'
+            ]
+          }
+        ]
+      },
+      {
+        categoryName: 'Phòng Lưu Niệm & Tuyến Truyện Cao Trào',
+        categoryIcon: '🏛️',
+        items: [
+          {
+            tag: 'MEMORY GALLERY',
+            tagColor: '#8b5cf6',
+            title: 'Bảo Tàng Ký Ức & Xem Lại Đại Kết Cục',
+            desc: 'Nơi lưu giữ toàn bộ hành trình lập nghiệp tại Hẻm 1102:',
+            details: [
+              'Xem lại các Đại Kết Cục đã chinh phục, album thư Thỏ Cam và các mốc bằng khen đạt được.',
+              'Cao trào Hồi 4 & Hồi 5 trong Ký Sự Cư Dân gắn kết với các chỉ số ngầm Karma.'
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     version: 'v2.9.0',
     codename: 'Smart Order Sorting, Quầy Khách Rộng Rãi, Fanta Cam & Bàn Ăn Pixel Art',
     releaseDate: '03/10/2026',
-    isLatest: true,
+    isLatest: false,
     highlightSummary: 'Tối ưu trải nghiệm thao tác đỉnh cao cho người chơi: Sắp xếp đơn hàng thông minh đưa món chưa làm xong lên trên đầu danh sách, tự động thu gọn món đã xong dạng chip để không bao giờ bị trôi món làm mất khách; Mở rộng hàng đợi khách cho phép đọc trọn vẹn thông tin; Mở khóa Fanta Cam ngay từ Chương 1 giúp máy rót 3 vòi hoạt động đầy đủ; Dời thời tiết lên Header dạng mini pixel badge và lược bỏ biển hiệu vỉa hè thừa; Thay thế hoàn toàn ghế emoji bằng bàn ghế gỗ mộc Pixel Art retro Stardew Valley kèm animation nhai thức ăn và hơi khói ấm nóng!',
     metrics: [
       { icon: '📋', label: 'Order Sorting', value: 'Món Chưa Xong Lên Đầu' },

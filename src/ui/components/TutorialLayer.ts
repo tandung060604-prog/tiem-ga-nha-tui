@@ -1,5 +1,6 @@
 import { TutorialHint, PrepTutorialHint } from '../../core/tutorial';
 import { ASSETS } from '../../content/assets';
+import { bacBaVoice } from '../../core/bacBaVoice';
 
 // Bong bóng lời Bác Ba + Hiệu ứng Spotlight Highlight (chiếu sáng nút mục tiêu, làm tối xung quanh).
 // Nằm NGOÀI #main-view (màn bán hàng dựng lại HTML liên tục) → chỉ vẽ lại khi đổi bước.
@@ -131,7 +132,8 @@ export function syncTutorialLayer(hint: TutorialHint | PrepTutorialHint | null, 
     updateSpotlight();
   }
 
-  if (shownKey === hint.step && document.getElementById(LAYER_ID)) return;
+  const isNewStep = shownKey !== hint.step;
+  if (!isNewStep && document.getElementById(LAYER_ID)) return;
   shownKey = hint.step;
 
   let layer = document.getElementById(LAYER_ID);
@@ -139,6 +141,17 @@ export function syncTutorialLayer(hint: TutorialHint | PrepTutorialHint | null, 
     layer = document.createElement('div');
     layer.id = LAYER_ID;
     document.body.appendChild(layer);
+  }
+
+  // Cất giọng Bác Ba khi chuyển sang bước mới
+  if (isNewStep) {
+    if (hint.step === 'prep-welcome' || hint.step === 'intro') {
+      bacBaVoice.playCue('intro', true);
+    } else if (hint.step === 'done' || hint.step === 'prep-start') {
+      bacBaVoice.playCue('praise', true);
+    } else {
+      bacBaVoice.speak('instruction', hint.text);
+    }
   }
 
   // Tính vị trí thông minh cho bong bóng thoại Bác Ba:
@@ -153,7 +166,7 @@ export function syncTutorialLayer(hint: TutorialHint | PrepTutorialHint | null, 
   layer.className = `tutorial-layer ${atBottom ? 'at-bottom' : 'at-top'}`;
   layer.innerHTML = `
     <div class="tutorial-bubble stardew-dialog-box" role="dialog" aria-live="polite">
-      <div class="tutorial-avatar-wrap">
+      <div class="tutorial-avatar-wrap" style="cursor: pointer;" title="Chạm nghe Bác Ba cười khà khà">
         <img class="tutorial-avatar" src="${ASSETS.bacba.front}" alt="Bác Ba" />
         <span class="tutorial-avatar-badge">BÁC BA</span>
       </div>
@@ -170,6 +183,9 @@ export function syncTutorialLayer(hint: TutorialHint | PrepTutorialHint | null, 
       </div>
     </div>`;
 
+  layer.querySelector('.tutorial-avatar-wrap')?.addEventListener('click', () => {
+    bacBaVoice.playCue('chuckle', true);
+  });
   layer.querySelector('#btn-tutorial-next')?.addEventListener('click', actions.onButton);
   layer.querySelector('#btn-tutorial-skip')?.addEventListener('click', actions.onSkip);
 }

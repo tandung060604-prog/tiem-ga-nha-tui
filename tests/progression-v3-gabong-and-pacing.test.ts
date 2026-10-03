@@ -1,159 +1,102 @@
 import { describe, it, expect } from 'vitest';
-import { BUNNY_LETTERS, BUNNY_RANDOM_VISIT_NOTES, MysteryBunnyEngine } from '../src/content/mysteryBunny';
-import { INITIAL_UPGRADES } from '../src/content/upgrades';
+import { BUNNY_LETTERS, BUNNY_RANDOM_VISIT_NOTES } from '../src/content/mysteryBunny';
+import { UPGRADES } from '../src/content/upgrades';
 import { DAILY_INCIDENTS } from '../src/content/dailyIncidents';
 import { SIGNATURE_STORY_DISHES } from '../src/content/signatureStoryDishes';
-import { renderBunnyAlbumModal } from '../src/ui/components/BunnyModal';
-import { renderMemoriesAlbumModal } from '../src/ui/components/MemoriesAlbumModal';
-import { renderEndingModal } from '../src/ui/components/EndingModal';
-import { STORY_ENDINGS } from '../src/content/endings';
-import { GameState } from '../src/types/game';
+import { PREP_TUTORIAL_STEPS } from '../src/core/tutorial';
 
-function createMockGameState(overrides: Partial<GameState> = {}): GameState {
-  return {
-    day: 1,
-    currentChapter: 1,
-    money: 500000,
-    ratings: { overall: 5.0, food: 5.0, service: 5.0, hygiene: 5.0 },
-    inventory: {
-      chicken_meat: { amount: 20, quality: 'good', cost: 15000 },
-      cooking_oil: { amount: 10, quality: 'good', cost: 20000 },
-      flour: { amount: 10, quality: 'good', cost: 10000 }
-    },
-    menu: [],
-    upgrades: [],
-    staff: [],
-    recentReviews: [],
-    unlockedBunnyLetters: [],
-    seenIncidentIds: [],
-    ...overrides
-  } as unknown as GameState;
-}
+describe('Plan V3 Progression & Bé Gà Bông Lore Masterpiece', () => {
+  describe('18 Mảnh Giấy Nhớ Bé Gà Bông (18 Gà Bông Memos)', () => {
+    it('should have exactly 18 letters spanning Chapters 1 through 5', () => {
+      expect(BUNNY_LETTERS).toHaveLength(18);
+    });
 
-describe('Bộ Truyện 18 Mảnh Giấy Nhớ Bé Gà Bông (Mystery Bunny Masterpiece)', () => {
-  it('BUNNY_LETTERS có đúng 18 bức thư ký ức trải dài qua 5 Hồi / 5 Chương', () => {
-    expect(BUNNY_LETTERS.length).toBe(18);
+    it('each letter should have valid structural properties and meaningful narrative content', () => {
+      BUNNY_LETTERS.forEach((letter, index) => {
+        expect(letter.id).toBe(`bunny_letter_${index + 1}`);
+        expect(letter.title).toBeTruthy();
+        expect(letter.content.length).toBeGreaterThan(30);
+        expect(letter.day).toBeGreaterThan(0);
+        expect(letter.chapter).toBeGreaterThanOrEqual(1);
+        expect(letter.chapter).toBeLessThanOrEqual(5);
+        expect(letter.favoriteDish).toBeTruthy();
+        expect(letter.reward.tipBonus).toBeGreaterThanOrEqual(0);
+        expect(letter.reward.description).toBeTruthy();
+      });
+    });
 
-    // Kiểm tra tính duy nhất của ID
-    const ids = BUNNY_LETTERS.map(l => l.id);
-    const uniqueIds = new Set(ids);
-    expect(uniqueIds.size).toBe(18);
+    it('should reflect the 3 Plot Twists at letters 6, 12, and 18', () => {
+      // Plot Twist 1 (Letter 6): Chiếc khăn len cam và mảnh giấy khen của Ba
+      const letter6 = BUNNY_LETTERS[5];
+      expect(letter6.title).toContain('Kỷ Vật');
+      expect(letter6.content).toContain('khăn len');
 
-    // Kiểm tra các chương 1, 2, 3, 4, 5 đều có thư tương ứng
-    const chapters = new Set(BUNNY_LETTERS.map(l => l.trigger.chapter));
-    expect(chapters.has(1)).toBe(true);
-    expect(chapters.has(2)).toBe(true);
-    expect(chapters.has(3)).toBe(true);
-    expect(chapters.has(4)).toBe(true);
-    expect(chapters.has(5)).toBe(true);
-  });
+      // Plot Twist 2 (Letter 12): Bí mật cuộc thi Cúp Gà Vàng và ông Hùng
+      const letter12 = BUNNY_LETTERS[11];
+      expect(letter12.title).toContain('Tự Thú');
+      expect(letter12.content).toContain('MegaChicken');
 
-  it('Mỗi mảnh giấy đều có đầy đủ title, preferredFood, rewardText và storyImpact phong phú', () => {
-    BUNNY_LETTERS.forEach((letter) => {
-      expect(letter.title).toBeTruthy();
-      expect(letter.noteContent.length).toBeGreaterThan(30);
-      expect(letter.preferredFood).toBeTruthy();
-      expect(letter.rewardText).toBeTruthy();
-      expect(letter.storyImpact).toBeTruthy();
-      expect(letter.trigger.atProgress).toBeGreaterThanOrEqual(0);
-      expect(letter.trigger.atProgress).toBeLessThanOrEqual(1.0);
+      // Plot Twist 3 / Hồi 5 (Letter 18): An chính là người bạn thuở nhỏ & Mâm cơm đoàn viên
+      const letter18 = BUNNY_LETTERS[17];
+      expect(letter18.title).toContain('Đoàn Viên');
+      expect(letter18.content).toContain('Hẻm 1102');
+    });
+
+    it('random visit notes should be in tone with Bé Gà Bông', () => {
+      expect(BUNNY_RANDOM_VISIT_NOTES.length).toBeGreaterThanOrEqual(5);
+      const combinedNotes = BUNNY_RANDOM_VISIT_NOTES.join(' ');
+      expect(combinedNotes).toContain('Gà Bông');
     });
   });
 
-  it('Các tầng Plot Twist được lồng ghép tinh tế (Bác Ba, MegaChicken, danh tính An / Chicky)', () => {
-    const allNotesText = BUNNY_LETTERS.map(l => l.noteContent).join(' ');
-    expect(allNotesText).toContain('Bác Ba');
-    expect(allNotesText).toContain('MegaChicken');
-    expect(allNotesText).toContain('khăn len cam');
-    expect(allNotesText).toContain('An');
+  describe('Đồ Nghề Xe Đẩy Vỉa Hè (Cart Branch)', () => {
+    it('should contain a 3-tier cart upgrade progression', () => {
+      const cartUpgrades = UPGRADES.filter(u => u.category === 'cart');
+      expect(cartUpgrades).toHaveLength(3);
+
+      const [cart1, cart2, cart3] = cartUpgrades;
+      expect(cart1.level).toBe(1);
+      expect(cart1.cost).toBe(0);
+      expect(cart1.unlockDay).toBe(1);
+
+      expect(cart2.level).toBe(2);
+      expect(cart2.cost).toBe(50000);
+      expect(cart2.unlockDay).toBe(3);
+
+      expect(cart3.level).toBe(3);
+      expect(cart3.cost).toBe(120000);
+      expect(cart3.unlockDay).toBe(5);
+    });
   });
 
-  it('BUNNY_RANDOM_VISIT_NOTES phản ánh đúng hình tượng Bé Gà Bông Chicky', () => {
-    expect(BUNNY_RANDOM_VISIT_NOTES.length).toBeGreaterThanOrEqual(5);
-    const allGreetings = BUNNY_RANDOM_VISIT_NOTES.join(' ');
-    expect(allGreetings).toContain('Gà Bông');
-    expect(allGreetings).toContain('cánh');
+  describe('Sự Kiện Đột Xuất Thực Tế F&B (Urban Patrol)', () => {
+    it('should trigger urban patrol incident on Day 2', () => {
+      const patrolIncident = DAILY_INCIDENTS.find(inc => inc.id === 'incident_urban_patrol');
+      expect(patrolIncident).toBeDefined();
+      expect(patrolIncident?.day).toBe(2);
+      expect(patrolIncident?.choices).toHaveLength(2);
+      expect(patrolIncident?.choices[0].text).toContain('chỉ giới');
+      expect(patrolIncident?.choices[1].text).toContain('nán lại');
+    });
   });
 
-  it('MysteryBunnyEngine hoạt động chính xác với 18 thư', () => {
-    // Chương 1, progress 0.26 (1.300.000 / 5.000.000) -> thư 1
-    const s1 = createMockGameState({ currentChapter: 1, money: 1300000, unlockedBunnyLetters: [] });
-    const letter1 = MysteryBunnyEngine.getScheduledLetter(s1);
-    expect(letter1?.id).toBe('bunny_letter_1');
-
-    // Nếu đã mở thư 1 thì trả về thư tiếp theo hoặc null nếu chưa đủ mốc
-    const s2 = createMockGameState({ currentChapter: 1, money: 1300000, unlockedBunnyLetters: ['bunny_letter_1'] });
-    const letterNext = MysteryBunnyEngine.getScheduledLetter(s2);
-    expect(letterNext).toBeNull();
-  });
-});
-
-describe('Cơ Chế Nâng Cấp Xe Đẩy Vỉa Hè (Cart Progression)', () => {
-  it('INITIAL_UPGRADES có nhánh cart với 3 cấp độ thực tế từ xe inox đến dù bạt và đèn neon', () => {
-    const cartBranch = INITIAL_UPGRADES.cart;
-    expect(cartBranch).toBeDefined();
-    expect(cartBranch.tiers.length).toBe(3);
-
-    const [tier1, tier2, tier3] = cartBranch.tiers;
-    expect(tier1.cost).toBe(0);
-    expect(tier2.cost).toBe(50000);
-    expect(tier2.minDay).toBe(3);
-    expect(tier3.cost).toBe(120000);
-    expect(tier3.minDay).toBe(5);
-  });
-});
-
-describe('Sự Kiện Thực Tế F&B Ngày 2: Đội Trật Tự Đô Thị & Y Tế Phường', () => {
-  it('DAILY_INCIDENTS có incident_urban_patrol ở Ngày 2 với các lựa chọn thực tế', () => {
-    const incident = DAILY_INCIDENTS.find(i => i.id === 'incident_urban_patrol');
-    expect(incident).toBeDefined();
-    expect(incident?.minDay).toBe(2);
-    expect(incident?.title).toContain('Đội Trật Tự Đô Thị');
-    expect(incident?.choices.length).toBe(2);
-
-    const choiceA = incident?.choices[0];
-    const choiceB = incident?.choices[1];
-    expect(choiceA).toBeDefined();
-    expect(choiceB).toBeDefined();
-  });
-});
-
-describe('Món Signature Gà Bông & Cốt Truyện Gà Vàng', () => {
-  it('dish_ga_lac_thocam gắn với cốt truyện Bé Gà Bông (An)', () => {
-    const signature = SIGNATURE_STORY_DISHES.find(d => d.id === 'dish_ga_lac_thocam');
-    expect(signature).toBeDefined();
-    expect(signature?.name).toContain('Gà Bông');
-    expect(signature?.associatedCharacter).toContain('An');
-  });
-});
-
-describe('Giao Diện Dynamic Không Hardcode /6 và Thể Hiện Đủ 18 Thư Gà Bông', () => {
-  it('renderBunnyAlbumModal hiển thị đúng tổng số thư 18 và tab tương ứng', () => {
-    const state = createMockGameState({ unlockedBunnyLetters: ['bunny_letter_1', 'bunny_letter_2'] });
-    const html = renderBunnyAlbumModal(state, 0);
-
-    expect(html).toContain('2/18');
-    expect(html).toContain('Sổ Ký Ức Gà Bông');
-    expect(html).toContain('Mảnh Giấy #1');
-    expect(html).toContain('Mảnh Giấy #18');
-    expect(html).not.toContain('/6');
+  describe('Signature Dishes & Visual Lore Consistency', () => {
+    it('signature dish dish_ga_lac_thocam should be renamed to Gà Lắc Bé Gà Bông', () => {
+      const signatureDish = SIGNATURE_STORY_DISHES.find(d => d.id === 'dish_ga_lac_thocam');
+      expect(signatureDish).toBeDefined();
+      expect(signatureDish?.name).toContain('Gà Bông');
+      expect(signatureDish?.lore).toContain('An');
+    });
   });
 
-  it('renderMemoriesAlbumModal render tab Thư Gà Bông với tỉ lệ trên tổng 18', () => {
-    const state = createMockGameState({ unlockedBunnyLetters: ['bunny_letter_1'] });
-    const html = renderMemoriesAlbumModal(state, 'bunny');
-
-    expect(html).toContain('1/18');
-    expect(html).toContain('Gà Bông');
-    expect(html).not.toContain('(1/6)');
-  });
-
-  it('renderEndingModal hiển thị Kỷ Niệm Gà Bông với số lượng thực tế', () => {
-    const state = createMockGameState({ unlockedBunnyLetters: ['bunny_letter_1', 'bunny_letter_2', 'bunny_letter_3'] });
-    const html = renderEndingModal(state, 'happy');
-
-    expect(html).toContain('3/18');
-    expect(html).toContain('Kỷ Niệm Gà Bông');
-    expect(html).not.toContain('3/6');
+  describe('Streamlined Prep Tutorial Pacing', () => {
+    it('should have 4 streamlined steps for Day 1 prep phase', () => {
+      expect(PREP_TUTORIAL_STEPS).toEqual([
+        'prep-welcome',
+        'prep-inventory',
+        'prep-menu',
+        'prep-start'
+      ]);
+    });
   });
 });

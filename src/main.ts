@@ -2398,7 +2398,7 @@ class AppController {
       audio.playBurnt();
       Haptics.warning();
     } else {
-      audio.playPop();
+      audio.playHarvestPlop();
       Haptics.tap();
     }
   }
@@ -2941,6 +2941,8 @@ class AppController {
       }
       case 'complete':
         Haptics.serveSuccess();
+        audio.playServingBell();
+        audio.playCoinChing();
         if (curState.day === 1 && (curState.onboardingGuideStep ?? 0) >= 1) {
           stateManager.update(draft => {
             draft.onboardingGuideStep = 0;

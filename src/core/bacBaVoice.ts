@@ -12,6 +12,9 @@ export type BacBaVoiceContext =
   | 'manual'
   | 'story';
 
+const BASE = import.meta.env?.BASE_URL ?? '/';
+const voiceUrl = (path: string) => `${BASE}${path.replace(/^\//, '')}`;
+
 interface VoiceCueConfig {
   file: string;
   fallbackF0: number;
@@ -21,31 +24,31 @@ interface VoiceCueConfig {
 
 const VOICE_CUE_CONFIGS: Record<BacBaVoiceCue, VoiceCueConfig> = {
   intro: {
-    file: '/assets/audio/bacba/bacba_intro.wav',
+    file: voiceUrl('assets/audio/bacba/bacba_intro.wav'),
     fallbackF0: 125,
     duration: 0.75,
     pitchSlide: -15
   },
   praise: {
-    file: '/assets/audio/bacba/bacba_khen.wav',
+    file: voiceUrl('assets/audio/bacba/bacba_khen.wav'),
     fallbackF0: 118,
     duration: 0.85,
     pitchSlide: 10
   },
   warning: {
-    file: '/assets/audio/bacba/bacba_canhbao.wav',
+    file: voiceUrl('assets/audio/bacba/bacba_canhbao.wav'),
     fallbackF0: 130,
     duration: 0.7,
     pitchSlide: 35
   },
   advice: {
-    file: '/assets/audio/bacba/bacba_loikhuyen.wav',
+    file: voiceUrl('assets/audio/bacba/bacba_loikhuyen.wav'),
     fallbackF0: 120,
     duration: 0.9,
     pitchSlide: -8
   },
   chuckle: {
-    file: '/assets/audio/bacba/bacba_chuckle.wav',
+    file: voiceUrl('assets/audio/bacba/bacba_chuckle.wav'),
     fallbackF0: 112,
     duration: 0.8,
     pitchSlide: 5
