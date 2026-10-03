@@ -47,8 +47,8 @@ for (const width of WIDTHS) {
     return {
       over: document.documentElement.scrollWidth - innerWidth,
       culprits: outside.filter(e => !clipped(e)).slice(0, 3).map(name),
-      // Hàng khách cuộn ngang và băng chữ ticker là thiết kế cố ý → không cảnh báo
-      hidden: [...new Set(outside.filter(e => clipped(e) && !e.closest('.customer-lane') && !e.closest('.selling-ticker-rail')).map(e => name(e.closest('[class]') ?? e)))].slice(0, 3)
+      // Hàng khách cuộn ngang, hàng khay sơ chế và băng chữ ticker là thiết kế cố ý → không cảnh báo
+      hidden: [...new Set(outside.filter(e => clipped(e) && !e.closest('.customer-lane') && !e.closest('.selling-ticker-rail') && !e.closest('.prep-row')).map(e => name(e.closest('[class]') ?? e)))].slice(0, 3)
     };
   });
   const checkOverflow = async label => {

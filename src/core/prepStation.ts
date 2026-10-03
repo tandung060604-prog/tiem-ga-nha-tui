@@ -21,15 +21,21 @@ interface PrepPanDef {
 }
 
 export const PREP_LAYOUT: readonly PrepPanDef[] = [
+  // Hàng trên (Khay GN 1/6: Món kèm, sốt & món phụ nóng hổi) - 6 khay
   { id: 'danmuji', row: 'top', action: 'scoop-danmuji', menuItemId: 'danmuji', stock: ['danmuji'], label: 'Củ Cải', icon: '🥒', asset: ASSETS.kitchen.gnSideRadishPickled },
   { id: 'coleslaw', row: 'top', action: 'scoop-coleslaw', menuItemId: 'coleslaw', stock: ['coleslaw'], label: 'Bắp Cải', icon: '🥗', asset: ASSETS.kitchen.gnSideColeslaw },
   { id: 'yangnyeom', row: 'top', action: 'season-spicy', menuItemId: 'spicy_chicken', stock: ['spicy_sauce'], label: 'Sốt Cay', icon: '🌶️', asset: ASSETS.kitchen.gnPanSauceYangnyeom },
   { id: 'soy_garlic', row: 'top', action: 'season-honey', menuItemId: 'honey_garlic_chicken', stock: ['garlic_honey'], label: 'Sốt Bơ Tỏi', icon: '🧄', asset: ASSETS.kitchen.gnPanSauceSoyGarlic },
+  { id: 'noodle', row: 'top', action: 'timer-noodle', menuItemId: 'pasta_beef', stock: ['pasta_beef'], label: 'Mì Ý', icon: '🍝', asset: null },
+  { id: 'oven', row: 'top', action: 'timer-oven', menuItemId: 'biscuit_honey', stock: ['garlic_honey'], label: 'Bánh Quy', icon: '🥐', asset: null },
+
+  // Hàng dưới (Khay GN 1/3: Đồ sống chiên rán & trạm lắp ráp) - 6 khay
   { id: 'chicken', row: 'bottom', action: 'fry-chicken', menuItemId: 'crispy_chicken', stock: FRY_RECIPES.crispy_chicken!.stock, label: 'Gà Tươi', icon: '🍗', asset: ASSETS.kitchen.gnPrepChickenRaw },
   { id: 'thigh', row: 'bottom', action: 'fry-thigh', menuItemId: 'spicy_thigh', stock: FRY_RECIPES.spicy_thigh!.stock, label: 'Má Đùi', icon: '🍗', asset: ASSETS.kitchen.gnPrepThighRaw },
   { id: 'fries', row: 'bottom', action: 'fry-fries', menuItemId: 'shake_fries', stock: FRY_RECIPES.shake_fries!.stock, label: 'Khoai Cắt', icon: '🍟', asset: ASSETS.kitchen.gnPrepFriesRaw },
   { id: 'popcorn', row: 'bottom', action: 'fry-popcorn', menuItemId: 'popcorn_chicken', stock: FRY_RECIPES.popcorn_chicken!.stock, label: 'Gà Viên', icon: '🍿', asset: ASSETS.kitchen.gnPrepPopcornRaw },
-  { id: 'cheese', row: 'bottom', action: 'fry-cheese', menuItemId: 'cheese_stick', stock: FRY_RECIPES.cheese_stick!.stock, label: 'Phô Mai', icon: '🧀', asset: ASSETS.kitchen.gnPrepCheeseStickRaw }
+  { id: 'cheese', row: 'bottom', action: 'fry-cheese', menuItemId: 'cheese_stick', stock: FRY_RECIPES.cheese_stick!.stock, label: 'Phô Mai', icon: '🧀', asset: ASSETS.kitchen.gnPrepCheeseStickRaw },
+  { id: 'burger', row: 'bottom', action: 'assemble-chicken_burger', menuItemId: 'chicken_burger', stock: ['burger_bun'], label: 'Burger', icon: '🍔', asset: null }
 ];
 
 const k = (vnd: number) => `${Math.round(vnd / 1000).toLocaleString('vi-VN')}k`;
