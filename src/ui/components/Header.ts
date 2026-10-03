@@ -65,7 +65,7 @@ export function renderHeader(state: GameState, _onOpenSettings?: () => void): st
 
     <div class="h-m">
       <span class="store-badge" title="${escapeHtml(theme.signboardTitle)} • ${escapeHtml(theme.signboardSubtitle)}">
-        <img class="store-logo-badge" src="${ASSETS.ui.logoKoreanChicken}" alt="Logo" />
+        <img class="store-logo-badge" src="${ASSETS.ui.changChickenLogo}" alt="Logo Chang Chicken" />
         <span class="store-name-text">${theme.id !== 'default' ? `${theme.icon} ` : ''}${escapeHtml(state.shopName)}</span>
       </span>
       <span class="money">

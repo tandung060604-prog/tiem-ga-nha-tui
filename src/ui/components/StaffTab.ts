@@ -120,7 +120,8 @@ export function renderStaffTab(state: GameState): string {
 export function bindStaffEvents(
   state: GameState,
   onUpdateState: (fn: (draft: GameState) => void) => void,
-  showToast: (msg: string) => void
+  showToast: (msg: string) => void,
+  confirmFn?: (msg: string, confirmLabel: string) => Promise<boolean>
 ) {
   // Nút Roll Gacha 1 (Phát tờ rơi tuyển dụng - 40k)
   const singleRollBtn = document.getElementById('btn-gacha-single');
@@ -149,7 +150,7 @@ export function bindStaffEvents(
           const staffContainer = document.querySelector('.pane, .staff-screen, #tab-staff-content, .tab-pane.active');
           if (staffContainer) {
             staffContainer.innerHTML = renderStaffTab(state);
-            bindStaffEvents(state, onUpdateState, showToast);
+            bindStaffEvents(state, onUpdateState, showToast, confirmFn);
           }
         }
       );
@@ -182,7 +183,7 @@ export function bindStaffEvents(
           const staffContainer = document.querySelector('.pane, .staff-screen, #tab-staff-content, .tab-pane.active');
           if (staffContainer) {
             staffContainer.innerHTML = renderStaffTab(state);
-            bindStaffEvents(state, onUpdateState, showToast);
+            bindStaffEvents(state, onUpdateState, showToast, confirmFn);
           }
         }
       );
@@ -222,15 +223,28 @@ export function bindStaffEvents(
         showToast(`Cần ${pay.toLocaleString('vi-VN')}đ trợ cấp mới cho ${member.name} nghỉ được!`);
         return;
       }
-      if (!confirm(`Cho ${member.name} nghỉ việc? Trả trợ cấp thôi việc ${pay.toLocaleString('vi-VN')}đ.`)) return;
-      onUpdateState(draft => {
-        const i = draft.staff.findIndex(m => m.id === member.id);
-        if (i < 0) return;
-        draft.staff.splice(i, 1);
-        draft.money -= pay;
-      });
-      audio.playPop();
-      showToast(`${member.name} đã nghỉ việc. Chúc bạn ấy may mắn! 👋`);
+
+      const executeFire = () => {
+        onUpdateState(draft => {
+          const i = draft.staff.findIndex(m => m.id === member.id);
+          if (i < 0) return;
+          draft.staff.splice(i, 1);
+          draft.money -= pay;
+        });
+        audio.playPop();
+        showToast(`${member.name} đã nghỉ việc. Chúc bạn ấy may mắn! 👋`);
+      };
+
+      const msg = `Cho ${member.name} nghỉ việc? Trả trợ cấp thôi việc ${pay.toLocaleString('vi-VN')}đ.`;
+      const askConfirm = confirmFn || ((window as any).__app?.confirmDialog ? (m: string, l: string) => (window as any).__app.confirmDialog(m, l) : null);
+
+      if (askConfirm) {
+        void askConfirm(msg, 'Đồng ý cho nghỉ').then((ok: boolean) => {
+          if (ok) executeFire();
+        });
+      } else {
+        executeFire();
+      }
     });
   });
 }

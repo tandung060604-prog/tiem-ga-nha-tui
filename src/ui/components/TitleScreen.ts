@@ -33,7 +33,7 @@ export function renderTitleScreen(state: GameState, hasProgress: boolean, musicO
       <!-- Grand Opening Game Banner (Stardew Valley Wooden Signboard) -->
       <header class="title-banner-container">
         <div class="title-stardew-banner">
-          <img src="${ASSETS.ui.bannerStardewChicken}" class="banner-stardew-img pixel-art" alt="Tiệm Gà Nhà Tui - Banner Stardew Valley" />
+          <img src="${ASSETS.ui.changChickenBanner}" class="banner-stardew-img pixel-art" alt="Chang Chicken - Tiệm Gà Nhà Tui" />
         </div>
       </header>
 

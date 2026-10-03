@@ -62,7 +62,7 @@ export async function drawWrapped(data: WrappedData): Promise<HTMLCanvasElement>
     ]);
   } catch { /* không có Font Loading API: vẫn vẽ */ }
   const [logo, food, mascot] = await Promise.all([
-    loadImage(ASSETS.ui.logoKoreanChicken),
+    loadImage(ASSETS.ui.changChickenLogo),
     loadImage(data.topDish ? foodImage(data.topDish.id, 'perfect') : null),
     loadImage(ASSETS.gabong.front)
   ]);

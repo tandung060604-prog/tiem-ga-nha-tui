@@ -99,6 +99,12 @@ class OvernightMonkey {
       }
     });
 
+    // 2b. Tự động chấp nhận Dialog trình duyệt (alert, confirm, prompt) tránh đóng băng headless browser
+    page.on('dialog', async (dialog) => {
+      log(`🔔 Nhận diện Native Dialog [${dialog.type()}]: "${dialog.message()}" -> Tự động chấp thuận...`);
+      await dialog.accept().catch(() => {});
+    });
+
     // 3. Mở trang Web Game
     try {
       await page.goto(TARGET_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
@@ -792,8 +798,10 @@ class OvernightMonkey {
 
   async emergencyRecover(page) {
     // Đóng tất cả các modal đang bị kẹt hoặc tự bấm tiếp tục (không return sớm để dọn sạch toàn bộ stack)
-    await page.evaluate(() => {
-      const viteOverlay = document.querySelector('vite-error-overlay');
+    try {
+      await Promise.race([
+        page.evaluate(() => {
+          const viteOverlay = document.querySelector('vite-error-overlay');
       if (viteOverlay) viteOverlay.remove();
 
       const introOverlay = document.getElementById('intro-cinematic-overlay');
@@ -881,7 +889,12 @@ class OvernightMonkey {
 
       const potEl = document.getElementById('btn-fry-pot');
       if (potEl instanceof HTMLElement) potEl.click();
-    }).catch(() => {});
+    }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('emergencyRecover eval timeout > 4s')), 4000))
+      ]);
+    } catch (err) {
+      log(`⚠️ emergencyRecover thoát an toàn: ${err?.message}`);
+    }
   }
 
   generateMarkdownReport() {

@@ -841,3 +841,13 @@
   - **Chiến lược Fix:** `contract_first_type_fix` (Độ tin cậy: 52.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
 ---
+
+### 🐞 [13:07:00 3/10/2026] (via Jev MCP) Native Dialog Hang in Overnight Monkey and StaffTab confirm
+- **Triệu chứng:** Monkey test hangs after Day 4; StaffTab uses native confirm() which blocks headless browser loop and UI thread without auto-dismissal.
+- **Vị trí:** `src/ui/components/StaffTab.ts` 
+- **Đánh giá Jev (861ms):**
+  - **Mức độ (Severity):** `p2_ui_friction` (Độ tin cậy: 53.0%)
+  - **Nguyên nhân gốc (Root Cause):** `ui_modal_stack` (Độ tin cậy: 100.0%)
+  - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 95.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---

@@ -1836,7 +1836,8 @@ class AppController {
         bindStaffEvents(
           state,
           fn => stateManager.update(fn),
-          msg => this.showToast(msg)
+          msg => this.showToast(msg),
+          (msg, label) => this.confirmDialog(msg, label)
         );
         break;
       case 'reviews':
