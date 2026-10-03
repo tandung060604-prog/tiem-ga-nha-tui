@@ -128,6 +128,7 @@ import {
 import { renderStoryletModal, bindStoryletTypewriter } from './ui/components/StoryletModal';
 import { renderNightRadioModal } from './ui/components/NightRadioModal';
 import { getTonightRadioBroadcast, activateRadioBroadcastBuff } from './content/nightRadio';
+import { radioAnnouncer } from './core/radioAnnouncer';
 import { getUnlockedCurios } from './content/curiosAndRelics';
 import { getUnlockedSignatureDishes } from './content/signatureStoryDishes';
 import {
@@ -1147,9 +1148,46 @@ class AppController {
     const html = renderNightRadioModal(state, broadcast);
     this.openModal(html);
 
+    const toggleVoiceBtn = document.getElementById('btn-toggle-radio-voice');
+    const voiceIcon = document.getElementById('radio-voice-icon');
+    const voiceLabel = document.getElementById('radio-voice-label');
+
+    const updateVoiceUI = (isSpeaking: boolean) => {
+      if (!toggleVoiceBtn || !voiceIcon || !voiceLabel) return;
+      if (isSpeaking) {
+        toggleVoiceBtn.style.background = '#b91c1c';
+        toggleVoiceBtn.style.borderColor = '#f87171';
+        voiceIcon.textContent = '⏹️';
+        voiceLabel.textContent = 'Dừng Phát Thanh';
+      } else {
+        toggleVoiceBtn.style.background = '#15803d';
+        toggleVoiceBtn.style.borderColor = '#4ade80';
+        voiceIcon.textContent = '🔊';
+        voiceLabel.textContent = 'Nghe Đài (Bíp Bíp)';
+      }
+    };
+
+    updateVoiceUI(radioAnnouncer.getSpeakingState());
+    const unsubVoiceListener = radioAnnouncer.addStatusListener(updateVoiceUI);
+
+    if (toggleVoiceBtn) {
+      toggleVoiceBtn.onclick = () => {
+        if (radioAnnouncer.getSpeakingState()) {
+          radioAnnouncer.stop();
+        } else {
+          radioAnnouncer.broadcastTonight(
+            broadcast.headline,
+            broadcast.audioTranscript,
+            broadcast.streetRumor
+          );
+        }
+      };
+    }
+
     const claimBtn = document.getElementById('btn-claim-radio-buff');
     if (claimBtn) {
       claimBtn.onclick = () => {
+        radioAnnouncer.stop();
         audio.playRadioTuning();
         setTimeout(() => audio.playRadioJingle(), 180);
         const res = activateRadioBroadcastBuff(stateManager.getState(), broadcast);
@@ -1163,6 +1201,8 @@ class AppController {
     const closeBtn = document.getElementById('btn-close-night-radio');
     if (closeBtn) {
       closeBtn.onclick = () => {
+        radioAnnouncer.stop();
+        unsubVoiceListener();
         audio.playPop();
         this.closeModal();
         const st = stateManager.getState();

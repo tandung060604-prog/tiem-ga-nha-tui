@@ -146,6 +146,26 @@ export function renderInventoryTab(state: GameState): string {
       <span style="font-size: 0.78rem; color: var(--soft); font-weight: normal;">Lưu ý: Mua dư hết hạn là lỗ!</span>
     </div>
     ${marketBannerHtml}
+    
+    <!-- THANH THANH TOÁN XẤP TIỀN PIXEL ART (PIXEL CASH STACK CHECKOUT) -->
+    <div id="inv-cash-checkout-banner" class="inv-cash-checkout-bar" style="background: linear-gradient(135deg, #2b1810, #4a2810); border: 2.5px solid #d4a373; border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; box-shadow: 0 6px 16px rgba(0,0,0,0.35);">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <img src="${ASSETS.ui.pixelCashStack}" class="pixel-cash-stack-icon" alt="Xấp Tiền" style="width: 44px; height: 44px; image-rendering: pixelated; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));" />
+        <div>
+          <div style="font-size: 0.72rem; font-weight: 800; color: #fde047; text-transform: uppercase; letter-spacing: 0.5px;">
+            💵 QUẦY THANH TOÁN TIỀN SỈ
+          </div>
+          <div id="inv-checkout-status-text" style="font-size: 0.8rem; color: #fffdf0; font-weight: 700;">
+            Quỹ quán: <b style="color: #4ade80;">${state.money.toLocaleString('vi-VN')}đ</b> • Bấm +5, +10 để chọn hàng
+          </div>
+        </div>
+      </div>
+      <button id="btn-inventory-cash-checkout" class="pixel-btn is-success btn-cash-checkout" style="background: linear-gradient(135deg, #15803d, #166534); border: 2px solid #86efac; border-radius: 8px; color: #fff; padding: 8px 14px; font-size: 0.82rem; font-weight: 900; display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.4); white-space: nowrap;" title="Ấn vào xấp tiền pixel để thanh toán tiền hàng sỉ">
+        <img src="${ASSETS.ui.pixelCashStack}" style="width: 22px; height: 22px; image-rendering: pixelated; object-fit: contain;" alt="" />
+        <span id="btn-cash-checkout-label">THANH TOÁN XẤP TIỀN</span>
+      </button>
+    </div>
+
     <div class="sec-desc">
       Nhập đủ gà tươi, bột, dầu và gia vị trước giờ mở bán (10:00). Bấm <b>-5</b> để hoàn trả nếu lỡ tay mua nhầm!
       ${effects.shelfLifeBonus > 0 ? `<br><b style="color:var(--mint-dark,#10b981);">❄️ Kho lạnh bảo quản: +${effects.shelfLifeBonus} ngày hạn dùng cho mọi lô nhập mới!</b>` : ''}
@@ -268,4 +288,13 @@ export function bindInventoryEvents(
       showToast(`🎉 Đã ký hợp đồng cung ứng: ${item.name}! Giờ bạn có thể nhập hàng.`);
     });
   });
+
+  // 4. Nút bấm Thanh Toán Xấp Tiền Pixel Art
+  const checkoutBtn = document.getElementById('btn-inventory-cash-checkout');
+  if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', () => {
+      audio.playCash();
+      showToast('💵 Đã chốt thanh toán xấp tiền nguyên liệu! Hàng đã nhập kho sẵn sàng cho ca bán.');
+    });
+  }
 }

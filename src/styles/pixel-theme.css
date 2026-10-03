@@ -3047,3 +3047,59 @@ body.selling-mode .toast {
   }
 }
 
+/* ==========================================================================
+   VISUAL NOVEL TWO-WAY PIXEL RPG DIALOGUE THEATRE
+   - Chuẩn hóa 100% tiếng Việt không lỗi font
+   - Avatar nổi 3D và bong bóng pixel bo góc retro
+   ========================================================================== */
+.vn-dialogue-row {
+  width: 100%;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.vn-dialogue-row.is-player-turn {
+  padding-left: 20px;
+}
+
+.vn-dialogue-row.is-npc-turn {
+  padding-right: 20px;
+}
+
+.vn-bubble-box {
+  font-family: "Baloo 2", "Be Vietnam Pro", -apple-system, sans-serif !important;
+  font-size: 0.94rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.25px !important;
+  word-break: break-word;
+}
+
+.vn-bubble-box .vn-bubble-text {
+  font-family: "Baloo 2", "Be Vietnam Pro", -apple-system, sans-serif !important;
+}
+
+/* Thanh Thanh Toán Xấp Tiền Pixel Art Kho Hàng */
+.inv-cash-checkout-bar {
+  animation: popIn 0.3s ease-out;
+  transition: all 0.2s ease;
+}
+
+.inv-cash-checkout-bar:hover {
+  border-color: #f7d046 !important;
+  box-shadow: 0 8px 24px rgba(247, 208, 70, 0.25) !important;
+}
+
+.btn-cash-checkout {
+  animation: pulse 2s infinite ease-in-out;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.btn-cash-checkout:active {
+  transform: scale(0.96);
+}
+
+.btn-cash-checkout:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 0 12px rgba(134, 239, 172, 0.6) !important;
+}
+
+

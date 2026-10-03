@@ -901,3 +901,13 @@
   - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 20.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `50` ngày chơi
 ---
+
+### 🐞 [19:53:47 3/10/2026] (via Jev MCP) Thiếu lượt thoại của người chơi (bên tôi / chủ tiệm) trong Ký Ức Hẻm & giao diện hội thoại chưa chuẩn Pixel Retro
+- **Triệu chứng:** Chỉ hiện đoạn thoại bên phía nhân vật hẻm, không hiện đoạn thoại bên phía người chơi (tôi), styling chưa pixelated đúng chuẩn game retro cozy.
+- **Vị trí:** `src/ui/components/CharacterStoryModal.ts` 
+- **Đánh giá Jev (736ms):**
+  - **Mức độ (Severity):** `p2_ui_friction` (Độ tin cậy: 72.0%)
+  - **Nguyên nhân gốc (Root Cause):** `content_mislabel` (Độ tin cậy: 47.0%)
+  - **Chiến lược Fix:** `contract_first_type_fix` (Độ tin cậy: 77.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---

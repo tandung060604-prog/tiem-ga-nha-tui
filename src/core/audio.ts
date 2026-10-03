@@ -973,6 +973,45 @@ class AudioManager {
   public playRadioJingle() {
     this.playZzfx(0.25, 0.02, 880, 0.01, 0.12, 0.25, 0, 1.2, 3, 0, 220, 0.05, 0, 0, 0, 0, 0.06, 0.8, 0.02, 0);
   }
+
+  // 11. Chuỗi âm thanh bíp bíp tín hiệu đài phát thanh FM 99.9 Sài Gòn
+  public playRadioBeepBeep(callback?: () => void) {
+    if (this.isMuted) {
+      if (callback) callback();
+      return;
+    }
+    this.initContext();
+    if (!this.ctx) {
+      if (callback) callback();
+      return;
+    }
+
+    try {
+      const now = this.ctx.currentTime;
+      const beeps = [
+        { freq: 880, start: 0, dur: 0.12 },
+        { freq: 880, start: 0.2, dur: 0.12 },
+        { freq: 1180, start: 0.4, dur: 0.26 }
+      ];
+
+      beeps.forEach(b => {
+        const osc = this.ctx!.createOscillator();
+        const gain = this.ctx!.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(b.freq, now + b.start);
+        gain.gain.setValueAtTime(0.22, now + b.start);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + b.start + b.dur);
+        osc.connect(gain);
+        gain.connect(this.dest());
+        osc.start(now + b.start);
+        osc.stop(now + b.start + b.dur);
+      });
+    } catch {}
+
+    if (callback) {
+      setTimeout(callback, 750);
+    }
+  }
 }
 
 export const audio = new AudioManager();

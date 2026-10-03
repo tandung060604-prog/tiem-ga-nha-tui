@@ -12,38 +12,106 @@ import { audio } from '../../core/audio';
  * - Tách biệt rõ nét bong bóng thoại người chơi vs nhân vật chuẩn Visual Novel
  * - Bảng câu hỏi & Lựa chọn chỉ bung ra khi câu chuyện kết thúc
  */
+function getContextualPlayerReply(characterName: string, characterRole: string): string {
+  if (characterName.includes('Bác Ba')) {
+    return 'Dạ Bác Ba, con mở tiệm gà ở đây cũng mong giữ được cái lửa nghề chân chính và tình làng nghĩa xóm như lời bác dạy.';
+  }
+  if (characterName.includes('Cô Mười') || characterRole.includes('Vé Số')) {
+    return 'Dạ cô Mười, cô bán cả ngày nắng nôi vất vả, quán con lúc nào cũng chừa góc bàn râm mát nhất cho cô ngồi nghỉ chân uống miếng nước mát.';
+  }
+  if (characterName.includes('Linh') || characterRole.includes('Trợ Thủ') || characterRole.includes('Phụ Bếp')) {
+    return 'Linh phụ quán chu đáo lắm, có em đứng bếp phụ là anh an tâm canh từng mẻ gà vàng mọng.';
+  }
+  if (characterName.includes('Khang') || characterRole.includes('Chiên Gà')) {
+    return 'Khang có đôi tay chiên gà rất bén! Cố gắng cùng anh giữ đúng độ giòn và sạch sẽ của chảo dầu nghen.';
+  }
+  if (characterName.includes('Bé Bo') || characterRole.includes('Bé Con')) {
+    return 'Bo cứ lại đây ăn nghen, anh chiên riêng cho Bo miếng gà vàng rụm ngon nhất xóm!';
+  }
+  if (characterName.includes('Bà Ba') || characterRole.includes('Mẹ Con') || characterRole.includes('Bà Lão')) {
+    return 'Dạ con chào bà Ba! Bà con trong hẻm ghé ăn là niềm vui lớn nhất của quán con.';
+  }
+  if (characterName.includes('Hải') || characterRole.includes('Giang Hồ') || characterRole.includes('Dân Phòng')) {
+    return 'Dạ em chào anh! Quán bình dân trong hẻm, anh em ghé ủng hộ là quý lắm rồi.';
+  }
+  if (characterName.includes('Nam') || characterRole.includes('Cảnh Sát') || characterRole.includes('Công An')) {
+    return 'Dạ chào anh Nam! Quán con buôn bán luôn chấp hành nghiêm chỉnh trật tự và an toàn vệ sinh thực phẩm.';
+  }
+  if (characterName.includes('Vy') || characterRole.includes('Văn Phòng') || characterRole.includes('GenZ')) {
+    return 'Cảm ơn bạn đã ghé quán! Món gà sốt cay hôm nay vừa mới ra lò giòn rụm đó, bạn nếm thử nghen!';
+  }
+  return 'Dạ con hiểu rồi! Ở đất hẻm 1102 này, buôn bán trước hết là cái tâm và tình cảm chân thành với mọi người.';
+}
+
+/**
+ * Modal Ký Sự Hẻm 1102 (Character Narrative Episode Modal)
+ * Nâng cấp trải nghiệm Visual Novel Mini:
+ * - Đối thoại hai chiều hoàn chỉnh: Cư dân Hẻm (bên trái) vs Tôi - Chủ Quán (bên phải)
+ * - Avatar tròn viền nổi 3D pixel art sắc nét cho cả hai bên
+ * - Hiệu ứng Typewriter gõ từng chữ từ từ thư thả có nhịp thở dấu câu
+ * - Nút '⏩ Hiện Hết' để xem nhanh toàn bộ
+ * - Bảng câu hỏi & Lựa chọn chỉ bung ra khi câu chuyện kết thúc
+ */
 export function renderCharacterEpisodeModal(
   _state: GameState,
   episode: CharacterEpisode
 ): string {
-  const dialogueHtml = episode.dialogueLines.map((line, idx) => {
-    const isPlayer = line.speaker.includes('Bạn') || line.speaker.includes('Chủ');
-    const bubbleBg = isPlayer ? 'rgba(15, 23, 42, 0.95)' : 'rgba(35, 18, 9, 0.95)';
-    const borderCol = isPlayer ? '#38bdf8' : '#f59e0b';
+  // Chuẩn hóa danh sách câu thoại để LUÔN LUÔN có đối thoại hai chiều (Cư Dân <-> Tôi)
+  let normalizedLines = [...episode.dialogueLines];
+  const hasPlayerLine = normalizedLines.some(l => l.speaker.includes('Bạn') || l.speaker.includes('Chủ') || l.speaker.includes('Tôi'));
+  if (!hasPlayerLine && normalizedLines.length >= 1) {
+    const firstLine = normalizedLines[0]!;
+    const playerReplyText = getContextualPlayerReply(episode.characterName, episode.characterRole);
+    normalizedLines = [
+      firstLine,
+      {
+        speaker: 'Tôi (Chủ Quán)',
+        text: playerReplyText,
+        mood: 'normal'
+      },
+      ...normalizedLines.slice(1)
+    ];
+  }
+
+  const dialogueHtml = normalizedLines.map((line, idx) => {
+    const isPlayer = line.speaker.includes('Bạn') || line.speaker.includes('Chủ') || line.speaker.includes('Tôi');
+    const bubbleBg = isPlayer ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.98))' : 'linear-gradient(135deg, rgba(43, 24, 16, 0.96), rgba(28, 14, 8, 0.98))';
+    const borderCol = isPlayer ? '#38bdf8' : '#b8860b';
     const textColor = isPlayer ? '#f0f9ff' : '#fffdf0';
-    const alignSelf = isPlayer ? 'flex-end' : 'flex-start';
 
     // Mood badge
     let moodBadge = '';
-    if (line.mood === 'happy') moodBadge = '<span style="font-size: 0.68rem; background: #fef08a; color: #854d0e; padding: 2px 6px; border-radius: 4px; font-weight: 800;">😊 Vui Vẻ</span>';
-    else if (line.mood === 'sad') moodBadge = '<span style="font-size: 0.68rem; background: #e0e7ff; color: #3730a3; padding: 2px 6px; border-radius: 4px; font-weight: 800;">🥺 Buồn Bã</span>';
-    else if (line.mood === 'tense') moodBadge = '<span style="font-size: 0.68rem; background: #fee2e2; color: #991b1b; padding: 2px 6px; border-radius: 4px; font-weight: 800;">⚡ Căng Thẳng</span>';
-    else if (line.mood === 'touched') moodBadge = '<span style="font-size: 0.68rem; background: #fce7f3; color: #9d174d; padding: 2px 6px; border-radius: 4px; font-weight: 800;">💖 Nghẹn Ngào</span>';
+    if (line.mood === 'happy') moodBadge = '<span style="font-size: 0.65rem; background: #fef08a; color: #854d0e; padding: 2px 6px; border-radius: 4px; font-weight: 800;">😊 Vui Vẻ</span>';
+    else if (line.mood === 'sad') moodBadge = '<span style="font-size: 0.65rem; background: #e0e7ff; color: #3730a3; padding: 2px 6px; border-radius: 4px; font-weight: 800;">🥺 Buồn Bã</span>';
+    else if (line.mood === 'tense') moodBadge = '<span style="font-size: 0.65rem; background: #fee2e2; color: #991b1b; padding: 2px 6px; border-radius: 4px; font-weight: 800;">⚡ Căng Thẳng</span>';
+    else if (line.mood === 'touched') moodBadge = '<span style="font-size: 0.65rem; background: #fce7f3; color: #9d174d; padding: 2px 6px; border-radius: 4px; font-weight: 800;">💖 Nghẹn Ngào</span>';
 
     // Dòng đầu tiên hiện sẵn, các dòng sau xuất hiện dần theo nhịp typewriter
     const initialDisplay = idx === 0 ? 'flex' : 'none';
 
     return `
-      <div class="vn-dialogue-row" data-line-index="${idx}" style="display: ${initialDisplay}; flex-direction: column; align-self: ${alignSelf}; max-width: 92%; margin-bottom: 12px; animation: popIn 0.25s ease-out;">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; ${isPlayer ? 'justify-content: flex-end;' : ''}">
-          <span style="font-size: 0.76rem; font-weight: 900; color: ${isPlayer ? '#38bdf8' : '#fde047'}; text-shadow: 1px 1px 1px #000;">
-            ${escapeHtml(line.speaker)}
-          </span>
-          ${moodBadge}
+      <div class="vn-dialogue-row ${isPlayer ? 'is-player-turn' : 'is-npc-turn'}" data-line-index="${idx}" style="display: ${initialDisplay}; flex-direction: ${isPlayer ? 'row-reverse' : 'row'}; align-items: flex-start; gap: 10px; margin-bottom: 14px; animation: popIn 0.25s ease-out;">
+        
+        <!-- Avatar Tròn Pixel Art -->
+        <div style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 2px;">
+          <img src="${isPlayer ? '/assets/characters/char_01_owner.png' : episode.avatar}" 
+               alt="${isPlayer ? 'Tôi (Chủ Quán)' : escapeHtml(line.speaker)}" 
+               style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2.5px solid ${isPlayer ? '#38bdf8' : '#f59e0b'}; background: ${isPlayer ? '#0f172a' : '#451a03'}; box-shadow: 0 3px 8px rgba(0,0,0,0.5); image-rendering: pixelated;" />
         </div>
-        <div class="vn-bubble-box" style="background: ${bubbleBg}; border: 1.5px solid ${borderCol}; border-radius: ${isPlayer ? '14px 14px 2px 14px' : '14px 14px 14px 2px'}; padding: 11px 14px; font-size: 0.88rem; line-height: 1.55; color: ${textColor}; box-shadow: 0 4px 12px rgba(0,0,0,0.5); text-shadow: 1px 1px 1px rgba(0,0,0,0.6);">
-          "<span class="vn-bubble-text" data-full-text="${escapeHtml(line.text)}">${escapeHtml(line.text)}</span>"
+
+        <!-- Khối Bong Bóng Thoại Pixel -->
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: ${isPlayer ? 'flex-end' : 'flex-start'};">
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+            <span style="font-size: 0.72rem; font-weight: 900; color: ${isPlayer ? '#38bdf8' : '#fde047'}; background: ${isPlayer ? 'rgba(15, 23, 42, 0.85)' : 'rgba(69, 26, 3, 0.85)'}; padding: 2px 8px; border-radius: 4px; border: 1px solid ${isPlayer ? '#0284c7' : '#b45309'}; text-shadow: 1px 1px 1px #000;">
+              ${isPlayer ? '🍳 Tôi (Chủ Quán)' : escapeHtml(line.speaker)}
+            </span>
+            ${moodBadge}
+          </div>
+          <div class="vn-bubble-box" style="background: ${bubbleBg}; border: 2px solid ${borderCol}; border-radius: ${isPlayer ? '14px 2px 14px 14px' : '2px 14px 14px 14px'}; padding: 11px 14px; font-size: 0.88rem; line-height: 1.55; color: ${textColor}; box-shadow: 0 4px 14px rgba(0,0,0,0.55); text-shadow: 1px 1px 1px rgba(0,0,0,0.6); position: relative; max-width: 95%;">
+            "<span class="vn-bubble-text" data-full-text="${escapeHtml(line.text)}">${escapeHtml(line.text)}</span>"
+          </div>
         </div>
+
       </div>
     `;
   }).join('');

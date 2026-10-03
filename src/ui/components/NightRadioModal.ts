@@ -110,6 +110,20 @@ export function renderNightRadioModal(
 
           </div>
 
+          <!-- Nút Nghe Phát Thanh Viên Đêm Tiếng Việt (Bíp Bíp & Giọng Đọc FM Hoài Niệm) -->
+          <div style="background: rgba(5, 46, 22, 0.4); border: 1.5px dashed #166534; border-radius: 8px; padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 1.2rem;">🎙️</span>
+              <div>
+                <div style="font-size: 0.76rem; font-weight: 800; color: #86efac;">GIỌNG ĐỌC ĐÀI ĐÊM (FM 99.9)</div>
+                <div style="font-size: 0.65rem; color: #4ade80;">Bíp bíp rà sóng & phát thanh tiếng Việt êm dịu</div>
+              </div>
+            </div>
+            <button id="btn-toggle-radio-voice" class="retro-clickable pixel-btn" style="background: #15803d; color: #f0fdf4; border: 1.5px solid #4ade80; border-radius: 6px; padding: 6px 12px; font-size: 0.76rem; font-weight: 800; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 5px;">
+              <span id="radio-voice-icon">🔊</span> <span id="radio-voice-label">Nghe Đài (Bíp Bíp)</span>
+            </button>
+          </div>
+
           <!-- Dải loa đài vải nỉ & Nút kích hoạt Buff -->
           <div style="display: flex; flex-direction: column; gap: 8px;">
             ${!isBuffClaimed && buff ? `

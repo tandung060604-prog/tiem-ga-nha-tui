@@ -213,7 +213,10 @@ export const ASSETS = {
     bannerStardewChicken: url('assets/ui/banner_stardew_chicken.png'),
     patioBistroBg: url('assets/ui/patio_bistro_bg.jpg'),
     mailboxStardew: url('assets/ui/mailbox_stardew.png'),
-    trophyGoldenShowcase: url('assets/ui/trophy_golden_showcase.png')
+    trophyGoldenShowcase: url('assets/ui/trophy_golden_showcase.png'),
+    pixelCashStack: url('assets/ui/pixel_cash_stack.png'),
+    toolboxCabinet: url('assets/ui/toolbox_cabinet_pixel.png'),
+    kitchenStation: url('assets/ui/kitchen_station_pixel.png')
   },
   intro: {
     poster: url('assets/intro/veo_intro_cinematic.jpg'),

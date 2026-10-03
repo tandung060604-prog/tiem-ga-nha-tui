@@ -139,12 +139,16 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
 
           <!-- HỘC TỦ ĐỒ NGHỀ BẾP GÀ (COZY COOKING KITCHEN CABINET) -->
           <div class="toolbox-cabinet cozy-cooking-cabinet">
-            <div class="toolbox-header">
-              <span class="toolbox-title">
-                <img src="${ASSETS.icons.inventory}" class="pixel-section-icon" alt="" />
-                HỘC TỦ ĐỒ NGHỀ BẾP GÀ
-              </span>
-              <span class="toolbox-subtitle">Dụng cụ nấu nướng & Không gian quán</span>
+            <div class="toolbox-header" style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="${ASSETS.ui.toolboxCabinet}" class="toolbox-cabinet-pixel-art" alt="Tủ Gỗ Bếp Gà" style="width: 38px; height: 38px; image-rendering: pixelated; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); flex-shrink: 0;" />
+                <div>
+                  <span class="toolbox-title" style="display: block; line-height: 1.2;">
+                    HỘC TỦ ĐỒ NGHỀ BẾP GÀ
+                  </span>
+                  <span class="toolbox-subtitle" style="display: block; line-height: 1.2;">Dụng cụ nấu nướng & Không gian quán</span>
+                </div>
+              </div>
             </div>
 
             <div class="toolbox-grid">
