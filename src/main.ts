@@ -1902,6 +1902,17 @@ class AppController {
       };
     }
 
+    const openTrophyShowcaseBtn = document.getElementById('btn-open-trophy-showcase');
+    if (openTrophyShowcaseBtn) {
+      openTrophyShowcaseBtn.onclick = (e) => {
+        if ((e.target as HTMLElement).closest('#btn-weekly-quests')) {
+          return;
+        }
+        audio.playPop();
+        this.openAchievementsWallModal('all');
+      };
+    }
+
     const openAchievementsBtn = document.getElementById('btn-open-achievements');
     if (openAchievementsBtn) {
       openAchievementsBtn.onclick = () => {

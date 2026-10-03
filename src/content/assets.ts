@@ -212,7 +212,8 @@ export const ASSETS = {
     landingVnBg: url('assets/ui/landing_vn_bg_clean.jpg'),
     bannerStardewChicken: url('assets/ui/banner_stardew_chicken.png'),
     patioBistroBg: url('assets/ui/patio_bistro_bg.jpg'),
-    mailboxStardew: url('assets/ui/mailbox_stardew.png')
+    mailboxStardew: url('assets/ui/mailbox_stardew.png'),
+    trophyGoldenShowcase: url('assets/ui/trophy_golden_showcase.png')
   },
   intro: {
     poster: url('assets/intro/veo_intro_cinematic.jpg'),

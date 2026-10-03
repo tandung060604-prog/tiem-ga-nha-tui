@@ -1,6 +1,7 @@
 import { GameState } from '../../types/game';
 import { getAllBadgesProgress } from '../../core/achievementsEngine';
 import { escapeHtml } from '../escapeHtml';
+import { ASSETS } from '../../content/assets';
 
 /**
  * Render Modal Bức Tường Bằng Khen Tổ Dân Phố Hẻm 1102 (Wall of Fame)
@@ -14,13 +15,15 @@ export function renderAchievementsWallModal(state: GameState, filterCategory: st
     ? allBadges
     : allBadges.filter(b => b.badge.category === filterCategory);
 
+  const countForCat = (cat: string) => allBadges.filter(b => b.badge.category === cat).length;
+
   const categories = [
     { id: 'all', label: `Tất Cả (${allBadges.length})` },
-    { id: 'cooking', label: '🍳 Bếp' },
-    { id: 'security', label: '👮 An Ninh' },
-    { id: 'community', label: '💖 Nghĩa Tình' },
-    { id: 'operations', label: '📦 Vận Hành' },
-    { id: 'legend', label: '🏛️ Huyền Thoại' },
+    { id: 'cooking', label: `🍳 Bếp (${countForCat('cooking')})` },
+    { id: 'security', label: `👮 An Ninh (${countForCat('security')})` },
+    { id: 'community', label: `💖 Nghĩa Tình (${countForCat('community')})` },
+    { id: 'operations', label: `📦 Vận Hành (${countForCat('operations')})` },
+    { id: 'legend', label: `🏛️ Huyền Thoại (${countForCat('legend')})` },
   ];
 
   const categoryFilterHtml = `
@@ -113,8 +116,8 @@ export function renderAchievementsWallModal(state: GameState, filterCategory: st
         
         <!-- Header Bức Tường Bằng Khen -->
         <div style="background: linear-gradient(135deg, #78350f, #451a03); color: #fff; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #290f02;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 1.6rem;">🏆</span>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="${ASSETS.ui.trophyGoldenShowcase}" alt="Cúp Vàng Tổ Dân Phố" style="width: 36px; height: 36px; image-rendering: pixelated; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); flex-shrink: 0;" />
             <div>
               <div style="font-size: 0.95rem; font-weight: 900; color: #fef08a; letter-spacing: 0.5px;">
                 BỨC TƯỜNG BẰNG KHEN TỔ DÂN PHỐ

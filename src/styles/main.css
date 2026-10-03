@@ -730,6 +730,164 @@ body.selling-mode .awning::after {
   margin-left: 2px;
 }
 
+/* KỆ CÚP VÀNG TỔ DÂN PHỐ (STARDEW GOLDEN TROPHY SHOWCASE WIDGET) */
+.stardew-trophy-section {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.trophy-widget-card {
+  width: 100%;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 2.5px solid #d97706;
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 4px 12px rgba(180, 83, 9, 0.15), inset 0 1px 0 #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.trophy-widget-card:hover {
+  transform: translateY(-2px);
+  border-color: #b45309;
+  box-shadow: 0 6px 18px rgba(180, 83, 9, 0.25), inset 0 1px 0 #fff;
+}
+
+.trophy-sprite-frame {
+  width: 68px;
+  height: 68px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);
+  border: 2px solid #b45309;
+  border-radius: 10px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+.trophy-pixel-sprite {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.25));
+  animation: trophyGleamPulse 3.5s infinite ease-in-out;
+}
+
+.trophy-pixel-sprite.has-new-trophy {
+  animation: trophyExcitedShine 1.8s infinite ease-in-out;
+}
+
+@keyframes trophyGleamPulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.25)); }
+  50% { transform: scale(1.05); filter: drop-shadow(0 0 8px rgba(234, 179, 8, 0.7)); }
+}
+
+@keyframes trophyExcitedShine {
+  0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 6px rgba(234, 179, 8, 0.6)); }
+  50% { transform: translateY(-4px) scale(1.08); filter: drop-shadow(0 0 14px rgba(234, 179, 8, 0.9)); }
+}
+
+.trophy-meta-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.trophy-kicker-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.trophy-kicker {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #b45309;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Con Dấu Sáp Vàng Kim Pixel Hoàng Gia (Không Dùng Emote Rác & Ribbon Chữ Nhật) */
+.trophy-pixel-gold-seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+  background: linear-gradient(135deg, #d97706 0%, #b45309 50%, #78350f 100%);
+  border: 2px solid #fef08a;
+  outline: 1.5px solid #451a03;
+  border-radius: 12px;
+  box-shadow: 
+    0 2px 0 #451a03,
+    0 0 10px rgba(234, 179, 8, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  animation: goldSealBob 2s infinite ease-in-out;
+  cursor: pointer;
+}
+
+.trophy-pixel-gold-seal.is-empty {
+  background: #e2d3be;
+  border-color: #a88a6d;
+  outline-color: #78583d;
+  box-shadow: none;
+  animation: none;
+}
+
+.trophy-pixel-gold-seal .gold-seal-text {
+  font-family: var(--font-pixel, 'Tiny5', monospace);
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #fef08a;
+  text-shadow: 1px 1px 0 #451a03;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+.trophy-pixel-gold-seal.is-empty .gold-seal-text {
+  color: #78583d;
+  text-shadow: none;
+  font-size: 0.62rem;
+}
+
+@keyframes goldSealBob {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 
+      0 4px 0 #451a03,
+      0 0 14px rgba(234, 179, 8, 0.9),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+}
+
+.trophy-main-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #451a03;
+  font-family: var(--font-display, sans-serif);
+  letter-spacing: 0.3px;
+}
+
+.trophy-quick-links {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
 /* HỘC TỦ ĐỒ NGHỀ BẾP GÀ (COZY COOKING KITCHEN CABINET) */
 .toolbox-cabinet.cozy-cooking-cabinet {
   width: 100%;

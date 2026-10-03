@@ -105,6 +105,38 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
             </div>
           </div>
 
+          <!-- KỆ CÚP VÀNG TỔ DÂN PHỐ (STARDEW GOLDEN TROPHY SHOWCASE WIDGET) -->
+          <div class="stardew-trophy-section">
+            <div class="trophy-widget-card" id="btn-open-trophy-showcase" title="Ấn vào Kệ Cúp Vàng để mở Bức Tường Bằng Khen Tổ Dân Phố & Thử Thách">
+              <div class="trophy-sprite-frame">
+                <img src="${ASSETS.ui.trophyGoldenShowcase}" class="trophy-pixel-sprite ${claimableBadges > 0 ? 'has-new-trophy' : ''}" alt="Kệ Cúp Vàng" />
+              </div>
+              <div class="trophy-meta-col">
+                <div class="trophy-kicker-row">
+                  <span class="trophy-kicker">VINH DANH HẺM 1102</span>
+                  ${claimableBadges > 0 ? `
+                    <div class="trophy-pixel-gold-seal" title="Có ${claimableBadges} bằng khen đạt chuẩn đang chờ đóng mộc">
+                      <span class="gold-seal-text">(${claimableBadges} CÚP MỚI)</span>
+                    </div>
+                  ` : `
+                    <div class="trophy-pixel-gold-seal is-empty" title="Đã nhận hết bằng khen hiện tại">
+                      <span class="gold-seal-text">(ĐÃ TREO HẾT)</span>
+                    </div>
+                  `}
+                </div>
+                <div class="trophy-main-title">KỆ CÚP VÀNG TỔ DÂN PHỐ</div>
+                <div class="trophy-quick-links">
+                  <button id="btn-open-achievements" class="btn-mailbox-pill ${claimableBadges > 0 ? 'has-badge' : ''}" title="Bức Tường Bằng Khen Tổ Dân Phố Hẻm 1102 (44 Danh Hiệu)">
+                    <img src="${ASSETS.icons.trophy}" class="btn-pixel-icon-xs" alt="" /> Bằng Khen Tổ Dân Phố ${claimableBadges > 0 ? `<b class="pill-seal">${claimableBadges}</b>` : ''}
+                  </button>
+                  <button id="btn-weekly-quests" class="btn-mailbox-pill" title="Nhiệm vụ tuần nhận thưởng tiền mặt và danh hiệu">
+                    <img src="${ASSETS.icons.target}" class="btn-pixel-icon-xs" alt="" /> Thử Thách Tuần
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- HỘC TỦ ĐỒ NGHỀ BẾP GÀ (COZY COOKING KITCHEN CABINET) -->
           <div class="toolbox-cabinet cozy-cooking-cabinet">
             <div class="toolbox-header">
@@ -135,23 +167,7 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
                 </div>
               </div>
 
-              <!-- Ngăn 2: Bằng Khen & Tổ Dân Phố -->
-              <div class="toolbox-drawer drawer-lore">
-                <div class="drawer-header">
-                  <img src="${ASSETS.icons.trophy}" class="btn-pixel-icon-xs" alt="" /> Bằng Khen & Tổ Dân Phố
-                </div>
-                <div class="drawer-actions">
-                  <button id="btn-open-achievements" class="btn-sm btn-toolbox ${claimableBadges > 0 ? 'has-badge' : ''}" title="Bức Tường Bằng Khen Tổ Dân Phố Hẻm 1102">
-                    <img src="${ASSETS.icons.trophy}" class="btn-pixel-icon-xs" alt="" /> Bằng Khen
-                    ${claimableBadges > 0 ? `<span class="badge-dot-pulse">${claimableBadges}</span>` : ''}
-                  </button>
-                  <button id="btn-weekly-quests" class="btn-sm btn-toolbox" title="Nhiệm vụ tuần nhận thưởng tiền mặt và danh hiệu">
-                    <img src="${ASSETS.icons.target}" class="btn-pixel-icon-xs" alt="" /> Thử Thách Tuần
-                  </button>
-                </div>
-              </div>
-
-              <!-- Ngăn 3: Hiên Quán & Thư Giãn -->
+              <!-- Ngăn 2: Hiên Quán & Thư Giãn -->
               <div class="toolbox-drawer drawer-cozy">
                 <div class="drawer-header">
                   <img src="${ASSETS.icons.radio}" class="btn-pixel-icon-xs" alt="" /> Hiên Quán & Thư Giãn
@@ -170,7 +186,7 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
                 </div>
               </div>
 
-              <!-- Ngăn 4: Thử Thách Bếp Lửa -->
+              <!-- Ngăn 3: Thử Thách Bếp Lửa -->
               <div class="toolbox-drawer drawer-arena">
                 <div class="drawer-header">
                   <img src="${ASSETS.icons.fireRush}" class="btn-pixel-icon-xs" alt="" /> Thử Thách Bếp Lửa

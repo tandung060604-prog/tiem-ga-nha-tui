@@ -960,15 +960,48 @@ export type HeritageBadgeId =
   | 'badge_ban_tay_vang'          // Chiên 50 mẻ Perfect
   | 'badge_khac_tinh_toi_pham'    // Bắt sống tên trộm 3 lần
   | 'badge_dung_si_dau_sach'      // Không dùng dầu đen liên tiếp 5 ngày
-  | 'badge_to_dan_pho_nghia_tinh' // Đạt 100 điểm Karma Community
+  | 'badge_to_dan_pho_nghia_tinh' // Đạt 90 điểm Karma Community
   | 'badge_bac_thay_gia_truyen'   // Pha chế thành công 5 nồi sốt bí truyền
   | 'badge_vua_giao_hang'         // Hoàn thành 15 đơn Delivery Express
   | 'badge_nha_hao_tam'           // Gửi 3 gói tiếp tế cho bạn bè trong Lobby
   | 'badge_ong_trum_gacha'        // Chiêu mộ thành công ít nhất 1 nhân viên SSR
-  | 'badge_nha_su_hoc_hem'        // Đọc xong 10 tập Ký sự cư dân
-  | 'badge_dai_ban_doanh_ga'      // Phục vụ tổng cộng 250 lượt khách
+  | 'badge_nha_su_hoc_hem'        // Đọc xong 8 tập Ký sự cư dân
+  | 'badge_dai_ban_doanh_ga'      // Phục vụ tổng cộng 200 lượt khách
   | 'badge_ban_than_thu_cung'     // Chăm sóc vuốt ve thú cưng 5 ngày
-  | 'badge_huyen_thoai_100_ngay'; // Đạt cột mốc 100 ngày kinh doanh Sài Gòn
+  | 'badge_huyen_thoai_100_ngay'  // Đạt cột mốc 100 ngày kinh doanh Sài Gòn
+  // +32 Bằng Khen Mới Đa Dạng:
+  | 'badge_bep_lua_than_toc'      // Đạt chuỗi 15 mẻ Perfect
+  | 'badge_phu_thuy_khoai_lac'    // Lắc 30 phần khoai tây
+  | 'badge_nghe_si_uot_uot'       // Rót 50 ly nước ngọt
+  | 'badge_bep_truong_5_sao'      // Đạt điểm đánh giá Taste 5.0 sao
+  | 'badge_chao_gang_khong_nghi'  // Bán 1 ca không cháy khét món nào
+  | 'badge_chuyen_gia_canh_lua'   // Nhấc vợt gà ở 0.5s cuối của Perfect 15 lần
+  | 'badge_dai_tiec_hoang_gia'    // Phục vụ 10 khay combo đại tiệc
+  | 'badge_mat_than_dan_pho'      // Tóm gọn trộm nhanh trong 2s
+  | 'badge_canh_ve_dem_khuya'     // Hoàn thành 5 ca đêm an toàn
+  | 'badge_chuot_nhat_khiep_so'   // Xua đuổi chuột cống 8 lần
+  | 'badge_hiep_si_duong_pho'     // Dọn sạch 15 đống rác trước hiên
+  | 'badge_khong_mot_hat_bui'     // Lau sạch bóng 20 bàn ăn
+  | 'badge_hoa_giai_drama'        // Xử lý êm thấm 8 sự cố drama xóm
+  | 'badge_an_ninh_vung_chac'     // Thuê bảo vệ dân phố
+  | 'badge_tri_ky_bac_ba'         // Đạt Cấp Tim 5 với Bác Ba
+  | 'badge_khau_vi_ruot_hem'      // Chiều đúng khẩu vị ruột 25 lần
+  | 'badge_ban_than_co_muoi'      // Nhận 5 quà tiếp tế từ cư dân
+  | 'badge_su_gia_hoa_binh'       // Đạt 100% hài lòng ở 8 cư dân
+  | 'badge_am_ap_trai_tim'        // Nuôi thú cưng đạt độ vui tối đa
+  | 'badge_chia_ngot_se_bui'      // Tặng đồ ăn miễn phí cho vé số/ve chai 5 lần
+  | 'badge_tieng_cuoi_xom_dao'    // Đạt 100 điểm Karma Cộng Đồng
+  | 'badge_trieu_phu_hem_sau'     // Tích lũy 1.000.000đ tiền mặt
+  | 'badge_doi_ngu_tinh_nhue'     // Nâng cấp 3 nhân viên lên cấp 2 trở lên
+  | 'badge_chuoi_cung_ung_vang'   // Mua hàng chợ đầu mối chiết khấu 8 lần
+  | 'badge_bien_hieu_ruc_ro'      // Mở khóa 2 biển hiệu Vintage
+  | 'badge_khong_mot_don_huy'     // Phục vụ liên tục 40 khách không huỷ
+  | 'badge_sieu_toc_phuc_vu'      // Tốc độ phục vụ trung bình nhanh
+  | 'badge_thinh_gia_trung_thanh' // Bật Đài FM 99.9 nhận buff 8 đêm
+  | 'badge_chinh_phuc_ca_dem'     // Vượt Wave 10 Ca Đêm Bất Tận
+  | 'badge_thu_tho_cam_bi_an'     // Thu thập 5 bức thư thỏ cam
+  | 'badge_truong_ton_sai_gon'    // Mở khóa Chương 3 trở lên
+  | 'badge_dai_ket_cuc_vien_man'; // Đạt ít nhất 2 kết cục khác nhau
 
 export interface HeritageBadge {
   id: HeritageBadgeId;

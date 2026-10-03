@@ -11,8 +11,8 @@ import { createInitialState } from '../src/core/state';
 
 describe('Heritage Badges & Wall of Fame System (Bằng Khen Tổ Dân Phố)', () => {
   describe('1. Content & Catalog Integrity', () => {
-    it('contains exactly 12 heritage badges with meaningful rewards and titles', () => {
-      expect(HERITAGE_BADGES).toHaveLength(12);
+    it('contains exactly 44 heritage badges with meaningful rewards and titles', () => {
+      expect(HERITAGE_BADGES).toHaveLength(44);
 
       for (const badge of HERITAGE_BADGES) {
         expect(badge.id).toBeTruthy();
