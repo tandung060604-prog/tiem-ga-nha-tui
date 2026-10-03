@@ -179,6 +179,8 @@ export function createInitialState(): GameState {
     unlockedThemeIds: ['default'],
     activeShopTheme: 'default',
     dineInTables: createDefaultDineInTables(),
+    freeOilFilterUsed: false,
+    testerFeedbackSubmissions: [],
   };
   getOrCreatePetPatio(state);
   Object.values(state.inventory).forEach(ensureBatches);
@@ -218,6 +220,12 @@ export function migrateSave(raw: unknown): { state: GameState; repaired: string[
   }
   if (!state.dineInTables || !Array.isArray(state.dineInTables) || state.dineInTables.length === 0) {
     state.dineInTables = createDefaultDineInTables();
+  }
+  if (typeof state.freeOilFilterUsed !== 'boolean') {
+    state.freeOilFilterUsed = defaults.freeOilFilterUsed ?? false;
+  }
+  if (!Array.isArray(state.testerFeedbackSubmissions)) {
+    state.testerFeedbackSubmissions = [];
   }
   // Save từ trước khi có hướng dẫn: đã qua ngày 1 thì coi như đã học, không bật lại
   if (typeof src.tutorialDone !== 'boolean') state.tutorialDone = typeof src.day === 'number' && src.day > 1;

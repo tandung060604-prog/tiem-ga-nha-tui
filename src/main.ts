@@ -50,6 +50,8 @@ import { squeezeCondiment, recordHelperFry, StationResult, scoopSide, changeOil,
 import { upgradeEffects } from './core/upgrades';
 import { renderSummaryModal } from './ui/components/SummaryModal';
 import { renderSettingsModal } from './ui/components/SettingsModal';
+import { renderKitchenGuideModal } from './ui/components/KitchenGuideModal';
+import { renderTesterFeedbackModal } from './ui/components/TesterFeedbackModal';
 import { renderWeeklyQuestsModal } from './ui/components/WeeklyQuestsModal';
 import { renderUpdateDashboardModal } from './ui/components/UpdateDashboardModal';
 import { renderStoryModal, bindStoryEvents, revealedStory } from './ui/components/StoryModal';
@@ -2466,6 +2468,13 @@ class AppController {
       return;
     }
 
+    const guideBtn = target.closest<HTMLElement>('#btn-open-kitchen-guide');
+    if (guideBtn) {
+      Haptics.tap();
+      this.openKitchenGuideModal();
+      return;
+    }
+
     const button = target.closest<HTMLElement>('[id]');
     const action = button?.id.replace(/^btn-/, '');
     if (!button || button.hasAttribute('disabled')) return;
@@ -2685,6 +2694,8 @@ class AppController {
       }
 
       case 'change-oil': {
+        const curState = stateManager.getState();
+        const willBeFree = !curState.freeOilFilterUsed && curState.day <= 3;
         let changed = false;
         stateManager.update(draft => { changed = changeOil(draft); });
         if (!changed) {
@@ -2692,7 +2703,11 @@ class AppController {
           return;
         }
         audio.playCash();
-        this.showToast('Đã thay dầu chiên mới tinh vàng óng! Vệ sinh 5 sao! ✨');
+        if (willBeFree) {
+          this.showToast('🎁 Bác Ba tặng can dầu sạch miễn phí tân thủ (Ngày 1-3)! Dầu vàng óng 5 sao! ✨');
+        } else {
+          this.showToast('Đã thay dầu chiên mới tinh vàng óng! Vệ sinh 5 sao! ✨');
+        }
         break;
       }
 
@@ -3702,6 +3717,13 @@ class AppController {
       };
     }
 
+    const testerFeedbackBtn = document.getElementById('btn-open-tester-feedback');
+    if (testerFeedbackBtn) {
+      testerFeedbackBtn.onclick = () => {
+        this.openTesterFeedbackModal();
+      };
+    }
+
     const changelogSettingsBtn = document.getElementById('btn-settings-changelog');
     if (changelogSettingsBtn) {
       changelogSettingsBtn.onclick = () => {
@@ -3777,6 +3799,91 @@ class AppController {
           this.setPhase('prep');
           this.showToast('Đã khôi phục game về ngày đầu tiên!');
         });
+      };
+    }
+  }
+
+  // Sổ tay tra cứu công thức nhanh cho ca bán
+  public openKitchenGuideModal() {
+    audio.playPop();
+    this.openModal(renderKitchenGuideModal());
+
+    const closeBtn1 = document.getElementById('btn-close-kitchen-guide');
+    if (closeBtn1) closeBtn1.onclick = () => this.closeModal();
+
+    const closeBtn2 = document.getElementById('btn-close-kitchen-guide-bottom');
+    if (closeBtn2) closeBtn2.onclick = () => this.closeModal();
+  }
+
+  // Modal góp ý & báo lỗi dành cho Tester trải nghiệm
+  public openTesterFeedbackModal() {
+    audio.playPop();
+    const state = stateManager.getState();
+    this.openModal(renderTesterFeedbackModal(state));
+
+    const closeBtn = document.getElementById('btn-close-tester-feedback');
+    if (closeBtn) closeBtn.onclick = () => this.openSettings();
+
+    // Chấm điểm sao tương tác
+    const starItems = document.querySelectorAll<HTMLElement>('.star-rating-item');
+    const inputStars = document.getElementById('input-feedback-stars') as HTMLInputElement | null;
+    starItems.forEach(item => {
+      item.onclick = () => {
+        const star = parseInt(item.dataset.star || '5', 10);
+        if (inputStars) inputStars.value = String(star);
+        starItems.forEach(s => {
+          const sVal = parseInt(s.dataset.star || '1', 10);
+          s.style.opacity = sVal <= star ? '1' : '0.35';
+        });
+        audio.playPop();
+      };
+    });
+
+    // Chép mã Save đính kèm
+    const copyBtn = document.getElementById('btn-copy-tester-save');
+    if (copyBtn) {
+      copyBtn.onclick = () => {
+        const code = exportSaveCode(stateManager.getState());
+        void navigator.clipboard?.writeText(code).then(
+          () => this.showToast('Đã chép mã Save vào bộ nhớ tạm! 📋'),
+          () => this.showToast('Không thể tự động chép mã.')
+        );
+      };
+    }
+
+    // Gửi góp ý
+    const submitBtn = document.getElementById('btn-submit-tester-feedback');
+    if (submitBtn) {
+      submitBtn.onclick = () => {
+        const commentEl = document.getElementById('textarea-feedback-comment') as HTMLTextAreaElement | null;
+        const categoryEl = document.getElementById('select-feedback-category') as HTMLSelectElement | null;
+        const comment = commentEl?.value.trim() || '';
+        const category = categoryEl?.value || 'other';
+        const stars = parseInt(inputStars?.value || '5', 10);
+
+        if (!comment) {
+          this.showToast('Vui lòng nhập đôi lời góp ý hoặc mô tả lỗi nhé!');
+          return;
+        }
+
+        const submission = {
+          id: `fb_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          stars,
+          category,
+          comment,
+          timestamp: new Date().toISOString()
+        };
+
+        stateManager.update(draft => {
+          if (!draft.testerFeedbackSubmissions) draft.testerFeedbackSubmissions = [];
+          draft.testerFeedbackSubmissions.push(submission);
+        });
+        stateManager.saveState();
+
+        audio.playCash();
+        confetti({ particleCount: 45, spread: 65, origin: { y: 0.6 } });
+        this.showToast('❤️ Cảm ơn bạn rất nhiều vì đã góp ý xây dựng Tiệm Gà Nhà Tui!');
+        this.closeModal();
       };
     }
   }

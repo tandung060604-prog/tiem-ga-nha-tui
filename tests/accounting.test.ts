@@ -97,6 +97,7 @@ describe('dòng tiền không trừ giá vốn hai lần', () => {
 
   it('thay dầu trả ngay, ghi vào giá vốn của ngày, không trừ lần nữa lúc đóng cửa', () => {
     const s = createInitialState();
+    s.freeOilFilterUsed = true;
     const start = s.money;
     expect(changeOil(s)).toBe(true);
     expect(s.money).toBe(start - OIL_CHANGE_COST);

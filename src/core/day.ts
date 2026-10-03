@@ -736,11 +736,18 @@ export function cleanserTasteBonus(session: Pick<SellingSession, 'friedMainOrder
 }
 
 // Thay dầu chiên (150k): trả tiền ngay, ghi vào giá vốn của ngày để hiện trong P&L
+// Trợ giá tân thủ Bác Ba: Ngày 1-3 lần đầu thay dầu được Bác Ba tặng can dầu sạch miễn phí 100%
 export const OIL_CHANGE_COST = 150000;
 export function changeOil(draft: GameState): boolean {
-  if (draft.money < OIL_CHANGE_COST) return false;
-  draft.money -= OIL_CHANGE_COST;
-  draft.todayOilCost = (draft.todayOilCost ?? 0) + OIL_CHANGE_COST;
+  const isFreeAid = !draft.freeOilFilterUsed && draft.day <= 3;
+  if (!isFreeAid && draft.money < OIL_CHANGE_COST) return false;
+
+  if (isFreeAid) {
+    draft.freeOilFilterUsed = true;
+  } else {
+    draft.money -= OIL_CHANGE_COST;
+    draft.todayOilCost = (draft.todayOilCost ?? 0) + OIL_CHANGE_COST;
+  }
   draft.oilCondition = 'clean';
   draft.oilBatchesCooked = 0;
   draft.dirtyOilFryingCount = 0;

@@ -24,16 +24,101 @@ export interface ChangelogRelease {
   }[];
 }
 
-export const CURRENT_GAME_VERSION = 'v2.7.0';
-export const CURRENT_VERSION_CODENAME = 'Hiên Quán Bàn Ăn Tại Chỗ (Dine-In Patio) & Giám Khảo Ẩm Thực VIP Khó Tính';
+export const CURRENT_GAME_VERSION = 'v2.8.0';
+export const CURRENT_VERSION_CODENAME = 'Bác Ba Trợ Giá Can Dầu, Sổ Tay Bếp Trưởng & Kênh Góp Ý Tester';
 export const CURRENT_BUILD_DATE = '03/10/2026';
 
 export const CHANGELOG_DATA: ChangelogRelease[] = [
   {
+    version: 'v2.8.0',
+    codename: 'Bác Ba Trợ Giá Can Dầu, Sổ Tay Bếp Trưởng & Kênh Góp Ý Tester',
+    releaseDate: '03/10/2026',
+    isLatest: true,
+    highlightSummary: 'Nâng cấp toàn diện trải nghiệm End-to-End sẵn sàng phát hành thử nghiệm: Bác Ba trợ giá miễn phí 100% can dầu sạch đầu tiên ở Ngày 1-3 giúp người chơi mới không bao giờ bị nghẽn vốn; Tích hợp Sổ Tay Bếp Trưởng tra nhanh công thức món ngay trong ca bán; Hệ thống cảnh báo kho thông minh chống hao hụt nguyên liệu hết hạn; Bảng hiệu mặt tiền cá nhân hóa tên quán; Hoạt họa chụp ảnh check-in sống ảo tại bàn hiên quán; và Kênh Góp Ý & Báo Lỗi Tester ngay trong phần Cài đặt!',
+    metrics: [
+      { icon: '🛢️', label: 'Trợ Giá Bác Ba', value: 'Miễn Phí Can Dầu 100%' },
+      { icon: '📖', label: 'Sổ Tay Bếp', value: 'Tra Nhanh Công Thức' },
+      { icon: '⚠️', label: 'Cảnh Báo HSD', value: 'Smart Spoilage Alert' },
+      { icon: '📸', label: 'Check-in Hiên', value: 'Flash & Bubble Sống Động' },
+      { icon: '💬', label: 'Kênh Tester', value: 'Đánh Giá & Chép Save' },
+      { icon: '🧪', label: 'Kiểm Định', value: '701+ Tests PASS 100%' }
+    ],
+    categories: [
+      {
+        categoryName: 'Kinh Tế & Kho Hàng Thông Minh',
+        categoryIcon: '🛢️',
+        items: [
+          {
+            tag: 'TRỢ GIÁ BÁC BA',
+            tagColor: '#16a34a',
+            title: 'Tặng 1 Can Dầu Sạch Miễn Phí (0đ) Tân Thủ',
+            desc: 'Bảo đảm người chơi mới trong Ngày 1 đến Ngày 3 không bao giờ rơi vào bế tắc kinh tế khi dầu chiên bị bẩn:',
+            details: [
+              'Lần đầu tiên chảo dầu bị bẩn hoặc cần thay ở Ngày 1-3, Bác Ba xuất hiện trợ giá 100% (miễn phí 150.000đ).',
+              'Nút thay dầu hiển thị nhãn "0k 🎁" trực quan và giải tỏa áp lực vốn cho người mới làm quen.'
+            ]
+          },
+          {
+            tag: 'KHO THÔNG MINH',
+            tagColor: '#dc2626',
+            title: 'Cảnh Báo Lô Hàng Hạn Hôm Nay (Smart Spoilage Alert)',
+            desc: 'Giúp người chơi quản lý kho FIFO chặt chẽ và không bị mất tiền oan vì nguyên liệu hỏng:',
+            details: [
+              'Thẻ nguyên liệu có lô còn hạn 1 ngày sẽ hiển thị viền đỏ và huy hiệu nhấp nháy "⚠️ Hạn hôm nay!".',
+              'Gợi ý người chơi ưu tiên dùng hoặc bấm nút "-5" hoàn trả lại đại lý thu hồi vốn.'
+            ]
+          }
+        ]
+      },
+      {
+        categoryName: 'Trải Nghiệm Màn Bán Hàng & Bảng Hiệu Cá Nhân Hóa',
+        categoryIcon: '🍗',
+        items: [
+          {
+            tag: 'SỔ TAY BẾP',
+            tagColor: '#b45309',
+            title: 'Sổ Tay Bếp Trưởng Mở Nhanh Trong Ca Bán',
+            desc: 'Tra cứu nhanh gọn bí quyết chiên gà chuẩn 5 sao:',
+            details: [
+              'Nút 📖 Sổ Tay bố trí tiện tay trên thanh HUD ca bán, chạm để mở cẩm nang tóm tắt.',
+              'Hướng dẫn vùng nhiệt Perfect vàng giòn, cách ướp sốt cay, sốt bơ tỏi và tác dụng rót nước giải khát.'
+            ]
+          },
+          {
+            tag: 'CÁ NHÂN HÓA',
+            tagColor: '#9333ea',
+            title: 'Bảng Hiệu Hiên Quán & Khách Check-in Sống Ảo',
+            desc: 'Mang đậm hơi thở phố thị Sài Gòn:',
+            details: [
+              'Biển hiệu vỉa hè Hẻm 1102 tự động khắc tên quán người chơi đặt trong Cài đặt.',
+              'Khách ngồi bàn hiên quán thỉnh thoảng giơ điện thoại check-in chụp ảnh với hiệu ứng chớp flash và bong bóng 📸 sống động.'
+            ]
+          }
+        ]
+      },
+      {
+        categoryName: 'Kênh Góp Ý & Báo Lỗi Dành Cho Tester',
+        categoryIcon: '💬',
+        items: [
+          {
+            tag: 'TESTER FEEDBACK',
+            tagColor: '#ca8a04',
+            title: 'Góp Ý Trực Tiếp & Đính Kèm Mã Save',
+            desc: 'Kênh kết nối trực tiếp giữa người chơi thử nghiệm và đội ngũ phát triển:',
+            details: [
+              'Chấm điểm trải nghiệm từ 1 đến 5 sao theo từng danh mục: Kinh tế, Đồ họa, Cốt truyện, Bug, Tính năng.',
+              'Nút Chép Mã Save 1 chạm giúp tester dễ dàng chia sẻ file save để dev tái hiện và fix lỗi tức thì.'
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     version: 'v2.7.0',
     codename: 'Hiên Quán Bàn Ăn Tại Chỗ (Dine-In Patio) & Giám Khảo Ẩm Thực VIP Khó Tính',
     releaseDate: '03/10/2026',
-    isLatest: true,
+    isLatest: false,
     highlightSummary: 'Đột phá chiều sâu trải nghiệm quán gà với 2 trụ cột gameplay mới toanh: Mở rộng Góc Bàn Ăn Hiên Quán (Dine-In Patio Tables) cho thực khách nán lại thưởng thức món ăn nóng hổi, đếm ngược thời gian và để lại cọc tiền tip vàng rực kèm thao tác dọn bàn 1 ngón cái; đồng thời diện kiến dàn Giám Khảo Ẩm Thực VIP Khó Tính (Food Critic Bosses) với những yêu cầu chế biến khắt khe thử thách bản lĩnh tay nghề chiên gà Vàng Kim thượng hạng!',
     metrics: [
       { icon: '🪑', label: 'Bàn Ăn Hiên Quán', value: '3 Bàn Độc Lập' },

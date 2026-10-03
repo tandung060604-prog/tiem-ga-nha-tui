@@ -2686,6 +2686,25 @@ body.selling-mode .toast {
   background: #fff5f5 !important;
 }
 
+.item-row.inv-grid-card.shelf-expiring-soon {
+  border-color: #ef4444 !important;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(254, 242, 242, 0.95) 100%) !important;
+  box-shadow: 0 0 0 1.5px #ef4444, 2px 2px 0 rgba(74, 40, 16, 0.22) !important;
+}
+
+.shelf-badge-expiring {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+  border: 1px solid #ef4444 !important;
+  font-weight: 700 !important;
+  animation: pulseExpireBadge 2s infinite ease-in-out;
+}
+
+@keyframes pulseExpireBadge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
 .item-row.inv-grid-card.is-locked {
   background: #f8fafc !important;
   border-color: #94a3b8 !important;

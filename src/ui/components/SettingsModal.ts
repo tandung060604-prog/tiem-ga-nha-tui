@@ -114,10 +114,17 @@ export function renderSettingsModal(state: GameState): string {
         </button>
       </div>
 
+      <!-- Tester Feedback Box -->
+      <div style="border-top: 1px dashed var(--line); padding-top: 10px; text-align: center;">
+        <button id="btn-open-tester-feedback" class="btn-sm" style="width: 100%; min-height: 44px; padding: 8px; font-weight: 800; background: linear-gradient(135deg, #fef9c3, #fde047); border: 2px solid #ca8a04; color: #854d0e; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          💬 <span>Góp Ý Cho Tiệm (Dành Cho Tester)</span>
+        </button>
+      </div>
+
       <!-- Version Changelog Dashboard -->
       <div style="border-top: 1px dashed var(--line); padding-top: 10px; text-align: center;">
         <button id="btn-settings-changelog" class="btn-sm" style="width: 100%; padding: 8px; font-weight: 800; background: linear-gradient(135deg, #fef3c7, #fde68a); border-color: #f59e0b; color: #92400e;">
-          📜 Nhật Ký Cập Nhật Phiên Bản (v2.2.0)
+          📜 Nhật Ký Cập Nhật Phiên Bản (v2.8.0)
         </button>
       </div>
 

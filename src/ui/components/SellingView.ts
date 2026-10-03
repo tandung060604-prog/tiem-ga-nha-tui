@@ -1178,7 +1178,10 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         </div>
         ${rush ? `<span class="rush-badge"><img src="${ASSETS.icons.fireRush}" class="hud-pixel-icon" alt="" /> CA CAO ĐIỂM!</span>` : `<span class="session-ambience">${timePeriodLabel}</span>`}
         ${state.secretSauceDay?.buffActive ? `<span class="sauce-buff-hud-badge" title="Sốt Bí Truyền đang kích hoạt: +3k tip mỗi đơn!"><img src="${ASSETS.icons.sauce}" class="hud-pixel-icon" alt="" /> Sốt Vàng</span>` : ''}
-        <div class="hud-actions">
+        <div class="hud-actions" style="display: flex; gap: 5px; align-items: center;">
+          <button id="btn-open-kitchen-guide" class="btn-sm" style="padding: 4px 8px; font-size: 0.72rem; font-weight: 800; background: #faeed1; color: #5a3516; border: 1.5px solid #8b5a2b; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 44px; min-width: 60px; box-sizing: border-box;" title="Sổ Tay Bếp Trưởng: Tra cứu công thức chuẩn">
+            📖 <span>Sổ Tay</span>
+          </button>
           <button id="btn-toggle-fast" class="btn-sm btn-toggle-fast">
             ${session.isFastForward ? '⏩ Tua x2' : '▶️ 1x'}
           </button>
@@ -1232,7 +1235,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         <!-- Biển hiệu vỉa hè Hẻm 1102 -->
         <div class="alley-sidewalk-sign" aria-hidden="true">
           <span class="sign-lantern-icon">🏮</span>
-          <span class="sign-street-name">Hẻm 1102 · Quầy Gọi Món</span>
+          <span class="sign-street-name">${escapeHtml(state.shopName || 'TIỆM GÀ NHÀ TUI')} · Hẻm 1102</span>
           <span class="sign-lantern-icon">🏮</span>
         </div>
 
@@ -1303,11 +1306,11 @@ export function renderSellingView(state: GameState, session: SellingSession): st
               <span class="fryer-title">
                 <img src="${ASSETS.icons.bell}" class="pixel-card-title-icon" alt="" /> Bếp Chiên
               </span>
-              <button id="btn-change-oil" class="oil-change-btn ${oilCondition === 'dirty' ? 'dirty-alert' : ''}" title="Dầu: ${oilLabel} - Chạm để thay chảo mới (150.000đ)">
+              <button id="btn-change-oil" class="oil-change-btn ${oilCondition === 'dirty' ? 'dirty-alert' : ''}" title="${!state.freeOilFilterUsed && state.day <= 3 ? `Dầu: ${oilLabel} - Bác Ba trợ giá miễn phí lần đầu (Ngày 1-3)! Chạm để thay mới` : `Dầu: ${oilLabel} - Chạm để thay chảo mới (150.000đ)`}">
                 <span class="oil-dot ${oilCondition}"></span>
                 <span class="oil-status-label">${oilCondition === 'clean' ? 'Sạch' : oilCondition === 'medium' ? 'Vừa' : 'Đen'}</span>
                 <span class="oil-sep">|</span>
-                <span>150k</span>
+                <span>${!state.freeOilFilterUsed && state.day <= 3 ? '0k 🎁' : '150k'}</span>
               </button>
             </div>
 
@@ -1625,12 +1628,14 @@ export function renderDineInPatio(tables?: DineInTable[]): string {
     }
     if (table.status === 'eating') {
       const progressPct = Math.round((table.eatingTimerSec / Math.max(1, table.eatingDurationSec)) * 100);
+      const isPhotoCheckin = table.eatingTimerSec > 3 && Math.floor(table.eatingTimerSec) % 4 === 0;
       return `
-        <div class="patio-table eating ${table.isCritic ? 'critic' : ''}" data-table-idx="${table.tableIndex}" title="${escapeHtml(table.customerName || 'Khách')} đang thưởng thức món ăn">
+        <div class="patio-table eating ${table.isCritic ? 'critic' : ''} ${isPhotoCheckin ? 'patio-checkin-flash' : ''}" data-table-idx="${table.tableIndex}" title="${escapeHtml(table.customerName || 'Khách')} đang thưởng thức món ăn">
           <div class="patio-table-inner">
             <div class="patio-guest-avatar-wrap">
               <img src="${table.customerAvatar || ASSETS.capdoi.stand}" class="patio-guest-avatar" alt="${escapeHtml(table.customerName || '')}" />
-              <span class="patio-eating-bubble">😋 ${table.isCritic ? '⭐' : '🍗'}</span>
+              <span class="patio-eating-bubble">${isPhotoCheckin ? '📸 Check-in!' : `😋 ${table.isCritic ? '⭐' : '🍗'}`}</span>
+              ${isPhotoCheckin ? '<span class="patio-camera-flash">✨</span>' : ''}
             </div>
             <div class="patio-info">
               <span class="patio-name">${escapeHtml(table.customerName || table.name)}</span>

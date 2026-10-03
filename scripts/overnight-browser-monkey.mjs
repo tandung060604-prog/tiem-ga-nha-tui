@@ -481,8 +481,8 @@ class OvernightMonkey {
       return true;
     }
 
-    // 16c. Các Modal Hệ Thống Khác (Radio, Bằng Khen, Thử Thách Tuần, Ca Đêm, Biển Hiệu, Kỷ Niệm, Lobby)
-    const extraModalClose = page.locator('#btn-close-night-radio, #btn-close-achievements, .btn-claim-badge, #btn-close-weekly-quests, .btn-claim-quest, #btn-close-shop-theme, #btn-close-endless, #btn-close-memories, #btn-close-leaderboard');
+    // 16c. Các Modal Hệ Thống Khác (Radio, Bằng Khen, Thử Thách Tuần, Ca Đêm, Biển Hiệu, Kỷ Niệm, Lobby, Sổ Tay Bếp, Tester Feedback)
+    const extraModalClose = page.locator('#btn-close-night-radio, #btn-close-achievements, .btn-claim-badge, #btn-close-weekly-quests, .btn-claim-quest, #btn-close-shop-theme, #btn-close-endless, #btn-close-memories, #btn-close-leaderboard, #btn-close-kitchen-guide, #btn-close-kitchen-guide-bottom, #btn-close-tester-feedback');
     if (await extraModalClose.first().isVisible({ timeout: 50 }).catch(() => false)) {
       await extraModalClose.first().click({ force: true });
       await sleep(200);
@@ -516,7 +516,9 @@ class OvernightMonkey {
         if (await oilBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
           const shouldChangeOil = await page.evaluate(() => {
             const s = window.__stateManager?.getState();
-            if (!s || s.money < 150000) return false;
+            if (!s) return false;
+            const isFreeOil = !s.freeOilFilterUsed && s.day <= 3;
+            if (!isFreeOil && s.money < 150000) return false;
             // Chỉ thay khi dầu bẩn (tránh công an phạt và khách chê), hoặc dầu vàng vừa nhưng dư dả tiền (>350k)
             return s.oilCondition === 'dirty' || (s.oilCondition === 'medium' && s.money >= 350000);
           }).catch(() => false);

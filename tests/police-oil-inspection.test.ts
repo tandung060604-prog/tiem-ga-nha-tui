@@ -90,6 +90,7 @@ describe('Hệ Thống Công An Kiểm Tra Dầu Đen & Realtime Reviews', () =>
     state.oilCondition = 'dirty';
     state.money = 300000;
     state.dirtyOilFryingCount = 1;
+    state.freeOilFilterUsed = true;
 
     const ok = changeOil(state);
     expect(ok).toBe(true);

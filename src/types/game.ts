@@ -570,6 +570,8 @@ export interface GameState {
   activeShopTheme?: ShopThemeId;
   endlessRecord?: EndlessRunRecord;
   dineInTables?: DineInTable[];
+  freeOilFilterUsed?: boolean;       // Bác Ba trợ giá miễn phí 1 lần thay dầu đầu tiên ở Ngày 1-3 khi dầu bẩn
+  testerFeedbackSubmissions?: Array<{ id: string; stars: number; category: string; comment: string; timestamp: string }>;
 }
 
 export interface BargainWholesaler {

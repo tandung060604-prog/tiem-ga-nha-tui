@@ -74,21 +74,24 @@ export function renderInventoryTab(state: GameState): string {
 
     const isLow = item.amount <= 5;
     const isOutOfStock = item.amount <= 0;
-    const isUrgentShelf = !isOutOfStock && item.currentLifeDays <= 1;
+    const hasExpiringTodayBatch = !isOutOfStock && (
+      (item.batches && item.batches.some(b => b.amount > 0 && b.daysLeft === 1)) ||
+      (item.currentLifeDays <= 1)
+    );
     const unitCost = Math.round(item.cost * (1 - discount / 100));
     const totalCost5 = unitCost * 5;
     const totalCost10 = unitCost * 10;
 
     return `
-      <div class="item-row inv-grid-card ${isLow ? 'is-low-stock' : ''} ${isOutOfStock ? 'is-out-of-stock' : ''}" data-id="${item.id}">
+      <div class="item-row inv-grid-card ${isLow ? 'is-low-stock' : ''} ${isOutOfStock ? 'is-out-of-stock' : ''} ${hasExpiringTodayBatch ? 'shelf-expiring-soon' : ''}" data-id="${item.id}">
         <div class="inv-card-header">
           <div class="item-icon">${getInventoryIcon(item)}</div>
           <div class="item-meta">
             <div class="item-name">${item.name}</div>
             ${isOutOfStock 
               ? '<span class="shelf-tag is-out-tag">Hết hàng</span>'
-              : isUrgentShelf 
-              ? '<span class="shelf-tag is-urgent-tag"><img src="' + ASSETS.icons.clock + '" class="btn-pixel-icon-xs" alt="" /> HSD: ' + item.currentLifeDays + 'd!</span>' 
+              : hasExpiringTodayBatch
+              ? '<span class="shelf-tag is-urgent-tag shelf-badge-expiring"><img src="' + ASSETS.icons.clock + '" class="btn-pixel-icon-xs" alt="" /> ⚠️ Hạn hôm nay!</span>'
               : '<span class="shelf-tag">HSD: ' + item.currentLifeDays + ' ngày</span>'}
           </div>
         </div>
@@ -100,7 +103,7 @@ export function renderInventoryTab(state: GameState): string {
           </div>
           ${item.batches && item.batches.length > 1 ? `
             <div class="inv-batch-info" style="font-size: 0.65rem; color: var(--soft); margin-top: 2px;">
-              <img src="${ASSETS.icons.inventory}" class="btn-pixel-icon-xs" alt="" /> FIFO: ${item.batches.map(b => `<b>${b.amount}</b>${item.unit}(${b.daysLeft}d)`).join(' · ')}
+              <img src="${ASSETS.icons.inventory}" class="btn-pixel-icon-xs" alt="" /> FIFO: ${item.batches.map(b => b.daysLeft === 1 && b.amount > 0 ? `<b style="color:#dc2626;">${b.amount}${item.unit}(hôm nay!)</b>` : `<b>${b.amount}</b>${item.unit}(${b.daysLeft}d)`).join(' · ')}
             </div>
           ` : ''}
         </div>

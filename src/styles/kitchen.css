@@ -671,6 +671,15 @@
   transition: all 0.15s ease;
 }
 
+#btn-open-kitchen-guide {
+  min-height: 44px !important;
+  min-width: 58px !important;
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
 .oil-change-btn .oil-sep {
   opacity: 0.4;
   margin: 0 1px;
