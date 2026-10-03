@@ -152,7 +152,6 @@ export function createInitialState(): GameState {
     lastRadioBroadcastDay: 0,
     heardRadioBroadcastIds: [],
     customSignatureDishesUnlocked: [],
-    todayWeather: 'sunny_hot',
     adoptedPets: [],
     pestIncidentsCount: 0,
     dirtyOilPenaltyDays: 0,

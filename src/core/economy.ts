@@ -10,16 +10,20 @@ import { GAME_HOUR_MS, OFF_PEAK_HOURS, RUSH_HOURS, isWeekend, WEEKEND_CUSTOMER_M
 export class EconomyEngine {
   // Tính toán lượng khách dự kiến trong ngày
   public static calculateDailyCustomerCount(state: GameState, weatherMultiplier: number = 1.0): number {
-    // Khách nền theo từng chương
+    // Khách nền theo từng chương: Đường cong tăng trưởng mượt mà (Jev Decision Confidence 1.0)
     const baseCustomersPerChapter: { [key: number]: number } = {
-      1: 10, // mô phỏng (npm run sim): 12 → qua Chương 1 ngày 16 khi giỏ hàng có món kèm + nước (27/09); 10 → ~ngày 20
-      2: 40, // mô phỏng: 28 khách thì phụ bếp không có việc, Chương 2 không qua nổi trong 35 ngày
-      3: 65,
-      4: 75,
-      5: 140
+      1: 10,
+      2: 22, // Tăng trưởng lũy tiến 18 -> 26 khách, tránh ồ ạt quá tải khi vừa mở chương mới
+      3: 36,
+      4: 55,
+      5: 90
     };
 
-    const base = baseCustomersPerChapter[state.currentChapter] || 16;
+    let base = baseCustomersPerChapter[state.currentChapter] || 16;
+    if (state.currentChapter === 2) {
+      const daysIntoCh2 = Math.max(0, state.day - 20);
+      base = 18 + Math.min(8, Math.floor(daysIntoCh2 * 0.7)); // Ngày 21: 18, Ngày 25: 21, Ngày 30: 25
+    }
     
     // Hệ số đánh giá sao (GDD: 3 sao ≈ 0.6x, 4 sao ≈ 1.0x, 4.8 sao trở lên ≈ 1.6x)
     const stars = state.ratings.overall;

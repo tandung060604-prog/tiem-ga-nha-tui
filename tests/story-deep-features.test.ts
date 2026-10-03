@@ -305,7 +305,6 @@ describe('Hệ Thống Tính Năng Chiều Sâu Cốt Truyện & Visual Novel (S
       initial.customSignatureDishesUnlocked = ['dish_chao_ga_gung_bac_ba'];
       initial.residentAffinityLevels = { tho_cam: 3, bac_ba: 4 };
       initial.heardRadioBroadcastIds = ['broadcast_ch1_d1'];
-      initial.todayWeather = 'sudden_rain';
 
       const jsonStr = JSON.stringify(initial);
       const migrated = migrateSave(JSON.parse(jsonStr));
@@ -316,7 +315,6 @@ describe('Hệ Thống Tính Năng Chiều Sâu Cốt Truyện & Visual Novel (S
       expect(savedState.customSignatureDishesUnlocked).toEqual(['dish_chao_ga_gung_bac_ba']);
       expect(savedState.residentAffinityLevels).toEqual({ tho_cam: 3, bac_ba: 4 });
       expect(savedState.heardRadioBroadcastIds).toEqual(['broadcast_ch1_d1']);
-      expect(savedState.todayWeather).toBe('sudden_rain');
       expect(savedState.petPatio).toBeDefined();
       expect(savedState.petPatio?.pets).toHaveLength(2);
     });

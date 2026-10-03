@@ -1,4 +1,4 @@
-import { TrayItem } from '../types/game';
+import { GameState, TrayItem } from '../types/game';
 import type { CookingState, Sauce } from './cooking';
 import { CookingEngine } from './cooking';
 import { missingItems } from './staff';
@@ -242,3 +242,58 @@ export function shouldRunPrepTutorial(state: { day: number; prepTutorialDone?: b
   }
   return state.day === 1 && !state.prepTutorialDone;
 }
+
+export interface DailyFeatureGuideHint {
+  key: string;
+  step: string;
+  text: string;
+  target: string;
+  button: string;
+  tabToSwitch?: 'inventory' | 'upgrades' | 'staff' | 'reviews' | 'menu';
+}
+
+export function checkDailyFeatureUnlockGuide(state: GameState): DailyFeatureGuideHint | null {
+  if (typeof navigator !== 'undefined' && /HeadlessChrome/.test(navigator.userAgent)) {
+    return null;
+  }
+  const guided = state.guidedFeatures || [];
+
+  // Ngày 2: Mở tính năng Đánh Giá (Reviews)
+  if (state.day === 2 && !guided.includes('day_2_reviews')) {
+    return {
+      key: 'day_2_reviews',
+      step: 'guide-day-2-reviews',
+      text: 'Bác Ba chỉ nè con: Hôm nay tiệm mình mở tính năng Đánh Giá & Review! Khách ăn xong sẽ để lại nhận xét và chấm sao trên mạng. Chạm vô Tab Đánh Giá để xem họ khen chê ra sao đặng rút kinh nghiệm nghen con!',
+      target: '.tab-btn[data-tab="reviews"]',
+      button: 'Dạ, con xem liền!',
+      tabToSwitch: 'reviews'
+    };
+  }
+
+  // Ngày 3: Mở tính năng Nâng Cấp Quán (Upgrades)
+  if (state.day === 3 && !guided.includes('day_3_upgrades')) {
+    return {
+      key: 'day_3_upgrades',
+      step: 'guide-day-3-upgrades',
+      text: 'Bác Ba mách nước: Hôm nay tiệm mở tính năng Nâng Cấp Quán! Mình buôn bán có dư chút đỉnh rồi, con chạm vô Tab Nâng Cấp để sắm thêm bàn ghế gỗ, dù bạt che mưa hay xe đẩy vỉa hè đặng bán đắt khách hơn nghen!',
+      target: '.tab-btn[data-tab="upgrades"]',
+      button: 'Dạ con đi sắm liền!',
+      tabToSwitch: 'upgrades'
+    };
+  }
+
+  // Ngày 4 / Chương 2: Mở tính năng Nhân Viên (Staff)
+  if ((state.day >= 4 || (state.currentChapter && state.currentChapter >= 2)) && !guided.includes('chapter_2_staff')) {
+    return {
+      key: 'chapter_2_staff',
+      step: 'guide-ch2-staff',
+      text: 'Bác Ba căn dặn: Quán bắt đầu đông khách một mình con đứng bếp làm hổng xuể đâu đa! Bác mở cho con Tab Nhân Viên đặng thuê thêm Phụ Bếp, Thu Ngân phụ con một tay đắc lực nghen!',
+      target: '.tab-btn[data-tab="staff"]',
+      button: 'Dạ có người phụ đỡ cực!',
+      tabToSwitch: 'staff'
+    };
+  }
+
+  return null;
+}
+

@@ -449,14 +449,32 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
     cache.oilDot.className = `oil-dot ${currentOil}`;
   }
   if (cache.oilLabel) {
-    const label = currentOil === 'clean' ? 'Sạch' : currentOil === 'medium' ? 'Vừa' : 'Đen';
+    const label = currentOil === 'clean' ? 'Sạch' : currentOil === 'medium' ? 'Vừa' : '⚠️ ĐEN! THAY';
     if (cache.oilLabel.textContent !== label) cache.oilLabel.textContent = label;
+  }
+
+  const changeOilBtn = root.querySelector<HTMLElement>('#btn-change-oil');
+  if (changeOilBtn) {
+    changeOilBtn.classList.toggle('dirty-alert', currentOil === 'dirty');
   }
 
   if (cache.fryPot) {
     cache.fryPot.classList.toggle('oil-clean', currentOil === 'clean');
     cache.fryPot.classList.toggle('oil-medium', currentOil === 'medium');
     cache.fryPot.classList.toggle('oil-dirty', currentOil === 'dirty');
+
+    // Quản lý nhãn cảnh báo dầu đen cực rõ (Jev Decision Confidence 1.0)
+    let dirtyOverlay = cache.fryPot.querySelector('.dirty-oil-warning-overlay');
+    if (currentOil === 'dirty') {
+      if (!dirtyOverlay) {
+        dirtyOverlay = document.createElement('div');
+        dirtyOverlay.className = 'dirty-oil-warning-overlay';
+        dirtyOverlay.innerHTML = '<span class="smoke-puff">💨</span><span>⚠️ DẦU ĐEN! THAY DẦU KẺO CHÁY!</span>';
+        cache.fryPot.appendChild(dirtyOverlay);
+      }
+    } else if (dirtyOverlay) {
+      dirtyOverlay.remove();
+    }
 
     if (cook.isFrying) {
       const quality = cookingEngine.calculateCurrentQuality();
@@ -1356,7 +1374,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
               </span>
               <button id="btn-change-oil" class="oil-change-btn ${oilCondition === 'dirty' ? 'dirty-alert' : ''}" title="${!state.freeOilFilterUsed && state.day <= 3 ? `Dầu: ${oilLabel} - Bác Ba trợ giá miễn phí lần đầu (Ngày 1-3)! Chạm để thay mới` : `Dầu: ${oilLabel} - Chạm để thay chảo mới (150.000đ)`}">
                 <span class="oil-dot ${oilCondition}"></span>
-                <span class="oil-status-label">${oilCondition === 'clean' ? 'Sạch' : oilCondition === 'medium' ? 'Vừa' : 'Đen'}</span>
+                <span class="oil-status-label">${oilCondition === 'clean' ? 'Sạch' : oilCondition === 'medium' ? 'Vừa' : '⚠️ ĐEN! THAY'}</span>
                 <span class="oil-sep">|</span>
                 <span>${!state.freeOilFilterUsed && state.day <= 3 ? '0k 🎁' : '150k'}</span>
               </button>
@@ -1364,6 +1382,12 @@ export function renderSellingView(state: GameState, session: SellingSession): st
 
             <!-- The Boiling Pot with Real Food Asset -->
             <div id="btn-fry-pot" class="fry-pot ${'oil-' + oilCondition} ${cookState.isFrying && quality === 'perfect' ? 'perfect-glow' : ''} ${session.perfectStreak >= 2 ? 'streak-fire' : ''}">
+              ${oilCondition === 'dirty' ? `
+                <div class="dirty-oil-warning-overlay">
+                  <span class="smoke-puff">💨</span>
+                  <span>⚠️ DẦU ĐEN! THAY DẦU KẺO CHÁY GÀ!</span>
+                </div>
+              ` : ''}
               <div class="bubble" style="left: 15%; animation-delay: 0s;"></div>
               <div class="bubble" style="left: 38%; animation-delay: 0.3s;"></div>
               <div class="bubble" style="left: 65%; animation-delay: 0.6s;"></div>

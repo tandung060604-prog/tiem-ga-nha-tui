@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import { getWeatherForDay, SAIGON_WEATHERS } from '../src/content/saigonWeather';
 import {
   getOrCreatePetPatio,
   petThePet,
@@ -8,52 +7,24 @@ import {
   checkCatPestDefense
 } from '../src/core/petPatioSystem';
 import { renderPetPatioModal } from '../src/ui/components/PetPatioComponent';
-import { renderWeatherAtmosphereStrip, renderWeatherChalkboardBadge } from '../src/ui/components/WeatherAtmosphere';
 import { createInitialState } from '../src/core/state';
+import { renderHeader } from '../src/ui/components/Header';
+import { renderChalkboard } from '../src/ui/components/Chalkboard';
 
-describe('Dynamic Saigon Weather & Pet Sanctuary System', () => {
-  describe('1. Dynamic Saigon Weather (Thời Tiết Sài Gòn Động)', () => {
-    it('provides all 5 Saigon signature weather types with balanced multipliers', () => {
-      const weatherKeys = Object.keys(SAIGON_WEATHERS);
-      expect(weatherKeys).toContain('sunny_hot');
-      expect(weatherKeys).toContain('sudden_rain');
-      expect(weatherKeys).toContain('cool_breeze');
-      expect(weatherKeys).toContain('thunderstorm');
-      expect(weatherKeys).toContain('golden_sunset');
-
-      // Nắng gắt: đơn ship tăng vọt, nước tăng mạnh
-      const sunny = SAIGON_WEATHERS.sunny_hot;
-      expect(sunny.deliveryMultiplier).toBeGreaterThan(1.0);
-      expect(sunny.walkupDrinkMultiplier).toBeGreaterThan(1.0);
-      expect(sunny.oilHeatModifier).toBeGreaterThan(0);
-
-      // Mưa rào: khách ăn tại quán tăng vọt
-      const rain = SAIGON_WEATHERS.sudden_rain;
-      expect(rain.dineInMultiplier).toBeGreaterThan(1.0);
-      expect(rain.patienceModifier).toBeGreaterThan(1.0);
+describe('Weather Removal & Pet Sanctuary System', () => {
+  describe('1. Clean HUD & Removal of Saigon Weather (Loại Bỏ Thời Tiết Khỏi HUD)', () => {
+    it('ensures Header does not contain weather badge or weather text', () => {
+      const state = createInitialState();
+      const headerHtml = renderHeader(state);
+      expect(headerHtml).not.toContain('h-weather-badge');
+      expect(headerHtml).not.toContain('h-weather-icon');
     });
 
-    it('generates consistent weather for each day', () => {
-      const w1 = getWeatherForDay(1);
-      const w1Repeat = getWeatherForDay(1);
-      expect(w1.id).toBe(w1Repeat.id);
-
-      const w2 = getWeatherForDay(2);
-      expect(w2.name).toBeTruthy();
-      expect(w2.icon).toBeTruthy();
-      expect(w2.flavorQuote).toBeTruthy();
-    });
-
-    it('renders weather HTML components correctly', () => {
-      const weather = SAIGON_WEATHERS.sudden_rain;
-      const stripHtml = renderWeatherAtmosphereStrip(weather);
-      expect(stripHtml).toContain('weather-atmosphere-strip');
-      expect(stripHtml).toContain(weather.badgeText);
-      expect(stripHtml).toContain(weather.icon);
-
-      const badgeHtml = renderWeatherChalkboardBadge(weather);
-      expect(badgeHtml).toContain('weather-badge');
-      expect(badgeHtml).toContain(weather.name);
+    it('ensures Chalkboard displays event badge cleanly without weather badge', () => {
+      const state = createInitialState();
+      const boardHtml = renderChalkboard(state, 'Trời Nắng Ráo');
+      expect(boardHtml).toContain('event-badge');
+      expect(boardHtml).not.toContain('weather-badge');
     });
   });
 

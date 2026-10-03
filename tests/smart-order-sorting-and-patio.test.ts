@@ -76,13 +76,13 @@ describe('Smart Order Sorting & Patio Visual Juice Features', () => {
     expect(friesIdx).toBeLessThan(summaryIdx); // Món chưa xong ở trên, dải thu gọn món xong ở dưới!
   });
 
-  it('3. Header displays pixel weather badge with icon and temperature', () => {
+  it('3. Header displays day box and phase clean without weather badge', () => {
     const state = createInitialState();
     const headerHtml = renderHeader(state);
 
-    expect(headerHtml).toContain('h-weather-badge');
-    expect(headerHtml).toContain('h-weather-icon');
-    expect(headerHtml).toContain('h-weather-text');
+    expect(headerHtml).toContain('h-day-box');
+    expect(headerHtml).toContain('Ngày 1');
+    expect(headerHtml).not.toContain('h-weather-badge');
   });
 
   it('4. Dine-In Patio uses pixel wood table asset and chewing/steam animation', () => {

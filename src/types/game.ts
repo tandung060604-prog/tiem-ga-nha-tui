@@ -615,7 +615,6 @@ export interface GameState {
   heardRadioBroadcastIds?: string[];
   activeRadioBuff?: RadioBuff | null;
   customSignatureDishesUnlocked?: string[];
-  todayWeather?: SaigonWeatherId;
   petPatio?: PetPatioState;
   claimedHeritageBadgeIds?: string[];
   unlockedThemeIds?: ShopThemeId[];
@@ -625,6 +624,8 @@ export interface GameState {
   freeOilFilterUsed?: boolean;       // Bác Ba trợ giá miễn phí 1 lần thay dầu đầu tiên ở Ngày 1-3 khi dầu bẩn
   testerFeedbackSubmissions?: Array<{ id: string; stars: number; category: string; comment: string; timestamp: string }>;
   seenStoryletIds?: string[];        // Ký ức đêm Hẻm 1102 (Storylet) đã đọc/trải nghiệm
+  lastStoryletDay?: number;          // Ngày gần nhất đã đọc storylet (mỗi ngày tối đa 1 mẩu truyện)
+  guidedFeatures?: string[];         // Danh sách tính năng theo ngày / món mới Bác Ba đã spotlight hướng dẫn
   onboardingGuideStep?: number;      // Bác Ba spotlight 3 bước ngày đầu: 1: Thả gà, 2: Vớt khay, 3: Lên món, 0/undefined: Xong
   onboardingGuideDismissed?: boolean; // Người chơi chủ động bấm Bỏ qua hướng dẫn
   day3FeedbackPrompted?: boolean;    // Đã hiện lời mời tester chấm sao & góp ý sau Ngày 2/3 chưa

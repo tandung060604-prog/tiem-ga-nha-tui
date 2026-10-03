@@ -20,10 +20,10 @@ export function renderEndlessModeModal(state: GameState): string {
             <span style="font-size: 1.8rem; animation: pulse 1.5s infinite;">🌙</span>
             <div>
               <div style="font-size: 0.68rem; font-weight: 800; color: #fbcfe8; letter-spacing: 1px; text-transform: uppercase;">
-                SURVIVAL RUSH HOUR
+                KHUNG GIỜ KHUYA 21:00 — 06:00 SÁNG
               </div>
-              <div style="font-size: 1.05rem; font-weight: 900; color: #fff; font-family: 'Silkscreen', 'VT323', monospace; text-shadow: 0 0 8px #f43f5e;">
-                CA ĐÊM BẤT TẬN
+              <div style="font-size: 1.05rem; font-weight: 900; color: #fff; font-family: 'Tiny5', 'Baloo 2', monospace; text-shadow: 0 0 8px #f43f5e;">
+                CA ĐÊM HẺM 1102
               </div>
             </div>
           </div>
@@ -51,23 +51,26 @@ export function renderEndlessModeModal(state: GameState): string {
             </div>
           </div>
 
-          <!-- Giới thiệu Thể Lực & Quy Tắc -->
-          <div style="background: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;">
+          <!-- Tác dụng & Điểm khác biệt so với ngày thường (Jev MCP Choice chill_night) -->
+          <div style="background: rgba(244, 63, 94, 0.08); border: 1.5px solid rgba(244, 63, 94, 0.4); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;">
             <div style="font-size: 0.72rem; font-weight: 800; color: #fda4af; display: flex; align-items: center; gap: 6px;">
-              <span>⚡</span>
-              <span>QUY TẮC SINH TỒN BẾP CA ĐÊM:</span>
+              <span>🌙</span>
+              <span>ĐẶC ĐIỂM CA ĐÊM (21:00 — 06:00 SÁNG):</span>
             </div>
-            <div style="font-size: 0.68rem; color: #cbd5e1; line-height: 1.4;">
-              • Khách hàng kéo đến liên tục không ngơi tay theo từng đợt sóng (Wave 1 - 20+).
+            <div style="font-size: 0.68rem; color: #f8fafc; line-height: 1.45;">
+              • <b>Khung giờ khuya</b>: Từ <b>21h tối đến 6h sáng</b>, mở bán khi ca ngày (10h-21h) đóng cửa.
             </div>
-            <div style="font-size: 0.68rem; color: #cbd5e1; line-height: 1.4;">
-              • Chiên <b style="color: #facc15;">Vàng Giòn (Perfect)</b> để kích hoạt Combo điểm x1.5 ➔ x3.5.
+            <div style="font-size: 0.68rem; color: #f8fafc; line-height: 1.45;">
+              • <b>Khách Cú Đêm đặc thù</b>: Game thủ cày rank, Tài xế xe ôm đêm, Lao công dọn phố, Nhóm bạn ăn khuya.
             </div>
-            <div style="font-size: 0.68rem; color: #cbd5e1; line-height: 1.4;">
-              • <b style="color: #f87171;">Bỏ lỡ 3 khách</b> trong một đợt sóng sẽ lập tức Hết Ca!
+            <div style="font-size: 0.68rem; color: #f8fafc; line-height: 1.45;">
+              • <b>Khách kiên nhẫn hơn +30%</b>: Ăn đêm thong thả, không hối thúc dí đơn, nhịp độ êm dịu hơn ban ngày.
             </div>
-            <div style="font-size: 0.68rem; color: #cbd5e1; line-height: 1.4;">
-              • <b style="color: #4ade80;">60% tiền bán gà</b> được chuyển thẳng vào quỹ quán sau khi kết thúc.
+            <div style="font-size: 0.68rem; color: #f8fafc; line-height: 1.45;">
+              • <b>Combo đêm & Tiền bo khủng +25%</b>: Khách gọi combo gà kèm bia/nước ngọt và sẵn sàng tip hậu hĩnh.
+            </div>
+            <div style="font-size: 0.68rem; color: #4ade80; line-height: 1.45; font-weight: 700;">
+              • <b>100% doanh thu & tiền bo</b> chuyển thẳng vào quỹ quán, giúp tích lũy tiền mặt bằng và trang trải chi phí nhanh hơn!
             </div>
           </div>
 

@@ -7,7 +7,7 @@ export function getWaveConfig(wave: number): EndlessWaveConfig {
   const safeWave = Math.max(1, wave);
   const customerCount = Math.min(16, 4 + safeWave * 2);
   const orderComplexity = Math.min(4, 1 + Math.floor(safeWave / 3));
-  const patienceMultiplier = Math.max(0.55, +(1.0 - (safeWave - 1) * 0.035).toFixed(2));
+  const patienceMultiplier = Math.max(0.75, +(1.30 - (safeWave - 1) * 0.03).toFixed(2)); // Khách đêm kiên nhẫn hơn +30%
   const targetScore = safeWave * 1500;
 
   return {
@@ -93,7 +93,7 @@ export function recordEndlessServe(
   }
 
   runState.customersServedThisWave += 1;
-  runState.totalMoneyEarned += Math.round(orderPaid * 0.6); // 60% doanh số chuyển thành tiền mặt
+  runState.totalMoneyEarned += orderPaid; // 100% doanh số chuyển thành tiền mặt cho quỹ quán
 
   const config = getWaveConfig(runState.currentWave);
   let newWaveUnlocked = false;

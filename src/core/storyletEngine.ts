@@ -41,6 +41,11 @@ export function getEligibleStorylets(state: GameState, pool: Storylet[]): Storyl
 }
 
 export function pickNightStorylet(state: GameState, pool: Storylet[]): Storylet | null {
+  // Giới hạn nghiêm ngặt theo Jev Decision (Confidence 1.0): Mỗi ngày chỉ 1 mẩu truyện duy nhất
+  if (state.lastStoryletDay && state.lastStoryletDay >= state.day) {
+    return null;
+  }
+
   const eligible = getEligibleStorylets(state, pool);
   if (eligible.length === 0) return null;
 
@@ -65,6 +70,7 @@ export function applyStoryletChoice(
   if (!state.seenStoryletIds.includes(storylet.id)) {
     state.seenStoryletIds.push(storylet.id);
   }
+  state.lastStoryletDay = state.day;
 
   // Cập nhật Karma
   if (effect.karmaDelta) {

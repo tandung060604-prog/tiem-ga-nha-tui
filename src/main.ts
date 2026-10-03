@@ -49,7 +49,8 @@ import { showPrepPopover } from './ui/components/PrepStation';
 import { staffEffects, tickStaff, fryingItemId, traySizeFor, hasAutoWork, missingItems, FRY_RECIPES, FRY_LOOK } from './core/staff';
 import {
   TutorialState, tutorialStep, tutorialHint, shouldRunTutorial, BAC_BA_GAME_TIPS,
-  shouldRunPrepTutorial, prepTutorialHint, PREP_TUTORIAL_STEPS, PrepTutorialStep
+  shouldRunPrepTutorial, prepTutorialHint, PREP_TUTORIAL_STEPS, PrepTutorialStep,
+  checkDailyFeatureUnlockGuide
 } from './core/tutorial';
 import { syncTutorialLayer } from './ui/components/TutorialLayer';
 import { weeklyWrapped } from './core/wrapped';
@@ -128,7 +129,6 @@ import { renderNightRadioModal } from './ui/components/NightRadioModal';
 import { getTonightRadioBroadcast, activateRadioBroadcastBuff } from './content/nightRadio';
 import { getUnlockedCurios } from './content/curiosAndRelics';
 import { getUnlockedSignatureDishes } from './content/signatureStoryDishes';
-import { getWeatherForDay } from './content/saigonWeather';
 import {
   petThePet,
   upgradePetPatio,
@@ -2036,6 +2036,42 @@ class AppController {
       if (this.prepTutorialStep) {
         this.endPrepTutorial();
       }
+
+      // Hướng dẫn tính năng mới theo ngày (Bác Ba Spotlight - Jev Decision Confidence 1.0)
+      const dailyGuide = checkDailyFeatureUnlockGuide(state);
+      if (dailyGuide) {
+        if (dailyGuide.tabToSwitch && this.activeTab !== dailyGuide.tabToSwitch) {
+          this.activeTab = dailyGuide.tabToSwitch;
+          this.render();
+        }
+        syncTutorialLayer({
+          step: dailyGuide.step as any,
+          text: dailyGuide.text,
+          target: dailyGuide.target,
+          button: dailyGuide.button
+        }, {
+          onButton: () => {
+            stateManager.update(draft => {
+              draft.guidedFeatures = draft.guidedFeatures || [];
+              if (!draft.guidedFeatures.includes(dailyGuide.key)) {
+                draft.guidedFeatures.push(dailyGuide.key);
+              }
+            });
+            syncTutorialLayer(null, { onButton: () => {}, onSkip: () => {} });
+          },
+          onSkip: () => {
+            stateManager.update(draft => {
+              draft.guidedFeatures = draft.guidedFeatures || [];
+              if (!draft.guidedFeatures.includes(dailyGuide.key)) {
+                draft.guidedFeatures.push(dailyGuide.key);
+              }
+            });
+            syncTutorialLayer(null, { onButton: () => {}, onSkip: () => {} });
+          }
+        });
+        return;
+      }
+
       return;
     }
 
@@ -2104,18 +2140,88 @@ class AppController {
   private lastShiftSnapshotAt = 0;
   private tutorial: TutorialState | null = null; // Bác Ba dẫn ca đầu
 
+  private sauceGuideActive = false;
+
   // Tính bước hướng dẫn từ trạng thái ca bán, vẽ bong bóng. Bước 'done' → đồng hồ chạy lại ngay.
   private updateTutorial(session: SellingSession) {
-    if (!this.tutorial) return;
-    const step = tutorialStep(this.tutorial, session, cookingEngine.getCookState(), cookingEngine.getTray(), cookingEngine.getActiveSeasoning());
-    session.tutorial = step !== 'done';
-    syncTutorialLayer(tutorialHint(step), {
-      onButton: () => {
-        if (step === 'intro' && this.tutorial) this.tutorial.introSeen = true;
-        else this.endTutorial();
-      },
-      onSkip: () => this.endTutorial()
-    });
+    if (this.tutorial) {
+      const step = tutorialStep(this.tutorial, session, cookingEngine.getCookState(), cookingEngine.getTray(), cookingEngine.getActiveSeasoning());
+      session.tutorial = step !== 'done';
+      syncTutorialLayer(tutorialHint(step), {
+        onButton: () => {
+          if (step === 'intro' && this.tutorial) this.tutorial.introSeen = true;
+          else this.endTutorial();
+        },
+        onSkip: () => this.endTutorial()
+      });
+      return;
+    }
+
+    // Hướng dẫn Bác Ba Spotlight khi lần đầu có món sốt cay hoặc sốt bơ tỏi (Jev Decision Confidence 1.0)
+    const state = stateManager.getState();
+    const hasSauceOrder = session.orders.some(o => o.items.some(it => it.menuItemId === 'spicy_chicken' || it.menuItemId === 'honey_garlic_chicken'));
+    if (hasSauceOrder && !state.guidedFeatures?.includes('sauce_cooking_guide')) {
+      this.sauceGuideActive = true;
+      const isSpicy = session.orders.some(o => o.items.some(it => it.menuItemId === 'spicy_chicken'));
+      const activeSauce = cookingEngine.getActiveSeasoning();
+      const cookState = cookingEngine.getCookState();
+
+      if (!activeSauce) {
+        const target = isSpicy ? '#btn-season-spicy' : '#btn-season-honey';
+        const sauceTitle = isSpicy ? 'Sốt Cay Yangnyeom' : 'Sốt Bơ Tỏi Thơm';
+        syncTutorialLayer({
+          step: 'season-spicy',
+          text: `Bác Ba chỉ nghề: Khách mê món Gà ${sauceTitle} kìa con! Nhớ quy tắc nghệ nhân: Chạm khay [${sauceTitle}] trên quầy trước đặng áo đều lớp sốt óng ả lên gà, rồi mới thả gà vô chảo chiên nghen con!`,
+          target,
+          button: 'Dạ Bác Ba!'
+        }, {
+          onButton: () => {},
+          onSkip: () => {
+            stateManager.update(draft => {
+              draft.guidedFeatures = draft.guidedFeatures || [];
+              if (!draft.guidedFeatures.includes('sauce_cooking_guide')) {
+                draft.guidedFeatures.push('sauce_cooking_guide');
+              }
+            });
+            this.sauceGuideActive = false;
+            syncTutorialLayer(null, { onButton: () => {}, onSkip: () => {} });
+          }
+        });
+      } else if (!cookState.isFrying) {
+        syncTutorialLayer({
+          step: 'fry-chicken',
+          text: 'Ướp sốt đỏ au thơm nức mũi rồi đó con! Giờ bấm nút [+ Gà Rán] thả miếng gà đã tẩm sốt vô chảo gang chiên đượm lửa nghen con!',
+          target: '#btn-fry-chicken',
+          button: 'Dạ con chiên liền!'
+        }, {
+          onButton: () => {},
+          onSkip: () => {
+            stateManager.update(draft => {
+              draft.guidedFeatures = draft.guidedFeatures || [];
+              if (!draft.guidedFeatures.includes('sauce_cooking_guide')) {
+                draft.guidedFeatures.push('sauce_cooking_guide');
+              }
+            });
+            this.sauceGuideActive = false;
+            syncTutorialLayer(null, { onButton: () => {}, onSkip: () => {} });
+          }
+        });
+      } else {
+        // Đã thả gà tẩm sốt vô chảo chiên -> Hoàn thành hướng dẫn sốt
+        stateManager.update(draft => {
+          draft.guidedFeatures = draft.guidedFeatures || [];
+          if (!draft.guidedFeatures.includes('sauce_cooking_guide')) {
+            draft.guidedFeatures.push('sauce_cooking_guide');
+          }
+        });
+        this.sauceGuideActive = false;
+        syncTutorialLayer(null, { onButton: () => {}, onSkip: () => {} });
+      }
+      return;
+    } else if (this.sauceGuideActive) {
+      this.sauceGuideActive = false;
+      syncTutorialLayer(null, { onButton: () => {}, onSkip: () => {} });
+    }
   }
 
   private endTutorial() {
@@ -2216,9 +2322,7 @@ class AppController {
     }
 
     // Số khách cả ngày: khách nền theo chương × sao × marketing × sự kiện (GDD)
-    const weather = getWeatherForDay(state.day);
-    const weatherMultiplier = weather?.dineInMultiplier ?? 1;
-    this.expectedCustomers = EconomyEngine.calculateDailyCustomerCount(state, (this.currentEvent.effect.customerMultiplier ?? 1) * weatherMultiplier);
+    this.expectedCustomers = EconomyEngine.calculateDailyCustomerCount(state, this.currentEvent.effect.customerMultiplier ?? 1);
     this.sellingSession.expectedCustomers = this.expectedCustomers;
     this.sellingSession.spawnedCount = this.sellingSession.orders.length;
 

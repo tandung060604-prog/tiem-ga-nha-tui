@@ -72,7 +72,7 @@ describe('Trụ Cột 5: Chế Độ Ca Đêm Bất Tận (Endless Rush Hour Cha
     expect(serve1.pointsEarned).toBeGreaterThan(0);
     expect(run.comboStreak).toBe(1);
     expect(run.score).toBe(serve1.pointsEarned);
-    expect(run.totalMoneyEarned).toBe(18000); // 60% của 30k
+    expect(run.totalMoneyEarned).toBe(30000); // 100% doanh thu chuyển vào quỹ quán
 
     // Phục vụ khách 2 Perfect (combo x1.15)
     const serve2 = recordEndlessServe(run, true, 30000);

@@ -10,7 +10,6 @@ import { INITIAL_MENU } from '../content/menu';
 import { upgradeEffects } from './upgrades';
 import { random, weightedPick } from './rng';
 import { ASSETS } from '../content/assets';
-import { getWeatherForDay, SAIGON_WEATHERS } from '../content/saigonWeather';
 import { assignDietaryPreference } from './loyaltyEngine';
 
 // Món khách được gọi = món có trạm trong bếp (đọc từ content, không từ save cũ).
@@ -158,11 +157,6 @@ export class OrdersEngine {
     const walkupRush = isWalkupDrink ? 0.6 : isCriticVip ? 0.85 : 1; // người đi đường vội, critic khó tính
     let patienceMax = Math.max(12, Math.round((28 + random() * 12 + spaceBonus + orderSizeBonus) * char.patienceMultiplier * patienceBoost * priceTolerance * walkupRush));
 
-    // Hiệp đồng Thời Tiết Sài Gòn & Kỷ Vật Hẻm & Thú Cưng
-    const weather = state.todayWeather ? SAIGON_WEATHERS[state.todayWeather] : getWeatherForDay(state.day);
-    if (weather?.patienceModifier) {
-      patienceMax = Math.round(patienceMax * weather.patienceModifier);
-    }
     // Kỷ vật Khăn Rằn Bác Ba: +3s kiên nhẫn
     if (state.unlockedCurioIds?.includes('relic_khan_ran_bacba')) {
       patienceMax += 3;

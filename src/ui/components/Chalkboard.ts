@@ -5,7 +5,6 @@ import { currentChapterData, chapterProgress, depositStatus } from '../../core/p
 import { finaleReady } from '../../content/endings';
 import { ASSETS } from '../../content/assets';
 import { DAILY_INCIDENTS } from '../../content/dailyIncidents';
-import { getWeatherForDay } from '../../content/saigonWeather';
 import { getClaimableBadgesCount } from '../../core/achievementsEngine';
 
 export function renderChalkboard(state: GameState, currentEventTitle: string = 'Trời Nắng Ráo'): string {
@@ -14,7 +13,6 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
   const deposit = depositStatus(state);
   const progressPercent = Math.round(chapterProgress(state) * 100);
   const vnd = (n: number) => n.toLocaleString('vi-VN') + 'đ';
-  const weather = getWeatherForDay(state.day);
   const day = state.day || 1;
   const chapter = state.currentChapter || 1;
   const claimableBadges = getClaimableBadgesCount(state);
@@ -28,7 +26,7 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
           <h2><img src="${ASSETS.icons.book}" class="board-pixel-icon-sm" alt="" /> Ngày ${state.day} · ${weekdayOf(state.day)}</h2>
         </div>
         <div class="board-header-right" style="display: flex; align-items: center; gap: 6px;">
-          <span class="weather-badge" title="${weather.flavorQuote}">${weather.name} · ${currentEventTitle}${isWeekend(state.day) ? ' · Cuối tuần' : ''}</span>
+          <span class="event-badge">${currentEventTitle}${isWeekend(state.day) ? ' · Cuối tuần' : ''}</span>
           <button id="btn-toggle-chalkboard" class="btn-chalkboard-toggle" title="Thu gọn / Mở rộng Bảng Kế Hoạch">
             <span class="toggle-icon">▼</span>
           </button>
