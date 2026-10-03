@@ -128,26 +128,24 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
               </div>
               ` : ''}
 
-              ${(day >= 3 || chapter >= 2) ? `
               <!-- Ngăn 3: Chốn Bình Yên Hẻm -->
               <div class="toolbox-drawer drawer-cozy">
                 <div class="drawer-header">
                   <img src="${ASSETS.icons.radio}" class="btn-pixel-icon-xs" alt="" /> Chốn Nghỉ Hẻm
                 </div>
                 <div class="drawer-actions">
-                  <button id="btn-open-night-radio" class="btn-sm btn-toolbox" title="Đài Phát Thanh Đêm Sài Gòn (FM 99.9 MHz)">
-                    <img src="${ASSETS.icons.radio}" class="btn-pixel-icon-xs" alt="" /> Đài Đêm FM 99.9
+                  <button id="btn-open-night-radio" class="btn-sm btn-toolbox ${(state.lastRadioBroadcastDay !== state.day) ? 'has-gift' : ''}" title="Đài Phát Thanh Đêm Sài Gòn (FM 99.9 MHz) - Nhận Buff & Dự Báo Thời Tiết">
+                    <img src="${ASSETS.icons.radio}" class="btn-pixel-icon-xs" alt="" /> Đài Đêm FM 99.9 ${(state.lastRadioBroadcastDay !== state.day) ? '<span class="badge-dot-pulse">✨</span>' : (state.activeRadioBuff ? '<span style="color:#16a34a; font-weight:800; font-size:0.65rem;">✓</span>' : '')}
                   </button>
                   ${hasPet ? `
                     <button id="btn-open-pet-patio" class="btn-sm btn-toolbox" title="Góc Thú Cưng Hiên Quán (Cậu Vàng & Bé Mướp)">
                       <img src="${ASSETS.icons.cat}" class="btn-pixel-icon-xs" alt="" /> Thú Cưng Hiên Quán
                     </button>
-                  ` : `
+                  ` : (day >= 4 ? '' : `
                     <span class="drawer-locked-hint">🐾 Nhận nuôi bé (Ngày 4)</span>
-                  `}
+                  `)}
                 </div>
               </div>
-              ` : ''}
 
               ${(day >= 3 || chapter >= 2) ? `
               <!-- Ngăn 4: Thử Thách & Đua Top -->

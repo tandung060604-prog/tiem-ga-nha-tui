@@ -2195,9 +2195,17 @@ class AppController {
     cookingEngine.setFryRampBonus(upgradeEffects(state.upgrades).fryRampPct);
     // Kỷ vật Chiếc Vá Gỗ Năm 1990: nới rộng cửa sổ Perfect thêm +4%
     const hasVaGoRelic = state.unlockedCurioIds?.includes('relic_va_go_1990');
-    cookingEngine.setPerfectWindowBonus(hasVaGoRelic ? 4 : 0);
+    // Hiệp đồng Radio Buff Mẹo Canh Lửa Bác Ba: nới rộng cửa sổ Perfect thêm +12%
+    const hasChefWisdom = state.activeRadioBuff?.type === 'chef_wisdom' && state.activeRadioBuff.activeForDay === state.day;
+    cookingEngine.setPerfectWindowBonus((hasVaGoRelic ? 4 : 0) + (hasChefWisdom ? 12 : 0));
     cookingEngine.clearTray();
     cookingEngine.setTraySize(traySizeFor(state));
+
+    if (state.activeRadioBuff && state.activeRadioBuff.activeForDay === state.day) {
+      setTimeout(() => {
+        this.showToast(`📻 Sóng FM 99.9: Kích hoạt ${state.activeRadioBuff!.title}!`);
+      }, 600);
+    }
     this.customerSource = createCustomerSource(state, this.currentEvent);
     this.sellingSession.orders.push(...this.customerSource.opening());
     this.sellingSession.thiefSchedule = scheduleThiefEvents(state.day);

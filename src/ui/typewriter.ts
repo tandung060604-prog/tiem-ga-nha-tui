@@ -19,7 +19,8 @@ export interface TypewriterOptions {
 export class TypewriterPlayer {
   private isCancelled = false;
   private isSkipped = false;
-  private timer: number | null = null;
+  private timer: any = null;
+  private resolvePromise: (() => void) | null = null;
 
   constructor(
     private targetEl: HTMLElement,
@@ -33,24 +34,34 @@ export class TypewriterPlayer {
     this.targetEl.textContent = '';
 
     return new Promise((resolve) => {
+      this.resolvePromise = resolve;
       let i = 0;
       const tick = () => {
         if (this.isCancelled) {
-          resolve();
+          if (this.resolvePromise) {
+            this.resolvePromise();
+            this.resolvePromise = null;
+          }
           return;
         }
 
         if (this.isSkipped || i >= this.fullText.length) {
           this.targetEl.textContent = this.fullText;
           if (this.options.onComplete) this.options.onComplete();
-          resolve();
+          if (this.resolvePromise) {
+            this.resolvePromise();
+            this.resolvePromise = null;
+          }
           return;
         }
 
         const char = this.fullText[i];
         if (!char) {
           if (this.options.onComplete) this.options.onComplete();
-          resolve();
+          if (this.resolvePromise) {
+            this.resolvePromise();
+            this.resolvePromise = null;
+          }
           return;
         }
         this.targetEl.textContent += char;
@@ -65,7 +76,7 @@ export class TypewriterPlayer {
         }
 
         i++;
-        this.timer = window.setTimeout(tick, speed);
+        this.timer = setTimeout(tick, speed);
       };
 
       tick();
@@ -75,20 +86,28 @@ export class TypewriterPlayer {
   public skip(): void {
     this.isSkipped = true;
     if (this.timer !== null) {
-      window.clearTimeout(this.timer);
+      clearTimeout(this.timer);
       this.timer = null;
     }
     this.targetEl.textContent = this.fullText;
     if (this.options.onComplete) {
       this.options.onComplete();
     }
+    if (this.resolvePromise) {
+      this.resolvePromise();
+      this.resolvePromise = null;
+    }
   }
 
   public cancel(): void {
     this.isCancelled = true;
     if (this.timer !== null) {
-      window.clearTimeout(this.timer);
+      clearTimeout(this.timer);
       this.timer = null;
+    }
+    if (this.resolvePromise) {
+      this.resolvePromise();
+      this.resolvePromise = null;
     }
   }
 }
