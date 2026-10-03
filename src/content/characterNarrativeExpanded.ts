@@ -587,7 +587,7 @@ export const CHARACTER_EPISODES_EXPANDED: CharacterEpisode[] = [
       },
       {
         speaker: 'Bác Ba',
-        text: 'Lần này có cả xóm hẻm đứng sau lưng, bác cháu mình quyết không lùi một bước!',
+        text: 'Lần này có cả xóm hẻm đứng sau lưng, bác với con quyết hổng lùi một bước!',
         mood: 'tense',
       },
     ],

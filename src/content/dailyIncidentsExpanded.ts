@@ -2319,7 +2319,7 @@ export const EXPANDED_DAILY_INCIDENTS: DailyIncident[] = [
     emoteBubble: '📜',
     characterRole: 'Cội Nguồn Di Sản Hẻm 1102',
     context: 'Bác Ba tuổi đã cao, gọi bạn sang căn nhà cổ, run run mở chiếc tráp gỗ lim lấy ra cuốn sổ ố vàng ghi chép những công thức ướp gà thảo mộc cổ truyền của xứ Nam Kỳ.',
-    dialogue: 'Cả đời bác giữ cuốn sổ này... Nay thấy cháu có tâm với nghề bếp, bác yên lòng trao lại cho cháu làm rạng danh ẩm thực nước mình...',
+    dialogue: 'Cả đời bác giữ cuốn sổ này... Nay thấy con có tâm với nghề bếp, bác yên lòng trao lại cho con làm rạng danh ẩm thực nước mình nghen...',
     phaseTiming: 'morning',
     isSecurityRisk: false,
     minChapter: 5,

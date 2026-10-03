@@ -84,7 +84,7 @@ export const BAC_BA_GAME_TIPS: BacBaGameTip[] = [
   {
     id: 'tip_sauce',
     trigger: 'sauce_needed',
-    text: 'Bác Ba chỉ nghề: Khách gọi Gà Sốt kìa cháu! Chạm khay [🌶️ Sốt Cay] hoặc [🧄 Bơ Tỏi] trước, rồi chạm [Gà Tẩm Bột] thả chảo là thành Gà Sốt thơm nức mũi nhé!'
+    text: 'Bác Ba chỉ nghề: Khách gọi Gà Sốt kìa con! Chạm khay [🌶️ Sốt Cay] hoặc [🧄 Bơ Tỏi] trước, rồi chạm [Gà Tẩm Bột] thả chảo là thành Gà Sốt thơm nức mũi nghen con!'
   },
   {
     id: 'tip_oil',

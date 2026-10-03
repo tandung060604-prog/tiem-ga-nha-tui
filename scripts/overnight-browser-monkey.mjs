@@ -8,11 +8,12 @@
  */
 
 import { chromium } from 'playwright-core';
-import { appendFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { appendFileSync, writeFileSync, mkdirSync, existsSync, readFileSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 
 const LOG_FILE = 'logs/overnight-browser-monkey.log';
 const REPORT_MD = 'docs/bao-cao-test-xuyen-dem.md';
+const JEV_TRIAGE_FILE = 'logs/jev-triage-events.json';
 mkdirSync('logs/screenshots', { recursive: true });
 
 writeFileSync(LOG_FILE, `=== BẮT ĐẦU TEST XUYÊN ĐÊM TRÌNH DUYỆT: ${new Date().toISOString()} ===\n`);
@@ -23,10 +24,27 @@ function log(msg) {
   appendFileSync(LOG_FILE, line + '\n');
 }
 
-function triggerJevTriage(title, symptom, source) {
-  // Ghi log lỗi vào file an toàn, tuyệt đối KHÔNG spawn child process shell để tránh bão cửa sổ PowerShell/CMD trên Windows
+function triggerJevTriage(title, symptom, source, extra = {}) {
+  // Ghi log lỗi vào file an toàn, lưu structured JSON cho TypeSafe AI Jev MCP phân tích tự động
   const line = `[TRIAGE LOG] ${title}: ${symptom} (${source})`;
   log(line);
+  try {
+    const entry = {
+      timestamp: new Date().toISOString(),
+      title,
+      symptom,
+      source,
+      ...extra
+    };
+    let list = [];
+    if (existsSync(JEV_TRIAGE_FILE)) {
+      try {
+        list = JSON.parse(readFileSync(JEV_TRIAGE_FILE, 'utf-8'));
+      } catch {}
+    }
+    list.push(entry);
+    writeFileSync(JEV_TRIAGE_FILE, JSON.stringify(list, null, 2), 'utf-8');
+  } catch {}
 }
 
 // Đọc tham số dòng lệnh: node scripts/overnight-browser-monkey.mjs [--hours H] [--days D] [--headless false] [--url URL]
@@ -158,6 +176,9 @@ class OvernightMonkey {
         if (acted) {
           this.totalActions++;
           lastActionTimestamp = Date.now();
+          if (this.totalActions % 150 === 0) {
+            log(`⚡ [Đang vận hành ca bán] Đã thực hiện ${this.totalActions} thao tác UI...`);
+          }
         }
 
         await sleep(ACTION_DELAY_MS);
@@ -175,7 +196,7 @@ class OvernightMonkey {
 
   async dismissTitleScreen(page) {
     // 0a. Bỏ qua Video Intro Cinematic nếu có (hỗ trợ cả chạm toàn màn hình)
-    const introBtn = page.locator('#btn-intro-start-game, #btn-intro-skip-top, #intro-cinematic-overlay, #intro-tap-prompt, .intro-tap-prompt');
+    const introBtn = page.locator('#btn-intro-start-game, #btn-intro-skip-top, #intro-cinematic-overlay:not(.fade-out-screen), #intro-tap-prompt, .intro-tap-prompt');
     if (await introBtn.first().isVisible({ timeout: 1500 }).catch(() => false)) {
       log(`🎬 Đóng Video Mở Màn AI...`);
       await introBtn.first().click({ force: true });
@@ -209,7 +230,7 @@ class OvernightMonkey {
   async performChaosStep(page) {
     // A. XỬ LÝ CÁC MODAL & MÀN HÌNH ĐẶC BIỆT (ƯU TIÊN SỐ 1 ĐỂ KHÔNG BỊ BLOCKED)
     // 0a. Video Mở Màn AI (Intro Cinematic Modal - chạm toàn màn hình hoặc nút)
-    const introBtn = page.locator('#btn-intro-start-game, #btn-intro-skip-top, #intro-cinematic-overlay, #intro-tap-prompt, .intro-tap-prompt');
+    const introBtn = page.locator('#btn-intro-start-game, #btn-intro-skip-top, #intro-cinematic-overlay:not(.fade-out-screen), #intro-tap-prompt, .intro-tap-prompt');
     if (await introBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
       log(`🎬 Đóng Video Mở Màn AI...`);
       await introBtn.first().click({ force: true });
@@ -268,7 +289,7 @@ class OvernightMonkey {
     }
 
     // 0. Màn hình chính Title Screen (khi reload trang, hot reload hoặc mới vào lại)
-    const titlePlayBtn = page.locator('#btn-title-play');
+    const titlePlayBtn = page.locator('#title-screen #btn-title-play, #btn-title-play');
     if (await titlePlayBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
       log(`👉 Nhận diện màn hình chính Title Screen -> Bấm TIẾP TỤC / VÀO TIỆM...`);
       await titlePlayBtn.first().click({ force: true });
@@ -494,8 +515,8 @@ class OvernightMonkey {
       return true;
     }
 
-    // 16c. Các Modal Hệ Thống Khác (Radio, Bằng Khen, Thử Thách Tuần, Ca Đêm, Biển Hiệu, Kỷ Niệm, Lobby, Sổ Tay Bếp, Tester Feedback, Sổ Tay Tri Kỷ, Phòng Lưu Niệm)
-    const extraModalClose = page.locator('#btn-close-gallery, #btn-close-loyalty-modal, .btn-claim-alley-gift, #btn-summary-open-loyalty, #btn-close-night-radio, #btn-close-achievements, .btn-claim-badge, #btn-close-weekly-quests, .btn-claim-quest, #btn-close-shop-theme, #btn-close-endless, #btn-close-memories, #btn-close-leaderboard, #btn-close-kitchen-guide, #btn-close-kitchen-guide-bottom, #btn-close-tester-feedback');
+    // 16c. Các Modal Hệ Thống Khác (Radio, Bằng Khen, Thử Thách Tuần, Ca Đêm, Biển Hiệu, Kỷ Niệm, Lobby, Sổ Tay Bếp, Sổ Tay Tri Kỷ, Phòng Lưu Niệm)
+    const extraModalClose = page.locator('#btn-close-gallery, #btn-close-loyalty-modal, .btn-claim-alley-gift, #btn-summary-open-loyalty, #btn-close-night-radio, #btn-close-achievements, .btn-claim-badge, #btn-close-weekly-quests, .btn-claim-quest, #btn-close-shop-theme, #btn-close-endless, #btn-close-memories, #btn-close-leaderboard, #btn-close-kitchen-guide, #btn-close-kitchen-guide-bottom');
     if (await extraModalClose.first().isVisible({ timeout: 50 }).catch(() => false)) {
       log(`🧩 Xử lý đóng modal hệ thống / Quà tri kỷ / Phòng lưu niệm...`);
       await extraModalClose.first().click({ force: true });
@@ -503,10 +524,39 @@ class OvernightMonkey {
       return true;
     }
 
-    // 17. Modal Thỏ Cam & Thư Tín
-    const bunnyBtn = page.locator('#btn-bunny-close, #btn-claim-bunny, .btn-bunny-letter');
+    // 17. Modal Bé Gà Bông & 18 Mảnh Giấy Nhớ (Plan V3 Memos & Album)
+    const bunnyBtn = page.locator('#btn-claim-bunny-letter, #btn-open-bunny-album, #btn-close-bunny-modal, #btn-close-bunny-album, #btn-bunny-close, #btn-claim-bunny, .btn-bunny-letter, .bunny-dialog-modal button, #btn-read-full-novel');
     if (await bunnyBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`💌 Nhận diện Thư Bé Gà Bông / 18 Mảnh Giấy Nhớ -> Tiếp nhận & gửi lời cảm ơn...`);
       await bunnyBtn.first().click({ force: true });
+      await sleep(250);
+      return true;
+    }
+
+    // 17b. Banner Bác Ba Onboarding Guide (#onboarding-guide-banner)
+    const onboardingBtn = page.locator('#btn-skip-onboarding, #onboarding-guide-banner #btn-skip-onboarding');
+    if (await onboardingBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`👴 Bác Ba Onboarding Guide -> Đã hiểu / Bỏ qua...`);
+      await onboardingBtn.first().click({ force: true });
+      await sleep(200);
+      return true;
+    }
+
+    // 17c. Modal Góp Ý Tester (Tester Feedback Modal)
+    const testerFeedbackBtn = page.locator('#btn-close-tester-feedback, #btn-submit-tester-feedback');
+    if (await testerFeedbackBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`💬 Đóng modal Góp Ý Tester...`);
+      await testerFeedbackBtn.first().click({ force: true });
+      await sleep(200);
+      return true;
+    }
+
+    // 17d. Modal Rủ Bạn Bè Đua Top (Social Share Modal)
+    const socialShareBtn = page.locator('#btn-close-social-share');
+    if (await socialShareBtn.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`👥 Đóng modal Rủ Bạn Bè Đua Top...`);
+      await socialShareBtn.first().click({ force: true });
+      await sleep(200);
       return true;
     }
 
@@ -860,12 +910,28 @@ class OvernightMonkey {
       if (confirmOkBtn instanceof HTMLElement) confirmOkBtn.click();
 
       // Dọn dẹp tất cả modal truyện cư dân, minigame, hệ thống
-      const specialModals = document.querySelectorAll('#modal-character-story, #modal-char-reaction, #modal-thief-minigame, #modal-thief-result, #modal-night-radio, #modal-achievements-wall, #modal-shop-theme, #modal-endless-mode, #modal-memories-album, #modal-weekly-quests, #modal-leaderboard, #sauce-minigame-modal, .sauce-modal-overlay, #loyalty-handbook-modal, .loyalty-modal-overlay, #memory-gallery-modal');
+      const specialModals = document.querySelectorAll('#modal-character-story, #modal-char-reaction, #modal-thief-minigame, #modal-thief-result, #modal-night-radio, #modal-achievements-wall, #modal-shop-theme, #modal-endless-mode, #modal-memories-album, #modal-weekly-quests, #modal-leaderboard, #sauce-minigame-modal, .sauce-modal-overlay, #loyalty-handbook-modal, .loyalty-modal-overlay, #memory-gallery-modal, #tester-feedback-modal, #social-share-modal, .bunny-dialog-modal, #modal-bunny, .storylet-night-modal, #onboarding-guide-banner');
       for (const sm of specialModals) {
         if (sm instanceof HTMLElement) sm.remove();
       }
-      const charChoice = document.querySelector('.storylet-choice-btn, .btn-char-story-choice, #btn-dismiss-char-reaction, #btn-close-char-story, #btn-close-gallery');
+      const charChoice = document.querySelector('.storylet-choice-btn, .btn-char-story-choice, #btn-dismiss-char-reaction, #btn-close-char-story, #btn-close-gallery, #btn-claim-bunny-letter, #btn-close-bunny-modal, #btn-skip-onboarding, #btn-close-tester-feedback, #btn-close-social-share');
       if (charChoice instanceof HTMLElement) charChoice.click();
+
+      const bunnyModalBtns = document.querySelectorAll('#btn-claim-bunny-letter, #btn-close-bunny-modal, #btn-open-bunny-album, #btn-read-full-novel, #btn-close-bunny-album, #btn-bunny-close, #btn-claim-bunny');
+      for (const bb of bunnyModalBtns) {
+        if (bb instanceof HTMLElement) bb.click();
+      }
+
+      const onboardingSkip = document.getElementById('btn-skip-onboarding');
+      if (onboardingSkip instanceof HTMLElement) onboardingSkip.click();
+      const onboardingBanner = document.getElementById('onboarding-guide-banner');
+      if (onboardingBanner) onboardingBanner.remove();
+
+      const socialClose = document.getElementById('btn-close-social-share');
+      if (socialClose instanceof HTMLElement) socialClose.click();
+
+      const feedbackClose = document.getElementById('btn-close-tester-feedback');
+      if (feedbackClose instanceof HTMLElement) feedbackClose.click();
 
       const thiefActions = document.querySelectorAll('#btn-guard-instant-bust, #btn-thief-strike, #btn-thief-finish-success, #btn-thief-finish-failure');
       for (const tb of thiefActions) {

@@ -1,4 +1,6 @@
 import { ASSETS } from '../../content/assets';
+import { music } from '../../core/music';
+import { bacBaVoice } from '../../core/bacBaVoice';
 export const INTRO_DURATION_SECONDS = 12;
 
 export interface IntroCinematicOptions {
@@ -71,6 +73,19 @@ export function renderIntroCinematicModal(): string {
           </div>
         </div>
 
+        <!-- Lời chào Bác Ba Nam Bộ mở màn Hẻm 1102 -->
+        <div class="intro-bacba-speech-container" id="intro-bacba-speech">
+          <div class="intro-bacba-bubble">
+            <img src="${ASSETS.bacba.front}" alt="Bác Ba" class="intro-bacba-avatar" />
+            <div class="intro-bacba-text-wrap">
+              <div class="intro-bacba-speaker">👴 BÁC BA NGHỆ NHÂN CHỢ LỚN</div>
+              <div class="intro-bacba-text">
+                “Mèn đét ơi! Sáng sớm mà Hẻm 1102 đã thơm phức mùi gà chiên giòn rụm rồi nghen! Nhào vô phụ Bác Ba một tay đặng tiệm mình khai trương hồng phát nghen con! 🍗✨”
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Dòng chữ nhấp nháy phát sáng ở đáy: CHẠM VÀO MÀN HÌNH ĐỂ VÀO GAME -->
         <div class="intro-tap-prompt-container">
           <div class="intro-tap-prompt" id="intro-tap-prompt">
@@ -138,22 +153,16 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
       videoEl.style.display = 'block';
       if (imgEl) imgEl.style.display = 'none';
 
-      // Thử phát có âm thanh trước (Unmuted playback)
-      videoEl.muted = false;
-      const playPromise = videoEl.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            // Trình duyệt cho phép phát tiếng ngay lập tức!
-            updateSoundUI(false);
-          })
-          .catch(() => {
-            // Trình duyệt chặn autoplay có tiếng (chờ tương tác người dùng)
-            // -> Fallback sang muted autoplay để video vẫn chạy hình ảnh mượt mà
-            videoEl.muted = true;
-            updateSoundUI(true);
-            videoEl.play().catch(() => {});
-          });
+      // Luôn tắt tiếng video gốc (triệt tiêu triệt để tạp âm / tiếng nước ngoài từ mô hình AI Veo)
+      videoEl.muted = true;
+      videoEl.play().catch(() => {});
+
+      // Đồng bộ trạng thái âm thanh game thuần Việt
+      if (music.isEnabled()) {
+        music.start('title');
+        updateSoundUI(false);
+      } else {
+        updateSoundUI(true);
       }
     };
 
@@ -182,14 +191,15 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
     e.preventDefault();
     if (!videoEl) return;
 
-    if (videoEl.muted) {
-      videoEl.muted = false;
-      videoEl.volume = 1.0;
-      videoEl.play().catch(() => {});
-      updateSoundUI(false);
-    } else {
-      videoEl.muted = true;
+    if (music.isEnabled()) {
+      music.setEnabled(false);
+      music.stop();
       updateSoundUI(true);
+    } else {
+      music.setEnabled(true);
+      music.start('title');
+      bacBaVoice.speak('instruction');
+      updateSoundUI(false);
     }
   };
 
@@ -224,6 +234,10 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
       try { videoEl.pause(); } catch {}
     }
 
+    if (music.isEnabled()) {
+      music.start('title');
+    }
+
     // Hiệu ứng chuyển cảnh màn hình mượt mà (Fade out & Flash golden transition)
     overlay.classList.add('fade-out-screen');
     setTimeout(() => {
@@ -250,16 +264,16 @@ export function openIntroCinematicModal(options: IntroCinematicOptions): void {
       return;
     }
 
-    // Nếu video đang bị tắt tiếng (do trình duyệt ép muted), chạm màn hình sẽ bật tiếng ngay lập tức!
-    if (videoEl && videoEl.muted) {
-      videoEl.muted = false;
-      videoEl.volume = 1.0;
-      videoEl.play().catch(() => {});
+    // Nếu âm thanh đang tắt, chạm lần đầu sẽ kích hoạt âm thanh game thuần Việt & cất giọng Bác Ba
+    if (!music.isEnabled()) {
+      music.setEnabled(true);
+      music.start('title');
+      bacBaVoice.speak('instruction');
       updateSoundUI(false);
       return;
     }
 
-    // Khi video đã có tiếng hoặc chạm tiếp: vào game
+    // Khi âm thanh đã bật hoặc chạm tiếp: vào game
     closeAndProceed();
   };
 

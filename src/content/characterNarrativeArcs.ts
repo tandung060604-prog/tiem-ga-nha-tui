@@ -27,7 +27,7 @@ const CHAPTER_1_EPISODES: CharacterEpisode[] = [
     dialogueLines: [
       {
         speaker: 'Bác Ba',
-        text: 'Dầu chưa sôi bọt tăm mà vội thả gà vào thì ngấy mỡ. Dầu quá lửa thì đắng chát cháy da. Nghề bếp với đời người cũng y chang vậy đó con à.',
+        text: 'Dầu chưa sôi bọt tăm mà vội thả gà vô thì ngấy mỡ. Dầu quá lửa thì đắng chát cháy da. Nghề bếp với đời người cũng y chang vậy đó con nghen.',
         mood: 'normal',
       },
       {
@@ -37,7 +37,7 @@ const CHAPTER_1_EPISODES: CharacterEpisode[] = [
       },
       {
         speaker: 'Bác Ba',
-        text: 'Năm 1990, tiệm Gà Chợ Lớn của thầy Võ Hòa cũng bắt đầu từ một chảo gang mép cống y vầy. Quan trọng không phải cái chảo sang, mà là cái tâm của đứa đứng bếp.',
+        text: 'Năm 1990, tiệm Gà Chợ Lớn của thầy Võ Hòa cũng bắt đầu từ một chảo gang mép cống y vầy. Quan trọng hổng phải cái chảo sang, mà là cái tâm của đứa đứng bếp.',
         mood: 'touched',
       },
     ],
@@ -97,7 +97,7 @@ const CHAPTER_1_EPISODES: CharacterEpisode[] = [
         id: 'bac_ba_02_fight_for_alley',
         label: 'Cam kết cùng Bác Ba và bà con giữ gìn văn hóa ẩm thực hẻm bằng mọi giá',
         kicker: '🛡️ GIỮ LỬA HẺM NGHÈO',
-        reactionDialogue: 'Bác Ba đập tay xuống bàn, mắt ánh lên quyết tâm: "Tốt lắm! Bác cháu mình sẽ chứng minh con hẻm này là cái hồn của thành phố, không tiền nào mua nổi!"',
+        reactionDialogue: 'Bác Ba đập tay xuống bàn, mắt ánh lên quyết tâm: "Tốt lắm! Bác với con sẽ chứng minh con hẻm này là cái hồn của thành phố, hổng có tiền nào mua nổi!"',
         causalityNotice: 'Mở khóa nhánh đoàn kết cư dân! Cả hẻm sẽ bảo vệ tiệm khi gặp biến cố lớn.',
         karmaEffect: { community: 25, ambition: -10 },
         rewardReputation: 15,
