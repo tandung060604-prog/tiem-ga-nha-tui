@@ -85,12 +85,12 @@
   --pixel-red: #d92534;
   --pixel-night-blue: #1c2646;
 
-  /* Typography - Phương Án A (Dual-Font: Stardew Valley & Kairosoft Hybrid) */
-  --font-display: "Tiny5 Duo", "Silkscreen", "VT323", monospace;
-  --font-heading: "Tiny5 Duo", "Silkscreen", "VT323", monospace;
+  /* Typography - Chuẩn hóa 100% tiếng Việt không lỗi font (Tiny5 Duo, Baloo 2 & Be Vietnam Pro) */
+  --font-display: "Tiny5 Duo", "Baloo 2", "Be Vietnam Pro", sans-serif;
+  --font-heading: "Tiny5 Duo", "Baloo 2", "Be Vietnam Pro", sans-serif;
   --font-body: "Be Vietnam Pro", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-handwriting: "Be Vietnam Pro", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-pixel-heading: "Tiny5 Duo", "Silkscreen", "VT323", monospace;
+  --font-handwriting: "Baloo 2", "Be Vietnam Pro", sans-serif;
+  --font-pixel-heading: "Tiny5 Duo", "Baloo 2", "Be Vietnam Pro", sans-serif;
   --font-pixel-body: "Be Vietnam Pro", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-pixel-mono: "VT323", monospace;
 

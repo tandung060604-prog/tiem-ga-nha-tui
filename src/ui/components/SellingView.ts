@@ -1199,9 +1199,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         ${rush ? `<span class="rush-badge"><img src="${ASSETS.icons.fireRush}" class="hud-pixel-icon" alt="" /> CA CAO ĐIỂM!</span>` : `<span class="session-ambience">${timePeriodLabel}</span>`}
         ${state.secretSauceDay?.buffActive ? `<span class="sauce-buff-hud-badge" title="Sốt Bí Truyền đang kích hoạt: +3k tip mỗi đơn!"><img src="${ASSETS.icons.sauce}" class="hud-pixel-icon" alt="" /> Sốt Vàng</span>` : ''}
         <div class="hud-actions" style="display: flex; gap: 5px; align-items: center;">
-          <button id="btn-open-kitchen-guide" class="btn-sm" style="padding: 4px 8px; font-size: 0.72rem; font-weight: 800; background: #faeed1; color: #5a3516; border: 1.5px solid #8b5a2b; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 44px; min-width: 60px; box-sizing: border-box;" title="Sổ Tay Bếp Trưởng: Tra cứu công thức chuẩn">
-            📖 <span>Sổ Tay</span>
-          </button>
+          <button id="btn-open-kitchen-guide" class="btn-sm" style="display: none !important;" aria-hidden="true" title="Sổ Tay Bếp Trưởng"></button>
           <button id="btn-toggle-fast" class="btn-sm btn-toggle-fast">
             ${session.isFastForward ? '⏩ Tua x2' : '▶️ 1x'}
           </button>
@@ -1319,16 +1317,8 @@ export function renderSellingView(state: GameState, session: SellingSession): st
               <div class="pot-hint">${potHint()}</div>
             </div>
 
-            <!-- Perfect Streak Flame Banner -->
-            <div class="streak-flame-container" id="streak-flame-container" data-streak="${session.perfectStreak || 0}">
-              ${session.perfectStreak >= 2 ? `
-                <div class="streak-flame ${session.perfectStreak >= 5 ? 'super-fire' : ''}" data-streak="${session.perfectStreak}">
-                  <span class="flame-icon">🔥</span>
-                  <span class="streak-count">Chuỗi x${session.perfectStreak} PERFECT!</span>
-                  <span class="streak-bonus">${streakTipLabel(session.perfectStreak)}</span>
-                </div>
-              ` : ''}
-            </div>
+            <!-- Perfect Streak Flame Banner (Bảo lưu 100% cơ chế tính toán nhưng ẩn hiển thị tại quầy theo thiết kế tối giản) -->
+            <div class="streak-flame-container" id="streak-flame-container" data-streak="${session.perfectStreak || 0}" style="display: none !important;"></div>
 
             <!-- Cooking Progress Gauge -->
             <div class="cook-gauge-container">
@@ -1661,26 +1651,45 @@ const FRY_ICON: Record<string, string> = { crispy_chicken: '🍗', spicy_chicken
 // ---------------------------------------------------------------------------
 function renderPatioWoodTableSvg(): string {
   return `
-    <svg class="patio-pixel-table-img" viewBox="0 0 32 32" width="28" height="28" style="image-rendering: pixelated; shape-rendering: crispEdges;" aria-hidden="true">
-      <!-- Ghế đẩu gỗ trái -->
-      <rect x="2" y="14" width="6" height="3" fill="#8b5a2b" stroke="#3e2723" stroke-width="0.5"/>
-      <rect x="3" y="17" width="2" height="7" fill="#5a3818"/>
-      <rect x="5" y="17" width="2" height="7" fill="#3e2723"/>
-      <!-- Ghế đẩu gỗ phải -->
-      <rect x="24" y="14" width="6" height="3" fill="#8b5a2b" stroke="#3e2723" stroke-width="0.5"/>
-      <rect x="25" y="17" width="2" height="7" fill="#5a3818"/>
-      <rect x="27" y="17" width="2" height="7" fill="#3e2723"/>
-      <!-- Chân bàn gỗ -->
-      <rect x="14" y="17" width="4" height="9" fill="#5a3818" stroke="#2a1810" stroke-width="0.5"/>
-      <rect x="11" y="25" width="10" height="2" fill="#3e2723"/>
-      <!-- Mặt bàn gỗ mộc tròn/bo góc -->
-      <rect x="8" y="10" width="16" height="7" rx="1" fill="#d97706" stroke="#5a3818" stroke-width="0.8"/>
-      <rect x="9" y="11" width="14" height="2" fill="#fde68a" opacity="0.6"/>
-      <!-- Khăn trải bàn ca-rô nhỏ trên bàn -->
-      <rect x="13" y="10" width="6" height="5" fill="#ef4444"/>
-      <rect x="14" y="11" width="2" height="3" fill="#ffffff" opacity="0.8"/>
-      <!-- Đĩa nhỏ sạch bóng -->
-      <ellipse cx="16" cy="12" rx="2" ry="1" fill="#ffffff" stroke="#94a3b8" stroke-width="0.5"/>
+    <svg class="patio-pixel-table-img" viewBox="0 0 36 36" width="32" height="32" style="image-rendering: pixelated; shape-rendering: crispEdges;" aria-hidden="true">
+      <!-- Ghế tựa bistro gỗ cổ điển bên trái -->
+      <rect x="2" y="10" width="2" height="10" fill="#78350f" stroke="#451a03" stroke-width="0.5"/>
+      <rect x="2" y="10" width="7" height="2" fill="#92400e"/>
+      <rect x="3" y="15" width="5" height="3" rx="0.5" fill="#b45309" stroke="#451a03" stroke-width="0.5"/>
+      <rect x="3" y="18" width="2" height="8" fill="#5a3018"/>
+      <rect x="6" y="18" width="2" height="8" fill="#3b1d0e"/>
+
+      <!-- Ghế tựa bistro gỗ cổ điển bên phải -->
+      <rect x="32" y="10" width="2" height="10" fill="#78350f" stroke="#451a03" stroke-width="0.5"/>
+      <rect x="27" y="10" width="7" height="2" fill="#92400e"/>
+      <rect x="28" y="15" width="5" height="3" rx="0.5" fill="#b45309" stroke="#451a03" stroke-width="0.5"/>
+      <rect x="28" y="18" width="2" height="8" fill="#5a3018"/>
+      <rect x="31" y="18" width="2" height="8" fill="#3b1d0e"/>
+
+      <!-- Chân bàn gỗ trụ chắc chắn có đế mộc -->
+      <rect x="16" y="16" width="4" height="11" fill="#78350f" stroke="#271206" stroke-width="0.5"/>
+      <rect x="12" y="26" width="12" height="3" rx="1" fill="#451a03"/>
+
+      <!-- Mặt bàn gỗ tròn bo góc ấm áp Bistro -->
+      <ellipse cx="18" cy="14" rx="12" ry="5.5" fill="#f59e0b" stroke="#78350f" stroke-width="0.8"/>
+      <ellipse cx="18" cy="13" rx="11" ry="4.5" fill="#fbbf24"/>
+      <ellipse cx="18" cy="12.5" rx="9" ry="3.5" fill="#fef3c7" opacity="0.4"/>
+
+      <!-- Khăn trải bàn sọc caro đỏ-kem vintage Bistro -->
+      <rect x="14" y="10.5" width="8" height="5" rx="0.5" fill="#dc2626"/>
+      <rect x="14" y="11.5" width="8" height="1" fill="#fef08a" opacity="0.8"/>
+      <rect x="14" y="13.5" width="8" height="1" fill="#fef08a" opacity="0.8"/>
+      <rect x="16" y="10.5" width="1" height="5" fill="#fef08a" opacity="0.8"/>
+      <rect x="19" y="10.5" width="1" height="5" fill="#fef08a" opacity="0.8"/>
+
+      <!-- Đĩa sứ men trắng bóng viền terracotta -->
+      <ellipse cx="16.5" cy="13" rx="2.5" ry="1.4" fill="#ffffff" stroke="#d4a373" stroke-width="0.5"/>
+      <!-- Miếng gà giòn rụm bốc khói -->
+      <circle cx="16.5" cy="12.5" r="1.1" fill="#ea580c"/>
+
+      <!-- Ly nước trà đá sài gòn có ống hút đỏ -->
+      <rect x="20.5" y="10" width="2" height="3.5" rx="0.5" fill="#67e8f9" opacity="0.9" stroke="#0891b2" stroke-width="0.3"/>
+      <line x1="21.5" y1="9" x2="22.5" y2="12" stroke="#ef4444" stroke-width="0.5"/>
     </svg>
   `;
 }

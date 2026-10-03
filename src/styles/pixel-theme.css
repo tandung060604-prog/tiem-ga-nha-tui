@@ -359,9 +359,10 @@ p, span, div, b, small, button, input, select, textarea,
 }
 
 .store-logo-badge {
-  border-radius: 2px !important;
+  border-radius: 50% !important;
   width: 18px !important;
   height: 18px !important;
+  object-fit: cover !important;
 }
 
 .h-m .money {
@@ -767,36 +768,43 @@ body.selling-mode .toast {
 }
 
 .prep-station {
-  background: #1e0e07 !important;
-  border: 1.5px solid #3d1e0d !important;
-  border-radius: 6px !important;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
-/* Khay Pan Đựng Món & Nguyên Liệu (Bỏ khung bạc kim loại, giữ trọn thẩm mỹ pan) */
+/* Khay Pan Đựng Món & Nguyên Liệu (Bỏ khung bạc kim loại, giữ trọn thẩm mỹ pan, tăng kích thước) */
 .gn-pan {
   background: transparent !important;
   border: none !important;
-  border-radius: 6px !important;
+  border-radius: 8px !important;
   box-shadow: none !important;
-  flex: 0 0 50px !important;
-  min-width: 48px !important;
+  flex: 0 0 56px !important;
+  min-width: 52px !important;
+  min-height: 48px !important;
+  height: 48px !important;
 }
 
 .gn-pan:active {
-  transform: translate(1px, 2px) !important;
-  box-shadow: inset 2px 2px 0 #64748b, inset -1px -1px 0 #ffffff, 0 1px 0 #1a0c06 !important;
+  transform: translate(1px, 2px) scale(0.94) !important;
+  box-shadow: none !important;
 }
 
 .gn-pan[data-state="locked"] {
-  background: linear-gradient(150deg, #64748b 0%, #475569 60%, #334155 100%) !important;
-  border-color: #1e293b !important;
-  opacity: 0.95 !important;
+  background: transparent !important;
+  border: none !important;
+  opacity: 0.45 !important;
+  filter: brightness(0.42) saturate(0.3) !important;
+}
+
+.gn-pan[data-state="locked"] .gn-pan-img {
+  filter: brightness(0.38) saturate(0.25) !important;
 }
 
 .gn-pan[data-state="locked"] .gn-pan-label {
-  color: #e2e8f0 !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9) !important;
+  color: #94a3b8 !important;
+  opacity: 0.8 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95) !important;
 }
 
 .gn-pan[data-state="locked"] .gn-pan-lock-label {
@@ -819,9 +827,10 @@ body.selling-mode .toast {
 }
 
 .gn-pan-label {
-  font-size: 0.52rem !important;
+  font-size: 0.56rem !important;
   font-weight: 800 !important;
-  color: #1e293b !important;
+  color: #fef08a !important; /* Vàng kem sáng rực rỡ, tương phản tuyệt đối trên nền gỗ */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95), 0 0 1px #000 !important;
   line-height: 1.05 !important;
   white-space: normal !important;
   text-align: center !important;
@@ -1584,7 +1593,7 @@ body.selling-mode .toast {
   align-items: center;
   gap: 8px;
   color: #fef08a;
-  font-family: 'Silkscreen', 'Tiny5', monospace;
+  font-family: 'Tiny5 Duo', 'Baloo 2', 'Be Vietnam Pro', monospace;
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0.5px;
@@ -1810,7 +1819,7 @@ body.selling-mode .toast {
   border: 1.5px solid rgba(254, 240, 138, 0.85);
   border-radius: 20px;
   color: #fef08a;
-  font-family: 'Silkscreen', 'Tiny5', 'Baloo 2', sans-serif;
+  font-family: 'Tiny5 Duo', 'Baloo 2', 'Be Vietnam Pro', sans-serif;
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -1877,7 +1886,7 @@ body.selling-mode .toast {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-family: 'Silkscreen', 'Tiny5', 'Baloo 2', sans-serif;
+  font-family: 'Tiny5 Duo', 'Baloo 2', 'Be Vietnam Pro', sans-serif;
   font-size: 0.88rem;
   font-weight: 800;
   color: #fef08a;
@@ -2328,7 +2337,7 @@ body.selling-mode .toast {
   background: #fef08a;
   border: 1.5px solid #ca8a04;
   border-radius: 12px;
-  font-family: 'Silkscreen', 'Tiny5', sans-serif;
+  font-family: 'Tiny5 Duo', 'Baloo 2', 'Be Vietnam Pro', sans-serif;
   font-size: 0.72rem;
   font-weight: 700;
   color: #854d0e;
@@ -2338,7 +2347,7 @@ body.selling-mode .toast {
 
 .onboarding-title {
   margin: 0;
-  font-family: 'Silkscreen', 'Tiny5', 'Baloo 2', sans-serif;
+  font-family: 'Tiny5 Duo', 'Baloo 2', 'Be Vietnam Pro', sans-serif;
   font-size: 1.3rem;
   font-weight: 800;
   color: #451a03;
@@ -2460,7 +2469,7 @@ body.selling-mode .toast {
 
 .welcome-shop-title {
   margin: 0;
-  font-family: 'Silkscreen', 'Tiny5', sans-serif;
+  font-family: 'Tiny5 Duo', 'Baloo 2', 'Be Vietnam Pro', sans-serif;
   font-size: 1.22rem;
   font-weight: 800;
   color: #9a3412;
@@ -2629,7 +2638,7 @@ body.selling-mode .toast {
   filter: brightness(1.1);
 }
 .vintage-signboard-title {
-  font-family: 'Silkscreen', 'VT323', monospace;
+  font-family: 'Tiny5 Duo', 'Baloo 2', 'VT323', sans-serif;
   font-size: 0.85rem;
   font-weight: 900;
   letter-spacing: 0.5px;

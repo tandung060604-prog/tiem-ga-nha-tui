@@ -299,9 +299,7 @@ Phiên làm việc: 26/09/2026, 14:35 → 15:35 (1 tiếng mỗi bên, chạy so
 | 11:31 | Antigravity (Lead & Core/UI) | 🔓 **[UNLOCK TASK]**: Mở khóa toàn bộ file sau khi hoàn tất xuất sắc toàn bộ mục tiêu đại tu v3.0.0 Street Chicken Bistro & UI/UX Streamlining! |
 | 11:38 | Antigravity (Lead & Core/UI) | 🚀 **HOÀN THÀNH TOÀN DIỆN ĐẠI TU GIAO DIỆN SÀI GÒN BISTRO v3.0.0 (JEV MCP VERIFIED - CONFIDENCE 1.0, 744/744 TESTS PASS, 16/16 UI CHECKS PASS): XONG 100%.** Đã nghiệm thu trọn gói: (1) **Đĩa Sứ Gốm Ấm Áp Thay Vỉ Kim Loại**: Cập nhật `.tray-item.ceramic-plate` men vàng ngà viền đất nung `#d4a373` và `.tray-slot-empty.ceramic-empty` với icon `🍽️ Đĩa trống`; (2) **Tinh Gọn Tên Món & Pill Badge Chống Tràn**: Thêm `shortFoodName`, cập nhật `.order-qty-pill` cho số lượng món, gỡ bỏ hoàn toàn lỗi clip dòng order `.order-row` (`min-height: 24px; height: auto`) và nới rộng bong bóng thoại `.speech-bubble` lên 124px; (3) **Dọn Sạch Lời Thoại Tương Sốt**: Chuyển đổi thoại dặn tương cũ thành thoại phong vị Bistro Sài Gòn ấm nồng hương gà chiên; (4) **Bảo Đảm Chuẩn 1 Ngón Cái Mobile 360px & 390px**: 0 tràn ngang, touch targets >= 44px; (5) **Nâng Cấp Version**: Cập nhật `package.json` lên v3.0.0; (6) **Bộ Ba Chốt Nghiệm Thu Kép 3 Lớp Tuyệt Đối**: Vitest 67/67 files PASS (**744/744 tests 100%**), Vite Production Build PASS sạch sẽ (0 lỗi TS), Playwright `ui:check` PASS **16/16 checks** trên cả 360px & 390px (0 tràn ngang, 0 lỗi JS, 0 WARN). |
 | 11:39 | Antigravity (Lead & Core/UI) | 🔓 **[UNLOCK TASK]**: Mở khóa toàn bộ file sau khi hoàn tất xuất sắc toàn bộ gói Đại tu Giao diện Sài Gòn Bistro (v3.0.0)! |
-
-
-
+| 12:35 | Antigravity (Lead & Core/UI) | 🔒 **[LOCK TASK] TRIỂN KHAI GÓI BISTRO POLISH v3.1.0: KIỂM CHỨNG TIẾNG BÁC BA, LÀM TỐI MÓN KHÓA, BỎ KHUNG BẠC, TĂNG KÍCH THƯỚC PAN, CHỮ SÁNG TƯƠNG PHẢN CAO, BẢN ĐỒ 12 KHAY SƠ CHẾ, CHUẨN HÓA FONT KHÔNG LỖI DẤU, ẨN LỬA PERFECT TẠI QUẦY & REDESIGN ASSET BÀN ĂN BISTRO**: File tác động: `src/core/bacBaVoice.ts`, `src/core/prepStation.ts`, `src/styles/*.css`, `src/ui/components/*.ts`, `tests/**`. |
 
 
 

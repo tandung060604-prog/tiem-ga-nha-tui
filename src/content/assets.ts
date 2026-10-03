@@ -201,6 +201,8 @@ export const ASSETS = {
   ui: {
     bunnyNote: url('assets/ui/ui_bunny_note.png'),
     logoKoreanChicken: url('assets/ui/logo_korean_chicken.png'),
+    changChickenLogo: url('assets/ui/chang_chicken.png'),
+    changChickenBanner: url('assets/ui/chang_chicken_banner.png'),
     stickerDrumstick: url('assets/ui/sticker_drumstick.png'),
     stickerNeon: url('assets/ui/sticker_neon.png'),
     stickerFries: url('assets/ui/sticker_fries.png'),

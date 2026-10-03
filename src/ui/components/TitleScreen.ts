@@ -2,6 +2,7 @@ import { GameState } from '../../types/game';
 import { ASSETS } from '../../content/assets';
 import { escapeHtml } from '../escapeHtml';
 import { audio } from '../../core/audio';
+import { bacBaVoice } from '../../core/bacBaVoice';
 
 const OWNER_QUOTES = [
   'Tiệm Gà Nhà Tui xin chào bạn! Gà vàng giòn rụm đang chờ nè! 🍗✨',
@@ -143,6 +144,9 @@ export function bindTitleScreenInteractions() {
   };
 
   bindZone('zone-owner', OWNER_QUOTES, 50, 42, () => audio.playPop());
-  bindZone('zone-bacba', BACBA_QUOTES, 70, 40, () => audio.playPop());
+  bindZone('zone-bacba', BACBA_QUOTES, 70, 40, () => {
+    audio.playPop();
+    bacBaVoice.playCue('intro', true);
+  });
   bindZone('zone-cat', CAT_QUOTES, 25, 68, () => audio.playPerfect());
 }

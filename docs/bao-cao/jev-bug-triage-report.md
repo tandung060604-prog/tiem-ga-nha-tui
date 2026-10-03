@@ -831,3 +831,13 @@
   - **Chiến lược Fix:** `contract_first_type_fix` (Độ tin cậy: 21.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
 ---
+
+### 🐞 [12:00:55 3/10/2026] (via Jev MCP) Page Error ReferenceError: qText is not defined at SellingView.ts:976
+- **Triệu chứng:** ReferenceError: qText is not defined in SellingView.ts line 976 during renderSellingView when mapping pending/completed items
+- **Vị trí:** `src/ui/components/SellingView.ts` 
+- **Đánh giá Jev (719ms):**
+  - **Mức độ (Severity):** `p0_blocker` (Độ tin cậy: 42.0%)
+  - **Nguyên nhân gốc (Root Cause):** `state_lifecycle` (Độ tin cậy: 42.0%)
+  - **Chiến lược Fix:** `contract_first_type_fix` (Độ tin cậy: 52.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---

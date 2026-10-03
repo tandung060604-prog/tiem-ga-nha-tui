@@ -133,6 +133,9 @@ export class BacBaVoiceEngine {
 
     const ctx = audio.context();
     if (!ctx) return;
+    if (ctx.state === 'suspended') {
+      void ctx.resume().catch(() => {});
+    }
 
     // 1. Nếu đã nạp buffer file âm thanh thực tế -> Phát ngay
     const buffer = this.audioBuffers.get(cue);
