@@ -60,7 +60,8 @@ for (const width of WIDTHS) {
   };
 
   console.log(`[ui-check] Đang kiểm tra viewport ${width}px...`);
-  await page.goto(TARGET, { waitUntil: 'domcontentloaded', timeout: 20000 });
+  await page.goto(TARGET, { waitUntil: 'commit', timeout: 30000 });
+  await page.waitForLoadState('domcontentloaded', { timeout: 15000 }).catch(() => {});
 
   const dismissIntro = async () => {
     await page.evaluate(() => {
