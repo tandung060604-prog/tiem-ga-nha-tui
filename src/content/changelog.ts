@@ -24,16 +24,86 @@ export interface ChangelogRelease {
   }[];
 }
 
-export const CURRENT_GAME_VERSION = 'v3.1.0';
-export const CURRENT_VERSION_CODENAME = 'Sài Gòn Bistro, Khách Quen Hẻm 1102 & Khẩu Vị Ruột';
+export const CURRENT_GAME_VERSION = 'v3.2.0';
+export const CURRENT_VERSION_CODENAME = 'Game Feel & Visual Juice: Bộ Emote Pixel Tự Thiết Kế, Khói Đĩa Nóng & Thú Cưng Hiên Quán';
 export const CURRENT_BUILD_DATE = '03/10/2026';
 
 export const CHANGELOG_DATA: ChangelogRelease[] = [
   {
+    version: 'v3.2.0',
+    codename: 'Game Feel & Visual Juice: Bộ Emote Pixel Tự Thiết Kế, Khói Đĩa Nóng & Thú Cưng Hiên Quán',
+    releaseDate: '03/10/2026',
+    isLatest: true,
+    highlightSummary: 'Bản nâng cấp Game Feel & Visual Juice toàn diện: Bộ 6 bóng thoại Emote 16-bit pixel nghệ thuật tự thiết kế riêng bằng AI (Yum, Sweat, Anger, Heart, Sủa mừng, Kêu meo meo); Làn khói nóng bốc lên từ 4 ô đĩa sứ gốm nung men ngà; Chùm hạt vàng kim lấp lánh khi chiên đạt Vàng Giòn Perfect; Quỹ đạo tiền bán & tiền bo bay parabol uốn lượn mượt mà về Header; Tương tác chạm cưng nựng Chó Cỏ Vàng & Mèo Mướp Tam Thể hiên quán!',
+    metrics: [
+      { icon: '💬', label: 'Emote Pixel AI', value: '6 Emote Độc Quyền' },
+      { icon: '♨️', label: 'Khói Đĩa Nóng', value: '3 Làn Hơi Tự Nhiên' },
+      { icon: '✨', label: 'Vàng Giòn Perfect', value: 'Chùm Tia Vàng Kim' },
+      { icon: '🪙', label: 'Quỹ Đạo Bay', value: 'Parabola Mượt Mà' },
+      { icon: '🐕', label: 'Chó Cỏ Vàng', value: 'Vẫy Đuôi Sủa Mừng' },
+      { icon: '🐈', label: 'Mèo Mướp', value: 'Vươn Vai Thả Tim' }
+    ],
+    categories: [
+      {
+        categoryName: 'Visual Juice & Emote Pixel Stardew Tự Thiết Kế',
+        categoryIcon: '💬',
+        items: [
+          {
+            tag: 'CUSTOM ASSETS',
+            tagColor: '#10b981',
+            title: 'Bộ 6 Emote Pixel 16-bit Tự Thiết Kế Độc Quyền',
+            desc: 'Thay thế hoàn toàn emoji hệ thống thông thường bằng ảnh pixel art 16-bit phong cách Stardew Valley tách nền trong suốt cực sắc nét:',
+            details: [
+              'Emote Ngon Miệng (emote_yum.png): Mặt cười tít mắt liếm môi cùng đùi gà vàng ruộm tỏa hào quang.',
+              'Emote Toát Mồ Hôi (emote_sweat.png): Mặt bối rối lo lắng với giọt mồ hôi xanh ngọc rỏ giọt khi khách đợi lâu.',
+              'Emote Tức Giận (emote_anger.png): Mặt đỏ bừng bốc khói hai tai kèm ký hiệu tĩnh mạch nổi giận khi kiên nhẫn cạn kiệt.',
+              'Emote Trái Tim (emote_heart.png): Trái tim hồng ngọc pixel lấp lánh khi phục vụ khách VIP, Thỏ Cam hay hoàn thành đơn xuất sắc.',
+              'Emote Chó Sủa (emote_dog_bark.png): Đầu Chó Vàng hớn hở kèm dấu chân cún và nốt nhạc vui nhộn.',
+              'Emote Mèo Meo Meo (emote_cat_purr.png): Mèo Mướp cuộn tròn ngủ trưa với bóng tim và ký hiệu zzz êm đềm.'
+            ]
+          },
+          {
+            tag: 'VISUAL JUICE',
+            tagColor: '#f59e0b',
+            title: 'Làn Khói Đĩa Nóng & Hào Quang Vàng Giòn Perfect',
+            desc: 'Cảm giác nấu nướng và bày món chân thực, kích thích thị giác tối đa:',
+            details: [
+              'Khói bốc nghi ngút (.plate-steam-particles): Từng cuộn hơi nóng bốc lên mờ ảo từ các món chiên rán vừa vớt lên 4 đĩa sứ.',
+              'Hạt sáng vàng kim (.perfect-sparkles-burst): Khi món ăn chạm chuẩn xác mốc Vàng Giòn (Perfect 100%), chảo gang bừng sáng các ngôi sao kim tuyến vàng lấp lánh.'
+            ]
+          },
+          {
+            tag: 'ECONOMY FX',
+            tagColor: '#3b82f6',
+            title: 'Quỹ Đạo Tiền Bán & Tiền Bo Bay Parabol',
+            desc: 'Hiệu ứng nhận tiền bay cong mượt mà theo đường cong Bezier về góc trên Header kèm âm thanh rổn rảng vui tai, tạo dopamine cao khi hoàn thành đơn.'
+          }
+        ]
+      },
+      {
+        categoryName: 'Tương Tác Thú Cưng Hiên Quán Hẻm 1102',
+        categoryIcon: '🐾',
+        items: [
+          {
+            tag: 'PET INTERACTION',
+            tagColor: '#8b5cf6',
+            title: 'Chạm Vào Chó Vàng & Mèo Mướp Để Cưng Nựng',
+            desc: 'Hiên quán luôn sinh động với hai cư dân 4 chân đáng yêu của Hẻm 1102:',
+            details: [
+              'Chạm vào Chó Vàng (#btn-alley-pet-dog): Cún hớn hở vẫy đuôi, sủa "Gâu gâu! Chúc tiệm đắt khách!" kèm bóng thoại pixel.',
+              'Chạm vào Mèo Mướp (#btn-alley-pet-cat): Mèo lười biếng vươn vai kêu "Meo meo~" thả tim chúc buôn may bán đắt.',
+              'Huy hiệu "Tri Kỷ" gắn nơ hồng và chuông vàng khi người chơi hoàn thành nhận nuôi.'
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     version: 'v3.1.0',
     codename: 'Sài Gòn Bistro, Khách Quen Hẻm 1102 & Khẩu Vị Ruột',
     releaseDate: '03/10/2026',
-    isLatest: true,
+    isLatest: false,
     highlightSummary: 'Bước chuyển mình rực rỡ sang phong cách Sài Gòn Retro Bistro: Giọng nói Bác Ba Nam Bộ tương tác chạm; Đại tu khay ra món đĩa gốm sứ 4 ô men ngà; Tinh giản tên món và badge số lượng chống tràn; Mở rộng quầy sơ chế 12 khay cân đối; Hệ thống Khách Quen Hẻm 1102 tích lũy 5 cấp tim thân thiết với Khẩu Vị Ruột tặng Tip khủng & Bưu Kiện Quà Quê mỗi sáng; Phòng Lưu Niệm Ký Ức Hẻm 1102 & Cao Trào Tuyến Truyện Visual Novel!',
     metrics: [
       { icon: '💖', label: 'Khách Quen', value: '5 Cấp Tim Tri Kỷ' },

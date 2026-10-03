@@ -22,6 +22,7 @@ import { openIntroCinematicModal } from './ui/components/IntroCinematicModal';
 import { showPrepLoadingModal } from './ui/components/PrepLoadingModal';
 import { openBacBaManualModal } from './ui/components/BacBaManualModal';
 import { renderChalkboard } from './ui/components/Chalkboard';
+import { openStardewMailboxModal } from './ui/components/StardewMailboxModal';
 import { renderInventoryTab, bindInventoryEvents } from './ui/components/InventoryTab';
 import { renderMemoryGalleryModal, bindMemoryGalleryEvents, GalleryTab } from './ui/components/MemoryGalleryModal';
 import { renderUpgradesTab, bindUpgradesEvents } from './ui/components/UpgradesTab';
@@ -1849,6 +1850,19 @@ class AppController {
       };
     }
 
+    const openStardewMailboxBtn = document.getElementById('btn-open-stardew-mailbox');
+    if (openStardewMailboxBtn) {
+      openStardewMailboxBtn.onclick = (e) => {
+        if ((e.target as HTMLElement).closest('.btn-mailbox-pill')) return;
+        audio.playPop();
+        openStardewMailboxModal(stateManager.getState(), {
+          openMemories: () => this.openMemoriesAlbumModal('residents', 'all'),
+          openLoyalty: () => this.openLoyaltyHandbookModal(),
+          openIncidents: () => this.openIncidentsAlbumDialog(),
+        });
+      };
+    }
+
     const openIncidentsBtn = document.getElementById('btn-open-incidents');
     if (openIncidentsBtn) {
       openIncidentsBtn.onclick = () => {
@@ -2688,6 +2702,52 @@ class AppController {
     }
   }
 
+  private lastPetInteractAt = 0;
+  private interactWithAlleyPet(kind: 'dog' | 'cat') {
+    const now = Date.now();
+    if (now - this.lastPetInteractAt < 1000) return;
+    this.lastPetInteractAt = now;
+
+    audio.playPop();
+    Haptics.tap();
+
+    if (kind === 'dog') {
+      const dogEl = document.getElementById('btn-alley-pet-dog');
+      const bubble = document.getElementById('pet-dog-bubble');
+      if (dogEl) {
+        dogEl.classList.remove('pet-tail-wag');
+        void dogEl.offsetWidth;
+        dogEl.classList.add('pet-tail-wag');
+      }
+      if (bubble) {
+        bubble.innerHTML = `<img src="${ASSETS.icons.emoteDogBark}" class="pet-emote-icon" alt="" /><span>Gâu gâu! Chúc tiệm đắt khách! 🐶✨</span>`;
+        bubble.style.display = 'flex';
+        setTimeout(() => {
+          if (bubble) bubble.style.display = 'none';
+          if (dogEl) dogEl.classList.remove('pet-tail-wag');
+        }, 2200);
+      }
+      this.showToast('🐶 Chó Vàng hớn hở vẫy đuôi: Gâu gâu!');
+    } else {
+      const catEl = document.getElementById('btn-alley-pet-cat');
+      const bubble = document.getElementById('pet-cat-bubble');
+      if (catEl) {
+        catEl.classList.remove('pet-stretch');
+        void catEl.offsetWidth;
+        catEl.classList.add('pet-stretch');
+      }
+      if (bubble) {
+        bubble.innerHTML = `<img src="${ASSETS.icons.emoteCatPurr}" class="pet-emote-icon" alt="" /><span>Meo meo... Chúc buôn may bán đắt! 🐾💖</span>`;
+        bubble.style.display = 'flex';
+        setTimeout(() => {
+          if (bubble) bubble.style.display = 'none';
+          if (catEl) catEl.classList.remove('pet-stretch');
+        }, 2200);
+      }
+      this.showToast('🐱 Mèo Mướp lười biếng vươn vai: Meo meo~');
+    }
+  }
+
   // Mọi click trong màn bán hàng đi qua đây (một listener gắn một lần trên #main-view).
   // Đọc state tại thời điểm bấm, không dùng state bắt trong closure lúc render.
   private handleSellingClick(target: Element) {
@@ -2763,6 +2823,18 @@ class AppController {
       if (idxStr !== null && idxStr !== undefined) {
         this.cleanPatioTable(Number(idxStr));
       }
+      return;
+    }
+
+    const petDog = target.closest<HTMLElement>('#btn-alley-pet-dog');
+    if (petDog) {
+      this.interactWithAlleyPet('dog');
+      return;
+    }
+
+    const petCat = target.closest<HTMLElement>('#btn-alley-pet-cat');
+    if (petCat) {
+      this.interactWithAlleyPet('cat');
       return;
     }
 

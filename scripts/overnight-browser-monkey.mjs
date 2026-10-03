@@ -515,10 +515,10 @@ class OvernightMonkey {
       return true;
     }
 
-    // 16c. Các Modal Hệ Thống Khác (Radio, Bằng Khen, Thử Thách Tuần, Ca Đêm, Biển Hiệu, Kỷ Niệm, Lobby, Sổ Tay Bếp, Sổ Tay Tri Kỷ, Phòng Lưu Niệm)
-    const extraModalClose = page.locator('#btn-close-gallery, #btn-close-loyalty-modal, .btn-claim-alley-gift, #btn-summary-open-loyalty, #btn-close-night-radio, #btn-close-achievements, .btn-claim-badge, #btn-close-weekly-quests, .btn-claim-quest, #btn-close-shop-theme, #btn-close-endless, #btn-close-memories, #btn-close-leaderboard, #btn-close-kitchen-guide, #btn-close-kitchen-guide-bottom');
+    // 16c. Các Modal Hệ Thống Khác (Radio, Bằng Khen, Thử Thách Tuần, Ca Đêm, Biển Hiệu, Kỷ Niệm, Lobby, Sổ Tay Bếp, Sổ Tay Tri Kỷ, Phòng Lưu Niệm, Hòm Thư Stardew)
+    const extraModalClose = page.locator('#btn-close-gallery, #btn-close-stardew-mailbox, #btn-dismiss-stardew-mailbox, #btn-close-loyalty-modal, .btn-claim-alley-gift, #btn-summary-open-loyalty, #btn-close-night-radio, #btn-close-achievements, .btn-claim-badge, #btn-close-weekly-quests, .btn-claim-quest, #btn-close-shop-theme, #btn-close-endless, #btn-close-memories, #btn-close-leaderboard, #btn-close-kitchen-guide, #btn-close-kitchen-guide-bottom');
     if (await extraModalClose.first().isVisible({ timeout: 50 }).catch(() => false)) {
-      log(`🧩 Xử lý đóng modal hệ thống / Quà tri kỷ / Phòng lưu niệm...`);
+      log(`🧩 Xử lý đóng modal hệ thống / Quà tri kỷ / Phòng lưu niệm / Hòm thư...`);
       await extraModalClose.first().click({ force: true });
       await sleep(200);
       return true;
@@ -922,11 +922,11 @@ class OvernightMonkey {
       if (confirmOkBtn instanceof HTMLElement) confirmOkBtn.click();
 
       // Dọn dẹp tất cả modal truyện cư dân, minigame, hệ thống
-      const specialModals = document.querySelectorAll('#modal-character-story, #modal-char-reaction, #modal-thief-minigame, #modal-thief-result, #modal-night-radio, #modal-achievements-wall, #modal-shop-theme, #modal-endless-mode, #modal-memories-album, #modal-weekly-quests, #modal-leaderboard, #sauce-minigame-modal, .sauce-modal-overlay, #loyalty-handbook-modal, .loyalty-modal-overlay, #memory-gallery-modal, #tester-feedback-modal, #social-share-modal, .bunny-dialog-modal, #modal-bunny, .storylet-night-modal, #onboarding-guide-banner, #tutorial-layer, #tutorial-spotlight');
+      const specialModals = document.querySelectorAll('#modal-stardew-mailbox, #modal-character-story, #modal-char-reaction, #modal-thief-minigame, #modal-thief-result, #modal-night-radio, #modal-achievements-wall, #modal-shop-theme, #modal-endless-mode, #modal-memories-album, #modal-weekly-quests, #modal-leaderboard, #sauce-minigame-modal, .sauce-modal-overlay, #loyalty-handbook-modal, .loyalty-modal-overlay, #memory-gallery-modal, #tester-feedback-modal, #social-share-modal, .bunny-dialog-modal, #modal-bunny, .storylet-night-modal, #onboarding-guide-banner, #tutorial-layer, #tutorial-spotlight');
       for (const sm of specialModals) {
         if (sm instanceof HTMLElement) sm.remove();
       }
-      const charChoice = document.querySelector('#btn-skip-storylet-typewriter, #btn-skip-char-typewriter, .storylet-choice-btn, .btn-char-story-choice, #btn-dismiss-char-reaction, #btn-close-char-story, #btn-close-gallery, #btn-claim-bunny-letter, #btn-close-bunny-modal, #btn-skip-onboarding, #btn-close-tester-feedback, #btn-close-social-share');
+      const charChoice = document.querySelector('#btn-close-stardew-mailbox, #btn-dismiss-stardew-mailbox, #btn-skip-storylet-typewriter, #btn-skip-char-typewriter, .storylet-choice-btn, .btn-char-story-choice, #btn-dismiss-char-reaction, #btn-close-char-story, #btn-close-gallery, #btn-claim-bunny-letter, #btn-close-bunny-modal, #btn-skip-onboarding, #btn-close-tester-feedback, #btn-close-social-share');
       if (charChoice instanceof HTMLElement) charChoice.click();
 
       const bunnyModalBtns = document.querySelectorAll('#btn-claim-bunny-letter, #btn-close-bunny-modal, #btn-open-bunny-album, #btn-read-full-novel, #btn-close-bunny-album, #btn-bunny-close, #btn-claim-bunny');

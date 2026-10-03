@@ -70,46 +70,56 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
               "${currentChapter.description}"
             </div>
           </div>
-          <!-- HỘC TỦ ĐỒ NGHỀ TIỆM GÀ (STARDEW TOOLBOX CABINET 4 NGĂN) -->
-          <div class="toolbox-cabinet">
-            <div class="toolbox-header">
-              <span class="toolbox-title">
-                <img src="${ASSETS.icons.inventory}" class="pixel-section-icon" alt="" />
-                HỘC TỦ ĐỒ NGHỀ TIỆM GÀ
-              </span>
-              <span class="toolbox-subtitle">Tính Năng & Sự Kiện Hẻm 1102</span>
-            </div>
-
-            <div class="toolbox-grid">
-              <!-- Ngăn 1: Ký Sự & Bằng Khen -->
-              <div class="toolbox-drawer drawer-lore">
-                <div class="drawer-header">
-                  <img src="${ASSETS.icons.book}" class="btn-pixel-icon-xs" alt="" /> Ký Sự & Kỷ Niệm
+          <!-- HỘP THƯ TRƯỚC CỬA NHÀ (STARDEW COZY MAILBOX WIDGET) -->
+          <div class="stardew-mailbox-section">
+            <div class="mailbox-widget-card" id="btn-open-stardew-mailbox" title="Ấn vào Hòm Thư Trước Nhà để mở Kỷ Niệm, Tri Kỷ & Sổ Tay Hẻm">
+              <div class="mailbox-sprite-frame">
+                <img src="${ASSETS.ui.mailboxStardew}" class="mailbox-pixel-sprite ${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0) > 0 ? 'has-new-mail' : ''}" alt="Hòm Thư Trước Nhà" />
+              </div>
+              <div class="mailbox-meta-col">
+                <div class="mailbox-kicker-row">
+                  <span class="mailbox-kicker">HIÊN NHÀ HẺM 1102</span>
+                  ${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0) > 0 ? `
+                    <div class="mailbox-pixel-wax-seal" title="Có ${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0)} tin mới đang chờ">
+                      <span class="wax-seal-text">(${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0)} TIN MỚI)</span>
+                    </div>
+                  ` : `
+                    <div class="mailbox-pixel-wax-seal is-empty" title="Hòm thư trống, đã đọc hết">
+                      <span class="wax-seal-text">(ĐÃ ĐỌC HẾT)</span>
+                    </div>
+                  `}
                 </div>
-                <div class="drawer-actions">
-                  <button id="btn-open-memories" class="btn-sm btn-toolbox" title="Sổ Tay Kỷ Niệm: Cư Dân Hẻm, Tủ Kỷ Vật, 6 Kết Cục & 18 Mảnh Giấy Nhớ Gà Bông">
-                    <img src="${ASSETS.icons.heart}" class="btn-pixel-icon-xs" alt="" /> Kỷ Niệm Hẻm
+                <div class="mailbox-main-title">HÒM THƯ TRƯỚC NHÀ</div>
+                <div class="mailbox-quick-links">
+                  <button id="btn-open-loyalty-handbook" class="btn-mailbox-pill ${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0) > 0 ? 'has-gift' : ''}" title="Sổ Tay Tri Kỷ Hẻm 1102 & Quà Tiếp Tế Cư Dân">
+                    <img src="${ASSETS.icons.heart}" class="btn-pixel-icon-xs" alt="" /> Tri Kỷ Hẻm ${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0) > 0 ? `<b class="pill-seal">${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0)}</b>` : ''}
                   </button>
-                  <button id="btn-open-loyalty-handbook" class="btn-sm btn-toolbox ${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0) > 0 ? 'has-gift' : ''}" title="Sổ Tay Tri Kỷ Hẻm 1102 & Quà Tiếp Tế Cư Dân">
-                    <img src="${ASSETS.icons.heart}" class="btn-pixel-icon-xs" alt="" /> Tri Kỷ Hẻm ${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0) > 0 ? '<span class="badge-dot-pulse">🎁</span>' : ''}
+                  <button id="btn-open-memories" class="btn-mailbox-pill" title="Sổ Tay Kỷ Niệm: Cư Dân Hẻm, Tủ Kỷ Vật, 6 Kết Cục & 18 Mảnh Giấy Nhớ Gà Bông">
+                    <img src="${ASSETS.icons.book}" class="btn-pixel-icon-xs" alt="" /> Kỷ Niệm Hẻm
                   </button>
-                  ${(day >= 2 || chapter >= 2) ? `
-                    <button id="btn-open-achievements" class="btn-sm btn-toolbox ${claimableBadges > 0 ? 'has-badge' : ''}" title="Bức Tường Bằng Khen Tổ Dân Phố Hẻm 1102">
-                      <img src="${ASSETS.icons.trophy}" class="btn-pixel-icon-xs" alt="" /> Bằng Khen
-                      ${claimableBadges > 0 ? `<span class="badge-dot-pulse">${claimableBadges}</span>` : ''}
-                    </button>
-                  ` : ''}
-                  <button id="btn-open-incidents" class="btn-sm btn-toolbox btn-incident-card" title="78 sự kiện drama xóm hẻm">
+                  <button id="btn-open-incidents" class="btn-mailbox-pill btn-incident-card" title="78 sự kiện drama xóm hẻm">
                     <img src="${ASSETS.icons.reviews}" class="btn-pixel-icon-xs" alt="" /> Sổ Tay Hẻm (${state.seenIncidentIds?.length ?? 0}/${DAILY_INCIDENTS.length})
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
 
-              ${(day >= 2 || chapter >= 2) ? `
-              <!-- Ngăn 2: Bếp Nghệ Nhân & Decor -->
+          <!-- HỘC TỦ ĐỒ NGHỀ BẾP GÀ (COZY COOKING KITCHEN CABINET) -->
+          <div class="toolbox-cabinet cozy-cooking-cabinet">
+            <div class="toolbox-header">
+              <span class="toolbox-title">
+                <img src="${ASSETS.icons.inventory}" class="pixel-section-icon" alt="" />
+                HỘC TỦ ĐỒ NGHỀ BẾP GÀ
+              </span>
+              <span class="toolbox-subtitle">Dụng cụ nấu nướng & Không gian quán</span>
+            </div>
+
+            <div class="toolbox-grid">
+              <!-- Ngăn 1: Bếp & Gia Vị Bí Truyền -->
               <div class="toolbox-drawer drawer-kitchen">
                 <div class="drawer-header">
-                  <img src="${ASSETS.icons.sauce}" class="btn-pixel-icon-xs" alt="" /> Bếp & Không Gian
+                  <img src="${ASSETS.icons.sauce}" class="btn-pixel-icon-xs" alt="" /> Gia Vị & Nồi Sốt
                 </div>
                 <div class="drawer-actions">
                   <button id="btn-secret-sauce" class="btn-sm btn-toolbox btn-sauce-card ${state.secretSauceDay?.buffActive ? 'is-active' : ''}" title="Pha nồi sốt bí truyền nhận Buff Vàng (+3k tip & +0.25★ Hương vị)">
@@ -124,12 +134,27 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
                   `}
                 </div>
               </div>
-              ` : ''}
 
-              <!-- Ngăn 3: Chốn Bình Yên Hẻm -->
+              <!-- Ngăn 2: Bằng Khen & Tổ Dân Phố -->
+              <div class="toolbox-drawer drawer-lore">
+                <div class="drawer-header">
+                  <img src="${ASSETS.icons.trophy}" class="btn-pixel-icon-xs" alt="" /> Bằng Khen & Tổ Dân Phố
+                </div>
+                <div class="drawer-actions">
+                  <button id="btn-open-achievements" class="btn-sm btn-toolbox ${claimableBadges > 0 ? 'has-badge' : ''}" title="Bức Tường Bằng Khen Tổ Dân Phố Hẻm 1102">
+                    <img src="${ASSETS.icons.trophy}" class="btn-pixel-icon-xs" alt="" /> Bằng Khen
+                    ${claimableBadges > 0 ? `<span class="badge-dot-pulse">${claimableBadges}</span>` : ''}
+                  </button>
+                  <button id="btn-weekly-quests" class="btn-sm btn-toolbox" title="Nhiệm vụ tuần nhận thưởng tiền mặt và danh hiệu">
+                    <img src="${ASSETS.icons.target}" class="btn-pixel-icon-xs" alt="" /> Thử Thách Tuần
+                  </button>
+                </div>
+              </div>
+
+              <!-- Ngăn 3: Hiên Quán & Thư Giãn -->
               <div class="toolbox-drawer drawer-cozy">
                 <div class="drawer-header">
-                  <img src="${ASSETS.icons.radio}" class="btn-pixel-icon-xs" alt="" /> Chốn Nghỉ Hẻm
+                  <img src="${ASSETS.icons.radio}" class="btn-pixel-icon-xs" alt="" /> Hiên Quán & Thư Giãn
                 </div>
                 <div class="drawer-actions">
                   <button id="btn-open-night-radio" class="btn-sm btn-toolbox ${(state.lastRadioBroadcastDay !== state.day) ? 'has-gift' : ''}" title="Đài Phát Thanh Đêm Sài Gòn (FM 99.9 MHz) - Nhận Buff & Dự Báo Thời Tiết">
@@ -145,16 +170,12 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
                 </div>
               </div>
 
-              ${(day >= 3 || chapter >= 2) ? `
-              <!-- Ngăn 4: Thử Thách & Đua Top -->
+              <!-- Ngăn 4: Thử Thách Bếp Lửa -->
               <div class="toolbox-drawer drawer-arena">
                 <div class="drawer-header">
-                  <img src="${ASSETS.icons.target}" class="btn-pixel-icon-xs" alt="" /> Thử Thách & Đua Top
+                  <img src="${ASSETS.icons.fireRush}" class="btn-pixel-icon-xs" alt="" /> Thử Thách Bếp Lửa
                 </div>
                 <div class="drawer-actions">
-                  <button id="btn-weekly-quests" class="btn-sm btn-toolbox" title="Nhiệm vụ tuần nhận thưởng tiền mặt và danh hiệu">
-                    <img src="${ASSETS.icons.target}" class="btn-pixel-icon-xs" alt="" /> Thử Thách Tuần
-                  </button>
                   ${(day >= 4 || chapter >= 2) ? `
                     <button id="btn-open-endless-mode" class="btn-sm btn-toolbox" title="Thử thách sinh tồn bếp dồn dập (Rush Hour Wave Survival)">
                       <img src="${ASSETS.icons.fireRush}" class="btn-pixel-icon-xs" alt="" /> Ca Đêm Bất Tận
@@ -164,7 +185,6 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
                   `}
                 </div>
               </div>
-              ` : ''}
             </div>
           </div>
         </div>

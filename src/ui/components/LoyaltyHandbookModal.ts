@@ -19,12 +19,23 @@ function escapeHtml(str: string): string {
     .replace(/'/g, '&#39;');
 }
 
+export const LOYALTY_ROLE_CATEGORIES = [
+  { id: 'all', label: 'Tất Cả' },
+  { id: 'staff', label: 'Bếp & Trợ Thủ' },
+  { id: 'regular', label: 'Khách Quen' },
+  { id: 'street_worker', label: 'Đường Phố' },
+  { id: 'authority', label: 'Chính Quyền' },
+  { id: 'transit', label: 'Vận Tải' },
+  { id: 'animal', label: 'Thú Cưng' },
+];
+
 export function openLoyaltyHandbookModal(state: GameState, onUpdate: () => void): void {
   const existing = document.getElementById('loyalty-handbook-modal');
   if (existing) existing.remove();
 
   const loyalty = ensureLoyaltyState(state);
   let activeTab: 'residents' | 'gifts' = loyalty.pendingAlleyGifts.length > 0 ? 'gifts' : 'residents';
+  let activeRoleFilter: string = 'all';
 
   const modalOverlay = document.createElement('div');
   modalOverlay.id = 'loyalty-handbook-modal';
@@ -71,7 +82,27 @@ export function openLoyaltyHandbookModal(state: GameState, onUpdate: () => void)
   function renderResidentsTab(state: GameState): string {
     const loyalty = state.loyaltyState!;
 
-    const cardsHtml = CHARACTERS_36.map(char => {
+    const filteredChars = CHARACTERS_36.filter(char => {
+      if (activeRoleFilter === 'all') return true;
+      return char.category === activeRoleFilter;
+    });
+
+    const roleFiltersHtml = `
+      <div class="loyalty-role-filter-bar">
+        ${LOYALTY_ROLE_CATEGORIES.map(cat => {
+          const count = cat.id === 'all'
+            ? CHARACTERS_36.length
+            : CHARACTERS_36.filter(c => c.category === cat.id).length;
+          return `
+            <button class="loyalty-role-btn ${activeRoleFilter === cat.id ? 'active' : ''}" data-role-cat="${cat.id}">
+              ${cat.label} (${count})
+            </button>
+          `;
+        }).join('')}
+      </div>
+    `;
+
+    const cardsHtml = filteredChars.map(char => {
       const entry: CustomerLoyaltyEntry = loyalty.residents[char.id] || {
         characterId: char.id,
         heartLevel: 0,
@@ -147,8 +178,9 @@ export function openLoyaltyHandbookModal(state: GameState, onUpdate: () => void)
     }).join('');
 
     return `
+      ${roleFiltersHtml}
       <div class="residents-grid">
-        ${cardsHtml}
+        ${cardsHtml.length > 0 ? cardsHtml : '<div style="padding: 20px; text-align: center; color: #78350f; font-size: 0.8rem; font-style: italic;">Chưa có cư dân nào trong danh mục này.</div>'}
       </div>
     `;
   }
@@ -238,6 +270,19 @@ export function openLoyaltyHandbookModal(state: GameState, onUpdate: () => void)
         const tab = btn.dataset.tab as 'residents' | 'gifts';
         if (tab && tab !== activeTab) {
           activeTab = tab;
+          audio.playPop();
+          renderContent();
+        }
+      };
+    });
+
+    // Role category filter buttons
+    const roleBtns = modalOverlay.querySelectorAll<HTMLButtonElement>('.loyalty-role-btn');
+    roleBtns.forEach(btn => {
+      btn.onclick = () => {
+        const cat = btn.dataset.roleCat;
+        if (cat && cat !== activeRoleFilter) {
+          activeRoleFilter = cat;
           audio.playPop();
           renderContent();
         }

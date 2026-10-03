@@ -200,13 +200,25 @@ export function renderFx(events: readonly FxEvent[]): void {
     layer!.appendChild(el);
     setTimeout(() => el.remove(), 1150);
   };
+
+  const spawnParabola = (text: string, isTip = false) => {
+    const el = document.createElement('div');
+    el.className = isTip ? 'money-float tip-parabola' : 'money-float cash-parabola';
+    el.innerHTML = isTip 
+      ? `<span class="coin-icon">✨</span><span>${text}</span>` 
+      : `<span class="coin-icon">🪙</span><span>${text}</span>`;
+    layer!.appendChild(el);
+    setTimeout(() => el.remove(), 1150);
+  };
+
   for (const fx of events) {
     const left = 20 + Math.random() * 35;
     if (fx.kind === 'cash') {
-      spawn('money-float', `+${fx.paid.toLocaleString('vi-VN')}đ 💵`, left, 'calc(env(safe-area-inset-top) + 72px)');
+      spawnParabola(`+${fx.paid.toLocaleString('vi-VN')}đ`, false);
       if (fx.tip > 0) {
-        spawn('money-float tip-float', `+${fx.tip.toLocaleString('vi-VN')}đ tip ✨`, left + 4, 'calc(env(safe-area-inset-top) + 102px)');
-        spawn('money-float heart-float', '💖 Cảm ơn tiệm!', left - 2, 'calc(env(safe-area-inset-top) + 132px)');
+        setTimeout(() => {
+          spawnParabola(`+${fx.tip.toLocaleString('vi-VN')}đ tip`, true);
+        }, 140);
       }
     } else if (fx.kind === 'lost') {
       spawn('money-float lost-float', '😤 Khách bỏ về', left, 'calc(env(safe-area-inset-top) + 140px)');
@@ -373,7 +385,7 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
         : p.cls === 'low'
         ? ASSETS.icons.emoteSweat
         : order.isVip || order.isBunny
-        ? ASSETS.icons.heart
+        ? ASSETS.icons.emoteHeart
         : p.cls === 'mid'
         ? ASSETS.icons.emoteQuestion
         : ASSETS.icons.emoteYum;
@@ -1083,7 +1095,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       : patiencePercent < 25
       ? ASSETS.icons.emoteSweat
       : ord.isBunny || ord.isVip
-      ? ASSETS.icons.heart
+      ? ASSETS.icons.emoteHeart
       : hasMatchInTray
       ? ASSETS.icons.sparkle
       : patiencePercent < 55
@@ -1208,7 +1220,14 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       <div class="frying-food-item ${quality} sizzle-active">
         <img src="${foodImg}" alt="${foodLabel}" class="food-pan-img" />
         <div class="food-status-badge ${quality}">${foodLabel} · ${qualityTag}</div>
-        ${quality === 'perfect' ? '<div class="perfect-sparkles">✨</div>' : ''}
+        ${quality === 'perfect' ? `
+          <div class="perfect-sparkles-burst" aria-hidden="true">
+            <span class="sparkle-dot">✨</span>
+            <span class="sparkle-dot">⭐</span>
+            <span class="sparkle-dot">✨</span>
+            <span class="sparkle-dot">⭐</span>
+          </div>
+        ` : ''}
         ${quality === 'burnt' ? '<div class="burnt-smoke-puff">💨</div>' : ''}
       </div>
     `;
@@ -1242,6 +1261,13 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         <div class="tray-item ceramic-plate ${drinkClass}" data-tray-idx="${slotIdx}" title="Bấm để vớt hoặc vứt">
           <div class="tray-food-frame">
             ${img ? `<img class="t-icon t-img" src="${img}" alt="${escapeHtml(item.name)}" width="52" height="52" />` : `<span class="t-icon">${item.icon}</span>`}
+            ${!isDrink ? `
+              <div class="plate-steam-particles" aria-hidden="true">
+                <span class="plate-steam-puff puff-1"></span>
+                <span class="plate-steam-puff puff-2"></span>
+                <span class="plate-steam-puff puff-3"></span>
+              </div>
+            ` : ''}
           </div>
           <span class="t-name">${escapeHtml(shortName)}</span>
           <span class="t-quality ${qClass}">${qText}</span>
@@ -1315,13 +1341,18 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <div class="alley-lantern-glow"></div>
         </div>
 
-        <!-- Thú cưng hiên quán sinh động đi lại/sưởi nắng -->
-        ${state.adoptedPets?.includes('pet_01_dog_vang') ? `
-          <div class="alley-pet-actor dog" title="Chó Vàng Chợ Lớn canh quán"><img src="${ASSETS.pets.dogWalk}" alt="Chó Vàng" class="pet-walk-sprite" /></div>
-        ` : ''}
-        ${state.adoptedPets?.includes('pet_02_cat_muop') ? `
-          <div class="alley-pet-actor cat" title="Mèo Mướp sưởi nắng"><img src="${ASSETS.pets.catWalk}" alt="Mèo Mướp" class="pet-walk-sprite" /></div>
-        ` : ''}
+        <!-- Thú cưng hiên quán sinh động Hẻm 1102 (Interactive Alley Pets) -->
+        <div id="btn-alley-pet-dog" class="alley-pet-actor dog ${state.adoptedPets?.includes('pet_01_dog_vang') ? 'is-adopted' : ''}" title="Chó Vàng Hẻm 1102 (Chạm để cưng nựng)">
+          <img src="${ASSETS.pets.dogWalk}" alt="Chó Vàng" class="pet-walk-sprite" />
+          <div class="pet-reaction-bubble" id="pet-dog-bubble" style="display: none;"></div>
+          ${state.adoptedPets?.includes('pet_01_dog_vang') ? '<span class="pet-adopted-badge">🎀 Tri Kỷ</span>' : ''}
+        </div>
+
+        <div id="btn-alley-pet-cat" class="alley-pet-actor cat ${state.adoptedPets?.includes('pet_02_cat_muop') ? 'is-adopted' : ''}" title="Mèo Mướp sưởi nắng (Chạm để vuốt ve)">
+          <img src="${ASSETS.pets.catWalk}" alt="Mèo Mướp" class="pet-walk-sprite" />
+          <div class="pet-reaction-bubble" id="pet-cat-bubble" style="display: none;"></div>
+          ${state.adoptedPets?.includes('pet_02_cat_muop') ? '<span class="pet-adopted-badge">🔔 Tri Kỷ</span>' : ''}
+        </div>
 
         <!-- Góc Bàn Ăn Hiên Quán (Dine-In Patio Tables) -->
         ${renderDineInPatio(session.dineInTables)}
