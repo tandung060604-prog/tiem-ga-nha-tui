@@ -497,11 +497,20 @@ class OvernightMonkey {
       return true;
     }
 
-    // 16. Modal Cốt Truyện Visual Novel (Story VN & Ký Sự Cư Dân & Ký Ức Đêm Storylet)
-    const storyChoice = page.locator('#btn-skip-storylet-typewriter, #btn-skip-char-typewriter, .storylet-choice-btn, .storylet-night-modal button, .dialogue-choice, .story-btn, #btn-story-next, #btn-story-close, #btn-story-choice-1, .btn-char-story-choice, #btn-dismiss-char-reaction, #btn-close-char-story, #btn-open-story-dialogue');
-    if (await storyChoice.first().isVisible({ timeout: 50 }).catch(() => false)) {
-      log(`📖 Nhận diện thoại truyện cư dân / Ký ức đêm -> Bấm lựa chọn / hiện hết thoại...`);
-      await storyChoice.first().click({ force: true });
+    // 16a. Lựa chọn phân nhánh hoặc phản hồi sau khi hết thoại (Ưu tiên số 1 để ra quyết định và đi tiếp)
+    const storyChoiceActive = page.locator('.storylet-choice-btn:visible, .btn-char-story-choice:visible, .dialogue-choice:visible, #btn-story-choice-1:visible, #btn-dismiss-char-reaction:visible, #btn-finish-char-reaction:visible, #btn-close-char-story:visible, #btn-story-close:visible, #btn-story-next:visible, .story-btn:visible');
+    if (await storyChoiceActive.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`🎯 Lựa chọn quyết định Ký sự / Thoại cư dân (#storylet-choice / #char-choice)...`);
+      await storyChoiceActive.first().click({ force: true });
+      await sleep(300);
+      return true;
+    }
+
+    // 16b. Nếu thoại đang gõ dở bằng typewriter: Bấm Hiện Hết để mở khay lựa chọn
+    const typewriterSkip = page.locator('#btn-skip-storylet-typewriter:visible, #btn-skip-char-typewriter:visible');
+    if (await typewriterSkip.first().isVisible({ timeout: 50 }).catch(() => false)) {
+      log(`⏩ Bỏ qua gõ chữ Typewriter để mở khay lựa chọn...`);
+      await typewriterSkip.first().click({ force: true });
       await sleep(250);
       return true;
     }
@@ -926,7 +935,7 @@ class OvernightMonkey {
       for (const sm of specialModals) {
         if (sm instanceof HTMLElement) sm.remove();
       }
-      const charChoice = document.querySelector('#btn-close-stardew-mailbox, #btn-dismiss-stardew-mailbox, #btn-skip-storylet-typewriter, #btn-skip-char-typewriter, .storylet-choice-btn, .btn-char-story-choice, #btn-dismiss-char-reaction, #btn-close-char-story, #btn-close-gallery, #btn-claim-bunny-letter, #btn-close-bunny-modal, #btn-skip-onboarding, #btn-close-tester-feedback, #btn-close-social-share');
+      const charChoice = document.querySelector('#btn-close-stardew-mailbox, #btn-dismiss-stardew-mailbox, .storylet-choice-btn, .btn-char-story-choice, #btn-dismiss-char-reaction, #btn-finish-char-reaction, #btn-close-char-story, #btn-close-gallery, #btn-claim-bunny-letter, #btn-close-bunny-modal, #btn-skip-storylet-typewriter, #btn-skip-char-typewriter, #btn-skip-onboarding, #btn-close-tester-feedback, #btn-close-social-share');
       if (charChoice instanceof HTMLElement) charChoice.click();
 
       const bunnyModalBtns = document.querySelectorAll('#btn-claim-bunny-letter, #btn-close-bunny-modal, #btn-open-bunny-album, #btn-read-full-novel, #btn-close-bunny-album, #btn-bunny-close, #btn-claim-bunny');

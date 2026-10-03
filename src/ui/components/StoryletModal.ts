@@ -131,6 +131,10 @@ export function bindStoryletTypewriter(
     if (choicesShown) return;
     choicesShown = true;
 
+    if (skipBtn) {
+      skipBtn.style.display = 'none';
+    }
+
     if (choicesSection) {
       choicesSection.style.display = 'block';
       // Trigger reflow cho transition mượt mà
@@ -160,6 +164,9 @@ export function bindStoryletTypewriter(
   });
 
   const doSkip = () => {
+    if (skipBtn) {
+      skipBtn.style.display = 'none';
+    }
     if (skipController) {
       skipController();
     } else {

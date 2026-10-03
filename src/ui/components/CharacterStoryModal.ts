@@ -237,6 +237,10 @@ export function bindCharacterEpisodeTypewriter(
     if (choicesShown) return;
     choicesShown = true;
 
+    if (skipBtn) {
+      skipBtn.style.display = 'none';
+    }
+
     if (dilemmaBox) {
       dilemmaBox.style.display = 'block';
       void dilemmaBox.offsetHeight;
@@ -273,6 +277,9 @@ export function bindCharacterEpisodeTypewriter(
   });
 
   const doSkip = () => {
+    if (skipBtn) {
+      skipBtn.style.display = 'none';
+    }
     if (skipController) {
       skipController();
     } else {

@@ -911,3 +911,23 @@
   - **Chiến lược Fix:** `contract_first_type_fix` (Độ tin cậy: 77.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
 ---
+
+### 🐞 [01:43:54 4/10/2026] (via Jev MCP) HMR Transient SyntaxError on StardewMailboxModal export during live edit
+- **Triệu chứng:** SyntaxError: The requested module '/src/ui/components/StardewMailboxModal.ts?t=1791030084665' does not provide an export named 'openStardewMailboxModal'
+- **Vị trí:** `src/ui/components/StardewMailboxModal.ts` 
+- **Đánh giá Jev (448ms):**
+  - **Mức độ (Severity):** `p3_minor` (Độ tin cậy: 21.0%)
+  - **Nguyên nhân gốc (Root Cause):** `state_lifecycle` (Độ tin cậy: 86.0%)
+  - **Chiến lược Fix:** `contract_first_type_fix` (Độ tin cậy: 85.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---
+
+### 🐞 [01:47:14 4/10/2026] (via Jev MCP) Monkey Test loop stuck on typewriter skip button in StoryletModal and CharacterStoryModal
+- **Triệu chứng:** Test monkey repeatedly clicks #btn-skip-storylet-typewriter every 250ms without selecting a choice to proceed to Day 2.
+- **Vị trí:** `src/ui/components/StoryletModal.ts, src/ui/components/CharacterStoryModal.ts, scripts/overnight-browser-monkey.mjs` 
+- **Đánh giá Jev (427ms):**
+  - **Mức độ (Severity):** `p2_ui_friction` (Độ tin cậy: 61.0%)
+  - **Nguyên nhân gốc (Root Cause):** `ui_modal_stack` (Độ tin cậy: 95.0%)
+  - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 81.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---

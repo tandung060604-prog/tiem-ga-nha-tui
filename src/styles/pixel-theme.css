@@ -3083,9 +3083,24 @@ body.selling-mode .toast {
   transition: all 0.2s ease;
 }
 
+.inv-cash-checkout-bar.is-active {
+  border-color: #facc15 !important;
+  box-shadow: 0 0 18px rgba(234, 179, 8, 0.45) !important;
+  animation: amberGlow 2.5s infinite alternate ease-in-out;
+}
+
+@keyframes amberGlow {
+  0% {
+    box-shadow: 0 0 12px rgba(234, 179, 8, 0.35);
+  }
+  100% {
+    box-shadow: 0 0 22px rgba(234, 179, 8, 0.65);
+  }
+}
+
 .inv-cash-checkout-bar:hover {
   border-color: #f7d046 !important;
-  box-shadow: 0 8px 24px rgba(247, 208, 70, 0.25) !important;
+  box-shadow: 0 8px 24px rgba(247, 208, 70, 0.3) !important;
 }
 
 .btn-cash-checkout {
@@ -3101,5 +3116,12 @@ body.selling-mode .toast {
   filter: brightness(1.1);
   box-shadow: 0 0 12px rgba(134, 239, 172, 0.6) !important;
 }
+
+.shelf-tag.is-draft-tag {
+  animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  font-family: inherit;
+  letter-spacing: 0.2px;
+}
+
 
 
