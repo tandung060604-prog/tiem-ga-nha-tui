@@ -124,14 +124,21 @@ class OvernightMonkey {
 
     while (Date.now() - this.startTime < maxDurationMs && this.daysCompleted < MAX_DAYS) {
       try {
-        // Kiểm tra UI Deadlock (nếu không có hành động nào thành công trong 25 giây)
-        if (Date.now() - lastActionTimestamp > 25000) {
-          log(`⚠️ Cảnh báo UI Deadlock: Hệ thống đứng yên > 25s. Kích hoạt Watchdog tự phục hồi...`);
-          const shotPath = `logs/screenshots/deadlock-day-${this.daysCompleted}-${Date.now()}.png`;
-          await page.screenshot({ path: shotPath, fullPage: true }).catch(() => {});
-          this.deadlocks.push({ day: this.daysCompleted, timestamp: new Date().toISOString(), screenshot: shotPath });
-          triggerJevTriage(`UI Deadlock Ngày ${this.daysCompleted}`, `Hệ thống đứng yên > 25s tại ngày ${this.daysCompleted}`, 'src/ui/SellingView.ts');
-          await this.emergencyRecover(page);
+        // Kiểm tra UI Deadlock (ngưỡng 40s thông minh theo khuyến nghị TypeSafe AI Jev MCP - Confidence 1.0)
+        if (Date.now() - lastActionTimestamp > 40000) {
+          const isActivelySelling = await page.evaluate(() => {
+            const s = window.__stateManager?.getState();
+            return s && s.phase === 'selling' && !s.activeEnding;
+          }).catch(() => false);
+
+          if (!isActivelySelling) {
+            log(`⚠️ Cảnh báo UI Deadlock: Hệ thống đứng yên > 40s ngoài ca bán. Kích hoạt Watchdog tự phục hồi...`);
+            const shotPath = `logs/screenshots/deadlock-day-${this.daysCompleted}-${Date.now()}.png`;
+            await page.screenshot({ path: shotPath, fullPage: true }).catch(() => {});
+            this.deadlocks.push({ day: this.daysCompleted, timestamp: new Date().toISOString(), screenshot: shotPath });
+            triggerJevTriage(`UI Deadlock Ngày ${this.daysCompleted}`, `Hệ thống đứng yên > 40s tại ngày ${this.daysCompleted}`, 'src/ui/SellingView.ts');
+            await this.emergencyRecover(page);
+          }
           lastActionTimestamp = Date.now();
         }
 
@@ -890,7 +897,7 @@ class OvernightMonkey {
       const potEl = document.getElementById('btn-fry-pot');
       if (potEl instanceof HTMLElement) potEl.click();
     }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('emergencyRecover eval timeout > 4s')), 4000))
+        new Promise((_, reject) => setTimeout(() => reject(new Error('emergencyRecover eval timeout > 8s')), 8000))
       ]);
     } catch (err) {
       log(`⚠️ emergencyRecover thoát an toàn: ${err?.message}`);
