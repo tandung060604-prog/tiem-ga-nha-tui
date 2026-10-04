@@ -489,7 +489,7 @@ class AppController {
     this.openModal(`
       <div class="onboarding-card shop-name-dialog">
         <div class="onboarding-kicker">
-          <span>🏷️</span> BƯỚC 1: KHỞI NGHIỆP HẺM 1102
+          <img src="${ASSETS.icons.woodenSign}" class="btn-pixel-icon-xs" alt="" /> BƯỚC 1: KHỞI NGHIỆP HẺM 1102
         </div>
         <h2 class="onboarding-title">Đặt Tên Cho Tiệm Gà Của Bạn</h2>
         <p class="onboarding-desc">Tên quán sẽ in trên biển hiệu gỗ, hóa đơn, ca bán và review của thực khách Sài Gòn.</p>
@@ -499,7 +499,7 @@ class AppController {
         </div>
 
         <div class="onboarding-chips-box">
-          <div class="onboarding-chips-label">💡 Gợi ý tên hay cho tiệm:</div>
+          <div class="onboarding-chips-label"><img src="${ASSETS.icons.lightbulbRetro}" class="btn-pixel-icon-xs" alt="" /> Gợi ý tên hay cho tiệm:</div>
           <div class="onboarding-chips-list">
             ${SHOP_NAME_SUGGESTIONS.map(n => `<button class="onboarding-chip-btn shop-name-chip" type="button" data-name="${escapeHtml(n)}">${escapeHtml(n)}</button>`).join('')}
           </div>
@@ -507,8 +507,8 @@ class AppController {
 
         <button id="btn-confirm-shop-name" class="btn-title-hero onboarding-submit-btn" type="button" style="width: 100%; min-height: 50px;">
           <span class="hero-btn-content">
-            <span class="hero-btn-icon">🍗</span>
-            <span class="hero-btn-text">TREO BIỂN &amp; TIẾP TỤC ➡️</span>
+            <img src="${ASSETS.icons.chickenCrispy}" class="btn-pixel-icon-xs" alt="" />
+            <span class="hero-btn-text">TREO BIỂN &amp; TIẾP TỤC</span>
           </span>
         </button>
       </div>
@@ -522,7 +522,7 @@ class AppController {
       stateManager.update(draft => { draft.shopName = name; });
       stateManager.flush();
       audio.playCash();
-      this.showToast(`Biển hiệu "${name}" đã được treo! 🎉`);
+      this.showToast(`Biển hiệu "${name}" đã được treo!`);
       // QUAN TRỌNG: Không gọi closeModal() giữa chừng để tránh rò rỉ kích hoạt nhầm tutorial.
       // Chuyển thẳng sang WelcomeDialog (onDone())!
       onDone();
@@ -537,7 +537,7 @@ class AppController {
     const welcomeHtml = `
       <div class="onboarding-card welcome-dialog">
         <div class="onboarding-kicker">
-          <span>🎉</span> BƯỚC 2: KHAI TRƯƠNG HỒNG PHÁT
+          <img src="${ASSETS.icons.sparkle}" class="btn-pixel-icon-xs" alt="" /> BƯỚC 2: KHAI TRƯƠNG HỒNG PHÁT
         </div>
 
         <div class="welcome-mascot-wrap">
@@ -550,31 +550,31 @@ class AppController {
 
         <div class="welcome-stat-grid">
           <div class="welcome-stat-card">
-            <span class="welcome-stat-icon">💰</span>
+            <span class="welcome-stat-icon"><img src="${ASSETS.icons.money}" class="btn-pixel-icon-sm" alt="" /></span>
             <span class="welcome-stat-label">VỐN BAN ĐẦU</span>
             <span class="welcome-stat-val val-green">850.000đ</span>
           </div>
           <div class="welcome-stat-card">
-            <span class="welcome-stat-icon">🛵</span>
+            <span class="welcome-stat-icon"><img src="${ASSETS.icons.scooter}" class="btn-pixel-icon-sm" alt="" /></span>
             <span class="welcome-stat-label">KHỞI ĐIỂM</span>
             <span class="welcome-stat-val">Xe Đẩy Hẻm</span>
           </div>
           <div class="welcome-stat-card">
-            <span class="welcome-stat-icon">🏆</span>
+            <span class="welcome-stat-icon"><img src="${ASSETS.icons.trophy}" class="btn-pixel-icon-sm" alt="" /></span>
             <span class="welcome-stat-label">MỤC TIÊU LỚN</span>
             <span class="welcome-stat-val val-gold">5.000.000đ</span>
           </div>
         </div>
 
         <div class="welcome-guide-box">
-          <span class="welcome-guide-avatar">👴</span>
+          <span class="welcome-guide-avatar"><img src="${ASSETS.bacba.front}" class="avatar-mini-pixel" alt="Bác Ba" style="width: 32px; height: 32px; border-radius: 50%;" /></span>
           <p class="welcome-guide-text">Bác Ba đang đứng đợi con ở quầy để chỉ dẫn cách chiên gà vàng giòn <b>Perfect</b> và chuẩn bị kho hàng Ngày 1 nè!</p>
         </div>
 
         <button id="btn-welcome-start" class="btn-title-hero onboarding-submit-btn" type="button" style="width: 100%; min-height: 52px;">
           <span class="hero-btn-content">
-            <span class="hero-btn-icon">🍗</span>
-            <span class="hero-btn-text">BẮT ĐẦU NGÀY 1 &amp; GẶP BÁC BA ➡️</span>
+            <img src="${ASSETS.icons.chickenCrispy}" class="btn-pixel-icon-xs" alt="" />
+            <span class="hero-btn-text">BẮT ĐẦU NGÀY 1 &amp; GẶP BÁC BA</span>
           </span>
         </button>
       </div>

@@ -52,130 +52,130 @@ export function getMoodThought(mood: CustomerMood, order?: CustomerOrder, state?
 
     if (isDirtyOil) {
       if (mood === 'waiting' && Math.random() < 0.4) {
-        return 'Mùi dầu hơi khét rồi đó chủ tiệm ơi... thay dầu đi nè! 🛢️';
+        return 'Mùi dầu hơi khét rồi đó chủ tiệm ơi... thay dầu đi nè!';
       }
       if (mood === 'impatient') {
-        return 'Dầu đen kịt vầy ăn có đau bụng hông ta... lo quá! 🥺';
+        return 'Dầu đen kịt vầy ăn có đau bụng hông ta... lo quá!';
       }
     } else if (isCleanOil && mood === 'waiting' && Math.random() < 0.3) {
-      return 'Dầu vàng ươm thơm phức nghen, nhìn là ưng cái bụng liền ✨!';
+      return 'Dầu vàng ươm thơm phức nghen, nhìn là ưng cái bụng liền!';
     }
 
     // Ngữ cảnh Đua Top Lobby 4 Người
     if (state.roomId && mood === 'waiting' && Math.random() < 0.25) {
-      return `Phòng ${state.roomId.toUpperCase()} đang đua top gắt lắm, quán mình ráng giật cúp nha 🏆!`;
+      return `Phòng ${state.roomId.toUpperCase()} đang đua top gắt lắm, quán mình ráng giật cúp nha!`;
     }
 
     // Ngữ cảnh Chuỗi Perfect cao
     if (((state as any)?.perfectStreak ?? 0) >= 3 && mood === 'happy' && Math.random() < 0.4) {
-      return 'Bếp trưởng chiên Perfect liên hoàn đỉnh nóc kịch trần luôn 🔥!';
+      return 'Bếp trưởng chiên Perfect liên hoàn đỉnh nóc kịch trần luôn!';
     }
   }
 
   // Ngữ cảnh phong vị Bistro ấm cúng
   if (mood === 'waiting' && Math.random() < 0.3) {
-    return 'Gà vừa chiên xong bốc khói nghi ngút, thơm nức cả con hẻm luôn nè! 🍗✨';
+    return 'Gà vừa chiên xong bốc khói nghi ngút, thơm nức cả con hẻm luôn nè!';
   }
 
   if (order?.isBunny) {
-    if (mood === 'leaving') return 'Em đói lả người rồi tiệm ơi... 🥺';
-    if (mood === 'impatient') return 'Chờ thêm xíu nữa thui nè! 🐰';
-    if (mood === 'waiting') return 'Mùi gà chiên thơm nức mũi luôn á! 🤤';
-    return 'Gà giòn rụm đỉnh nóc kịch trần! 💖';
+    if (mood === 'leaving') return 'Em đói lả người rồi tiệm ơi...';
+    if (mood === 'impatient') return 'Chờ thêm xíu nữa thui nè!';
+    if (mood === 'waiting') return 'Mùi gà chiên thơm nức mũi luôn á!';
+    return 'Gà giòn rụm đỉnh nóc kịch trần!';
   }
 
   const p = order?.personality;
   if (p === 'vip_generous' || order?.isVip) {
     switch (mood) {
-      case 'leaving': return 'Thời gian là vàng bạc! Anh xin kiếu lần này! 🚪';
-      case 'impatient': return 'Lâu quá anh sốt ruột nha, nhanh tay là có thưởng đậm! ⏱️';
-      case 'waiting': return 'Tiền nong không quan trọng, làm chuẩn giòn rụm anh bo hết nấc! 💵';
-      case 'happy': return 'Gà ngon xuất sắc! Khỏi thối tiền thừa nha em! 👑✨';
+      case 'leaving': return 'Thời gian là vàng bạc! Anh xin kiếu lần này!';
+      case 'impatient': return 'Lâu quá anh sốt ruột nha, nhanh tay là có thưởng đậm!';
+      case 'waiting': return 'Tiền nong không quan trọng, làm chuẩn giòn rụm anh bo hết nấc!';
+      case 'happy': return 'Gà ngon xuất sắc! Khỏi thối tiền thừa nha em!';
     }
   }
 
   if (p === 'critic' || order?.isCriticVip) {
     switch (mood) {
-      case 'leaving': return 'Phục vụ quá chậm trễ! Đánh giá 1 sao và bêu tên trên bài viết! 💢';
-      case 'impatient': return 'Lâu quá đấy! Tôi đang bấm giờ từng giây chất lượng phục vụ! ⏱️';
-      case 'waiting': return 'Chờ xem độ giòn và mùi vị có xứng danh đồn thổi hay không... 🧐';
-      case 'happy': return 'Vàng giòn rụm, vỏ mỏng ráo dầu! Xứng đáng 5 sao thượng hạng! ⭐⭐⭐⭐⭐';
+      case 'leaving': return 'Phục vụ quá chậm trễ! Đánh giá 1 sao và bêu tên trên bài viết!';
+      case 'impatient': return 'Lâu quá đấy! Tôi đang bấm giờ từng giây chất lượng phục vụ!';
+      case 'waiting': return 'Chờ xem độ giòn và mùi vị có xứng danh đồn thổi hay không...';
+      case 'happy': return 'Vàng giòn rụm, vỏ mỏng ráo dầu! Xứng đáng 5 sao thượng hạng!';
     }
   }
 
   if (p === 'foodie') {
     switch (mood) {
-      case 'leaving': return 'Chờ mòn mỏi chưa có, trừ sạch sao nha! 💢';
-      case 'impatient': return 'Canh lửa chuẩn nha, chiên non lửa là tui biết đó! ⏱️';
-      case 'waiting': return 'Nghe tiếng dầu réo là biết tay nghề cứng rồi! 🍗';
-      case 'happy': return 'Da gà ráo dầu, giòn rụm đúng chuẩn! ⭐';
+      case 'leaving': return 'Chờ mòn mỏi chưa có, trừ sạch sao nha!';
+      case 'impatient': return 'Canh lửa chuẩn nha, chiên non lửa là tui biết đó!';
+      case 'waiting': return 'Nghe tiếng dầu réo là biết tay nghề cứng rồi!';
+      case 'happy': return 'Da gà ráo dầu, giòn rụm đúng chuẩn!';
     }
   }
 
   if (p === 'impatient') {
     switch (mood) {
-      case 'leaving': return 'Trễ giờ chấm công rồi! Bỏ đi đây! 😤';
-      case 'impatient': return 'Sắp trễ giờ họp rồi, nóng ruột quá trời! ⏳';
-      case 'waiting': return 'Gói lẹ giùm em nha chủ tiệm ơi! 🏃';
-      case 'happy': return 'Nhanh như chớp, kịp giờ làm rồi! ⚡';
+      case 'leaving': return 'Trễ giờ chấm công rồi! Bỏ đi đây!';
+      case 'impatient': return 'Sắp trễ giờ họp rồi, nóng ruột quá trời!';
+      case 'waiting': return 'Gói lẹ giùm em nha chủ tiệm ơi!';
+      case 'happy': return 'Nhanh như chớp, kịp giờ làm rồi!';
     }
   }
 
   if (p === 'driver') {
     switch (mood) {
-      case 'leaving': return 'Trễ giờ đơn app phạt tiền, huỷ đơn thôi! ❌';
-      case 'impatient': return 'Khách réo nổ máy điện thoại luôn rồi anh ơi! ⏳';
-      case 'waiting': return 'App báo đơn gấp, tiệm làm liền giùm em nha! 📦';
-      case 'happy': return 'Cảm ơn tiệm, em phóng đi giao cho kịp đây! 🛵';
+      case 'leaving': return 'Trễ giờ đơn app phạt tiền, huỷ đơn thôi!';
+      case 'impatient': return 'Khách réo nổ máy điện thoại luôn rồi anh ơi!';
+      case 'waiting': return 'App báo đơn gấp, tiệm làm liền giùm em nha!';
+      case 'happy': return 'Cảm ơn tiệm, em phóng đi giao cho kịp đây!';
     }
   }
 
   if (p === 'student') {
     switch (mood) {
-      case 'leaving': return 'Đói lả người rồi, qua quán bánh mì ăn cho lẹ! 🏃';
-      case 'impatient': return 'Bụng réo ầm ầm rồi đại ca ơi... 🥺';
-      case 'waiting': return 'Ăn xong cái đùi này về giải tích phân mới vô! 📖';
-      case 'happy': return 'Gà sốt cay ở đây dính vãi chưởng! 🍟';
+      case 'leaving': return 'Đói lả người rồi, qua quán bánh mì ăn cho lẹ!';
+      case 'impatient': return 'Bụng réo ầm ầm rồi đại ca ơi...';
+      case 'waiting': return 'Ăn xong cái đùi này về giải tích phân mới vô!';
+      case 'happy': return 'Gà sốt cay ở đây dính vãi chưởng!';
     }
   }
 
   if (p === 'easygoing') {
     switch (mood) {
-      case 'leaving': return 'Có việc bận rồi, hẹn tiệm mai ghé lại nhen! 🚶';
-      case 'impatient': return 'Nay đông khách dữ ta ơi, ráng đợi thêm chút! ⏳';
-      case 'waiting': return 'Tiệm cứ chiên từ từ, em đứng đợi được nhen! 😊';
-      case 'happy': return 'Gà nóng hổi thơm ngon, ưng cái bụng ghê! 🍵';
+      case 'leaving': return 'Có việc bận rồi, hẹn tiệm mai ghé lại nhen!';
+      case 'impatient': return 'Nay đông khách dữ ta ơi, ráng đợi thêm chút!';
+      case 'waiting': return 'Tiệm cứ chiên từ từ, em đứng đợi được nhen!';
+      case 'happy': return 'Gà nóng hổi thơm ngon, ưng cái bụng ghê!';
     }
   }
 
   if (p === 'generous') {
     switch (mood) {
-      case 'leaving': return 'Thôi chịu hết nổi rồi, hẹn tiệm dịp khác vậy! 🚪';
-      case 'impatient': return 'Cũng hơi lâu xíu rồi đó nha tiệm! 🕒';
-      case 'waiting': return 'Cứ làm kỹ càng nha em, anh không vội đâu! ✨';
-      case 'happy': return 'Quá ngon! Bữa nay tip đậm cho chủ quán! 💵';
+      case 'leaving': return 'Thôi chịu hết nổi rồi, hẹn tiệm dịp khác vậy!';
+      case 'impatient': return 'Cũng hơi lâu xíu rồi đó nha tiệm!';
+      case 'waiting': return 'Cứ làm kỹ càng nha em, anh không vội đâu!';
+      case 'happy': return 'Quá ngon! Bữa nay tip đậm cho chủ quán!';
     }
   }
 
   if (p === 'frugal') {
     switch (mood) {
-      case 'leaving': return 'Giá rẻ mà đợi lâu vầy thì thôi xin kiếu! 🏃';
-      case 'impatient': return 'Lâu quá chừng, xin thêm gói tương nha! 🍅';
-      case 'waiting': return 'Đợi combo rẻ mà ngon bõ công ghê! 🍗';
-      case 'happy': return 'Combo giá hời mà gà chất lượng thiệt! 🪙';
+      case 'leaving': return 'Giá rẻ mà đợi lâu vầy thì thôi xin kiếu!';
+      case 'impatient': return 'Lâu quá chừng, xin thêm gói tương nha!';
+      case 'waiting': return 'Đợi combo rẻ mà ngon bõ công ghê!';
+      case 'happy': return 'Combo giá hời mà gà chất lượng thiệt!';
     }
   }
 
   switch (mood) {
     case 'leaving':
-      return 'Lâu quá mức! Bỏ về đây! 💢';
+      return 'Lâu quá mức! Bỏ về đây!';
     case 'impatient':
-      return 'Chờ sốt ruột ghê, nhanh giùm em nha! 🥺';
+      return 'Chờ sốt ruột ghê, nhanh giùm em nha!';
     case 'waiting':
-      return 'Mùi gà thơm nức mũi, thèm chảy nước miếng! 🤤';
+      return 'Mùi gà thơm nức mũi, thèm chảy nước miếng!';
     case 'happy':
     default:
-      return 'Tiệm này đỉnh chóp hẻm 1102! ✨';
+      return 'Tiệm này đỉnh chóp hẻm 1102!';
   }
 }
 
@@ -205,7 +205,7 @@ export function renderFx(events: readonly FxEvent[]): void {
     const el = document.createElement('div');
     el.className = isTip ? 'money-float tip-parabola' : 'money-float cash-parabola';
     el.innerHTML = isTip 
-      ? `<img src="${ASSETS.ui.pixelBanknoteFly}" class="flying-banknote-img tip-glow" alt="Tiền" /><span class="tip-sparkle-badge">✨</span><span>${text}</span>` 
+      ? `<img src="${ASSETS.ui.pixelBanknoteFly}" class="flying-banknote-img tip-glow" alt="Tiền" /><img src="${ASSETS.icons.sparkle}" class="btn-pixel-icon-xs" alt="" /><span>${text}</span>` 
       : `<img src="${ASSETS.ui.pixelBanknoteFly}" class="flying-banknote-img" alt="Tiền" /><span>${text}</span>`;
     layer!.appendChild(el);
     setTimeout(() => el.remove(), 1150);
@@ -473,7 +473,7 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
     cache.oilDot.className = `oil-dot ${currentOil}`;
   }
   if (cache.oilLabel) {
-    const label = currentOil === 'clean' ? 'Sạch' : currentOil === 'medium' ? 'Vừa' : '⚠️ ĐEN! THAY';
+    const label = currentOil === 'clean' ? 'Sạch' : currentOil === 'medium' ? 'Vừa' : 'DẦU ĐEN! THAY';
     if (cache.oilLabel.textContent !== label) cache.oilLabel.textContent = label;
   }
 
@@ -493,7 +493,7 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
       if (!dirtyOverlay) {
         dirtyOverlay = document.createElement('div');
         dirtyOverlay.className = 'dirty-oil-warning-overlay';
-        dirtyOverlay.innerHTML = '<span class="smoke-puff">💨</span><span>⚠️ DẦU ĐEN! THAY DẦU KẺO CHÁY!</span>';
+        dirtyOverlay.innerHTML = `<img src="${ASSETS.icons.smokePuff}" class="btn-pixel-icon-sm" alt="" /><span><img src="${ASSETS.icons.burntAlert}" class="btn-pixel-icon-xs" alt="" /> DẦU ĐEN! THAY DẦU KẺO CHÁY!</span>`;
         cache.fryPot.appendChild(dirtyOverlay);
       }
     } else if (dirtyOverlay) {
@@ -507,12 +507,12 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
 
       if (cache.foodStatusBadge) {
         cache.foodStatusBadge.className = `food-status-badge ${quality}`;
-        const qualityTag = quality === 'perfect' ? '⭐ VÀNG GIÒN' : quality === 'burnt' ? '💥 CHÁY KHÉT' : quality === 'good' ? 'VỪA CHÍN' : 'SỐNG';
-        let foodLabel = '🍗 GÀ GIÒN';
-        if (cook.fryingType === 'thigh') foodLabel = '🍗 MÁ ĐÙI CAY';
-        else if (cook.fryingType === 'fries') foodLabel = '🍟 KHOAI LẮC';
-        else if (cook.fryingType === 'popcorn') foodLabel = '🍿 GÀ VIÊN';
-        else if (cook.fryingType === 'cheese') foodLabel = '🧀 PHÔ MAI QUE';
+        const qualityTag = quality === 'perfect' ? 'VÀNG GIÒN' : quality === 'burnt' ? 'CHÁY KHÉT' : quality === 'good' ? 'VỪA CHÍN' : 'SỐNG';
+        let foodLabel = 'GÀ GIÒN';
+        if (cook.fryingType === 'thigh') foodLabel = 'MÁ ĐÙI CAY';
+        else if (cook.fryingType === 'fries') foodLabel = 'KHOAI LẮC';
+        else if (cook.fryingType === 'popcorn') foodLabel = 'GÀ VIÊN';
+        else if (cook.fryingType === 'cheese') foodLabel = 'PHÔ MAI QUE';
         cache.foodStatusBadge.textContent = `${foodLabel} · ${qualityTag}`;
       }
 
@@ -590,12 +590,12 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
           const isStaff = !!table.cleanedByStaff;
           const isCleaning = !!table.isBeingCleaned;
           const newText = isStaff
-            ? `🧹 ${table.staffCleanerName || 'Phục vụ'} lau (${progress}%)`
+            ? `${table.staffCleanerName || 'Phục vụ'} lau (${progress}%)`
             : isCleaning
-            ? `🧼 Đang chà... (${progress}%)`
+            ? `Đang chà... (${progress}%)`
             : progress > 0
-            ? `🧼 Chà tiếp (${progress}%)`
-            : '🧼 Chà lau';
+            ? `Chà tiếp (${progress}%)`
+            : 'Chà lau';
           if (cleanText.textContent?.trim() !== newText.trim()) {
             cleanText.textContent = newText;
           }
@@ -614,18 +614,18 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
 
 function potHint(): string {
   const cook = cookingEngine.getCookState();
-  if (!cook.isFrying) return '👉 Thả gà vào chiên';
+  if (!cook.isFrying) return 'Thả gà vào chiên';
   const quality = cookingEngine.calculateCurrentQuality();
-  if (quality === 'perfect') return '⭐ VÀNG GIÒN! VỚT';
-  if (quality === 'burnt') return '💥 CHÁY KHÉT! BỎ';
-  if (quality === 'good') return '🔥 Dầu sôi xèo xèo...';
-  return '🍗 Đang chiên giòn...';
+  if (quality === 'perfect') return 'VÀNG GIÒN! VỚT';
+  if (quality === 'burnt') return 'CHÁY KHÉT! BỎ';
+  if (quality === 'good') return 'Dầu sôi xèo xèo...';
+  return 'Đang chiên giòn...';
 }
 
 const TRAY_QUALITY_LABEL: Record<QualityRating, string> = {
   raw: 'CÒN SỐNG',
   good: 'VỪA CHÍN',
-  perfect: 'VÀNG GIÒN ⭐',
+  perfect: 'VÀNG GIÒN',
   burnt: 'CHÁY KHÉT'
 };
 
@@ -723,7 +723,7 @@ export function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
       angry: shipStand,
       leave: shipWalk,
       name: order.customerName,
-      badge: order.archetypeBadge ? `🛵 ${order.archetypeBadge}` : '🛵 Shipper Ruột',
+      badge: order.archetypeBadge ? `<img src="${ASSETS.icons.scooter}" class="badge-pixel-star-xs" alt="" /> ${order.archetypeBadge}` : `<img src="${ASSETS.icons.scooter}" class="badge-pixel-star-xs" alt="" /> Shipper Ruột`,
       badgeClass: 'delivery-badge'
     };
   }
@@ -745,7 +745,7 @@ export function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
       angry: asset,
       leave: leaveAsset,
       name: order.customerName,
-      badge: order.isVip ? `👑 ${order.archetypeBadge || profile.roleTitle}` : (order.archetypeBadge || profile.roleTitle),
+      badge: order.isVip ? `<img src="${ASSETS.icons.crownVip}" class="badge-pixel-star-xs" alt="" /> ${order.archetypeBadge || profile.roleTitle}` : (order.archetypeBadge || profile.roleTitle),
       badgeClass: order.isVip ? 'vip-badge' : getBadgeClassForChar(profile.category, profile.id)
     };
   }
@@ -762,7 +762,7 @@ export function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
         angry: asset,
         leave: asset,
         name: order.customerName,
-        badge: order.isVip ? `👑 ${order.archetypeBadge || profile.roleTitle}` : (order.archetypeBadge || profile.roleTitle),
+        badge: order.isVip ? `<img src="${ASSETS.icons.crownVip}" class="badge-pixel-star-xs" alt="" /> ${order.archetypeBadge || profile.roleTitle}` : (order.archetypeBadge || profile.roleTitle),
         badgeClass: order.isVip ? 'vip-badge' : getBadgeClassForChar(profile.category, profile.id)
       };
     }
@@ -772,7 +772,7 @@ export function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
       angry: order.avatar,
       leave: order.avatar,
       name: order.customerName,
-      badge: order.isVip ? `👑 ${order.archetypeBadge || 'Khách Sộp'}` : (order.archetypeBadge || 'Cư Dân Hẻm'),
+      badge: order.isVip ? `<img src="${ASSETS.icons.crownVip}" class="badge-pixel-star-xs" alt="" /> ${order.archetypeBadge || 'Khách Sộp'}` : (order.archetypeBadge || 'Cư Dân Hẻm'),
       badgeClass: order.isVip ? 'vip-badge' : 'genz-badge'
     };
   }
@@ -953,7 +953,7 @@ export function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
   const leaveAsset = picked.id === 'char_19_shipper_tuan' ? ASSETS.shipper.leave : ASSETS.takeawayCustomer;
   const badgeClass = order.isVip ? 'vip-badge' : getBadgeClassForChar(picked.category, picked.id);
   const badgeText = order.isVip 
-    ? (order.archetypeBadge ? `👑 ${order.archetypeBadge}` : `👑 ${picked.roleTitle} (Khách Sộp)`)
+    ? (order.archetypeBadge ? `<img src="${ASSETS.icons.crownVip}" class="badge-pixel-star-xs" alt="" /> ${order.archetypeBadge}` : `<img src="${ASSETS.icons.crownVip}" class="badge-pixel-star-xs" alt="" /> ${picked.roleTitle} (Khách Sộp)`)
     : (order.archetypeBadge || picked.roleTitle);
 
   return {
@@ -967,11 +967,57 @@ export function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
   };
 }
 
+export interface ShiftDisplayInfo {
+  icon: string;
+  title: string;
+  sub: string;
+  className: string;
+}
+
+export function getShiftDisplayInfo(gameHour: number): ShiftDisplayInfo {
+  if (isRushHour(gameHour)) {
+    return {
+      icon: ASSETS.icons.fireRush,
+      title: 'CA CAO ĐIỂM',
+      sub: 'Khách Tấp Nập',
+      className: 'shift-rush'
+    };
+  }
+  if (gameHour < 13) {
+    return {
+      icon: ASSETS.icons.shiftNoon,
+      title: 'Ca Trưa',
+      sub: 'Nắng Vàng Giòn Rụm',
+      className: 'shift-noon'
+    };
+  }
+  if (gameHour < 17) {
+    return {
+      icon: ASSETS.icons.shiftAfternoon,
+      title: 'Ca Chiều',
+      sub: 'Nắng Xế Hoàng Hôn',
+      className: 'shift-afternoon'
+    };
+  }
+  if (gameHour < 19.5) {
+    return {
+      icon: ASSETS.icons.shiftEvening,
+      title: 'Ca Tối',
+      sub: 'Phố Lên Đèn',
+      className: 'shift-evening'
+    };
+  }
+  return {
+    icon: ASSETS.icons.shiftNight,
+    title: 'Ca Đêm',
+    sub: 'Trăng Sao Tĩnh Lặng',
+    className: 'shift-night'
+  };
+}
+
 export function renderSellingView(state: GameState, session: SellingSession): string {
   const formattedTime = formatClock(session.gameHour);
-  const rush = isRushHour(session.gameHour);
-  const hourNum = session.gameHour;
-  const timePeriodLabel = hourNum < 14 ? '☀️ Ca Trưa Hẻm 1102 · Nắng Vàng Giòn Rụm' : '🌙 Ca Tối Hẻm 1102 · Đèn Dầu Bập Bùng';
+  const shiftInfo = getShiftDisplayInfo(session.gameHour);
   const tray = cookingEngine.getTray();
 
   // 1. Khách Hàng Hoàn Tất Đang Diễn Hoạt Nhận Món & Bước Đi Rời Quán (The 4-Beat Serving Cadence)
@@ -988,7 +1034,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
            style="pointer-events: none;">
         <!-- Stardew Floating Emote Bubble -->
         <div class="stardew-emote-bubble ${dep.isDelighted ? 'happy' : 'leaving'}">
-          <img src="${dep.isDelighted ? ASSETS.icons.sparkle : ASSETS.icons.emoteYum}" class="emote-pixel-img" alt="✨" width="16" height="16" />
+          <img src="${dep.isDelighted ? ASSETS.icons.sparkle : ASSETS.icons.emoteYum}" class="emote-pixel-img" alt="" width="16" height="16" />
         </div>
 
         <!-- 2D Character Walking & Standing Stage -->
@@ -998,14 +1044,14 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             <div class="char-shadow ${isLeaving ? 'shadow-walk' : ''}"></div>
             <!-- Túi giấy Kraft mang về trên tay khách -->
             <div class="prop-takeaway-bag" title="Đã đóng gói mang về">
-              <span class="bag-steam">♨️</span>
-              <span class="bag-icon">🛍️</span>
+              <img src="${ASSETS.icons.smokePuff}" class="bag-steam-img" alt="" />
+              <img src="${ASSETS.icons.inventory}" class="bag-icon-img" alt="" />
             </div>
           </div>
           <div class="cust-info-col">
             <div class="cust-name-row">
               <span class="cust-name">${visual.name}</span>
-              <span class="mood-indicator"><img src="${ASSETS.icons.sparkle}" class="badge-pixel-star-xs" alt="✨" /></span>
+              <span class="mood-indicator"><img src="${ASSETS.icons.sparkle}" class="badge-pixel-star-xs" alt="" /></span>
             </div>
             <div class="cust-badges-row">
               <span class="cust-badge served-success-badge"><img src="${ASSETS.icons.check}" class="badge-pixel-star-xs" alt="" /> ĐÃ LÊN MÓN</span>
@@ -1017,7 +1063,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         <div class="speech-bubble wooden-order-ticket is-takeaway-served">
           <div class="bubble-arrow"></div>
           <div class="served-bag-notice">
-            <span class="served-bag-title">🎁 ĐÃ LÊN MÓN</span>
+            <span class="served-bag-title"><img src="${ASSETS.icons.gift}" class="badge-pixel-star-xs" alt="" /> ĐÃ LÊN MÓN</span>
             <span class="served-bag-sub">${escapeHtml(dep.takeawayItemName || 'Gà Rán Giòn')} · Cảm ơn quán!</span>
           </div>
         </div>
@@ -1159,7 +1205,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             </div>
             <div class="cust-badges-row">
               <span class="queue-pos-badge ${isFirstInQueue ? 'first' : 'wait'}">${queuePosText}</span>
-              ${ord.isVip ? '<span class="cust-badge vip-gold-badge">👑 VIP</span>' : ord.isCriticVip ? '<span class="cust-badge critic-gold-badge">⭐ PHÊ BÌNH</span>' : ord.isDineIn ? '<span class="cust-badge dine-in-tag">🍽️ Bàn Quán</span>' : `<span class="cust-badge ${visual.badgeClass}">${visual.badge}</span>`}
+              ${ord.isVip ? `<span class="cust-badge vip-gold-badge"><img src="${ASSETS.icons.crownVip}" class="badge-pixel-star-xs" alt="" /> VIP</span>` : ord.isCriticVip ? `<span class="cust-badge critic-gold-badge"><img src="${ASSETS.icons.star}" class="badge-pixel-star-xs" alt="" /> PHÊ BÌNH</span>` : ord.isDineIn ? '<span class="cust-badge dine-in-tag">Bàn Quán</span>' : `<span class="cust-badge ${visual.badgeClass}">${visual.badge}</span>`}
               ${ord.dietaryPreference ? `<span class="cust-badge dietary-tag ${ord.dietaryFulfilled ? 'fulfilled' : ''}" title="${escapeHtml(ord.dietaryPreference.hint)}">${ord.dietaryPreference.label}</span>` : ''}
             </div>
           </div>
@@ -1207,26 +1253,26 @@ export function renderSellingView(state: GameState, session: SellingSession): st
   let panFoodHtml = '';
   if (cookState.isFrying) {
     let foodImg = ASSETS.food.crispyChickenPerfect;
-    let foodLabel = '🍗 GÀ RÁN';
+    let foodLabel = 'GÀ RÁN';
 
     if (cookState.fryingType === 'thigh') {
       foodImg = quality === 'raw' ? ASSETS.kitchen.gnPrepThighRaw : quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.spicyThigh;
-      foodLabel = '🍗 MÁ ĐÙI CAY';
+      foodLabel = 'MÁ ĐÙI CAY';
     } else if (cookState.fryingType === 'fries') {
       foodImg = quality === 'raw' ? ASSETS.kitchen.gnPrepFriesRaw : quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.shakeFries;
-      foodLabel = '🍟 KHOAI LẮC';
+      foodLabel = 'KHOAI LẮC';
     } else if (cookState.fryingType === 'popcorn') {
       foodImg = quality === 'raw' ? ASSETS.kitchen.gnPrepPopcornRaw : quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.popcornChicken;
-      foodLabel = '🍿 GÀ VIÊN';
+      foodLabel = 'GÀ VIÊN';
     } else if (cookState.fryingType === 'cheese') {
       foodImg = quality === 'raw' ? ASSETS.kitchen.gnPrepCheeseStickRaw : quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.cheeseStick;
-      foodLabel = '🧀 PHÔ MAI QUE';
+      foodLabel = 'PHÔ MAI QUE';
     } else {
       foodImg = quality === 'raw' ? ASSETS.food.crispyChickenRaw : quality === 'burnt' ? ASSETS.food.crispyChickenBurnt : ASSETS.food.crispyChickenPerfect;
-      foodLabel = '🍗 GÀ GIÒN';
+      foodLabel = 'GÀ GIÒN';
     }
 
-    const qualityTag = quality === 'perfect' ? '⭐ VÀNG GIÒN' : quality === 'burnt' ? '💥 CHÁY KHÉT' : quality === 'good' ? 'VỪA CHÍN' : 'SỐNG';
+    const qualityTag = quality === 'perfect' ? 'VÀNG GIÒN' : quality === 'burnt' ? 'CHÁY KHÉT' : quality === 'good' ? 'VỪA CHÍN' : 'SỐNG';
 
     panFoodHtml = `
       <div class="frying-food-item ${quality} sizzle-active">
@@ -1234,13 +1280,13 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         <div class="food-status-badge ${quality}">${foodLabel} · ${qualityTag}</div>
         ${quality === 'perfect' ? `
           <div class="perfect-sparkles-burst" aria-hidden="true">
-            <span class="sparkle-dot">✨</span>
-            <span class="sparkle-dot">⭐</span>
-            <span class="sparkle-dot">✨</span>
-            <span class="sparkle-dot">⭐</span>
+            <span class="sparkle-dot"><img src="${ASSETS.icons.sparkle}" class="btn-pixel-icon-xs" alt="" /></span>
+            <span class="sparkle-dot"><img src="${ASSETS.icons.star}" class="btn-pixel-icon-xs" alt="" /></span>
+            <span class="sparkle-dot"><img src="${ASSETS.icons.sparkle}" class="btn-pixel-icon-xs" alt="" /></span>
+            <span class="sparkle-dot"><img src="${ASSETS.icons.star}" class="btn-pixel-icon-xs" alt="" /></span>
           </div>
         ` : ''}
-        ${quality === 'burnt' ? '<div class="burnt-smoke-puff">💨</div>' : ''}
+        ${quality === 'burnt' ? `<div class="burnt-smoke-puff"><img src="${ASSETS.icons.smokePuff}" class="btn-pixel-icon-sm" alt="" /></div>` : ''}
       </div>
     `;
   } else {
@@ -1260,12 +1306,12 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       const img = foodImage(item.menuItemId, item.quality);
       const qClass = isDrink ? 'good' : item.quality;
       const drinkTag = item.menuItemId === 'soda'
-        ? '🔴 COCA ĐÁ ❄️'
+        ? 'COCA ĐÁ LẠNH'
         : item.menuItemId === 'seven_up'
-        ? '🟢 7UP CHANH ❄️'
+        ? '7UP CHANH ĐÁ'
         : item.menuItemId === 'fanta_orange'
-        ? '🟠 FANTA CAM ❄️'
-        : 'ƯỚP LẠNH ❄️';
+        ? 'FANTA CAM ĐÁ'
+        : 'ƯỚP LẠNH';
       const qText = isDrink ? drinkTag : TRAY_QUALITY_LABEL[item.quality];
       const drinkClass = item.menuItemId === 'soda' ? 'drink-coca' : item.menuItemId === 'seven_up' ? 'drink-7up' : item.menuItemId === 'fanta_orange' ? 'drink-fanta' : '';
       const shortName = shortFoodName(item.name);
@@ -1305,11 +1351,14 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <img src="${ASSETS.icons.clock}" class="hud-pixel-icon" alt="" />
           <span>Giờ mở bán: <b>${formattedTime}</b></span>
         </div>
-        ${rush ? `<span class="rush-badge"><img src="${ASSETS.icons.fireRush}" class="hud-pixel-icon" alt="" /> CA CAO ĐIỂM!</span>` : `<span class="session-ambience">${timePeriodLabel}</span>`}
-        ${state.secretSauceDay?.buffActive ? `<span class="sauce-buff-hud-badge" title="Sốt Bí Truyền đang kích hoạt: +3k tip mỗi đơn!"><img src="${ASSETS.icons.sauce}" class="hud-pixel-icon" alt="" /> Sốt Vàng</span>` : ''}
+        <div class="session-ambience ${shiftInfo.className}">
+          <img src="${shiftInfo.icon}" class="hud-pixel-icon" alt="" />
+          <span class="ambience-title">${shiftInfo.title}</span>
+          <span class="ambience-sub">· ${shiftInfo.sub}</span>
+        </div>
         ${(state.activeRadioBuff && state.activeRadioBuff.activeForDay === state.day) ? `
           <span class="radio-buff-hud-badge" style="background: #fef08a; color: #854d0e; border: 1px solid #eab308; border-radius: 12px; padding: 2px 7px; font-size: 0.68rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;" title="${escapeHtml(state.activeRadioBuff.description)}">
-            <span>📻</span> ${escapeHtml(state.activeRadioBuff.title)}
+            <img src="${ASSETS.icons.radio}" class="btn-pixel-icon-xs" alt="" /> ${escapeHtml(state.activeRadioBuff.title)}
           </span>
         ` : ''}
         <div class="hud-actions" style="display: flex; gap: 5px; align-items: center;">
@@ -1327,7 +1376,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             <img src="${session.activeThief.disguiseAvatar}" style="width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid #fef08a; object-fit: contain; background: #fff;" alt="" />
             <div style="min-width: 0;">
               <div style="font-size: 0.76rem; font-weight: 900; color: #fef08a; display: flex; align-items: center; gap: 4px;">
-                <span>🚨 KẺ GIAN ĐÓNG GIẢ: "${escapeHtml(session.activeThief.disguiseName)}"</span>
+                <span><img src="${ASSETS.icons.alarmSiren}" class="btn-pixel-icon-xs" alt="" /> KẺ GIAN ĐÓNG GIẢ: "${escapeHtml(session.activeThief.disguiseName)}"</span>
               </div>
               <div style="font-size: 0.65rem; color: #fecaca; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                 Đang rình Bàn ${session.activeThief.targetTable} (${escapeHtml(session.activeThief.targetCustomerName)})!
@@ -1336,10 +1385,10 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           </div>
           <div style="display: flex; align-items: center; gap: 6px;">
             <span id="thief-banner-time" style="font-size: 0.72rem; font-weight: 800; background: #7f1d1d; color: #fef08a; padding: 2px 6px; border-radius: 4px; border: 1px solid #ef4444; white-space: nowrap;">
-              ⏳ ${Math.ceil(session.activeThief.timeRemaining)}s
+              <img src="${ASSETS.icons.clock}" class="btn-pixel-icon-xs" alt="" /> ${Math.ceil(session.activeThief.timeRemaining)}s
             </span>
-            <button class="btn-sm" style="padding: 4px 8px; font-size: 0.7rem; font-weight: 900; background: #fbbf24; color: #78350f; border: 1px solid #d97706; border-radius: 5px; cursor: pointer; white-space: nowrap;">
-              ✋ BẮT NGAY!
+            <button class="btn-sm" style="padding: 4px 8px; font-size: 0.7rem; font-weight: 900; background: #fbbf24; color: #78350f; border: 1px solid #d97706; border-radius: 5px; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 3px;">
+              <img src="${ASSETS.icons.handCatch}" class="btn-pixel-icon-xs" alt="" /> BẮT NGAY!
             </button>
           </div>
         </div>
@@ -1349,7 +1398,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       <div class="alley-stage-container">
         <!-- Đèn lồng treo tường hẻm tỏa sáng ấm áp -->
         <div class="alley-lantern-mount" aria-hidden="true">
-          <span class="alley-lantern-pixel">🏮</span>
+          <img src="${ASSETS.icons.lanternRed}" class="alley-lantern-pixel" alt="" />
           <div class="alley-lantern-glow"></div>
         </div>
 
@@ -1363,16 +1412,16 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             (session.disruptionTimerSec ?? 0) > 0 ? `
               <div class="empty-queue disruption-alert" style="background: #fff1f0; border: 1.5px solid #ff4d4f; color: #cf1322; padding: 12px 14px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(255,77,79,0.15);">
                 <div style="font-weight: 800; font-size: 0.92rem; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                  <span>💥</span> <span>QUÁN ĐANG HỖN LOẠN: KHÁCH CHẠY HẾT!</span>
+                  <img src="${ASSETS.icons.burntAlert}" class="btn-pixel-icon-sm" alt="" /> <span>QUÁN ĐANG HỖN LOẠN: KHÁCH CHẠY HẾT!</span>
                 </div>
                 <div style="font-size: 0.78rem; margin-top: 4px; color: #595959;">
                   Giang hồ vừa quậy phá! Đang dọn dẹp bàn ghế và trấn an bà con lối xóm...
                 </div>
-                <div style="margin-top: 6px; font-weight: 800; font-size: 0.85rem; color: #d4380d;">
-                  ⏳ Chờ lứa khách mới sau: <b>${Math.ceil(session.disruptionTimerSec ?? 0)}s</b> 🧹
+                <div style="margin-top: 6px; font-weight: 800; font-size: 0.85rem; color: #d4380d; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                  <img src="${ASSETS.icons.clock}" class="btn-pixel-icon-xs" alt="" /> Chờ lứa khách mới sau: <b>${Math.ceil(session.disruptionTimerSec ?? 0)}s</b> <img src="${ASSETS.icons.broom}" class="btn-pixel-icon-xs" alt="" />
                 </div>
               </div>
-            ` : '<div class="empty-queue">🍗 Mùi gà thơm phức bay khắp hẻm... Khách đang tấp nập tới! 🏃</div>'
+            ` : `<div class="empty-queue"><img src="${ASSETS.icons.chickenCrispy}" class="btn-pixel-icon-xs" alt="" /> Mùi gà thơm phức bay khắp hẻm... Khách đang tấp nập tới!</div>`
           )}
         </div>
 
@@ -1407,7 +1456,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
                 <span class="oil-dot ${oilCondition}"></span>
                 <span class="oil-status-label">${oilCondition === 'clean' ? 'Sạch' : oilCondition === 'medium' ? 'Vừa' : '⚠️ ĐEN! THAY'}</span>
                 <span class="oil-sep">|</span>
-                <span>${!state.freeOilFilterUsed && state.day <= 3 ? '0k 🎁' : '150k'}</span>
+                <span>${!state.freeOilFilterUsed && state.day <= 3 ? '0k (Miễn phí)' : '150k'}</span>
               </button>
             </div>
 
@@ -1415,8 +1464,8 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             <div id="btn-fry-pot" class="fry-pot ${'oil-' + oilCondition} ${cookState.isFrying && quality === 'perfect' ? 'perfect-glow' : ''} ${session.perfectStreak >= 2 ? 'streak-fire' : ''}">
               ${oilCondition === 'dirty' ? `
                 <div class="dirty-oil-warning-overlay">
-                  <span class="smoke-puff">💨</span>
-                  <span>⚠️ DẦU ĐEN! THAY DẦU KẺO CHÁY GÀ!</span>
+                  <img src="${ASSETS.icons.smokePuff}" class="btn-pixel-icon-sm" alt="" />
+                  <span><img src="${ASSETS.icons.burntAlert}" class="btn-pixel-icon-xs" alt="" /> DẦU ĐEN! THAY DẦU KẺO CHÁY GÀ!</span>
                 </div>
               ` : ''}
               <div class="bubble" style="left: 15%; animation-delay: 0s;"></div>
@@ -1461,7 +1510,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
 
               <!-- Khu vực mô phỏng rót nước tinh gọn -->
               <div class="fountain-pour-stage" id="fountain-pour-stage" style="padding: 1px 3px; display: flex; align-items: center; justify-content: space-between;">
-                <span class="glass-cup-label" id="glass-cup-label" style="font-size: 0.58rem; color: #475569; font-weight: 800;">💧 Rót nước</span>
+                <span class="glass-cup-label" id="glass-cup-label" style="font-size: 0.58rem; color: #475569; font-weight: 800;"><img src="${ASSETS.icons.sodaCup}" class="btn-pixel-icon-xs" alt="" /> Rót nước</span>
                 <div class="pour-stream-line" id="pour-stream-line" style="display: none;"></div>
                 <div class="cup-liquid-fill" id="cup-liquid-fill" style="display: none;"></div>
               </div>
@@ -1469,19 +1518,19 @@ export function renderSellingView(state: GameState, session: SellingSession): st
               <!-- Hàng 3 vòi bấm rót nước đa vị -->
               <div class="fountain-taps-grid">
                 <button id="btn-add-drink" class="fountain-tap-btn tap-coca" data-action="pour-coca" title="Rót đầy một cốc Coca-Cola sủi bọt caramel mát lạnh">
-                  <div class="tap-badge">🔴 Cola</div>
+                  <div class="tap-badge">Cola</div>
                   <img src="${ASSETS.food.soda}" alt="Coca-Cola" class="tap-cup-img" />
                   <span class="tap-name">Cola</span>
                 </button>
 
                 <button id="btn-pour-7up" class="fountain-tap-btn tap-7up" data-action="pour-7up" title="Rót đầy một cốc 7Up Chanh đá mát lạnh">
-                  <div class="tap-badge">🟢 7Up</div>
+                  <div class="tap-badge">7Up</div>
                   <img src="${ASSETS.food.sevenUp}" alt="7Up Chanh" class="tap-cup-img" />
                   <span class="tap-name">7Up</span>
                 </button>
 
                 <button id="btn-pour-fanta" class="fountain-tap-btn tap-fanta" data-action="pour-fanta" title="Rót đầy một cốc Fanta Cam bùng nổ hương vị">
-                  <div class="tap-badge">🟠 Fanta</div>
+                  <div class="tap-badge">Fanta</div>
                   <img src="${ASSETS.food.fantaOrange}" alt="Fanta Cam" class="tap-cup-img" />
                   <span class="tap-name">Fanta</span>
                 </button>
@@ -1586,14 +1635,14 @@ export function renderStaffStrip(state: GameState, session: SellingSession): str
 
   const chips = state.staff.map(member => {
     const roleIconMap: Record<string, string> = {
-      cook: '👨‍🍳',
-      waiter: '🧹',
-      cashier: '💰',
-      delivery: '🛵',
-      manager: '👔',
-      security: '🛡️'
+      cook: `<img src="${ASSETS.icons.roleCook}" class="staff-role-mini-img" alt="" />`,
+      waiter: `<img src="${ASSETS.icons.roleWaiter}" class="staff-role-mini-img" alt="" />`,
+      cashier: `<img src="${ASSETS.icons.roleCashier}" class="staff-role-mini-img" alt="" />`,
+      delivery: `<img src="${ASSETS.icons.roleDelivery}" class="staff-role-mini-img" alt="" />`,
+      manager: `<img src="${ASSETS.icons.roleManager}" class="staff-role-mini-img" alt="" />`,
+      security: `<img src="${ASSETS.icons.roleSecurity}" class="staff-role-mini-img" alt="" />`
     };
-    const roleIcon = roleIconMap[member.role] || '👤';
+    const roleIcon = roleIconMap[member.role] || `<img src="${ASSETS.icons.staff}" class="staff-role-mini-img" alt="" />`;
     const modelSrc = staffImage(member);
     const fallbackSrc = staffImage({ role: member.role, rarity: member.rarity });
     const shortName = member.name.split(' ')[0] || member.name;
@@ -1606,7 +1655,7 @@ export function renderStaffStrip(state: GameState, session: SellingSession): str
       const slot = session.helpers?.[cookIndex];
       if (slot) {
         isBusy = true;
-        const fryIcon = FRY_ICON[slot.menuItemId] ?? '🍗';
+        const fryIcon = FRY_ICON[slot.menuItemId] ?? `<img src="${ASSETS.icons.chickenCrispy}" class="btn-pixel-icon-xs" alt="" />`;
         actionHtml = `<span class="staff-action busy">${fryIcon} Chiên <b class="helper-progress" data-helper="${cookIndex}">0%</b></span>`;
       } else {
         actionHtml = `<span class="staff-action idle">Chờ chảo</span>`;
@@ -1674,14 +1723,14 @@ export function renderStaffRosterCards(state: GameState, session: SellingSession
 
   const cardsHtml = state.staff.map(member => {
     const roleIconMap: Record<string, string> = {
-      cook: '👨‍🍳',
-      waiter: '🧹',
-      cashier: '💰',
-      delivery: '🛵',
-      manager: '👔',
-      security: '🛡️'
+      cook: `<img src="${ASSETS.icons.roleCook}" class="staff-role-mini-img" alt="" />`,
+      waiter: `<img src="${ASSETS.icons.roleWaiter}" class="staff-role-mini-img" alt="" />`,
+      cashier: `<img src="${ASSETS.icons.roleCashier}" class="staff-role-mini-img" alt="" />`,
+      delivery: `<img src="${ASSETS.icons.roleDelivery}" class="staff-role-mini-img" alt="" />`,
+      manager: `<img src="${ASSETS.icons.roleManager}" class="staff-role-mini-img" alt="" />`,
+      security: `<img src="${ASSETS.icons.roleSecurity}" class="staff-role-mini-img" alt="" />`
     };
-    const roleIcon = roleIconMap[member.role] || '👤';
+    const roleIcon = roleIconMap[member.role] || `<img src="${ASSETS.icons.staff}" class="staff-role-mini-img" alt="" />`;
     const modelSrc = staffImage(member);
     const fallbackSrc = staffImage({ role: member.role, rarity: member.rarity });
     const isCook = member.role === 'cook';
@@ -1693,29 +1742,29 @@ export function renderStaffRosterCards(state: GameState, session: SellingSession
       const slot = session.helpers?.[cookIndex];
       if (slot) {
         isBusy = true;
-        const fryIcon = FRY_ICON[slot.menuItemId] ?? '🍗';
+        const fryIcon = FRY_ICON[slot.menuItemId] ?? `<img src="${ASSETS.icons.chickenCrispy}" class="btn-pixel-icon-xs" alt="" />`;
         headStatusHtml = `<span class="head-badge busy">${fryIcon} <b class="helper-progress" data-helper="${cookIndex}">0%</b></span>`;
       } else if (isSlacking) {
-        headStatusHtml = `<span class="head-badge slacking">😴 Lười</span>`;
+        headStatusHtml = `<span class="head-badge slacking">Lười</span>`;
       } else {
-        headStatusHtml = `<span class="head-badge idle">✨ Chờ</span>`;
+        headStatusHtml = `<span class="head-badge idle"><img src="${ASSETS.icons.sparkle}" class="btn-pixel-icon-xs" alt="" /> Chờ</span>`;
       }
       cookIndex++;
     } else if (member.role === 'waiter') {
-      headStatusHtml = `<span class="head-badge waiter">🧹 Dọn</span>`;
+      headStatusHtml = `<span class="head-badge waiter"><img src="${ASSETS.icons.broom}" class="btn-pixel-icon-xs" alt="" /> Dọn</span>`;
     } else if (member.role === 'cashier') {
-      headStatusHtml = `<span class="head-badge cashier">💰 +Tip</span>`;
+      headStatusHtml = `<span class="head-badge cashier"><img src="${ASSETS.icons.money}" class="btn-pixel-icon-xs" alt="" /> +Tip</span>`;
     } else if (member.role === 'delivery') {
-      headStatusHtml = `<span class="head-badge delivery">🛵 Ship</span>`;
+      headStatusHtml = `<span class="head-badge delivery"><img src="${ASSETS.icons.scooter}" class="btn-pixel-icon-xs" alt="" /> Ship</span>`;
     } else if (member.role === 'manager') {
-      headStatusHtml = `<span class="head-badge manager">⚡ +20%</span>`;
+      headStatusHtml = `<span class="head-badge manager"><img src="${ASSETS.icons.lightning}" class="btn-pixel-icon-xs" alt="" /> +20%</span>`;
     } else if (member.role === 'security') {
-      headStatusHtml = `<span class="head-badge security">🛡️ Canh</span>`;
+      headStatusHtml = `<span class="head-badge security"><img src="${ASSETS.icons.roleSecurity}" class="btn-pixel-icon-xs" alt="" /> Canh</span>`;
     }
 
     return `
       <div class="staff-round-card ${isBusy ? 'is-busy' : ''} ${isSlacking ? 'is-slacking' : ''}" 
-           title="${roleIcon} ${escapeHtml(member.name)} (${member.role}): ${isSlacking ? 'Đang uể oải/lười biếng' : isBusy ? 'Đang chiên mẻ gà' : 'Túc trực'}">
+           title="${escapeHtml(member.name)} (${member.role}): ${isSlacking ? 'Đang uể oải/lười biếng' : isBusy ? 'Đang chiên mẻ gà' : 'Túc trực'}">
         <div class="staff-head-status">${headStatusHtml}</div>
         <div class="staff-circle-avatar">
           <img src="${modelSrc}" alt="${escapeHtml(member.name)}" onerror="this.onerror=null;this.src='${fallbackSrc}';" />
@@ -1731,14 +1780,14 @@ export function renderStaffRosterCards(state: GameState, session: SellingSession
   if (robot) {
     const slot = session.helpers?.[cookIndex];
     const headStatusHtml = slot
-      ? `<span class="head-badge busy">🤖 <b class="helper-progress" data-helper="${cookIndex}">0%</b></span>`
-      : `<span class="head-badge idle">🤖 Chờ</span>`;
+      ? `<span class="head-badge busy"><img src="${ASSETS.icons.helperBot}" class="btn-pixel-icon-xs" alt="" /> <b class="helper-progress" data-helper="${cookIndex}">0%</b></span>`
+      : `<span class="head-badge idle"><img src="${ASSETS.icons.helperBot}" class="btn-pixel-icon-xs" alt="" /> Chờ</span>`;
     robotCardHtml = `
       <div class="staff-round-card ${slot ? 'is-busy' : ''}" title="Robot Chiên Tự Động (Bếp cấp 6)">
         <div class="staff-head-status">${headStatusHtml}</div>
         <div class="staff-circle-avatar robot-avatar">
-          <span class="robot-face-emoji">🤖</span>
-          <span class="staff-role-mini-badge">⚙️</span>
+          <img src="${ASSETS.icons.helperBot}" class="robot-face-pixel-img" alt="Robot" />
+          <span class="staff-role-mini-badge"><img src="${ASSETS.icons.settings}" class="staff-role-mini-img" alt="" /></span>
         </div>
       </div>
     `;
@@ -1756,7 +1805,14 @@ export function renderStaffCornerCard(_state: GameState, _session: SellingSessio
   return '';
 }
 
-const FRY_ICON: Record<string, string> = { crispy_chicken: '🍗', spicy_chicken: '🌶️', honey_garlic_chicken: '🍯', shake_fries: '🍟', popcorn_chicken: '🍿' };
+const FRY_ICON: Record<string, string> = { 
+  crispy_chicken: `<img src="${ASSETS.icons.chickenCrispy}" class="btn-pixel-icon-xs" alt="" />`, 
+  spicy_chicken: `<img src="${ASSETS.icons.chickenSpicy}" class="btn-pixel-icon-xs" alt="" />`, 
+  honey_garlic_chicken: `<img src="${ASSETS.icons.chickenHoney}" class="btn-pixel-icon-xs" alt="" />`, 
+  shake_fries: `<img src="${ASSETS.icons.shakeFries}" class="btn-pixel-icon-xs" alt="" />`, 
+  popcorn_chicken: `<img src="${ASSETS.food.popcornChicken}" class="btn-pixel-icon-xs" alt="" />`,
+  cheese_stick: `<img src="${ASSETS.icons.cheeseStick}" class="btn-pixel-icon-xs" alt="" />`
+};
 
 // ---------------------------------------------------------------------------
 // Góc Bàn Ăn Hiên Quán (Dine-In Patio Tables) - Thưởng thức tại chỗ & Thu gom tip
@@ -1863,9 +1919,9 @@ export function renderDineInPatio(tables?: DineInTable[]): string {
           <div class="patio-table-inner">
             <div class="patio-guest-avatar-wrap">
               <img src="${table.customerAvatar || ASSETS.capdoi.stand}" class="patio-guest-avatar chew-head-bob" alt="${escapeHtml(table.customerName || '')}" />
-              <span class="patio-eating-bubble">${isPhotoCheckin ? '📸 Check-in!' : `😋 ${table.isCritic ? '⭐' : '🍗'}`}</span>
-              <span class="patio-steam-puff" aria-hidden="true">♨️</span>
-              ${isPhotoCheckin ? '<span class="patio-camera-flash">✨</span>' : ''}
+              <span class="patio-eating-bubble">${isPhotoCheckin ? 'Check-in!' : `<img src="${table.isCritic ? ASSETS.icons.star : ASSETS.icons.chickenCrispy}" class="btn-pixel-icon-xs" alt="" />`}</span>
+              <span class="patio-steam-puff" aria-hidden="true"><img src="${ASSETS.icons.smokePuff}" class="btn-pixel-icon-xs" alt="" /></span>
+              ${isPhotoCheckin ? `<span class="patio-camera-flash"><img src="${ASSETS.icons.sparkle}" class="btn-pixel-icon-xs" alt="" /></span>` : ''}
             </div>
             <div class="patio-info">
               <span class="patio-table-name">${escapeHtml(table.customerName || table.name)}</span>
@@ -1888,7 +1944,7 @@ export function renderDineInPatio(tables?: DineInTable[]): string {
       <div class="patio-table dirty patio-bistro-table ${table.isCritic ? 'critic' : ''} ${isCleaning ? 'is-being-cleaned' : ''}" data-table-idx="${table.tableIndex}" title="Khách đã ăn xong! Chà tay lên bàn 3-4s để lau sạch và thu ${tip.toLocaleString('vi-VN')}đ tiền tip">
         <div class="patio-table-inner">
           <div class="patio-dirty-icon-wrap">
-            <span class="patio-tip-tag">+${tipK}k 🪙</span>
+            <span class="patio-tip-tag">+${tipK}k <img src="${ASSETS.icons.money}" class="btn-pixel-icon-xs" alt="" /></span>
           </div>
           <button class="btn-clean-table ${isCleaning ? 'is-scrubbing' : ''} ${isStaff ? 'by-staff' : ''}" data-table-idx="${table.tableIndex}" aria-label="Chà lau bàn sạch">
             <div class="patio-rag-motion-wrap">
@@ -1896,12 +1952,12 @@ export function renderDineInPatio(tables?: DineInTable[]): string {
               ${isCleaning ? `
                 <span class="scrub-bubble bubble-1" aria-hidden="true">🫧</span>
                 <span class="scrub-bubble bubble-2" aria-hidden="true">🫧</span>
-                <span class="scrub-sparkle" aria-hidden="true">✨</span>
+                <span class="scrub-sparkle" aria-hidden="true"><img src="${ASSETS.icons.sparkle}" class="btn-pixel-icon-xs" alt="" /></span>
               ` : ''}
             </div>
             <div class="patio-clean-label-group">
               <span class="patio-clean-text">
-                ${isStaff ? `🧹 ${escapeHtml(table.staffCleanerName || 'Phục vụ')} lau` : isCleaning ? '🧼 Đang chà...' : (progress > 0 ? '🧼 Chà tiếp' : '🧼 Chà lau')}
+                ${isStaff ? `<img src="${ASSETS.icons.broom}" class="btn-pixel-icon-xs" alt="" /> ${escapeHtml(table.staffCleanerName || 'Phục vụ')} lau` : isCleaning ? `<img src="${ASSETS.icons.spongeSoap}" class="btn-pixel-icon-xs" alt="" /> Đang chà...` : (progress > 0 ? `<img src="${ASSETS.icons.spongeSoap}" class="btn-pixel-icon-xs" alt="" /> Chà tiếp` : `<img src="${ASSETS.icons.spongeSoap}" class="btn-pixel-icon-xs" alt="" /> Chà lau`)}
               </span>
               <div class="patio-table-clean-bar" title="Tiến trình lau: ${progress}%">
                 <div class="patio-table-clean-fill" style="width: ${progress}%;"></div>
@@ -1917,7 +1973,7 @@ export function renderDineInPatio(tables?: DineInTable[]): string {
     <div class="dine-in-patio-container dine-in-patio-terrace">
       <div class="patio-header patio-terrace-header">
         <span class="patio-title patio-terrace-title">
-          <span class="patio-lantern-icon">🏮</span> Hiên Quán · Bàn Gỗ Tại Chỗ
+          <span class="patio-lantern-icon"><img src="${ASSETS.icons.lanternRed}" class="btn-pixel-icon-xs" alt="" /></span> Hiên Quán · Bàn Gỗ Tại Chỗ
         </span>
       </div>
       <div class="patio-tables-grid">

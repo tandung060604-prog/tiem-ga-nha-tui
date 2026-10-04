@@ -16,7 +16,7 @@ export function resetDraftCart(): void {
 function getInventoryIcon(item: any): string {
   const iconMap: Record<string, string> = {
     chicken_meat: ASSETS.icons.chickenCrispy,
-    flour: ASSETS.icons.sauce,
+    flour: ASSETS.icons.flourSack,
     fry_oil: ASSETS.icons.oilCan,
     potato_cheese: ASSETS.icons.shakeFries,
     soft_drink: ASSETS.food.soda,
@@ -24,15 +24,17 @@ function getInventoryIcon(item: any): string {
     honey_garlic_sauce: ASSETS.icons.chickenHoney,
     popcorn_chicken_meat: ASSETS.kitchen.gnPrepPopcornRaw || ASSETS.food.popcornChicken,
     chicken_thigh: ASSETS.kitchen.gnPrepThighRaw || ASSETS.food.spicyThigh,
-    cheese_stick: ASSETS.food.cheeseStick,
-    radish_danmuji: ASSETS.food.danmuji,
+    cheese_stick: ASSETS.icons.cheeseStick || ASSETS.food.cheeseStick,
+    radish_danmuji: ASSETS.icons.danmujiPlate || ASSETS.food.danmuji,
+    danmuji: ASSETS.icons.danmujiPlate || ASSETS.food.danmuji,
     coleslaw_salad: ASSETS.food.coleslaw,
+    cabbage_mayo: ASSETS.food.coleslaw,
   };
   const src = iconMap[item.id];
   if (src) {
     return `<img src="${src}" class="item-pixel-thumb" alt="${item.name}" width="32" height="32" />`;
   }
-  return `<span class="item-icon-char">${item.icon}</span>`;
+  return `<img src="${ASSETS.icons.sparkle}" class="item-pixel-thumb" alt="${item.name}" width="32" height="32" />`;
 }
 
 export function renderInventoryTab(state: GameState): string {
@@ -141,12 +143,12 @@ export function renderInventoryTab(state: GameState): string {
             <span><img src="${ASSETS.icons.scooter}" class="btn-pixel-icon-xs" alt="" /> <b>Đã đi Chợ Lớn:</b> Giảm -${marketDiscount}% giá nhập sỉ cả ngày hôm nay!</span>
           </div>`
         : `<div style="background: rgba(0,0,0,0.05); border: 1px dashed var(--line); border-radius: 6px; padding: 6px 10px; margin-bottom: 10px; font-size: 0.78rem; color: var(--soft);">
-            <span>🛒 Đã ghé chợ sáng nay (tiểu thương giữ nguyên giá sỉ).</span>
+            <span><img src="${ASSETS.icons.marketCart}" class="btn-pixel-icon-xs" alt="" /> Đã ghé chợ sáng nay (tiểu thương giữ nguyên giá sỉ).</span>
           </div>`
       )
     : `<div style="background: var(--pixel-parchment-bg, #faeed1); border: 2px solid var(--pixel-wood-dark, #4a2810); border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 2px 2px 0 rgba(0,0,0,0.2);">
         <div>
-          <div style="font-weight: 800; font-size: 0.86rem; color: var(--pixel-wood-dark, #4a2810);">🛒 Đi Chợ Đầu Mối Chợ Lớn</div>
+          <div style="font-weight: 800; font-size: 0.86rem; color: var(--pixel-wood-dark, #4a2810);"><img src="${ASSETS.icons.marketCart}" class="btn-pixel-icon-xs" alt="" /> Đi Chợ Đầu Mối Chợ Lớn</div>
           <div style="font-size: 0.72rem; color: #6b4c35;">Mặc cả với tiểu thương để được giảm 15% - 35% giá nhập sỉ cả ngày!</div>
         </div>
         <button id="btn-open-market-bargain" class="pixel-btn is-warning" style="font-size: 0.74rem; padding: 5px 8px; white-space: nowrap;">ĐI CHỢ NGAY</button>
@@ -154,13 +156,13 @@ export function renderInventoryTab(state: GameState): string {
 
   return `
     <div class="sec-title">
-      <span>📦 Quản Lý Kho & Nguyên Liệu (Stardew Shelf)</span>
+      <span><img src="${ASSETS.icons.inventory}" class="btn-pixel-icon-xs" alt="" /> Quản Lý Kho & Nguyên Liệu (Stardew Shelf)</span>
       <span style="font-size: 0.78rem; color: var(--soft); font-weight: normal;">Lưu ý: Mua dư hết hạn là lỗ!</span>
     </div>
     ${marketBannerHtml}
     <div class="sec-desc">
       Nhập đủ gà tươi, bột, dầu và gia vị trước giờ mở bán (10:00). Bấm <b>-5</b> để hoàn trả nếu lỡ tay mua nhầm!
-      ${effects.shelfLifeBonus > 0 ? `<br><b style="color:var(--mint-dark,#10b981);">❄️ Kho lạnh bảo quản: +${effects.shelfLifeBonus} ngày hạn dùng cho mọi lô nhập mới!</b>` : ''}
+      ${effects.shelfLifeBonus > 0 ? `<br><b style="color:var(--mint-dark,#10b981);"><img src="${ASSETS.icons.sparkle}" class="btn-pixel-icon-xs" alt="" /> Kho lạnh bảo quản: +${effects.shelfLifeBonus} ngày hạn dùng cho mọi lô nhập mới!</b>` : ''}
     </div>
     <div class="inventory-list inventory-grid-stardew">
       ${rowsHtml}

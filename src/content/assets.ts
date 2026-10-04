@@ -287,7 +287,25 @@ export const ASSETS = {
     emoteDogBark: url('assets/icons/emote_dog_bark.png'),
     emoteCatPurr: url('assets/icons/emote_cat_purr.png'),
     speed1x: url('assets/ui/speed_btn_1x.png'),
-    speed2x: url('assets/ui/speed_btn_2x.png')
+    speed2x: url('assets/ui/speed_btn_2x.png'),
+    spongeSoap: url('assets/icons/icon_sponge_soap.png'),
+    helperBot: url('assets/icons/icon_helper_bot.png'),
+    alarmSiren: url('assets/icons/icon_alarm_siren.png'),
+    handCatch: url('assets/icons/icon_hand_catch.png'),
+    lanternRed: url('assets/icons/icon_lantern_red.png'),
+    smokePuff: url('assets/icons/icon_smoke_puff.png'),
+    flourSack: url('assets/icons/icon_flour_sack.png'),
+    danmujiPlate: url('assets/icons/icon_danmuji_plate.png'),
+    cheeseStick: url('assets/icons/icon_cheese_stick.png'),
+    marketCart: url('assets/icons/icon_market_cart.png'),
+    woodenSign: url('assets/icons/icon_wooden_sign.png'),
+    lightbulbRetro: url('assets/icons/icon_lightbulb_retro.png'),
+    crownVip: url('assets/icons/icon_crown_vip.png'),
+    burntAlert: url('assets/icons/icon_burnt_alert.png'),
+    shiftNoon: url('assets/icons/icon_shift_noon.png'),
+    shiftAfternoon: url('assets/icons/icon_shift_afternoon.png'),
+    shiftEvening: url('assets/icons/icon_shift_evening.png'),
+    shiftNight: url('assets/icons/icon_shift_night.png')
   }
 } as const;
 

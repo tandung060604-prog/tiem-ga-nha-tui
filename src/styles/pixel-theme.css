@@ -739,9 +739,11 @@ body.selling-mode .toast {
 }
 
 .kitchen-hud .session-ambience {
-  color: #faeed1 !important;
-  font-family: var(--font-pixel-body) !important;
-  font-size: 0.74rem !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  font-family: var(--font-pixel-heading), "Tiny5 Duo", "VT323", monospace !important;
 }
 
 .kitchen-counter {

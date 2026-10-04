@@ -951,3 +951,13 @@
   - **Chiến lược Fix:** `defensive_nullcheck_fallback` (Độ tin cậy: 94.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `200` ngày chơi
 ---
+
+### 🐞 [13:22:51 4/10/2026] (via Jev MCP) ReferenceError: rush is not defined in SellingView.ts during Shift Ambience refactor
+- **Triệu chứng:** ReferenceError: rush is not defined at renderSellingView (SellingView.ts:1135:11)
+- **Vị trí:** `src/ui/components/SellingView.ts` 
+- **Đánh giá Jev (491ms):**
+  - **Mức độ (Severity):** `p2_ui_friction` (Độ tin cậy: 52.0%)
+  - **Nguyên nhân gốc (Root Cause):** `state_lifecycle` (Độ tin cậy: 100.0%)
+  - **Chiến lược Fix:** `contract_first_type_fix` (Độ tin cậy: 54.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---

@@ -65,18 +65,75 @@
 }
 
 .kitchen-hud .session-ambience {
-  color: #faeed1;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  font-family: var(--font-pixel-heading), inherit;
   font-size: 0.74rem;
-  font-weight: 700;
+  font-weight: 800;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 150px;
-  text-align: center;
-  background: rgba(0, 0, 0, 0.25);
-  padding: 3px 8px;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  max-width: 170px;
+  user-select: none;
+}
+
+.kitchen-hud .session-ambience .hud-pixel-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+
+.kitchen-hud .session-ambience .ambience-title {
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.kitchen-hud .session-ambience .ambience-sub {
+  color: #78350f;
+  font-size: 0.68rem;
+  font-weight: 700;
+  opacity: 0.85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kitchen-hud .session-ambience.shift-noon .ambience-title {
+  color: #b45309;
+}
+
+.kitchen-hud .session-ambience.shift-afternoon .ambience-title {
+  color: #c2410c;
+}
+
+.kitchen-hud .session-ambience.shift-evening .ambience-title {
+  color: #1e3a8a;
+}
+
+.kitchen-hud .session-ambience.shift-night .ambience-title {
+  color: #4c1d95;
+}
+
+.kitchen-hud .session-ambience.shift-rush {
+  animation: rushPulseSoft 1s infinite alternate;
+}
+
+.kitchen-hud .session-ambience.shift-rush .ambience-title {
+  color: #dc2626;
+  text-shadow: 0 0 6px rgba(220, 38, 38, 0.4);
+}
+
+@keyframes rushPulseSoft {
+  from { transform: scale(0.97); }
+  to { transform: scale(1.03); }
 }
 
 /* Bottom Street Ticker Rail - Non-intrusive Live Status */

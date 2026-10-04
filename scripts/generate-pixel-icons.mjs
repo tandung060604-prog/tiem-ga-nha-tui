@@ -1,1160 +1,329 @@
 import sharp from 'sharp';
-import { writeFileSync, mkdirSync } from 'node:fs';
-import { join } from 'node:path';
+import fs from 'node:fs';
+import path from 'node:path';
 
-mkdirSync('public/assets/icons', { recursive: true });
-mkdirSync('assets-src/icons', { recursive: true });
+const OUT_DIRS = ['assets-src/icons', 'public/assets/icons'];
+OUT_DIRS.forEach(dir => {
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+});
 
-function renderPixelArt(grid, palette, scale = 4) {
-  const height = grid.length;
-  const width = grid[0].length;
-  const rawBuf = Buffer.alloc(width * height * 4);
+// Palette retro Sài Gòn 16-bit
+const C = {
+  outline: '#3D2C2E',
+  outlineDark: '#231819',
+  white: '#FFFFFF',
+  goldLight: '#FEF08A',
+  gold: '#FBBF24',
+  goldDark: '#D97706',
+  goldDeep: '#B45309',
+  redLight: '#FCA5A5',
+  red: '#EF4444',
+  redDark: '#B91C1C',
+  orange: '#F97316',
+  orangeDark: '#C2410C',
+  yellow: '#FDE047',
+  greenLight: '#86EFAC',
+  green: '#10B981',
+  greenDark: '#047857',
+  cyanLight: '#BAE6FD',
+  cyan: '#38BDF8',
+  cyanDark: '#0284C7',
+  blueLight: '#93C5FD',
+  blue: '#3B82F6',
+  grayLight: '#F1F5F9',
+  grayMed: '#94A3B8',
+  grayDark: '#475569',
+  grayDeep: '#1E293B',
+  woodLight: '#FBBF24',
+  woodMed: '#D97706',
+  woodDark: '#854D0E',
+  woodDeep: '#451A03',
+  burlap: '#E2D4B7',
+  burlapDark: '#C4B598',
+  burlapDeep: '#9A8A70',
+  cheese: '#FEF08A',
+  crust: '#D97706'
+};
 
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const char = grid[y][x];
-      const color = palette[char] || [0, 0, 0, 0];
-      const idx = (y * width + x) * 4;
-      rawBuf[idx] = color[0];
-      rawBuf[idx + 1] = color[1];
-      rawBuf[idx + 2] = color[2];
-      rawBuf[idx + 3] = color[3];
+const ICONS = {
+  // 1. Bọt biển chà bàn (Soap sponge)
+  'icon_sponge_soap.png': `
+<svg width="64" height="64" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- Bong bóng bọt biển -->
+  <circle cx="24" cy="7" r="3" fill="${C.cyanLight}" stroke="${C.cyanDark}" stroke-width="1"/>
+  <circle cx="26" cy="13" r="2" fill="${C.cyanLight}" stroke="${C.cyanDark}" stroke-width="1"/>
+  <circle cx="9" cy="6" r="2" fill="${C.cyanLight}" stroke="${C.cyanDark}" stroke-width="1"/>
+  
+  <!-- Thân bọt biển: mặt mút vàng -->
+  <rect x="5" y="10" width="22" height="11" rx="2" fill="${C.yellow}" stroke="${C.outline}" stroke-width="1.5"/>
+  <rect x="7" y="12" width="2" height="2" fill="${C.goldDark}"/>
+  <rect x="13" y="14" width="3" height="2" fill="${C.goldDark}"/>
+  <rect x="21" y="13" width="2" height="2" fill="${C.goldDark}"/>
+  <rect x="10" y="17" width="2" height="2" fill="${C.goldDark}"/>
+  <rect x="18" y="17" width="3" height="2" fill="${C.goldDark}"/>
+  
+  <!-- Lớp cọ rửa nhám xanh lá dưới đáy -->
+  <rect x="5" y="21" width="22" height="5" rx="1" fill="${C.green}" stroke="${C.outline}" stroke-width="1.5"/>
+  <rect x="6" y="23" width="20" height="2" fill="${C.greenDark}"/>
+</svg>`,
+
+  // 2. Robot phụ bếp tự động (Helper Bot)
+  'icon_helper_bot.png': `
+<svg width="64" height="64" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- Anten xoắn trên đầu có bóng đỏ -->
+  <rect x="15" y="3" width="2" height="5" fill="${C.grayDark}" stroke="${C.outline}" stroke-width="0.8"/>
+  <circle cx="16" cy="3" r="2.5" fill="${C.red}" stroke="${C.outline}" stroke-width="1"/>
+  
+  <!-- Đầu robot hình khối hộp bo góc -->
+  <rect x="6" y="8" width="20" height="17" rx="3" fill="${C.grayLight}" stroke="${C.outline}" stroke-width="1.5"/>
+  <rect x="8" y="10" width="16" height="7" rx="2" fill="${C.grayDeep}" stroke="${C.outline}" stroke-width="1"/>
+  
+  <!-- Mắt số sáng cyan -->
+  <rect x="10" y="12" width="4" height="3" rx="1" fill="${C.cyan}"/>
+  <rect x="18" y="12" width="4" height="3" rx="1" fill="${C.cyan}"/>
+  
+  <!-- Nụ cười cơ khí pixel -->
+  <rect x="12" y="20" width="8" height="2" fill="${C.grayDark}"/>
+  <rect x="14" y="20" width="4" height="2" fill="${C.white}"/>
+  
+  <!-- Ốc tai hai bên -->
+  <rect x="3" y="14" width="3" height="5" rx="1" fill="${C.gold}" stroke="${C.outline}" stroke-width="1"/>
+  <rect x="26" y="14" width="3" height="5" rx="1" fill="${C.gold}" stroke="${C.outline}" stroke-width="1"/>
+</svg>`,
+
+  // 3. Còi báo động kẻ gian (Alarm Siren)
+  'icon_alarm_siren.png': `
+<svg width="64" height="64" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- Tia sáng nhấp nháy phát ra -->
+  <line x1="16" y1="2" x2="16" y2="5" stroke="${C.yellow}" stroke-width="2" stroke-linecap="round"/>
+  <line x1="5" y1="8" x2="8" y2="10" stroke="${C.yellow}" stroke-width="2" stroke-linecap="round"/>
+  <line x1="27" y1="8" x2="24" y2="10" stroke="${C.yellow}" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Vòm đèn đỏ tròn bóng -->
+  <path d="M 8 20 C 8 10, 24 10, 24 20 Z" fill="${C.red}" stroke="${C.outline}" stroke-width="1.5"/>
+  <!-- Điểm highlight sáng vòm -->
+  <path d="M 11 18 C 11 12, 17 12, 17 18 Z" fill="${C.redLight}"/>
+  <rect x="14" y="13" width="4" height="6" fill="${C.white}" opacity="0.6"/>
+  
+  <!-- Đế còi kim loại xám bọc cao su đen -->
+  <rect x="6" y="20" width="20" height="5" rx="1" fill="${C.grayMed}" stroke="${C.outline}" stroke-width="1.5"/>
+  <rect x="5" y="24" width="22" height="4" rx="1" fill="${C.grayDeep}" stroke="${C.outline}" stroke-width="1.5"/>
+</svg>`,
+
+  // 4. Bàn tay bắt trộm (Hand Catch)
+  'icon_hand_catch.png': `
+<svg width="64" height="64" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- Tia chuyển động vồ chộp -->
+  <path d="M 2 8 L 6 12" stroke="${C.red}" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 2 24 L 6 20" stroke="${C.red}" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Bàn tay nắm chộp xòe ngón -->
+  <path d="M 8 16 C 8 10, 16 7, 24 9 C 27 12, 27 20, 23 23 C 18 26, 10 24, 8 16 Z" fill="${C.gold}" stroke="${C.outline}" stroke-width="1.5"/>
+  <!-- Các ngón tay cong -->
+  <rect x="18" y="6" width="5" height="4" rx="1.5" fill="${C.goldLight}" stroke="${C.outline}" stroke-width="1"/>
+  <rect x="23" y="10" width="5" height="4" rx="1.5" fill="${C.goldLight}" stroke="${C.outline}" stroke-width="1"/>
+  <rect x="23" y="16" width="5" height="4" rx="1.5" fill="${C.goldLight}" stroke="${C.outline}" stroke-width="1"/>
+  <rect x="19" y="21" width="5" height="4" rx="1.5" fill="${C.goldLight}" stroke="${C.outline}" stroke-width="1"/>
+  
+  <!-- Lòng bàn tay đổ bóng cam đậm -->
+  <circle cx="16" cy="16" r="4" fill="${C.orange}"/>
+</svg>`,
+
+  // 5. Đèn lồng đỏ hẻm (Red Lantern)
+  'icon_lantern_red.png': `
+<svg width="64" height="64" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- Móc treo sắt trên đầu -->
+  <rect x="15" y="1" width="2" height="4" fill="${C.grayDeep}"/>
+  
+  <!-- Chóp nón vàng trên -->
+  <rect x="10" y="5" width="12" height="3" rx="1" fill="${C.goldDark}" stroke="${C.outline}" stroke-width="1"/>
+  
+  <!-- Bầu đèn lồng đỏ tròn căng -->
+  <ellipse cx="16" cy="16" rx="9" ry="8" fill="${C.red}" stroke="${C.outline}" stroke-width="1.5"/>
+  <!-- Múi gân đèn lồng màu cam vàng -->
+  <ellipse cx="16" cy="16" rx="4" ry="8" fill="none" stroke="${C.orange}" stroke-width="1.5"/>
+  <line x1="16" y1="8" x2="16" y2="24" stroke="${C.yellow}" stroke-width="1.5"/>
+  
+  <!-- Chóp đáy vàng dưới -->
+  <rect x="11" y="23" width="10" height="3" rx="1" fill="${C.goldDark}" stroke="${C.outline}" stroke-width="1"/>
+  
+  <!-- Chùm tua rua vàng đung đưa -->
+  <rect x="15" y="26" width="2" height="5" fill="${C.gold}"/>
+  <circle cx="16" cy="30" r="1.5" fill="${C.goldLight}"/>
+</svg>`,
+
+  // 6. Khói khét bốc chảo (Smoke Puff)
+  'icon_smoke_puff.png': `
+<svg width="64" height="64" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- Cụm khói lớn ở giữa -->
+  <circle cx="16" cy="15" r="7" fill="${C.grayLight}" stroke="${C.outline}" stroke-width="1.5"/>
+  <circle cx="10" cy="18" r="5" fill="${C.grayMed}" stroke="${C.outline}" stroke-width="1.5"/>
+  <circle cx="22" cy="19" r="5" fill="${C.grayMed}" stroke="${C.outline}" stroke-width="1.5"/>
+  <circle cx="15" cy="8" r="4" fill="${C.white}" stroke="${C.outline}" stroke-width="1.2"/>
+  
+  <!-- Đuôi khói cuộn nhỏ bên dưới -->
+  <circle cx="12" cy="25" r="3" fill="${C.grayDark}" stroke="${C.outline}" stroke-width="1"/>
+  <circle cx="17" cy="27" r="2" fill="${C.grayDeep}" stroke="${C.outline}" stroke-width="1"/>
+</svg>`,
+
+  // 7. Bao bột chiên giòn (Flour Sack)
+  'icon_flour_sack.png': `
+<svg width="64" height="64" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- Cổ bao bột túm miệng -->
+  <path d="M 12 7 L 16 10 L 20 7 L 18 12 L 14 12 Z" fill="${C.burlap}" stroke="${C.outline}" stroke-width="1.2"/>
+  <!-- Dây thừng nâu buộc cổ -->
+  <rect x="12" y="11" width="8" height="2" fill="${C.woodDeep}"/>
+  
+  <!-- Bầu bao tải căng tròn -->
+  <rect x="8" y="12" width="16" height="16" rx="4" fill="${C.burlap}" stroke="${C.outline}" stroke-width="1.5"/>
+  <rect x="9" y="14" width="14" height="13" rx="3" fill="${C.burlapDark}"/>
+  
+  <!-- Bột mì trắng rớt ngoài viền -->
+  <rect x="11" y="16" width="10" height="7" rx="2" fill="${C.white}"/>
+  <!-- Ký hiệu bông lúa mì trên bao -->
+  <path d="M 16 17 L 16 22 M 14 18 L 16 20 M 18 18 L 16 20" stroke="${C.goldDark}" stroke-width="1.2" stroke-linecap="round"/>
+</svg>`,
+
+  // 8. Đĩa củ cải muối Danmuji (Danmuji Plate)
+  'icon_danmuji_plate.png': `
+<svg width="64" height="64" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- Đĩa sứ men ngọc viền nâu -->
+  <ellipse cx="16" cy="18" rx="14" ry="9" fill="${C.white}" stroke="${C.outline}" stroke-width="1.5"/>
+  <ellipse cx="16" cy="18" rx="12" ry="7" fill="${C.cyanLight}" opacity="0.4"/>
+  
+  <!-- 3 lát củ cải vàng bán nguyệt xếp chồng -->
+  <path d="M 6 18 A 6 6 0 0 1 14 14 L 14 18 Z" fill="${C.yellow}" stroke="${C.outline}" stroke-width="1"/>
+  <path d="M 12 18 A 6 6 0 0 1 20 14 L 20 18 Z" fill="${C.goldLight}" stroke="${C.outline}" stroke-width="1"/>
+  <path d="M 18 18 A 6 6 0 0 1 26 14 L 26 18 Z" fill="${C.yellow}" stroke="${C.outline}" stroke-width="1"/>
+  
+  <!-- Hạt mè đen rắc trên mặt -->
+  <rect x="11" y="16" width="1.5" height="1.5" fill="${C.outline}"/>
+  <rect x="15" y="15" width="1.5" height="1.5" fill="${C.outline}"/>
+  <rect x="21" y="16" width="1.5" height="1.5" fill="${C.outline}"/>
+</svg>`,
+
+  // 9. Thanh phô mai que kéo sợi (Cheese Stick)
+  'icon_cheese_stick.png': `
+<svg width="64" height="64" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- Nửa bên trái thanh que bọc bột chiên giòn -->
+  <rect x="3" y="18" width="10" height="7" rx="3" fill="${C.crust}" stroke="${C.outline}" stroke-width="1.2"/>
+  <rect x="5" y="19" width="6" height="5" rx="2" fill="${C.gold}"/>
+  
+  <!-- Nửa bên phải que giơ lên chếch -->
+  <rect x="19" y="7" width="10" height="7" rx="3" transform="rotate(-20 24 10)" fill="${C.crust}" stroke="${C.outline}" stroke-width="1.2"/>
+  
+  <!-- Phô mai que nóng chảy kéo sợi đàn hồi giữa 2 đầu -->
+  <path d="M 11 20 C 14 18, 16 14, 20 11 L 22 13 C 18 16, 15 21, 12 22 Z" fill="${C.cheese}" stroke="${C.outline}" stroke-width="1"/>
+  <path d="M 10 22 C 15 22, 18 16, 22 14" stroke="${C.white}" stroke-width="1.5"/>
+</svg>`,
+
+  // 10. Xe đẩy đi chợ Chợ Lớn (Market Cart)
+  'icon_market_cart.png': `
+<svg width="64" height="64" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- Tay nắm đẩy màu đỏ sắt -->
+  <path d="M 5 6 L 10 11 L 10 22 L 25 22" fill="none" stroke="${C.red}" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Giỏ lưới / thùng hàng trên xe -->
+  <rect x="10" y="10" width="16" height="10" rx="1" fill="${C.grayLight}" stroke="${C.outline}" stroke-width="1.5"/>
+  <line x1="15" y1="10" x2="15" y2="20" stroke="${C.grayMed}" stroke-width="1"/>
+  <line x1="20" y1="10" x2="20" y2="20" stroke="${C.grayMed}" stroke-width="1"/>
+  <line x1="10" y1="15" x2="26" y2="15" stroke="${C.grayMed}" stroke-width="1"/>
+  
+  <!-- 2 bánh xe cao su viền đen căm bạc -->
+  <circle cx="12" cy="25" r="3.5" fill="${C.grayDeep}" stroke="${C.outline}" stroke-width="1"/>
+  <circle cx="12" cy="25" r="1.5" fill="${C.grayLight}"/>
+  <circle cx="23" cy="25" r="3.5" fill="${C.grayDeep}" stroke="${C.outline}" stroke-width="1"/>
+  <circle cx="23" cy="25" r="1.5" fill="${C.grayLight}"/>
+</svg>`,
+
+  // 11. Bảng hiệu gỗ treo tiệm (Wooden Sign)
+  'icon_wooden_sign.png': `
+<svg width="64" height="64" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- Dây xích sắt treo 2 bên -->
+  <line x1="9" y1="2" x2="9" y2="9" stroke="${C.grayDark}" stroke-width="1.5" stroke-dasharray="2 1"/>
+  <line x1="23" y1="2" x2="23" y2="9" stroke="${C.grayDark}" stroke-width="1.5" stroke-dasharray="2 1"/>
+  
+  <!-- Tấm biển gỗ mộc nẹp đồng -->
+  <rect x="4" y="9" width="24" height="17" rx="2" fill="${C.woodMed}" stroke="${C.outline}" stroke-width="1.5"/>
+  <rect x="6" y="11" width="20" height="13" fill="${C.woodLight}"/>
+  
+  <!-- Chữ khắc trên biển gỗ -->
+  <rect x="9" y="14" width="14" height="3" rx="1" fill="${C.woodDeep}"/>
+  <rect x="11" y="19" width="10" height="2" rx="0.5" fill="${C.woodDeep}"/>
+</svg>`,
+
+  // 12. Bóng đèn tròn dây tóc gợi ý (Retro Lightbulb)
+  'icon_lightbulb_retro.png': `
+<svg width="64" height="64" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- Tia sáng vàng tỏa ra 4 góc -->
+  <line x1="16" y1="2" x2="16" y2="5" stroke="${C.gold}" stroke-width="2" stroke-linecap="round"/>
+  <line x1="4" y1="14" x2="7" y2="14" stroke="${C.gold}" stroke-width="2" stroke-linecap="round"/>
+  <line x1="25" y1="14" x2="28" y2="14" stroke="${C.gold}" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Bầu bóng đèn thủy tinh vàng óng -->
+  <circle cx="16" cy="14" r="8" fill="${C.yellow}" stroke="${C.outline}" stroke-width="1.5"/>
+  <path d="M 12 18 L 14 23 L 18 23 L 20 18 Z" fill="${C.yellow}" stroke="${C.outline}" stroke-width="1.5"/>
+  
+  <!-- Dây tóc tungsten xoắn sáng rực -->
+  <path d="M 14 16 L 16 11 L 18 16" fill="none" stroke="${C.orangeDark}" stroke-width="1.5" stroke-linecap="round"/>
+  
+  <!-- Chuôi đèn ren xoắn kim loại -->
+  <rect x="13" y="24" width="6" height="4" rx="1" fill="${C.grayMed}" stroke="${C.outline}" stroke-width="1"/>
+  <rect x="14" y="28" width="4" height="2" fill="${C.grayDeep}"/>
+</svg>`,
+
+  // 13. Vương miện VIP khách sộp (Crown VIP)
+  'icon_crown_vip.png': `
+<svg width="64" height="64" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- Vương miện hoàng gia 5 đỉnh nạm ngọc -->
+  <path d="M 5 24 L 4 10 L 10 16 L 16 7 L 22 16 L 28 10 L 27 24 Z" fill="${C.gold}" stroke="${C.outline}" stroke-width="1.5"/>
+  <path d="M 6 22 L 5 12 L 10 17 L 16 9 L 22 17 L 27 12 L 26 22 Z" fill="${C.goldLight}"/>
+  
+  <!-- 3 viên ngọc châu trên 3 đỉnh chính -->
+  <circle cx="4" cy="9" r="1.8" fill="${C.white}" stroke="${C.outline}" stroke-width="1"/>
+  <circle cx="16" cy="6" r="2.2" fill="${C.white}" stroke="${C.outline}" stroke-width="1"/>
+  <circle cx="28" cy="9" r="1.8" fill="${C.white}" stroke="${C.outline}" stroke-width="1"/>
+  
+  <!-- Đai vương miện đính ngọc ruby đỏ & sapphire xanh -->
+  <rect x="5" y="23" width="22" height="4" rx="1" fill="${C.goldDark}" stroke="${C.outline}" stroke-width="1.2"/>
+  <circle cx="10" cy="25" r="1.2" fill="${C.cyan}"/>
+  <circle cx="16" cy="25" r="1.5" fill="${C.red}"/>
+  <circle cx="22" cy="25" r="1.2" fill="${C.cyan}"/>
+</svg>`,
+
+  // 14. Ký hiệu cảnh báo cháy khét / chảo khói (Burnt Alert)
+  'icon_burnt_alert.png': `
+<svg width="64" height="64" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- Vết nổ sao lửa 8 cánh cảnh báo -->
+  <polygon points="16,2 20,10 29,7 23,15 30,22 20,22 18,30 13,23 3,25 9,16 3,9 12,11" fill="${C.red}" stroke="${C.outline}" stroke-width="1.5"/>
+  <polygon points="16,5 19,11 26,9 21,15 27,20 19,20 17,27 13,21 5,23 10,16 5,11 12,12" fill="${C.orange}"/>
+  <polygon points="16,8 18,12 23,10 19,15 23,18 18,18 17,23 14,19 8,20 11,16 8,13 13,13" fill="${C.yellow}"/>
+  
+  <!-- Dấu chấm than cảnh báo màu đen nâu -->
+  <rect x="15" y="11" width="2" height="6" rx="1" fill="${C.outline}"/>
+  <rect x="15" y="19" width="2" height="2" rx="0.5" fill="${C.outline}"/>
+</svg>`
+};
+
+async function generate() {
+  console.log('Generating 14 Retro Pixel Art Icons...');
+  for (const [filename, svgContent] of Object.entries(ICONS)) {
+    const svgBuffer = Buffer.from(svgContent.trim());
+    const pngBuffer = await sharp(svgBuffer)
+      .resize(64, 64, { kernel: sharp.kernel.nearest })
+      .png()
+      .toBuffer();
+
+    for (const dir of OUT_DIRS) {
+      const targetPath = path.join(dir, filename);
+      fs.writeFileSync(targetPath, pngBuffer);
     }
+    console.log(`✓ Generated: ${filename} (64x64 transparent pixel PNG)`);
   }
-
-  return sharp(rawBuf, {
-    raw: {
-      width,
-      height,
-      channels: 4
-    }
-  })
-    .resize(width * scale, height * scale, { kernel: 'nearest' })
-    .png();
+  console.log('All 14 icons generated successfully in assets-src/icons and public/assets/icons!');
 }
 
-// 1. Service Bell 🛎️ (16x16)
-const bellPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [44, 26, 17, 255],     // dark outline
-  'B': [241, 196, 15, 255],   // shiny bell gold
-  'Y': [243, 156, 18, 255],   // bell amber shade
-  'W': [255, 250, 205, 255],  // specular highlight
-  'S': [189, 195, 199, 255],  // ringer steel
-  'D': [127, 140, 141, 255],  // ringer dark
-  'O': [141, 73, 37, 255],    // wood base
-  'K': [94, 44, 20, 255]      // wood base shadow
-};
-const bellGrid = [
-  '.......##.......',
-  '......#SS#......',
-  '.......##.......',
-  '......#YY#......',
-  '....##YYYY##....',
-  '...#WWBBYYYY#...',
-  '..#WWBBYYYYYY#..',
-  '.#WWBBYYYYYYYY#.',
-  '.#WWBBBBBYYYYY#.',
-  '#WWBBBBBBBYYYYY#',
-  '#WWBBBBBBBYYYYY#',
-  '#WWBBBBBBBYYYYY#',
-  '################',
-  '..#OOOOOOOOOO#..',
-  '..#KKKKKKKKKK#..',
-  '..############..'
-];
-
-// 2. Stardew Red Heart ❤️ (16x16)
-const heartPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [58, 14, 18, 255],    // deep border
-  'R': [235, 47, 6, 255],     // crimson heart
-  'D': [183, 21, 64, 255],    // dark heart shading
-  'L': [255, 107, 107, 255],  // bright red
-  'W': [255, 255, 255, 255]   // shine
-};
-const heartGrid = [
-  '..####...####...',
-  '.#LRRR#.#LRRR#..',
-  '#WLLRRR#WLLRRR#.',
-  '#WLLRRRRRRRRRR#.',
-  '#WLLRRRRRRRRRR#.',
-  '#LLRRRRRRRRRRR#.',
-  '.#LRRRRRRRRRRD#.',
-  '..#RRRRRRRRRD#..',
-  '...#RRRRRRRRD#..',
-  '....#RRRRRRD#...',
-  '.....#RRRRD#....',
-  '......#RRRD#....',
-  '.......#RD#.....',
-  '........#D#.....',
-  '.........#......',
-  '................'
-];
-
-// 3. Oil Can / Jerrycan 🛢️ (16x16)
-const oilPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [38, 42, 48, 255],    // dark steel outline
-  'M': [116, 125, 140, 255], // metal grey
-  'L': [164, 176, 190, 255], // light metal
-  'G': [245, 176, 65, 255],  // golden oil
-  'Y': [243, 156, 18, 255],  // deep amber oil
-  'W': [255, 243, 205, 255], // bright highlight
-  'C': [235, 77, 75, 255]    // red spout cap
-};
-const oilGrid = [
-  '....##..........',
-  '...#CC#.........',
-  '...#CC##.####...',
-  '....#LL#.#MM#...',
-  '...#LLLL##MM#...',
-  '..#LLLLLL####...',
-  '..#LLLLLLLLM#...',
-  '..#LLWWWWLLM#...',
-  '..#LLWGGWLLM#...',
-  '..#LLWGGWLLM#...',
-  '..#LLWWWWLLM#...',
-  '..#LLYYYYLLM#...',
-  '..#LLLLLLLLM#...',
-  '..#LLLLLLLLM#...',
-  '..#MMMMMMMMM#...',
-  '...#########....'
-];
-
-// 4. Secret Sauce Jar 🍲 (16x16)
-const saucePalette = {
-  '.': [0, 0, 0, 0],
-  '#': [47, 24, 16, 255],     // dark rim
-  'C': [225, 112, 85, 255],   // clay terra cotta
-  'L': [250, 177, 160, 255],  // clay light
-  'S': [178, 60, 40, 255],    // clay shadow
-  'R': [214, 48, 49, 255],    // red cloth / ribbon
-  'W': [255, 234, 167, 255],  // parchment tie
-  'G': [241, 196, 15, 255]    // golden star badge
-};
-const sauceGrid = [
-  '.....######.....',
-  '....#WWWWWW#....',
-  '....#RRRRRR#....',
-  '...#R#R##R#R#...',
-  '..#LLLLCCCCCS#..',
-  '.#LLLLCCCCCCCS#.',
-  '.#LLLLCCCCCCCS#.',
-  '.#LLLCCGGCCCS#..',
-  '.#LLLCCGGCCCS#..',
-  '.#LLLCCCCCCCS#..',
-  '.#LLLCCCCCCCS#..',
-  '.#LLLCCCCCCCS#..',
-  '..#LLCCCCCCCS#..',
-  '..#SSSSSSSSSS#..',
-  '...##########...',
-  '................'
-];
-
-// 5. Retro Delivery Scooter 🛵 (16x16)
-const scooterPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [33, 33, 33, 255],    // outline
-  'R': [235, 77, 75, 255],   // scooter red
-  'W': [255, 255, 255, 255], // white headlight/fender
-  'B': [46, 204, 113, 255],  // green delivery thermal box
-  'D': [39, 174, 96, 255],   // dark green box
-  'Y': [241, 196, 15, 255],  // headlight amber
-  'T': [60, 64, 70, 255],    // tire rubber
-  'S': [189, 195, 199, 255]  // chrome rim
-};
-const scooterGrid = [
-  '.........##.....',
-  '........#SS#....',
-  '..####...#R#Y#..',
-  '.#BBBB#..#R##...',
-  '.#B##B#...#R#...',
-  '.#BBBB#.##RR#...',
-  '..####.#RRRR#...',
-  '...#RRRRRRRR#...',
-  '...#RRRRRRR##...',
-  '..##TT##RR#TT#..',
-  '.#TTSTT#.#TTST#.',
-  '.#TSSST#.#TSSST#',
-  '.#TTSTT#.#TTSTT#',
-  '..##TT##..##TT##',
-  '....##......##..',
-  '................'
-];
-
-// 6. Trash / Cancel Bin 🗑️ (16x16)
-const trashPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [44, 44, 44, 255],
-  'M': [149, 165, 166, 255],
-  'L': [200, 214, 229, 255],
-  'D': [127, 140, 141, 255],
-  'R': [231, 76, 60, 255]
-};
-const trashGrid = [
-  '......####......',
-  '.....#LLLL#.....',
-  '...##########...',
-  '..#LLLLLLLLLM#..',
-  '...##########...',
-  '...#LLMRRMLL#...',
-  '...#LLMRRMLL#...',
-  '...#LLMRRMLL#...',
-  '...#LLMRRMLL#...',
-  '...#LLMRRMLL#...',
-  '...#LLMRRMLL#...',
-  '...#LLMRRMLL#...',
-  '...#DDMDDMDD#...',
-  '....########....',
-  '................',
-  '................'
-];
-
-// 7. Sparkle Star ✨ (16x16)
-const sparklePalette = {
-  '.': [0, 0, 0, 0],
-  '#': [180, 130, 20, 255],
-  'G': [241, 196, 15, 255],
-  'W': [255, 255, 230, 255],
-  'Y': [243, 156, 18, 255]
-};
-const sparkleGrid = [
-  '.......#........',
-  '......#W#.......',
-  '......#W#.......',
-  '.....#GWW#......',
-  '....#GGWWG#.....',
-  '...#GGWWWGG#....',
-  '.##GGWWWWWGG##..',
-  '#WWWWWWWWWWWW#..',
-  '.##GGWWWWWGG##..',
-  '...#GGWWWGG#....',
-  '....#GGWWG#.....',
-  '.....#GWW#......',
-  '......#W#.......',
-  '......#W#.......',
-  '.......#........',
-  '................'
-];
-
-// 8. Straw Broom 🧹 (16x16)
-const broomPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [45, 30, 15, 255],
-  'W': [160, 82, 45, 255],   // wood handle
-  'L': [205, 133, 63, 255],  // wood light
-  'S': [245, 205, 121, 255], // straw yellow
-  'D': [225, 177, 44, 255],  // straw shadow
-  'R': [192, 57, 43, 255]    // red twine
-};
-const broomGrid = [
-  '.............#L#',
-  '............#LW#',
-  '...........#LW#.',
-  '..........#LW#..',
-  '.........#LW#...',
-  '........#LW#....',
-  '.......#LW#.....',
-  '......#LW#......',
-  '.....#RR#.......',
-  '....#SSSS#......',
-  '...#SSDDSS#.....',
-  '..#SSDDDDSS#....',
-  '.#SSSDDDDDSS#...',
-  '#SSSSDDDDDSS#...',
-  '##.##.##.##.##..',
-  '................'
-];
-
-// 9. Golden Trophy Cup 🏆 (16x16)
-const trophyPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [50, 30, 10, 255],
-  'G': [241, 196, 15, 255],
-  'Y': [243, 156, 18, 255],
-  'W': [255, 255, 210, 255],
-  'S': [218, 165, 32, 255],
-  'B': [100, 50, 20, 255],
-  'L': [140, 75, 30, 255]
-};
-const trophyGrid = [
-  '..############..',
-  '.#GWWWWGGGGYY#..',
-  '#WGGGGGGGGGYYY#.',
-  '#W##GGGGGGG##Y#.',
-  '#W##GGGGGGG##Y#.',
-  '.##GGGGGGGGG##..',
-  '..#GGGGGGGGG#...',
-  '...#YYGGGGY#....',
-  '....#YYYYY#.....',
-  '.....#GGG#......',
-  '.....#GGG#......',
-  '....#SSSSS#.....',
-  '...#LLLLLLL#....',
-  '..#LLLLLLLLL#...',
-  '..#BBBBBBBBB#...',
-  '..###########...'
-];
-
-// 10. Vintage Newspaper 📰 (16x16)
-const newspaperPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [45, 35, 30, 255],
-  'P': [248, 241, 227, 255],
-  'S': [225, 215, 195, 255],
-  'I': [50, 45, 40, 255],
-  'R': [200, 40, 40, 255]
-};
-const newspaperGrid = [
-  '..##########....',
-  '.#PPPPPPPPP#....',
-  '#PRRRRRRRRP#....',
-  '#PPPPPPPPPP#....',
-  '#PIIIIIIIIP#....',
-  '#PPPPPPPPPP#....',
-  '#PII#..#IIIP#...',
-  '#PII#..#IIIP#...',
-  '#PII#..#IIIP#...',
-  '#PPPPPPPPPPP##..',
-  '#PIII#..#IIISP#.',
-  '#PIII#..#IIISP#.',
-  '#PIII#..#IIISP#.',
-  '#PPPPPPPPPPSSP#.',
-  '.#SSSSSSSSSSSP#.',
-  '..#############.'
-];
-
-// 11. Crispy Fried Drumstick 🍗 (16x16)
-const chickenCrispyPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [60, 30, 10, 255],
-  'C': [230, 126, 34, 255],
-  'Y': [243, 156, 18, 255],
-  'L': [245, 205, 121, 255],
-  'S': [160, 64, 0, 255],
-  'B': [250, 240, 230, 255],
-  'G': [210, 200, 190, 255]
-};
-const chickenCrispyGrid = [
-  '......#####.....',
-  '....##LLLLC##...',
-  '...#LLLLCCCCY#..',
-  '..#LLLLCCCCCCY#.',
-  '.#LLLLCCCCCCCCS#',
-  '.#LLLCCCCCCCCCS#',
-  '#LLCCCCSCCCCCCS#',
-  '#LCCCCCCCCCCCCS#',
-  '#CCCCCCCCCCCCS#.',
-  '.#YCCCCCCCCCS#..',
-  '..#YYCCCCSS##...',
-  '...##YYSS##B#...',
-  '....####.#BBG#..',
-  '........#BBBBG#.',
-  '........#BB#BG#.',
-  '.........##.##..'
-];
-
-// 12. Spicy Glazed Drumstick 🌶️ (16x16)
-const chickenSpicyPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [50, 10, 10, 255],
-  'R': [214, 48, 49, 255],
-  'D': [150, 20, 20, 255],
-  'L': [255, 118, 117, 255],
-  'W': [255, 255, 255, 255],
-  'Y': [249, 202, 36, 255],
-  'B': [250, 240, 230, 255],
-  'G': [210, 200, 190, 255]
-};
-const chickenSpicyGrid = [
-  '......#####.....',
-  '....##LLLLR##...',
-  '...#WLLLRRRRD#..',
-  '..#WLLLRRRRRRD#.',
-  '.#WLLLRRRRRRRRD#',
-  '.#LLLRRYRRRRRRD#',
-  '#LLRRRYDRRRRRRD#',
-  '#LRRRRRDRRRRRRD#',
-  '#RRRRRRYRRRRRD#.',
-  '.#DRRRRRRRRRD#..',
-  '..#DDRRRRDD##...',
-  '...##DDRR##B#...',
-  '....####.#BBG#..',
-  '........#BBBBG#.',
-  '........#BB#BG#.',
-  '.........##.##..'
-];
-
-// 13. Honey Garlic Drumstick 🍯 (16x16)
-const chickenHoneyPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [55, 30, 10, 255],
-  'H': [243, 156, 18, 255],
-  'Y': [241, 196, 15, 255],
-  'L': [255, 234, 167, 255],
-  'D': [180, 85, 10, 255],
-  'W': [255, 255, 255, 255],
-  'B': [250, 240, 230, 255],
-  'G': [210, 200, 190, 255]
-};
-const chickenHoneyGrid = [
-  '......#####.....',
-  '....##LLLLY##...',
-  '...#WLLLYYYYD#..',
-  '..#WLLLYWYYHYD#.',
-  '.#WLLLYYYHYHHYD#',
-  '.#LLLYYYHHYHHYD#',
-  '#LLYYYWDYHHYHYD#',
-  '#LYYYYHHDHHYHYD#',
-  '#YYYYHHYWYHYHD#.',
-  '.#DYYHYHHYYYD#..',
-  '..#DDYYHHDD##...',
-  '...##DDYY##B#...',
-  '....####.#BBG#..',
-  '........#BBBBG#.',
-  '........#BB#BG#.',
-  '.........##.##..'
-];
-
-// 14. Shake Fries 🍟 (16x16)
-const shakeFriesPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [45, 25, 15, 255],
-  'F': [241, 196, 15, 255],
-  'L': [255, 234, 167, 255],
-  'O': [230, 126, 34, 255],
-  'B': [210, 180, 140, 255],
-  'D': [180, 140, 100, 255],
-  'R': [235, 77, 75, 255]
-};
-const shakeFriesGrid = [
-  '..#L#...#L#.....',
-  '.#LFL#.#LFL#.#L#',
-  '.#LFL#.#LFL##LFL',
-  '#LFLOF##LFL#LFL#',
-  '#LFOOF#LFLOFLLF#',
-  '################',
-  '#BBBBBBBBBBBBBBD',
-  '#BBBRRRRRRBBBBDD',
-  '#BBBRRRRRRBBBBDD',
-  '#BBBRRRRRRBBBBDD',
-  '#BBBBBBBBBBBBBBD',
-  '#BBBBBBBBBBBBBBD',
-  '.#BBBBBBBBBBBBD.',
-  '..#BBBBBBBBBBD..',
-  '...#DDDDDDDDD#..',
-  '....#########...'
-];
-
-// 15. Soda Cup 🥤 (16x16)
-const sodaCupPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [30, 30, 40, 255],
-  'T': [245, 245, 245, 255],
-  'S': [235, 77, 75, 255],
-  'C': [52, 152, 219, 255],
-  'W': [255, 255, 255, 255],
-  'D': [41, 128, 185, 255],
-  'L': [220, 225, 230, 255]
-};
-const sodaCupGrid = [
-  '.......#SS#.....',
-  '......#TT##.....',
-  '.....#SS#.......',
-  '....#TT#........',
-  '..############..',
-  '.#LLLLLLLLLLLL#.',
-  '..############..',
-  '..#WWCCWWCCWWD#.',
-  '..#WWCCWWCCWWD#.',
-  '..#WWCCWWCCWWD#.',
-  '...#WCCWWCCWD#..',
-  '...#WCCWWCCWD#..',
-  '...#WCCWWCCWD#..',
-  '....#CCWWCCD#...',
-  '....#DDDDDDD#...',
-  '.....#######....'
-];
-
-// 16. Cast Iron Pan 🍳 (16x16)
-const panPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [25, 25, 30, 255],
-  'M': [50, 55, 65, 255],
-  'L': [80, 85, 95, 255],
-  'Y': [241, 196, 15, 255],
-  'W': [255, 255, 250, 255],
-  'S': [255, 235, 150, 255],
-  'H': [140, 75, 30, 255]
-};
-const panGrid = [
-  '................',
-  '....########....',
-  '..##LLLLLLLL##..',
-  '.#LMMMMMMMMMMD#.',
-  '.#LMMWWWWMMMMD#.',
-  '#LMMWWWWWWMMMMD#',
-  '#LMWWYYYYWWMMMD#',
-  '#LMWWYSYYWWMMMD#',
-  '#LMMWWYYWWMMMMD#',
-  '#LMMMWWWWMMMMMD#',
-  '.#LMMMMMMMMMMD#.',
-  '..##DDDDDDDD##..',
-  '....####H####...',
-  '.......#HH#.....',
-  '.......#HH#.....',
-  '........##......'
-];
-
-// 17. Role Cook 👨‍🍳 (16x16)
-const roleCookPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [40, 30, 25, 255],
-  'W': [255, 255, 255, 255],
-  'S': [220, 225, 230, 255],
-  'R': [235, 77, 75, 255],
-  'F': [255, 218, 193, 255],
-  'D': [225, 175, 140, 255]
-};
-const roleCookGrid = [
-  '.....######.....',
-  '..###WWWWWW###..',
-  '.#WWWWWWWWWWWW#.',
-  '#WWWWWWWWWWWWWW#',
-  '#WWSSWWSSWWSSWW#',
-  '#WWSSWWSSWWSSWW#',
-  '.#WWWWWWWWWWWW#.',
-  '..############..',
-  '...#FFFFFFFF#...',
-  '..#F#F####F#F#..',
-  '..#FFFFFFFFFF#..',
-  '...#FFDDDDFF#...',
-  '....#RRRRRR#....',
-  '...#RRRRRRRR#...',
-  '..#RRRRRRRRRR#..',
-  '..############..'
-];
-
-// 18. Role Waiter 🧹 (16x16)
-const roleWaiterPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [30, 30, 35, 255],
-  'B': [41, 128, 185, 255],
-  'L': [52, 152, 219, 255],
-  'W': [255, 255, 255, 255],
-  'T': [235, 77, 75, 255],
-  'F': [255, 218, 193, 255],
-  'H': [50, 35, 25, 255]
-};
-const roleWaiterGrid = [
-  '.....######.....',
-  '....#HHHHHH#....',
-  '...#HHHHHHHH#...',
-  '...#FFFFFFFF#...',
-  '...#F#F##F#F#...',
-  '...#FFFFFFFF#...',
-  '....#FFFFFF#....',
-  '..###WWTTWW###..',
-  '.#W#WWTWTWW#W#..',
-  '#W#WW#TT#WWW#W#.',
-  '#W#BBLLLLBBW#W#.',
-  '..#BBLLLLBB#....',
-  '..#BBLLLLBB#....',
-  '..#BBLLLLBB#....',
-  '..#BBBBBBBB#....',
-  '..##########....'
-];
-
-// 19. Role Cashier 💰 (16x16)
-const roleCashierPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [45, 30, 15, 255],
-  'W': [140, 75, 30, 255],
-  'L': [180, 110, 50, 255],
-  'S': [189, 195, 199, 255],
-  'G': [241, 196, 15, 255],
-  'B': [212, 172, 13, 255]
-};
-const roleCashierGrid = [
-  '################',
-  '#LLLLLLLLLLLLLL#',
-  '#L############L#',
-  '#L#G#S#G#S#G#G#L#',
-  '#L#B#S#B#S#B#B#L#',
-  '#L#S#G#S#G#S#S#L#',
-  '#L##############',
-  '#L#G#S#G#G#S#G#L#',
-  '#L#B#S#B#B#S#B#L#',
-  '#L#S#G#S#S#G#S#L#',
-  '#L#S#B#S#S#B#S#L#',
-  '#L#S#S#S#S#S#S#L#',
-  '#L############L#',
-  '#WWWWWWWWWWWWWW#',
-  '################',
-  '................'
-];
-
-// 20. Role Manager 👔 (16x16)
-const roleManagerPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [30, 30, 35, 255],
-  'C': [255, 255, 255, 255],
-  'T': [192, 57, 43, 255],
-  'L': [231, 76, 60, 255],
-  'J': [44, 62, 80, 255],
-  'D': [30, 40, 55, 255],
-  'G': [241, 196, 15, 255]
-};
-const roleManagerGrid = [
-  '................',
-  '....########....',
-  '..##CCCCCCCC##..',
-  '.#J#C#TTTT#C#J#.',
-  '#JJ#C#TLTT#C#JJ#',
-  '#JJD##TLTT##DJJ#',
-  '#JJJ#GTLTT#DJJJ#',
-  '#JJJD#TLTT#DJJJ#',
-  '#JJJD#TLTT#DJJJ#',
-  '#JJJD.#TT#.DJJJ#',
-  '#JJJD.#TL#.DJJJ#',
-  '#JJJD..#T#..DJJ#',
-  '.#JJD..#T#..DJ#.',
-  '..#JD...#...D#..',
-  '...##.......##..',
-  '................'
-];
-
-// 21. Role Security 🛡️ (16x16)
-const roleSecurityPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [25, 35, 20, 255],
-  'K': [55, 85, 45, 255],
-  'L': [80, 115, 65, 255],
-  'R': [200, 35, 35, 255],
-  'Y': [245, 215, 60, 255],
-  'W': [190, 195, 200, 255],
-  'S': [130, 135, 140, 255]
-};
-const roleSecurityGrid = [
-  '.....######.....',
-  '...##LLLLLL##...',
-  '..#LLLLLLLLLL#..',
-  '.#LLLLRRYLLLLL#.',
-  '#LLLLRYYYYLLLLK#',
-  '#KKKKRYYYYKKKKK#',
-  '#KKKKKRRYKKKKKK#',
-  '#KKKKKKKKKKKKKK#',
-  '################',
-  '....#WWWWWW#....',
-  '....#WSSSSW#....',
-  '....#W#..#W#....',
-  '....#WWWWWW#....',
-  '.....#WWWW#.....',
-  '......#WW#......',
-  '.......##.......'
-];
-
-// 22. Hamburger Menu ☰ (16x16)
-const menuPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [45, 25, 15, 255],
-  'W': [160, 82, 45, 255],
-  'L': [210, 140, 75, 255],
-  'S': [110, 50, 20, 255],
-  'N': [200, 200, 200, 255]
-};
-const menuGrid = [
-  '................',
-  '..############..',
-  '.#NLLLLLLLLLLN#.',
-  '.#NWWWWWWWWWWN#.',
-  '.#NSSSSSSSSSSN#.',
-  '..############..',
-  '................',
-  '..############..',
-  '.#NLLLLLLLLLLN#.',
-  '.#NWWWWWWWWWWN#.',
-  '.#NSSSSSSSSSSN#.',
-  '..############..',
-  '................',
-  '..############..',
-  '.#NLLLLLLLLLLN#.',
-  '..############..'
-];
-
-// 23. Lightning Bolt ⚡ (16x16)
-const lightningPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [140, 90, 10, 255],
-  'Y': [241, 196, 15, 255],
-  'W': [255, 255, 220, 255],
-  'O': [230, 126, 34, 255]
-};
-const lightningGrid = [
-  '........#####...',
-  '.......#WWYY#...',
-  '......#WWYY#....',
-  '.....#WWYY#.....',
-  '....#WWYY#......',
-  '...#WWYYYYYY#...',
-  '..#WWYYYYYYY#...',
-  '..###########...',
-  '......#WWYY#....',
-  '.....#WWYY#.....',
-  '....#WWYY#......',
-  '...#WWYY#.......',
-  '..#WWYY#........',
-  '.#WWY##.........',
-  '.#YY#...........',
-  '..##............'
-];
-
-// 24. Tabby Cat 🐱 (16x16)
-const catPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [45, 30, 20, 255],
-  'O': [230, 126, 34, 255],
-  'L': [245, 185, 120, 255],
-  'W': [255, 255, 255, 255],
-  'P': [255, 160, 170, 255],
-  'G': [46, 204, 113, 255]
-};
-const catGrid = [
-  '.##.......##....',
-  '#PL#.....#LP#...',
-  '#OPL#...#LPO#...',
-  '#OOPL###LPOO#...',
-  '#OOOOOOOOOOO#...',
-  '#OLLOOOOOLLO#...',
-  '#OLGOLOLGLLO#...',
-  '#OLLLLLLLLLO#...',
-  '#OOOWWWWWPOO#...',
-  '#OOOWPWPWOOO#...',
-  '#OOOOWWWPOOO#...',
-  '.#OOOOOOOOO#....',
-  '..#OOOOOOO#.....',
-  '...#######......',
-  '................',
-  '................'
-];
-
-// 25. Golden Alley Dog 🐕 (16x16)
-const dogPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [45, 30, 15, 255],
-  'Y': [212, 143, 56, 255],
-  'L': [245, 195, 130, 255],
-  'W': [255, 255, 255, 255],
-  'N': [30, 20, 15, 255],
-  'R': [235, 77, 75, 255]
-};
-const dogGrid = [
-  '..###.....###...',
-  '.#YYY#...#YYY#..',
-  '#YYYYY###YYYYY#.',
-  '#YYYYYYYYYYYYY#.',
-  '#YLLYYYYYYYLLY#.',
-  '#YLNYYYYYYYNLY#.',
-  '#YLLYYYYYYYLLY#.',
-  '#YYYWWWWWWWYYY#.',
-  '#YYWWNNNNNWWYY#.',
-  '.#YWWNNNNNWWY#..',
-  '..#YWWWWWWWY#...',
-  '...#YYYYYYY#....',
-  '..#RRRRRRRRR#...',
-  '..#RRRRRRRRR#...',
-  '..###########...',
-  '................'
-];
-
-// 26. Vintage Radio 📻 (16x16)
-const radioPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [35, 35, 40, 255],
-  'M': [140, 80, 45, 255],
-  'L': [180, 115, 70, 255],
-  'S': [200, 205, 210, 255],
-  'D': [80, 85, 90, 255],
-  'Y': [241, 196, 15, 255],
-  'A': [160, 165, 170, 255]
-};
-const radioGrid = [
-  '........#A......',
-  '.......#A.......',
-  '......#A........',
-  '..#####A######..',
-  '.#LLLLLLLLLLLL#.',
-  '#LLLLLLLLLLLLLL#',
-  '#L#SD#SD##YYYY#M',
-  '#L#DS#DS##YYYY#M',
-  '#L#SD#SD###YY##M',
-  '#L#DS#DS##M##M#M',
-  '#L#SD#SD##M##M#M',
-  '#MMMMMMMMMMMMMM#',
-  '#MMMMMMMMMMMMMM#',
-  '.##############.',
-  '..##........##..',
-  '................'
-];
-
-// 27. Green Checkmark ✓ (16x16)
-const checkPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [15, 60, 25, 255],
-  'G': [39, 174, 96, 255],
-  'L': [46, 204, 113, 255],
-  'W': [255, 255, 255, 255]
-};
-const checkGrid = [
-  '................',
-  '.............##.',
-  '............#LW#',
-  '...........#LWG#',
-  '..........#LWG#.',
-  '.........#LWG#..',
-  '........#LWG#...',
-  '.##....#LWG#....',
-  '#WW#..#LWG#.....',
-  '#GWW##LWG#......',
-  '.#GLWWWG#.......',
-  '..#GLWG#........',
-  '...#GW#.........',
-  '....##..........',
-  '................',
-  '................'
-];
-
-// 28. Crimson Close Cross ✕ (16x16)
-const closePalette = {
-  '.': [0, 0, 0, 0],
-  '#': [60, 15, 15, 255],
-  'R': [235, 77, 75, 255],
-  'L': [255, 118, 117, 255],
-  'D': [180, 30, 30, 255]
-};
-const closeGrid = [
-  '................',
-  '.##..........##.',
-  '#LL##......##LL#',
-  '#LRRL#....#LRRL#',
-  '.#DRRL#..#LRRD#.',
-  '..#DRRL##LRRD#..',
-  '...#DRRRRRD#....',
-  '....#LRRRL#.....',
-  '....#LRRRL#.....',
-  '...#DRRRRRD#....',
-  '..#DRRL##LRRD#..',
-  '.#DRRL#..#LRRD#.',
-  '#LRRL#....#LRRL#',
-  '#LL##......##LL#',
-  '.##..........##.',
-  '................'
-];
-
-// 29. Festive Gift 🎁 (16x16)
-const giftPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [50, 20, 10, 255],
-  'Y': [241, 196, 15, 255],
-  'L': [255, 234, 167, 255],
-  'R': [235, 77, 75, 255],
-  'D': [180, 30, 30, 255],
-  'W': [255, 255, 255, 255]
-};
-const giftGrid = [
-  '.....##..##.....',
-  '....#WW##WW#....',
-  '....#WRRRRW#....',
-  '.....#RRRR#.....',
-  '..############..',
-  '.#LLLLRRRRLLLL#.',
-  '.#YYYYRRRRYYYY#.',
-  '.#YYYYRRRRYYYY#.',
-  '..############..',
-  '..#LLLRRRRLLL#..',
-  '..#YYYRRRRYYY#..',
-  '..#YYYRRRRYYY#..',
-  '..#YYYRRRRYYY#..',
-  '..#YYYRRRRYYY#..',
-  '..#DDDRRRRDDD#..',
-  '..############..'
-];
-
-// 30. Bullseye Target 🎯 (16x16)
-const targetPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [50, 15, 15, 255],
-  'R': [235, 77, 75, 255],
-  'W': [255, 255, 255, 255],
-  'Y': [241, 196, 15, 255]
-};
-const targetGrid = [
-  '.....######.....',
-  '...##RRRRRR##...',
-  '..#RRWWWWWWRR#..',
-  '.#RRWWWWWWWWRR#.',
-  '.#RWW#RRRR#WWR#.',
-  '#RWW#RRRRRR#WWR#',
-  '#RWW#RR##RR#WWR#',
-  '#RWW#R#YY#R#WWR#',
-  '#RWW#R#YY#R#WWR#',
-  '#RWW#RR##RR#WWR#',
-  '#RWW#RRRRRR#WWR#',
-  '.#RWW#RRRR#WWR#.',
-  '.#RRWWWWWWWWRR#.',
-  '..#RRWWWWWWRR#..',
-  '...##RRRRRR##...',
-  '.....######.....'
-];
-
-// 31. Police Cap 👮 (16x16)
-const policePalette = {
-  '.': [0, 0, 0, 0],
-  '#': [20, 25, 40, 255],
-  'B': [41, 128, 185, 255],
-  'L': [52, 152, 219, 255],
-  'G': [241, 196, 15, 255],
-  'Y': [243, 156, 18, 255],
-  'V': [40, 45, 50, 255]
-};
-const policeGrid = [
-  '.....######.....',
-  '...##LLLLLL##...',
-  '..#LLLLLLLLLL#..',
-  '.#LLLL#GG#LLLL#.',
-  '#LLLL#GGGG#LLLB#',
-  '#BBBB#GGGG#BBBB#',
-  '#BBBBB#YY#BBBBB#',
-  '#BBBBBBBBBBBBBB#',
-  '################',
-  '..#VVVVVVVVVV#..',
-  '.#VVVVVVVVVVVV#.',
-  '..############..',
-  '................',
-  '................',
-  '................',
-  '................'
-];
-
-// 32. Emote Yum 😋 (16x16)
-const emoteYumPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [80, 50, 10, 255],
-  'Y': [241, 196, 15, 255],
-  'L': [255, 234, 167, 255],
-  'R': [235, 77, 75, 255],
-  'W': [255, 255, 255, 255]
-};
-const emoteYumGrid = [
-  '.....######.....',
-  '...##LLLLYY##...',
-  '..#LLLLYYYYYY#..',
-  '.#LL##YYYY##YY#.',
-  '.#L#..#YY#..#Y#.',
-  '#LL####YY####YY#',
-  '#LLYYYYYYYYYYYY#',
-  '#LLYYYYYYYYYYYY#',
-  '#LL#RRRRRRRR#YY#',
-  '#LL#RWWWWWRR#YY#',
-  '.#L#RRRRRRRR#Y#.',
-  '.#LL##RRRR##YY#.',
-  '..#LLLYYYRYYY#..',
-  '...##YYYYYY##...',
-  '.....######.....',
-  '................'
-];
-
-// 33. Emote Sweat 💦 (16x16)
-const emoteSweatPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [20, 60, 90, 255],
-  'B': [52, 152, 219, 255],
-  'L': [116, 185, 255, 255],
-  'W': [255, 255, 255, 255]
-};
-const emoteSweatGrid = [
-  '.......#........',
-  '......#L#.......',
-  '.....#LLW#......',
-  '....#LLLLW#.....',
-  '....#LLLLLB#....',
-  '....#LLLLLB#....',
-  '.....#BBB##.....',
-  '......###.......',
-  '..#.......#.....',
-  '.#L#.....#L#....',
-  '#LLW#...#LLW#...',
-  '#LLLB#..#LLLB#..',
-  '#LLLB#..#LLLB#..',
-  '.#BB#....#BB#...',
-  '..##......##....',
-  '................'
-];
-
-// 34. Emote Anger 💢 (16x16)
-const emoteAngerPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [70, 10, 10, 255],
-  'R': [235, 47, 6, 255],
-  'L': [255, 107, 107, 255],
-  'W': [255, 255, 255, 255]
-};
-const emoteAngerGrid = [
-  '.####......####.',
-  '#WLLR#....#WLLR#',
-  '#WLLR######WLLR#',
-  '.#RRRWLLLLRRRR#.',
-  '..#RRWLLLLRRR#..',
-  '..#RRWLLLLRRR#..',
-  '..#RRWLLLLRRR#..',
-  '.#WLLRRRRRRWLLR#',
-  '#WLLLLRRRRWLLLL#',
-  '#WLLLLRRRRWLLLL#',
-  '.#WLLRRRRRRWLLR#',
-  '..#RRWLLLLRRR#..',
-  '..#RRWLLLLRRR#..',
-  '..#RRWLLLLRRR#..',
-  '#WLLR######WLLR#',
-  '.####......####.'
-];
-
-// 35. Emote Question ❓ (16x16)
-const emoteQuestionPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [60, 40, 10, 255],
-  'Y': [241, 196, 15, 255],
-  'L': [255, 234, 167, 255],
-  'D': [212, 143, 56, 255]
-};
-const emoteQuestionGrid = [
-  '....########....',
-  '..##LLLLLLYY##..',
-  '.#LLLLYYYYYYDD#.',
-  '#LLYY####YYYYDD#',
-  '#LLYY#..#YYYYDD#',
-  '####....#YYYYDD#',
-  '........#YYYDD#.',
-  '.......#YYYDD#..',
-  '......#YYYDD#...',
-  '.....#YYYDD#....',
-  '.....#YYYDD#....',
-  '......#####.....',
-  '................',
-  '.....######.....',
-  '....#LLYYDD#....',
-  '.....######.....'
-];
-
-// 36. Emote Money 💵 (16x16)
-const emoteMoneyPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [20, 60, 30, 255],
-  'G': [39, 174, 96, 255],
-  'L': [46, 204, 113, 255],
-  'Y': [241, 196, 15, 255],
-  'W': [255, 255, 255, 255]
-};
-const emoteMoneyGrid = [
-  '..############..',
-  '.#LLLLLLLLLLLL#.',
-  '#LLLLLLLLLLLLLG#',
-  '#L##LLLLLLLL##G#',
-  '#L#LL##YY##LL#G#',
-  '#LLLL#YYYY#LLLG#',
-  '#LLLL#YYYY#LLLG#',
-  '#L#LL##YY##LL#G#',
-  '#L##LLLLLLLL##G#',
-  '#LGGGGGGGGGGGGG#',
-  '.#GGGGGGGGGGGG#.',
-  '..############..',
-  '................',
-  '................',
-  '................',
-  '................'
-];
-
-// 37. Emote Oil Alert ⚠️ (16x16)
-const emoteOilAlertPalette = {
-  '.': [0, 0, 0, 0],
-  '#': [60, 40, 10, 255],
-  'Y': [241, 196, 15, 255],
-  'L': [255, 234, 167, 255],
-  'O': [45, 25, 10, 255]
-};
-const emoteOilAlertGrid = [
-  '.......##.......',
-  '......#LL#......',
-  '.....#LLYY#.....',
-  '.....#LOOY#.....',
-  '....#LLOOYY#....',
-  '...#LLLOOYYY#...',
-  '...#LLLOOYYY#...',
-  '..#LLLLOOYYYY#..',
-  '..#LLLLOOYYYY#..',
-  '.#LLLLLOOYYYYY#.',
-  '.#LLLL####YYYY#.',
-  '#LLLLL#OO#YYYYY#',
-  '#LLLLL####YYYYY#',
-  '#LLLLLLLLYYYYYY#',
-  '################',
-  '................'
-];
-
-const icons = [
-  { name: 'icon_bell.png', grid: bellGrid, pal: bellPalette },
-  { name: 'icon_heart.png', grid: heartGrid, pal: heartPalette },
-  { name: 'icon_oil_can.png', grid: oilGrid, pal: oilPalette },
-  { name: 'icon_sauce.png', grid: sauceGrid, pal: saucePalette },
-  { name: 'icon_scooter.png', grid: scooterGrid, pal: scooterPalette },
-  { name: 'icon_trash.png', grid: trashGrid, pal: trashPalette },
-  { name: 'icon_sparkle.png', grid: sparkleGrid, pal: sparklePalette },
-  { name: 'icon_broom.png', grid: broomGrid, pal: broomPalette },
-  { name: 'icon_trophy.png', grid: trophyGrid, pal: trophyPalette },
-  { name: 'icon_newspaper.png', grid: newspaperGrid, pal: newspaperPalette },
-  { name: 'icon_chicken_crispy.png', grid: chickenCrispyGrid, pal: chickenCrispyPalette },
-  { name: 'icon_chicken_spicy.png', grid: chickenSpicyGrid, pal: chickenSpicyPalette },
-  { name: 'icon_chicken_honey.png', grid: chickenHoneyGrid, pal: chickenHoneyPalette },
-  { name: 'icon_shake_fries.png', grid: shakeFriesGrid, pal: shakeFriesPalette },
-  { name: 'icon_soda_cup.png', grid: sodaCupGrid, pal: sodaCupPalette },
-  { name: 'icon_pan.png', grid: panGrid, pal: panPalette },
-  { name: 'icon_role_cook.png', grid: roleCookGrid, pal: roleCookPalette },
-  { name: 'icon_role_waiter.png', grid: roleWaiterGrid, pal: roleWaiterPalette },
-  { name: 'icon_role_cashier.png', grid: roleCashierGrid, pal: roleCashierPalette },
-  { name: 'icon_role_delivery.png', grid: scooterGrid, pal: scooterPalette },
-  { name: 'icon_role_manager.png', grid: roleManagerGrid, pal: roleManagerPalette },
-  { name: 'icon_role_security.png', grid: roleSecurityGrid, pal: roleSecurityPalette },
-  { name: 'icon_hamburger_menu.png', grid: menuGrid, pal: menuPalette },
-  { name: 'icon_lightning.png', grid: lightningGrid, pal: lightningPalette },
-  { name: 'icon_cat.png', grid: catGrid, pal: catPalette },
-  { name: 'icon_dog.png', grid: dogGrid, pal: dogPalette },
-  { name: 'icon_radio.png', grid: radioGrid, pal: radioPalette },
-  { name: 'icon_check.png', grid: checkGrid, pal: checkPalette },
-  { name: 'icon_close.png', grid: closeGrid, pal: closePalette },
-  { name: 'icon_gift.png', grid: giftGrid, pal: giftPalette },
-  { name: 'icon_target.png', grid: targetGrid, pal: targetPalette },
-  { name: 'icon_police.png', grid: policeGrid, pal: policePalette },
-  // Stardew emote balloons
-  { name: 'emote_yum.png', grid: emoteYumGrid, pal: emoteYumPalette },
-  { name: 'emote_sweat.png', grid: emoteSweatGrid, pal: emoteSweatPalette },
-  { name: 'emote_anger.png', grid: emoteAngerGrid, pal: emoteAngerPalette },
-  { name: 'emote_question.png', grid: emoteQuestionGrid, pal: emoteQuestionPalette },
-  { name: 'emote_money.png', grid: emoteMoneyGrid, pal: emoteMoneyPalette },
-  { name: 'emote_oil_alert.png', grid: emoteOilAlertGrid, pal: emoteOilAlertPalette },
-  { name: 'emote_sparkle.png', grid: sparkleGrid, pal: sparklePalette },
-  { name: 'emote_heart.png', grid: heartGrid, pal: heartPalette }
-];
-
-async function main() {
-  for (const item of icons) {
-    const buf = await renderPixelArt(item.grid, item.pal, 4).toBuffer();
-    writeFileSync(join('public/assets/icons', item.name), buf);
-    writeFileSync(join('assets-src/icons', item.name), buf);
-    console.log(`Generated: public/assets/icons/${item.name}`);
-  }
-}
-
-main().catch(err => {
-  console.error(err);
+generate().catch(err => {
+  console.error('Generation failed:', err);
   process.exit(1);
 });

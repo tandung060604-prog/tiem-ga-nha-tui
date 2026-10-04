@@ -41,8 +41,8 @@ export function renderStaffTab(state: GameState): string {
           </div>
           <div class="staff-stats">
             <img src="${ASSETS.icons.lightning}" class="btn-pixel-icon-xs" alt="" /> Tốc độ: <b>${member.speed}</b> | <img src="${ASSETS.icons.target}" class="btn-pixel-icon-xs" alt="" /> Tay nghề: <b>${member.skill}</b>
-            ${member.laziness !== undefined ? ` | 💤 Lười: <b style="color:#f87171">${member.laziness}%</b>` : ''}
-            ${member.errorRate !== undefined ? ` | ⚠️ Sai: <b style="color:#f87171">${member.errorRate}%</b>` : ''}
+            ${member.laziness !== undefined ? ` | Lười: <b style="color:#f87171">${member.laziness}%</b>` : ''}
+            ${member.errorRate !== undefined ? ` | Sai: <b style="color:#f87171">${member.errorRate}%</b>` : ''}
           </div>
           <div class="staff-effect"><img src="${ASSETS.icons.settings}" class="btn-pixel-icon-xs" alt="" /> ${describeStaffEffect(member, state.staff)}</div>
           ${member.passiveName ? `<div class="staff-passive"><img src="${ASSETS.icons.sparkle}" class="btn-pixel-icon-xs" alt="" /> <b>${member.passiveName}:</b> ${member.passiveDesc}</div>` : ''}
@@ -100,12 +100,12 @@ export function renderStaffTab(state: GameState): string {
       </div>
 
       ${isChapter1 ? `<div style="color: #fef08a; font-size: 0.72rem; font-weight: 700; text-align: center; margin-top: 8px; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 6px;"><img src="${ASSETS.icons.scooter}" class="btn-pixel-icon-xs" alt="" /> <b>Xe Đẩy Chương 1:</b> Tối đa 1 bạn phụ việc. Đạt Chương 2 để mở rộng tới 4 nhân sự!</div>` : ''}
-      ${full ? '<div style="color: #f87171; font-size: 0.72rem; font-weight: 750; text-align: center; margin-top: 8px;">⚠️ Tiệm đã đủ nhân viên tối đa! Hãy cho nghỉ bớt trước khi chiêu mộ thêm.</div>' : ''}
+      ${full ? `<div style="color: #f87171; font-size: 0.72rem; font-weight: 750; text-align: center; margin-top: 8px;"><img src="${ASSETS.icons.roleSecurity}" class="btn-pixel-icon-xs" alt="" /> Tiệm đã đủ nhân viên tối đa! Hãy cho nghỉ bớt trước khi chiêu mộ thêm.</div>` : ''}
     </div>
 
     <!-- DANH SÁCH ĐỘI NGŨ NHÂN VIÊN HIỆN CÓ -->
     <div class="sec-title">
-      <span>👥 Đội Ngũ Nhân Viên Hiện Tại (${state.staff.length}/${cap} người)</span>
+      <span><img src="${ASSETS.icons.staff}" class="btn-pixel-icon-xs" alt="" /> Đội Ngũ Nhân Viên Hiện Tại (${state.staff.length}/${cap} người)</span>
     </div>
     <div class="sec-desc">
       Lương tự động thanh toán cuối mỗi ngày. Nhân viên có độ lười và tỷ lệ làm sai riêng tùy theo độ hiếm. Thưởng nóng để tăng lại tâm trạng khi mệt mỏi.

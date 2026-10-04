@@ -151,9 +151,9 @@ describe('Hybrid Polish v2.8.0 Feature Tests', () => {
 
       const html = renderSellingView(state, mockSession);
       expect(html).toContain('btn-open-kitchen-guide');
-      expect(html).toContain('0k 🎁'); // Nút thay dầu hiển thị trợ giá 0k
+      expect(html).toContain('0k'); // Nút thay dầu hiển thị trợ giá 0k
       expect(html).toContain('patio-checkin-flash'); // Khách ăn giây thứ 4 check-in sống ảo
-      expect(html).toContain('📸 Check-in!');
+      expect(html).toContain('Check-in!');
       expect(html).toContain('chew-head-bob'); // Hoạt họa khách nhai đồ ăn sống động
     });
   });

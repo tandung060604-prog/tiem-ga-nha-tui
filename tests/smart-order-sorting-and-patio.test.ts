@@ -117,7 +117,7 @@ describe('Smart Order Sorting & Patio Visual Juice Features', () => {
     // Bàn ăn có animation nhai và hơi khói ấm nóng
     expect(html).toContain('chew-head-bob');
     expect(html).toContain('patio-steam-puff');
-    expect(html).toContain('♨️');
+    expect(html).toContain('icon_smoke_puff.png');
   });
 
   it('5. Staff Visual on Kitchen (Jev MCP P0): Renders staff corner card on HUD and staff actor beside fryer', () => {

@@ -24,16 +24,81 @@ export interface ChangelogRelease {
   }[];
 }
 
-export const CURRENT_GAME_VERSION = 'v3.2.0';
-export const CURRENT_VERSION_CODENAME = 'Game Feel & Visual Juice: Bộ Emote Pixel Tự Thiết Kế, Khói Đĩa Nóng & Thú Cưng Hiên Quán';
-export const CURRENT_BUILD_DATE = '03/10/2026';
+export const CURRENT_GAME_VERSION = 'v1.1';
+export const CURRENT_VERSION_CODENAME = 'Pixel Art Sài Gòn Retro 90s: Đồng Bộ Toàn Diện Asset Game, Nút Tua Nhanh 2X Thuần Sprite, Ẩn Sốt Vàng & Tái Thiết Kế Ca Bán';
+export const CURRENT_BUILD_DATE = '04/10/2026';
 
 export const CHANGELOG_DATA: ChangelogRelease[] = [
+  {
+    version: 'v1.1',
+    codename: 'Pixel Art Sài Gòn Retro 90s: Đồng Bộ Toàn Diện Asset Game, Nút Tua Nhanh 2X Thuần Sprite, Ẩn Sốt Vàng & Tái Thiết Kế Ca Bán',
+    releaseDate: '04/10/2026',
+    isLatest: true,
+    highlightSummary: 'Bản cập nhật v1.1 đánh dấu bước chuyển mình toàn diện về thị giác và trải nghiệm Game Feel: Thay thế 100% emoji thô bằng bộ 18+ asset pixel art 16-bit độc bản chuẩn phong cách Sài Gòn Retro 90s (cozy Stardew Valley); Nút Tua Nhanh 1X/2X thuần sprite arcade nổi tự nhiên trên HUD, xóa bỏ hoàn toàn lớp nền layer lót và chữ thừa; Ẩn chữ Sốt Vàng giúp quầy bếp tinh gọn; Tái thiết kế toàn bộ 4 ca bán (Trưa, Chiều, Tối, Đêm & Cao Điểm) với template thống nhất và icon thời gian sống động!',
+    metrics: [
+      { icon: '🎨', label: 'Pixel Art Icons', value: '18+ Asset Tự Thiết Kế' },
+      { icon: '⚡', label: 'Nút Tua Nhanh', value: 'Thuần Sprite 1X/2X' },
+      { icon: '🍲', label: 'Tối Giản Quầy Bếp', value: 'Ẩn Chữ Sốt Vàng' },
+      { icon: '⏰', label: 'Ca Bán Thời Khắc', value: '4 Ca + Cao Điểm' },
+      { icon: '🔊', label: 'Web Audio API', value: 'Phục Hồi SFX Toàn Diện' },
+      { icon: '📱', label: 'Chuẩn 1 Ngón Cái', value: 'Touch Target ≥ 44px' }
+    ],
+    categories: [
+      {
+        categoryName: 'Thay Thế Toàn Diện Emoji Bằng Asset Pixel Art Thuần Việt',
+        categoryIcon: '🎨',
+        items: [
+          {
+            tag: 'PIXEL ART ASSETS',
+            tagColor: '#10b981',
+            title: 'Bộ Asset Pixel Art 16-Bit Tự Thiết Kế Độc Quyền',
+            desc: 'Dọn sạch hoàn toàn emoji hệ thống trên toàn bộ các bề mặt tương tác quan trọng, thay bằng ảnh pixel art 16-bit sắc nét 64x64 nền trong suốt:',
+            details: [
+              'Biển hiệu gỗ Bác Ba (icon_wooden_sign.png) và bóng đèn dây tóc retro (icon_lightbulb_retro.png) trên màn hình khởi nghiệp.',
+              'Bọt biển & xà phòng (icon_sponge_soap.png) cho hành động lau chùi bàn gỗ hiên quán.',
+              'Robot phụ bếp bằng đồng (icon_helper_bot.png) và vương miện khách VIP (icon_crown_vip.png).',
+              'Còi báo động (icon_alarm_siren.png) và bàn tay bắt trộm (icon_hand_catch.png) trong sự kiện kẻ gian đột nhập.',
+              'Làn khói chảo & đĩa nóng (icon_smoke_puff.png) cùng cảnh báo chảo khét (icon_burnt_alert.png).'
+            ]
+          },
+          {
+            tag: 'HUD STREAMLINE',
+            tagColor: '#f59e0b',
+            title: 'Nút Tăng Tốc Độ Thuần Sprite & Ẩn Chữ Sốt Vàng',
+            desc: 'Thiết kế lại toàn bộ thanh HUD quầy bếp chuẩn tối giản:',
+            details: [
+              'Nút #btn-toggle-fast trong suốt 100%, chỉ hiển thị trực tiếp ảnh sprite pixel art 1X (vàng caramel) và 2X (đỏ cam bốc lửa), không còn bất kỳ viền hộp hay chữ thừa nào.',
+              'Ẩn hoàn toàn nhãn chữ "Sốt Vàng" trên HUD theo yêu cầu người dùng, giữ nguyên 100% hiệu ứng buff tiền thưởng ngầm khi bán hàng.'
+            ]
+          }
+        ]
+      },
+      {
+        categoryName: 'Tái Thiết Kế 4 Ca Bán Thời Gian & Môi Trường Hẻm 1102',
+        categoryIcon: '⏰',
+        items: [
+          {
+            tag: 'SHIFT REDESIGN',
+            tagColor: '#3b82f6',
+            title: 'Template Mẫu Bán Hàng Thống Nhất Không Layer Hộp Lót',
+            desc: 'Loại bỏ hoàn toàn lớp nền hộp đen mờ và viền container, dùng chung một template cấu trúc thanh thoát [Icon Pixel] [Tên Ca] · [Mô tả Hẻm]:',
+            details: [
+              'Ca Trưa (10:00 - 13:00): Icon mặt trời ấm (icon_shift_noon.png) · Nắng Vàng Giòn Rụm.',
+              'Ca Chiều (13:00 - 17:00): Icon nắng xế hoàng hôn (icon_shift_afternoon.png) · Nắng Xế Hoàng Hôn.',
+              'Ca Tối (17:00 - 19:30): Icon trăng khuyết & đèn phố (icon_shift_evening.png) · Phố Lên Đèn.',
+              'Ca Đêm (19:30 - 21:00): Icon trăng bạc & sao khuya (icon_shift_night.png) · Trăng Sao Tĩnh Lặng.',
+              'Ca Cao Điểm (Rush Hours): Icon lửa rực cháy (icon_fire_rush.png) · Khách Tấp Nập với hiệu ứng nhịp thở nhẹ nhàng.'
+            ]
+          }
+        ]
+      }
+    ]
+  },
   {
     version: 'v3.2.0',
     codename: 'Game Feel & Visual Juice: Bộ Emote Pixel Tự Thiết Kế, Khói Đĩa Nóng & Thú Cưng Hiên Quán',
     releaseDate: '03/10/2026',
-    isLatest: true,
+    isLatest: false,
     highlightSummary: 'Bản nâng cấp Game Feel & Visual Juice toàn diện: Bộ 6 bóng thoại Emote 16-bit pixel nghệ thuật tự thiết kế riêng bằng AI (Yum, Sweat, Anger, Heart, Sủa mừng, Kêu meo meo); Làn khói nóng bốc lên từ 4 ô đĩa sứ gốm nung men ngà; Chùm hạt vàng kim lấp lánh khi chiên đạt Vàng Giòn Perfect; Quỹ đạo tiền bán & tiền bo bay parabol uốn lượn mượt mà về Header; Tương tác chạm cưng nựng Chó Cỏ Vàng & Mèo Mướp Tam Thể hiên quán!',
     metrics: [
       { icon: '💬', label: 'Emote Pixel AI', value: '6 Emote Độc Quyền' },

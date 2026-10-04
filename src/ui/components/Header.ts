@@ -16,7 +16,7 @@ export function renderHeader(state: GameState, _onOpenSettings?: () => void): st
   return `
     <div class="h-l">
       <button id="btn-header-drawer" class="h-btn btn-drawer-toggle" aria-label="Menu Tiệm" title="Danh mục chức năng quán">
-        <span class="drawer-burger-icon">☰</span>
+        <img src="${ASSETS.icons.menu}" class="h-pixel-icon" alt="Menu" />
       </button>
       <button id="btn-audio-toggle" class="h-btn" aria-label="Âm thanh" title="Bật/Tắt âm thanh">
         <img src="${soundIcon}" class="h-pixel-icon" alt="Âm thanh" />
@@ -29,7 +29,7 @@ export function renderHeader(state: GameState, _onOpenSettings?: () => void): st
       <!-- Quick Utilities Dropdown Drawer -->
       <div id="header-quick-drawer" class="header-drawer-popover" style="display: none;">
         <div class="drawer-header-bar">
-          <span class="drawer-title">📜 TIỆN ÍCH HẺM 1102</span>
+          <span class="drawer-title"><img src="${ASSETS.icons.book}" class="btn-pixel-icon-xs" alt="" /> TIỆN ÍCH HẺM 1102</span>
           <button id="btn-close-header-drawer" class="drawer-close-btn" aria-label="Đóng">✕</button>
         </div>
         <div class="drawer-items-list">
@@ -38,16 +38,16 @@ export function renderHeader(state: GameState, _onOpenSettings?: () => void): st
             <span class="drawer-label">Cài đặt tiệm</span>
           </button>
           <button id="btn-leaderboard-toggle" class="drawer-action-btn" title="Bảng xếp hạng Đua Top 4 Tiệm Gà">
-            <span class="drawer-icon-emoji">🏆</span>
+            <img src="${ASSETS.icons.trophy}" class="drawer-icon-img" alt="" />
             <span class="drawer-label">Đua Top 4 Máy</span>
           </button>
           <button id="btn-social-share-toggle" class="drawer-action-btn" title="Rủ bạn bè đua top (Chia sẻ link / QR)">
-            <span class="drawer-icon-emoji">👥</span>
+            <img src="${ASSETS.icons.staff}" class="drawer-icon-img" alt="" />
             <span class="drawer-label">Rủ bạn đua top</span>
           </button>
           <button id="btn-loyalty-handbook-toggle" class="drawer-action-btn" title="Sổ Tay Tri Kỷ Hẻm 1102 & Quà Tiếp Tế">
-            <span class="drawer-icon-emoji">💖</span>
-            <span class="drawer-label">Sổ Tay Tri Kỷ Hẻm ${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0) > 0 ? `(${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0)} 🎁)` : ''}</span>
+            <img src="${ASSETS.icons.heart}" class="drawer-icon-img" alt="" />
+            <span class="drawer-label">Sổ Tay Tri Kỷ Hẻm ${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0) > 0 ? `(${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0)} <img src="${ASSETS.icons.gift}" class="btn-pixel-icon-xs" alt="" />)` : ''}</span>
           </button>
           <button id="btn-changelog-toggle" class="drawer-action-btn" title="Xem bản cập nhật">
             <img src="${ASSETS.icons.book}" class="drawer-icon-img" alt="" />
@@ -75,7 +75,7 @@ export function renderHeader(state: GameState, _onOpenSettings?: () => void): st
     <div class="h-r">
       <button id="btn-header-handbook" class="h-btn btn-header-handbook ${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0) > 0 ? 'has-gift' : ''}" aria-label="Sổ tay" title="Sổ tay Tri Kỷ Hẻm 1102 & Cẩm nang quán">
         <img src="${ASSETS.icons.book}" class="h-pixel-icon" alt="Sổ tay" />
-        ${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0) > 0 ? '<span class="header-gift-badge">🎁</span>' : ''}
+        ${(state.loyaltyState?.pendingAlleyGifts?.length ?? 0) > 0 ? `<img src="${ASSETS.icons.gift}" class="header-gift-badge-img" alt="Quà" />` : ''}
       </button>
       <button id="btn-header-settings" class="h-btn btn-header-settings" aria-label="Cài đặt" title="Cài đặt tiệm">
         <img src="${ASSETS.icons.settings}" class="h-pixel-icon" alt="Cài đặt" />

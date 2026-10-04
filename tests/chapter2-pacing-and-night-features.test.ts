@@ -174,8 +174,8 @@ describe('Đại Tu Pacing Chương 2, Xóa Thời Tiết, Ca Đêm 21h-6h & Bá
 
       const html = renderSellingView(state, session);
       expect(html).toContain('dirty-oil-warning-overlay');
-      expect(html).toContain('⚠️ DẦU ĐEN! THAY DẦU KẺO CHÁY GÀ!');
-      expect(html).toContain('⚠️ ĐEN! THAY');
+      expect(html).toContain('DẦU ĐEN! THAY DẦU KẺO CHÁY GÀ!');
+      expect(html).toContain('icon_smoke_puff.png');
       expect(html).toContain('oil-dirty');
     });
   });
