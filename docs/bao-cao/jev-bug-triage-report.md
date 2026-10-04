@@ -931,3 +931,13 @@
   - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 81.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
 ---
+
+### 🐞 [11:06:51 4/10/2026] (via Jev MCP) Hieu ung to tien bay dang dung confetti mau va emoji dong xu thay vi asset to tien polymer pixel Viet Nam thuc te
+- **Triệu chứng:** (1) Canvas-confetti ban ra cac cham tron/manh mau chu nhat don sac cua thu vien web, khong phai asset to tien. (2) Chi tien mua hang kho lai ban phao hoa party la phi logic kinh te. (3) Ban ga o Sai Gon ma khach tra dong xu emoji 🪙 khong phu hop van hoa tien giay polymer va phong cach pixel art. (4) Thieu asset pixel to tien bay chuyen biet.
+- **Vị trí:** `src/ui/components/InventoryTab.ts, src/ui/components/SellingView.ts, src/styles/kitchen.css` 
+- **Đánh giá Jev (919ms):**
+  - **Mức độ (Severity):** `p3_minor` (Độ tin cậy: 61.0%)
+  - **Nguyên nhân gốc (Root Cause):** `content_mislabel` (Độ tin cậy: 65.0%)
+  - **Chiến lược Fix:** `contract_first_type_fix` (Độ tin cậy: 92.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---

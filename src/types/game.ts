@@ -385,6 +385,19 @@ export interface KarmaState {
   ambition: number;      // Tham Vọng Quy Mô (0-100)
 }
 
+export type KarmaArchetypeId = 'alley_soul' | 'artisan_flame' | 'street_tycoon' | 'alley_heart' | 'novice_dreamer';
+
+export interface KarmaArchetype {
+  id: KarmaArchetypeId;
+  title: string;
+  tagline: string;
+  icon: string;
+  description: string;
+  badgeColor: string;
+  dominantStat: 'community' | 'craftsmanship' | 'ambition' | 'balanced' | 'neutral';
+  perks: string[];
+}
+
 export type StoryEndingId = 'happy' | 'open' | 'bad_bankruptcy' | 'bad_corporate' | 'bad_police' | 'secret';
 
 export interface MemoryAlbumCG {

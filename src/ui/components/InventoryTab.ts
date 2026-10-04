@@ -355,6 +355,59 @@ function syncCartDOM(state: GameState) {
   }
 }
 
+/**
+ * Hiệu ứng Chi Tiền Thanh Toán Kho (Cash Payment FX):
+ * 1. Phun các tờ tiền polymer pixel (ASSETS.ui.pixelBanknoteFly) bay lượn từ nút bấm
+ * 2. Badge trừ tiền đỏ rực (-XXXđ) bay lên
+ * 3. Đóng dấu mộc đỏ "ĐÃ THANH TOÁN" đè lên banner hóa đơn
+ */
+function triggerBanknotePaymentFx(checkoutBtn: HTMLElement, totalCost: number): void {
+  if (typeof document === 'undefined' || typeof document.createElement !== 'function' || !document.body) return;
+
+  const banner = document.getElementById('inv-cash-checkout-banner');
+  const rect = typeof checkoutBtn?.getBoundingClientRect === 'function' 
+    ? checkoutBtn.getBoundingClientRect() 
+    : { left: 100, top: 100, width: 80, height: 40 };
+  const startX = rect.left + rect.width / 2;
+  const startY = rect.top + rect.height / 2;
+
+  // 1. Sinh 5 tờ tiền polymer pixel bay lượn theo các hướng khác nhau
+  const count = 5;
+  for (let i = 0; i < count; i++) {
+    const note = document.createElement('div');
+    note.className = 'banknote-flutter-particle';
+    note.style.backgroundImage = `url("${ASSETS.ui.pixelBanknoteFly}")`;
+    note.style.left = `${startX + (Math.random() * 20 - 10)}px`;
+    note.style.top = `${startY + (Math.random() * 10 - 5)}px`;
+    
+    // Tỏa ra theo góc ngẫu nhiên
+    const angle = ((i / (count - 1)) * 100 - 50) + (Math.random() * 20 - 10);
+    const flyDist = (Math.random() - 0.5) * 80;
+    note.style.setProperty('--fly-x', `${flyDist}px`);
+    note.style.transform = `translate(0, 0) rotate(${angle}deg)`;
+
+    document.body.appendChild(note);
+    setTimeout(() => note.remove(), 950);
+  }
+
+  // 2. Badge trừ tiền đỏ bay lên
+  if (banner) {
+    const expense = document.createElement('div');
+    expense.className = 'expense-cash-float';
+    expense.innerHTML = `<img src="${ASSETS.ui.pixelBanknoteFly}" class="flying-banknote-img" alt="" /> <span>-${totalCost.toLocaleString('vi-VN')}đ</span>`;
+    banner.style.position = 'relative';
+    banner.appendChild(expense);
+    setTimeout(() => expense.remove(), 1100);
+
+    // 3. Dấu mộc đỏ "ĐÃ THANH TOÁN" đóng cộp xuống giữa banner
+    const stamp = document.createElement('div');
+    stamp.className = 'pixel-paid-stamp';
+    stamp.textContent = 'ĐÃ THANH TOÁN';
+    banner.appendChild(stamp);
+    setTimeout(() => stamp.remove(), 950);
+  }
+}
+
 export function bindInventoryEvents(
   state: GameState,
   onUpdateState: (fn: (draft: GameState) => void) => void,
@@ -514,18 +567,11 @@ export function bindInventoryEvents(
         }
       });
 
-      // Hiệu ứng pháo hoa confetti tiền giấy
-      try {
-        const c = (window as any).confetti;
-        if (typeof c === 'function') {
-          c({
-            particleCount: 45,
-            spread: 60,
-            origin: { y: 0.25 },
-            colors: ['#22c55e', '#16a34a', '#facc15', '#fef08a', '#ffffff']
-          });
-        }
-      } catch {}
+      // Hiệu ứng chi tiền chân thực (tờ tiền pixel bay ra, badge trừ tiền & dấu mộc)
+      triggerBanknotePaymentFx(checkoutBtn as HTMLElement, totalCost);
+      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+        try { navigator.vibrate([20, 30, 20]); } catch {}
+      }
 
       audio.playCash();
       showToast(`🧾 ĐÃ THANH TOÁN: -${totalCost.toLocaleString('vi-VN')}đ nhập ${totalItems} món vào kho sẵn sàng!`);

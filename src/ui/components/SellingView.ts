@@ -205,10 +205,22 @@ export function renderFx(events: readonly FxEvent[]): void {
     const el = document.createElement('div');
     el.className = isTip ? 'money-float tip-parabola' : 'money-float cash-parabola';
     el.innerHTML = isTip 
-      ? `<span class="coin-icon">✨</span><span>${text}</span>` 
-      : `<span class="coin-icon">🪙</span><span>${text}</span>`;
+      ? `<img src="${ASSETS.ui.pixelBanknoteFly}" class="flying-banknote-img tip-glow" alt="Tiền" /><span class="tip-sparkle-badge">✨</span><span>${text}</span>` 
+      : `<img src="${ASSETS.ui.pixelBanknoteFly}" class="flying-banknote-img" alt="Tiền" /><span>${text}</span>`;
     layer!.appendChild(el);
     setTimeout(() => el.remove(), 1150);
+
+    // Kèm 1 tờ tiền polymer pixel tung cánh lượn flutter bay lên
+    try {
+      const flutter = document.createElement('div');
+      flutter.className = 'banknote-flutter-particle';
+      flutter.style.backgroundImage = `url("${ASSETS.ui.pixelBanknoteFly}")`;
+      flutter.style.left = `${45 + (Math.random() * 12 - 6)}%`;
+      flutter.style.bottom = isTip ? '30%' : '27%';
+      flutter.style.setProperty('--fly-x', `${(Math.random() - 0.5) * 50}px`);
+      layer!.appendChild(flutter);
+      setTimeout(() => flutter.remove(), 950);
+    } catch {}
   };
 
   for (const fx of events) {

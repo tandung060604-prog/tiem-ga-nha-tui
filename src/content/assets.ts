@@ -215,6 +215,7 @@ export const ASSETS = {
     mailboxStardew: url('assets/ui/mailbox_stardew.png'),
     trophyGoldenShowcase: url('assets/ui/trophy_golden_showcase.png'),
     pixelCashStack: url('assets/ui/pixel_cash_stack.png'),
+    pixelBanknoteFly: url('assets/ui/pixel_banknote_fly.png'),
     toolboxCabinet: url('assets/ui/toolbox_cabinet_pixel.png'),
     kitchenStation: url('assets/ui/kitchen_station_pixel.png')
   },

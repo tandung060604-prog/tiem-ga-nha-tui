@@ -3852,5 +3852,141 @@
   }
 }
 
+/* 4. Tờ Tiền Polymer Pixel Art & Hiệu Ứng Thu / Chi Tiền Chân Thực */
+.flying-banknote-img {
+  width: 28px;
+  height: 13px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  object-fit: cover;
+  border-radius: 2px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
 
+.flying-banknote-img.tip-glow {
+  filter: drop-shadow(0 0 6px rgba(253, 224, 71, 0.85));
+  border: 1px solid #fde047;
+}
 
+.tip-sparkle-badge {
+  font-size: 0.75rem;
+  margin-right: 2px;
+}
+
+/* Tờ tiền polymer pixel bay lơ lửng dập dờn flutter */
+.banknote-flutter-particle {
+  position: fixed;
+  width: 34px;
+  height: 16px;
+  background-size: cover;
+  image-rendering: pixelated;
+  pointer-events: none;
+  z-index: 10000;
+  animation: banknoteFlutterFlight 0.95s cubic-bezier(0.25, 0.9, 0.35, 1) forwards;
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes banknoteFlutterFlight {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.6) rotate(-15deg);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(var(--fly-x, 20px), -30px) scale(1.1) rotate(12deg);
+  }
+  60% {
+    opacity: 0.95;
+    transform: translate(calc(var(--fly-x, 20px) * 1.5), -90px) scale(1) rotate(-8deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--fly-x, 20px) * 2), -150px) scale(0.7) rotate(20deg);
+  }
+}
+
+/* Dấu Mộc Đỏ "ĐÃ THANH TOÁN" đóng cộp phong cách thu ngân */
+.pixel-paid-stamp {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-12deg) scale(1);
+  background: rgba(220, 38, 38, 0.15);
+  border: 3px dashed #ef4444;
+  color: #ef4444;
+  font-family: var(--font-display, monospace);
+  font-weight: 900;
+  font-size: 1.05rem;
+  padding: 4px 14px;
+  border-radius: 6px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.4), inset 0 0 8px rgba(239, 68, 68, 0.2);
+  pointer-events: none;
+  z-index: 100;
+  animation: stampSlapDown 0.95s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+
+@keyframes stampSlapDown {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(-25deg) scale(2.4);
+  }
+  35% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(-10deg) scale(0.95);
+  }
+  75% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(-12deg) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(-12deg) scale(1);
+  }
+}
+
+/* Tiền xuất quỹ bay lên từ quầy */
+.expense-cash-float {
+  position: absolute;
+  right: 12px;
+  top: -10px;
+  background: linear-gradient(135deg, #7f1d1d, #991b1b);
+  border: 1.5px solid #f87171;
+  color: #fef2f2;
+  font-family: var(--font-display, monospace);
+  font-weight: 900;
+  font-size: 0.85rem;
+  padding: 4px 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+  z-index: 110;
+  animation: expenseFloatUp 1.1s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
+}
+
+@keyframes expenseFloatUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.8);
+  }
+  25% {
+    opacity: 1;
+    transform: translateY(-15px) scale(1.1);
+  }
+  75% {
+    opacity: 1;
+    transform: translateY(-40px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-65px) scale(0.85);
+  }
+}
