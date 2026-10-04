@@ -2250,114 +2250,59 @@
 }
 
 /* ==========================================================================
-   RETRO CASSETTE TURBO SPEED SWITCH (Nút Tăng Tốc Độ Bán Hàng)
+   PIXEL ART SPEED TOGGLE (Nút Tăng Tốc Độ Thuần Sprite - Không Nền Layer Lót)
    ========================================================================== */
 
+#btn-toggle-fast,
+.btn-speed-toggle,
 .btn-toggle-fast {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
   min-height: 44px;
-  padding: 4px 10px;
-  border-radius: 8px;
+  min-width: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease;
-  position: relative;
-  overflow: hidden;
+  transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
   box-sizing: border-box;
 }
 
-.btn-toggle-fast:active {
-  transform: translateY(2px);
+#btn-toggle-fast:active,
+.btn-speed-toggle:active {
+  transform: scale(0.9);
 }
 
-/* Chế độ 1x (Thong thả / Êm đềm) */
-.btn-toggle-fast.mode-normal {
-  background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 50%, #fde68a 100%);
-  border: 2px solid #d97706;
-  border-bottom: 3px solid #b45309;
-  box-shadow: 0 2px 4px rgba(180, 83, 9, 0.25), inset 0 1px 0 #ffffff;
-  color: #78350f;
+.speed-sprite-img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+  transition: filter 0.15s ease, transform 0.15s ease;
 }
 
-.btn-toggle-fast.mode-normal .speed-badge {
-  background: #ffffff;
-  color: #b45309;
-  font-weight: 900;
-  font-size: 0.72rem;
-  padding: 2px 5px;
-  border-radius: 4px;
-  border: 1px solid #fcd34d;
-  font-family: var(--font-pixel-mono), "VT323", monospace;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+#btn-toggle-fast.is-2x .speed-sprite-img {
+  animation: speedSprite2xPulse 1.2s infinite alternate ease-in-out;
 }
 
-.btn-toggle-fast.mode-normal .speed-text {
-  font-size: 0.74rem;
-  font-weight: 800;
-  letter-spacing: 0.2px;
-  font-family: var(--font-handbook), "Baloo 2", sans-serif;
-  color: #854d0e;
-}
-
-/* Chế độ 2x (Tua nhanh Turbo / Neon Flame) */
-.btn-toggle-fast.mode-fast {
-  background: linear-gradient(135deg, #ef4444 0%, #f97316 45%, #ea580c 100%);
-  border: 2px solid #fef08a;
-  border-bottom: 3px solid #991b1b;
-  box-shadow: 0 0 12px rgba(249, 115, 22, 0.65), 0 2px 6px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  color: #ffffff;
-  text-shadow: 0 1px 2px #7f1d1d;
-  animation: fastModePulse 1.4s infinite ease-in-out;
-}
-
-.btn-toggle-fast.mode-fast .speed-badge {
-  background: #991b1b;
-  color: #fef08a;
-  font-weight: 900;
-  font-size: 0.72rem;
-  padding: 2px 6px;
-  border-radius: 4px;
-  border: 1px solid #fca5a5;
-  font-family: var(--font-pixel-mono), "VT323", monospace;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-.btn-toggle-fast.mode-fast .speed-text {
-  font-size: 0.76rem;
-  font-weight: 900;
-  letter-spacing: 0.5px;
-  font-family: var(--font-pixel-title), "VT323", monospace;
-  color: #fff;
-  text-transform: uppercase;
-}
-
-.speed-flame-icon {
-  display: inline-block;
-  font-size: 0.76rem;
-  animation: flameFlicker 0.6s infinite alternate ease-in-out;
-}
-
-@keyframes fastModePulse {
-  0%, 100% {
-    box-shadow: 0 0 8px rgba(249, 115, 22, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
-    filter: brightness(1);
-  }
-  50% {
-    box-shadow: 0 0 16px rgba(239, 68, 68, 0.8), 0 3px 8px rgba(0, 0, 0, 0.4);
-    filter: brightness(1.08);
-  }
-}
-
-@keyframes flameFlicker {
+@keyframes speedSprite2xPulse {
   0% {
-    transform: scale(0.9) rotate(-3deg);
+    transform: scale(1);
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
   }
   100% {
-    transform: scale(1.15) rotate(4deg);
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 6px rgba(249, 115, 22, 0.85)) drop-shadow(0 2px 4px rgba(239, 68, 68, 0.6));
   }
 }
 

@@ -285,7 +285,9 @@ export const ASSETS = {
     emoteOilAlert: url('assets/icons/emote_oil_alert.png'),
     emoteHeart: url('assets/icons/emote_heart.png'),
     emoteDogBark: url('assets/icons/emote_dog_bark.png'),
-    emoteCatPurr: url('assets/icons/emote_cat_purr.png')
+    emoteCatPurr: url('assets/icons/emote_cat_purr.png'),
+    speed1x: url('assets/ui/speed_btn_1x.png'),
+    speed2x: url('assets/ui/speed_btn_2x.png')
   }
 } as const;
 

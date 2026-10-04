@@ -629,11 +629,11 @@ class OvernightMonkey {
         }
       }
 
-      // 1. Bật tua nhanh nếu chưa bật (chỉ bấm khi đang ở chế độ 1x / mode-normal)
+      // 1. Bật tua nhanh nếu chưa bật (chỉ bấm khi đang ở chế độ 1x)
       const fastBtn = page.locator('#btn-toggle-fast');
       if (await fastBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
-        const isNormal = await fastBtn.first().evaluate(el => el.classList.contains('mode-normal') || el.textContent.includes('1.0x') || el.textContent.includes('1x') || el.textContent.includes('Thong')).catch(() => false);
-        if (isNormal) {
+        const is1x = await fastBtn.first().evaluate(el => el.classList.contains('is-1x') || Boolean(el.querySelector('img[src*="1x"]'))).catch(() => false);
+        if (is1x) {
           await fastBtn.first().click({ force: true }).catch(() => {});
           await sleep(50);
         }
