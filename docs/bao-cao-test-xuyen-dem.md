@@ -1,9 +1,9 @@
 # BÁO CÁO TEST XUYÊN ĐÊM (ENDURANCE MONKEY TEST REPORT)
-*Thời gian chạy:* 07:33:14 4/10/2026
-*Thời lượng treo máy:* 343 phút
-*Số ngày chơi hoàn thành:* 200 ngày
-*Tổng số thao tác UI mô phỏng:* 130,955 thao tác
-*Số lượng DOM Nodes trung bình:* 495 nodes
+*Thời gian chạy:* 11:51:11 4/10/2026
+*Thời lượng treo máy:* 4 phút
+*Số ngày chơi hoàn thành:* 2 ngày
+*Tổng số thao tác UI mô phỏng:* 273 thao tác
+*Số lượng DOM Nodes trung bình:* 485 nodes
 
 ---
 
@@ -14,7 +14,7 @@
 | **Console Runtime Errors** | **0** cảnh báo | 🟢 SẠCH SẼ |
 | **UI Deadlocks / Freeze** | **0** lần kẹt | 🟢 100% THÔNG SUỐT |
 | **Tràn ngang màn hình (Horizontal Overflow)** | **0** lần | 🟢 KHỚP 100% 360px & 390px |
-| **Rò rỉ DOM (DOM Node Leak)** | Đỉnh: 666 nodes | 🟢 ỔN ĐỊNH (< 800 nodes) |
+| **Rò rỉ DOM (DOM Node Leak)** | Đỉnh: 544 nodes | 🟢 ỔN ĐỊNH (< 800 nodes) |
 
 ---
 

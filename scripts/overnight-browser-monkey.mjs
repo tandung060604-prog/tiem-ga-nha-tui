@@ -629,17 +629,17 @@ class OvernightMonkey {
         }
       }
 
-      // 1. Bật tua nhanh nếu chưa bật (chỉ bấm khi đang ở chế độ 1x)
+      // 1. Bật tua nhanh nếu chưa bật (chỉ bấm khi đang ở chế độ 1x / mode-normal)
       const fastBtn = page.locator('#btn-toggle-fast');
       if (await fastBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
-        const text = await fastBtn.first().textContent().catch(() => '');
-        if (text.includes('1x')) {
+        const isNormal = await fastBtn.first().evaluate(el => el.classList.contains('mode-normal') || el.textContent.includes('1.0x') || el.textContent.includes('1x') || el.textContent.includes('Thong')).catch(() => false);
+        if (isNormal) {
           await fastBtn.first().click({ force: true }).catch(() => {});
           await sleep(50);
         }
       }
 
-      // 1b. Dọn dẹp bàn ăn hiên quán (Dine-In Patio) - Thao tác chà khăn lau bàn 3-4s hoặc cọ xát
+      // 1b. Dọn dẹp bàn ăn hiên quán (Dine-In Patio) - Thao tác chà khăn lau bàn kiên nhẫn 4-5s
       const cleanTableBtn = page.locator('.btn-clean-table:not([disabled]), .patio-table.dirty');
       if (await cleanTableBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
         const box = await cleanTableBtn.first().boundingBox().catch(() => null);
@@ -648,9 +648,11 @@ class OvernightMonkey {
           const cy = box.y + box.height / 2;
           await page.mouse.move(cx, cy);
           await page.mouse.down();
-          await page.mouse.move(cx + 10, cy + 4, { steps: 3 });
-          await page.mouse.move(cx - 10, cy - 4, { steps: 3 });
-          await sleep(200);
+          for (let s = 0; s < 4; s++) {
+            await page.mouse.move(cx + 14, cy + 5, { steps: 2 });
+            await page.mouse.move(cx - 14, cy - 5, { steps: 2 });
+            await sleep(50);
+          }
           await page.mouse.up();
         } else {
           await cleanTableBtn.first().click({ force: true }).catch(() => {});
