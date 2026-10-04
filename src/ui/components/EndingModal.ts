@@ -35,6 +35,33 @@ export function renderEndingModal(stateOrEnding: any, endingOrState?: any): stri
   const totalRev = (state.lifetimeStats?.totalRevenue || 0).toLocaleString('vi-VN') + 'đ';
   const stars = (state.ratings?.overall || 4.0).toFixed(2) + '⭐';
   const bunnyNotes = `${(state.unlockedBunnyLetters || []).length}/${BUNNY_LETTERS.length}`;
+  const totalCGs = (state.unlockedCGIds || []).length;
+
+  const epilogueHtml = data.epilogueDetails && data.epilogueDetails.length > 0
+    ? `
+      <div class="ending-epilogue-box" style="background: #fffdf5; border: 1.5px solid #d4a373; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
+        <div style="font-size: 0.72rem; font-weight: 800; color: #b45309; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+          <span>📜 VĨ THANH HẺM 1102 & SỐ PHẬN NHÂN VẬT</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          ${data.epilogueDetails.map(d => `
+            <div style="font-size: 0.78rem; color: #451a03; line-height: 1.4; padding: 4px 6px; background: rgba(254, 243, 199, 0.4); border-radius: 6px;">
+              ${d}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `
+    : '';
+
+  const cgImageHtml = data.cgImage
+    ? `
+      <div class="ending-cg-frame" style="margin: 10px 0 14px 0; background: #fff; padding: 6px; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); border: 2px solid #e2e8f0; text-align: center;">
+        <img src="${data.cgImage}" alt="${data.title}" style="width: 100%; max-height: 220px; object-fit: cover; border-radius: 8px; image-rendering: auto;" />
+        <div style="font-size: 0.68rem; color: #64748b; font-style: italic; margin-top: 4px;">Kỷ niệm vinh danh Hẻm 1102</div>
+      </div>
+    `
+    : '';
 
   return `
     <div class="ending-modal-container" style="max-height: 85vh; overflow-y: auto;">
@@ -47,9 +74,13 @@ export function renderEndingModal(stateOrEnding: any, endingOrState?: any): stri
         </div>
 
         <div class="ending-body" style="padding: 14px; background: #fff;">
+          ${cgImageHtml}
+
           <div class="ending-novel-excerpt" style="font-family: var(--font-body); font-size: 0.86rem; line-height: 1.6; color: #424242; margin-bottom: 14px; text-align: justify; background: #fdfbf7; border-left: 3px solid #ffb74d; padding: 10px 12px; border-radius: 4px;">
             ${data.excerpt}
           </div>
+
+          ${epilogueHtml}
 
           <!-- Bảng Chỉ Số Nghiệp Cảm Thực Tế -->
           <div class="ending-karma-board" style="background: #fafafa; border: 1.5px solid var(--line); border-radius: 10px; padding: 12px; margin-bottom: 14px;">
@@ -107,8 +138,8 @@ export function renderEndingModal(stateOrEnding: any, endingOrState?: any): stri
               <div class="ending-stat-lbl" style="font-size: 0.68rem; color: var(--soft);">Đánh Giá Thực Khách</div>
             </div>
             <div class="ending-stat-box" style="background: #f5f5f5; border-radius: 8px; padding: 8px 10px; text-align: center;">
-              <div class="ending-stat-val" style="font-weight: 800; font-size: 1rem; color: #6a1b9a;">${bunnyNotes} Thư</div>
-              <div class="ending-stat-lbl" style="font-size: 0.68rem; color: var(--soft);">Kỷ Niệm Gà Bông</div>
+              <div class="ending-stat-val" style="font-weight: 800; font-size: 0.95rem; color: #6a1b9a;">${totalCGs}/4 Ảnh • ${bunnyNotes} Thư</div>
+              <div class="ending-stat-lbl" style="font-size: 0.68rem; color: var(--soft);">Kỷ Niệm & Thư Gà Bông</div>
             </div>
           </div>
 
@@ -116,12 +147,17 @@ export function renderEndingModal(stateOrEnding: any, endingOrState?: any): stri
             <button id="btn-open-gallery-from-ending" style="width: 100%; min-height: 44px; padding: 10px; border-radius: 10px; border: 1.5px solid #d4a373; background: linear-gradient(135deg, #fef3c7, #fde68a); color: #78350f; font-weight: 800; font-size: 0.88rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
               🏛️ <span>Xem Phòng Ký Ức Hẻm 1102</span>
             </button>
+
+            <button id="btn-restart-game-legacy" style="width: 100%; min-height: 44px; padding: 10px; border-radius: 10px; border: 2px solid #16a34a; background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; font-weight: 900; font-size: 0.88rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);">
+              ✨ <span>CHƠI LẠI NEW GAME+ (KẾ THỪA DI SẢN & KỶ NIỆM)</span>
+            </button>
+
             <div style="display: flex; gap: 8px;">
               <button id="btn-close-ending" style="flex: 1; min-height: 44px; padding: 10px; border-radius: 10px; border: 2px solid var(--line); background: #fff; font-weight: 800; font-size: 0.85rem; cursor: pointer;">
                 Đóng Xem Lại
               </button>
-              <button id="btn-restart-game" style="flex: 1; min-height: 44px; padding: 10px; border-radius: 10px; border: 2px solid var(--red); background: var(--red); color: #fff; font-weight: 800; font-size: 0.85rem; cursor: pointer;">
-                🔄 Chơi Lại Mới
+              <button id="btn-restart-game" style="flex: 1; min-height: 44px; padding: 10px; border-radius: 10px; border: 2px solid #ef4444; background: #fff; color: #dc2626; font-weight: 800; font-size: 0.85rem; cursor: pointer;">
+                🔄 Chơi Mới Xóa Trắng
               </button>
             </div>
           </div>
@@ -135,7 +171,8 @@ export function bindEndingEvents(
   onClose: () => void,
   onRestart: () => void,
   onOpenGallery?: () => void,
-  endingId?: StoryEndingId
+  endingId?: StoryEndingId,
+  onNewGamePlus?: () => void
 ) {
   if (typeof document === 'undefined') return;
 
@@ -156,6 +193,18 @@ export function bindEndingEvents(
     galleryBtn.onclick = () => {
       audio.playPop();
       onOpenGallery();
+    };
+  }
+
+  const legacyRestartBtn = document.getElementById('btn-restart-game-legacy');
+  if (legacyRestartBtn) {
+    legacyRestartBtn.onclick = () => {
+      audio.playCash();
+      if (onNewGamePlus) {
+        onNewGamePlus();
+      } else {
+        onRestart();
+      }
     };
   }
 

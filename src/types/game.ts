@@ -387,6 +387,18 @@ export interface KarmaState {
 
 export type StoryEndingId = 'happy' | 'open' | 'bad_bankruptcy' | 'bad_corporate' | 'bad_police' | 'secret';
 
+export interface MemoryAlbumCG {
+  id: string;
+  title: string;
+  subtitle: string;
+  characterName: string;
+  image: string;
+  unlockCondition: string;
+  storySnippet: string;
+  dateUnlocked?: string;
+  karmaBonus?: Partial<KarmaState>;
+}
+
 export interface StoryEnding {
   id: StoryEndingId;
   themeClass: string;
@@ -397,6 +409,8 @@ export interface StoryEnding {
   excerpt: string;
   conditionDescription: string;
   karma: KarmaState;
+  cgImage?: string;
+  epilogueDetails?: string[];
 }
 
 export interface IncidentChoice {
@@ -553,6 +567,8 @@ export interface GameState {
   karma: KarmaState;
   activeEnding?: StoryEndingId | null;
   achievedEndings?: StoryEndingId[]; // kết thúc đã đạt: chỉ những cái này được xem lại
+  unlockedCGIds?: string[];          // Danh sách các bức ảnh kỷ niệm CG đã mở khóa trong Sổ Tay Hẻm
+  legacyPerks?: string[];            // Đặc quyền kế thừa di sản (New Game+)
   debtStreak?: number;               // số ngày liên tiếp đóng cửa với quỹ âm
   chosenDialogueIds?: string[];
   seenIncidentIds?: string[];        // Danh sách các sự kiện đã gặp

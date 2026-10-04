@@ -117,6 +117,8 @@ export function createInitialState(): GameState {
     // Mọi trường được lưu PHẢI có mặt ở đây: migrateSave chỉ chép các khóa có trong trạng thái mặc định
     // (thiếu → mất sau khi tải lại trang, kể cả cờ chống gian lận).
     achievedEndings: [],
+    unlockedCGIds: [],
+    legacyPerks: [],
     debtStreak: 0,
     depositsPaid: 0,
     baBaAidChapter: 0,

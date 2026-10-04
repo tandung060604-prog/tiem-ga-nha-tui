@@ -3123,5 +3123,25 @@ body.selling-mode .toast {
   letter-spacing: 0.2px;
 }
 
+/* Album Kỷ Niệm CG Polaroid & Ending Showcase */
+.cg-polaroid-card {
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+}
+
+.cg-polaroid-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
+}
+
+.ending-cg-frame img {
+  animation: popIn 0.4s ease-out;
+  border: 1.5px solid #cbd5e1;
+}
+
+.ending-epilogue-box {
+  animation: fadeIn 0.5s ease-out;
+}
+
+
 
 

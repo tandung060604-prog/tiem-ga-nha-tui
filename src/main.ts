@@ -25,6 +25,7 @@ import { renderChalkboard } from './ui/components/Chalkboard';
 import { openStardewMailboxModal } from './ui/components/StardewMailboxModal';
 import { renderInventoryTab, bindInventoryEvents } from './ui/components/InventoryTab';
 import { renderMemoryGalleryModal, bindMemoryGalleryEvents, GalleryTab } from './ui/components/MemoryGalleryModal';
+import { syncEligibleCGs } from './content/memoryAlbum';
 import { renderUpgradesTab, bindUpgradesEvents } from './ui/components/UpgradesTab';
 import { renderStaffTab, bindStaffEvents } from './ui/components/StaffTab';
 import { renderReviewsTab, bindReviewsEvents } from './ui/components/ReviewsTab';
@@ -943,15 +944,40 @@ class AppController {
         });
       },
       () => {
-        this.openMemoryGalleryModal('endings');
+        this.openMemoryGalleryModal('album');
       },
-      currentEndingId
+      currentEndingId,
+      () => {
+        void this.confirmDialog(
+          'Bắt đầu lượt chơi mới (New Game+)? Bạn sẽ giữ lại toàn bộ Cúp Thành Tựu, Album Ảnh Kỷ Niệm CG và nhận thêm +50.000đ vốn khởi nghiệp!',
+          'Khởi Động New Game+'
+        ).then(ok => {
+          if (ok) {
+            const oldState = stateManager.getState();
+            const preservedEndings = oldState.achievedEndings ?? [];
+            const preservedCGs = oldState.unlockedCGIds ?? [];
+            const preservedPerks = [...new Set([...(oldState.legacyPerks ?? []), 'legacy_veteran_chef'])];
+            stateManager.resetGame();
+            stateManager.update(draft => {
+              draft.achievedEndings = preservedEndings;
+              draft.unlockedCGIds = preservedCGs;
+              draft.legacyPerks = preservedPerks;
+              draft.money += 50000;
+            });
+            stateManager.flush();
+            window.location.reload();
+          }
+        });
+      }
     );
   }
 
-  // Phòng Lưu Niệm Ký Ức Hẻm 1102 (Bảo Tàng Thành Tựu & 6 Đại Kết Cục)
-  public openMemoryGalleryModal(initialTab: GalleryTab = 'endings') {
+  // Phòng Lưu Niệm Ký Ức Hẻm 1102 (Bảo Tàng Thành Tựu, Album Kỷ Niệm & 6 Đại Kết Cục)
+  public openMemoryGalleryModal(initialTab: GalleryTab = 'album') {
     audio.playPop();
+    stateManager.update(draft => {
+      syncEligibleCGs(draft);
+    });
     const render = (tab: GalleryTab) => {
       const state = stateManager.getState();
       const html = renderMemoryGalleryModal(state, tab);

@@ -524,8 +524,8 @@ class OvernightMonkey {
       return true;
     }
 
-    // 16c. Các Modal Hệ Thống Khác (Radio, Bằng Khen, Thử Thách Tuần, Ca Đêm, Biển Hiệu, Kỷ Niệm, Lobby, Sổ Tay Bếp, Sổ Tay Tri Kỷ, Phòng Lưu Niệm, Hòm Thư Stardew)
-    const extraModalClose = page.locator('#btn-close-gallery, #btn-close-stardew-mailbox, #btn-dismiss-stardew-mailbox, #btn-close-loyalty-modal, .btn-claim-alley-gift, #btn-summary-open-loyalty, #btn-close-night-radio, #btn-close-achievements, .btn-claim-badge, #btn-close-weekly-quests, .btn-claim-quest, #btn-close-shop-theme, #btn-close-endless, #btn-close-memories, #btn-close-leaderboard, #btn-close-kitchen-guide, #btn-close-kitchen-guide-bottom');
+    // 16c. Các Modal Hệ Thống Khác (Radio, Bằng Khen, Thử Thách Tuần, Ca Đêm, Biển Hiệu, Kỷ Niệm, Lobby, Sổ Tay Bếp, Sổ Tay Tri Kỷ, Phòng Lưu Niệm, Hòm Thư Stardew, Kết Thúc Game)
+    const extraModalClose = page.locator('#btn-close-ending, #btn-close-gallery, #btn-close-stardew-mailbox, #btn-dismiss-stardew-mailbox, #btn-close-loyalty-modal, .btn-claim-alley-gift, #btn-summary-open-loyalty, #btn-close-night-radio, #btn-close-achievements, .btn-claim-badge, #btn-close-weekly-quests, .btn-claim-quest, #btn-close-shop-theme, #btn-close-endless, #btn-close-memories, #btn-close-leaderboard, #btn-close-kitchen-guide, #btn-close-kitchen-guide-bottom');
     if (await extraModalClose.first().isVisible({ timeout: 50 }).catch(() => false)) {
       log(`🧩 Xử lý đóng modal hệ thống / Quà tri kỷ / Phòng lưu niệm / Hòm thư...`);
       await extraModalClose.first().click({ force: true });
@@ -752,6 +752,14 @@ class OvernightMonkey {
         await sleep(100);
       }
 
+      // 💵 CHỐT THANH TOÁN XẤP TIỀN SỈ (QUẦY THANH TOÁN TIỀN SỈ DRAFT CART VỪA CẬP NHẬT)
+      const checkoutBtn = page.locator('#btn-inventory-cash-checkout:not([disabled])');
+      if (await checkoutBtn.first().isVisible({ timeout: 200 }).catch(() => false)) {
+        log(`💵 Bấm Quầy Thanh Toán Xấp Tiền Pixel nhập hàng sỉ vào kho (#btn-inventory-cash-checkout)...`);
+        await checkoutBtn.first().click({ force: true }).catch(() => {});
+        await sleep(250);
+      }
+
       // 2. Thỉnh thoảng nâng cấp quán
       if (Math.random() < 0.15) {
         const upgradeTabBtn = page.locator('.tab-btn[data-tab="upgrades"]');
@@ -958,6 +966,9 @@ class OvernightMonkey {
       for (const tb of thiefActions) {
         if (tb instanceof HTMLElement) tb.click();
       }
+
+      const checkoutCash = document.querySelector('#btn-inventory-cash-checkout:not([disabled])');
+      if (checkoutCash instanceof HTMLElement) checkoutCash.click();
 
       const closeButtons = document.querySelectorAll('.dash-close-x, #btn-modal-close-icon, #btn-close-header-drawer, .bacba-tip-banner-close, [id*="btn-close"], .btn-close, .modal-close');
       for (const btn of closeButtons) {

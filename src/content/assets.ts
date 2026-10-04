@@ -222,6 +222,12 @@ export const ASSETS = {
     poster: url('assets/intro/veo_intro_cinematic.jpg'),
     video: url('assets/intro/intro_video.mp4')
   },
+  cg: {
+    rainyShelterBacBa: url('assets/cg/cg_rainy_shelter_bacba.jpg'),
+    mimiBunnyReveal: url('assets/cg/cg_mimi_bunny_reveal.jpg'),
+    tetReunionAlley: url('assets/cg/cg_tet_reunion_alley.jpg'),
+    happyGoldenGrandOpening: url('assets/cg/cg_happy_golden_grand_opening.jpg')
+  },
   icons: {
     book: url('assets/icons/icon_book.png'),
     clock: url('assets/icons/icon_clock.png'),
