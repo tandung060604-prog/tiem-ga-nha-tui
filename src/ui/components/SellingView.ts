@@ -1032,11 +1032,6 @@ export function renderSellingView(state: GameState, session: SellingSession): st
            data-order-id="${dep.order.id}" 
            aria-hidden="true"
            style="pointer-events: none;">
-        <!-- Stardew Floating Emote Bubble -->
-        <div class="stardew-emote-bubble ${dep.isDelighted ? 'happy' : 'leaving'}">
-          <img src="${dep.isDelighted ? ASSETS.icons.sparkle : ASSETS.icons.emoteYum}" class="emote-pixel-img" alt="" width="16" height="16" />
-        </div>
-
         <!-- 2D Character Walking & Standing Stage -->
         <div class="cust-stage">
           <div class="char-actor ${isReceiving ? 'char-hop-delight' : 'char-flip-exit'} focus-actor">
@@ -1056,15 +1051,6 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             <div class="cust-badges-row">
               <span class="cust-badge served-success-badge"><img src="${ASSETS.icons.check}" class="badge-pixel-star-xs" alt="" /> ĐÃ LÊN MÓN</span>
             </div>
-          </div>
-        </div>
-
-        <!-- Phiếu hoàn tất đơn hàng đóng gói xinh xắn -->
-        <div class="speech-bubble wooden-order-ticket is-takeaway-served">
-          <div class="bubble-arrow"></div>
-          <div class="served-bag-notice">
-            <span class="served-bag-title"><img src="${ASSETS.icons.gift}" class="badge-pixel-star-xs" alt="" /> ĐÃ LÊN MÓN</span>
-            <span class="served-bag-sub">${escapeHtml(dep.takeawayItemName || 'Gà Rán Giòn')} · Cảm ơn quán!</span>
           </div>
         </div>
 
@@ -1361,11 +1347,8 @@ export function renderSellingView(state: GameState, session: SellingSession): st
             <img src="${ASSETS.icons.radio}" class="btn-pixel-icon-xs" alt="" /> ${escapeHtml(state.activeRadioBuff.title)}
           </span>
         ` : ''}
-        <div class="hud-actions" style="display: flex; gap: 5px; align-items: center;">
+        <div class="hud-actions" style="display: none; gap: 5px; align-items: center;">
           <button id="btn-open-kitchen-guide" class="btn-sm" style="display: none !important;" aria-hidden="true" title="Sổ Tay Bếp Trưởng"></button>
-          <button id="btn-toggle-fast" class="btn-speed-toggle ${session.isFastForward ? 'is-2x' : 'is-1x'}" data-action="toggle-fast" title="${session.isFastForward ? 'Tốc độ 2X. Bấm để về 1X' : 'Tốc độ 1X. Bấm để tăng tốc 2X'}">
-            <img src="${session.isFastForward ? ASSETS.icons.speed2x : ASSETS.icons.speed1x}" class="speed-sprite-img" alt="${session.isFastForward ? '2x' : '1x'}" />
-          </button>
         </div>
       </div>
 
@@ -1396,11 +1379,6 @@ export function renderSellingView(state: GameState, session: SellingSession): st
 
       <!-- SÂN KHẤU HẺM 1102 & LỐI ĐI QUẦY GỌI MÓN (Living Alley 2D Staging) -->
       <div class="alley-stage-container">
-        <!-- Đèn lồng treo tường hẻm tỏa sáng ấm áp -->
-        <div class="alley-lantern-mount" aria-hidden="true">
-          <img src="${ASSETS.icons.lanternRed}" class="alley-lantern-pixel" alt="" />
-          <div class="alley-lantern-glow"></div>
-        </div>
 
 
         <!-- Góc Bàn Ăn Hiên Quán (Dine-In Patio Tables) -->
@@ -1973,7 +1951,7 @@ export function renderDineInPatio(tables?: DineInTable[]): string {
     <div class="dine-in-patio-container dine-in-patio-terrace">
       <div class="patio-header patio-terrace-header">
         <span class="patio-title patio-terrace-title">
-          <span class="patio-lantern-icon"><img src="${ASSETS.icons.lanternRed}" class="btn-pixel-icon-xs" alt="" /></span> Hiên Quán · Bàn Gỗ Tại Chỗ
+          Hiên Quán · Bàn Gỗ Tại Chỗ
         </span>
       </div>
       <div class="patio-tables-grid">

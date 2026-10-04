@@ -89,7 +89,7 @@ import { getTodayWholesaler, executeBargain, BargainTactic } from './core/market
 import { renderMarketBargainModal } from './ui/components/MarketBargainModal';
 import { DeliveryRunnerEngine, DeliveryRunState } from './core/deliveryRunner';
 import { renderDeliveryPromptModal, renderDeliveryRunnerGame, renderDeliveryResultModal } from './ui/components/DeliveryRunnerModal';
-import { recordCustomerLoyaltyVisit, ensureLoyaltyState, HEART_LEVEL_TITLES } from './core/loyaltyEngine';
+import { recordCustomerLoyaltyVisit, ensureLoyaltyState } from './core/loyaltyEngine';
 import { openLoyaltyHandbookModal } from './ui/components/LoyaltyHandbookModal';
 import {
   syncToLeaderboard,
@@ -654,14 +654,18 @@ class AppController {
       window.clearTimeout(this.toastTimer);
     }
 
+    const isSelling = document.body.classList.contains('selling-mode');
+    const displayDuration = isSelling ? 1200 : 2200;
+    const cooldownDuration = isSelling ? 150 : 350;
+
     this.toastTimer = window.setTimeout(() => {
       toast.classList.remove('show');
-      // Khoảng đệm thư thái 350ms giữa 2 thông báo giúp mắt người chơi kịp nghỉ ngơi
+      // Khoảng đệm thư thái giữa 2 thông báo giúp mắt người chơi kịp nghỉ ngơi
       this.toastTimer = window.setTimeout(() => {
         this.isToastActive = false;
         this.processToastQueue();
-      }, 350);
-    }, 2200);
+      }, cooldownDuration);
+    }, displayDuration);
   }
 
   public showBacBaTip(trigger: 'oil_dirty' | 'perfect_streak' | 'low_patience' | 'out_of_chicken' | 'general' | 'sauce_needed') {
@@ -3523,14 +3527,14 @@ class AppController {
       if (order.dietaryFulfilled) {
         audio.playCoinChing();
         Haptics.combo();
-        this.showToast(`💖 ĐÚNG GU HẺM 1102! ${order.customerName} khen nức nở (+${(order.dietaryPreference?.bonusTip ?? 0).toLocaleString('vi-VN')}đ tip)!`);
+        this.showToast(`💖 Đúng gu! +${(order.dietaryPreference?.bonusTip ?? 0).toLocaleString('vi-VN')}đ tip`);
       }
 
       if (leveledUp) {
         audio.playGoldChime();
-        this.showToast(`✨ THÂN THIẾT CẤP ${newLevel} ❤️! ${order.customerName} đã trở thành ${HEART_LEVEL_TITLES[newLevel]}!`);
+        this.showToast(`✨ Thân thiết Cấp ${newLevel} ❤️ (${order.customerName})`);
         if (giftNotice) {
-          this.showToast(`🎁 ${order.customerName} gửi tặng tiệm Quà Quê (${giftNotice}), hãy kiểm tra vào sáng mai nhé!`);
+          this.showToast(`🎁 Nhận quà quê từ ${order.customerName}!`);
         }
       }
     }
@@ -3580,21 +3584,18 @@ class AppController {
       }, 750); // Đệm trễ 750ms để người chơi ngắm trọn vẹn cử chỉ nhận đồ và vẫy cánh chào của Bé Gà Bông!
     } else if (order.isBunny) {
       audio.playCash();
-      this.showToast(`🐥 Bé Gà Bông gật gù hạnh phúc, tip thêm ${BUNNY_VISIT_TIP.toLocaleString('vi-VN')}đ và vẫy cánh chào! 💖`);
+      this.showToast(`🐥 Bé Gà Bông +${BUNNY_VISIT_TIP.toLocaleString('vi-VN')}đ tip 💖`);
     } else if (seatedAtTable) {
       audio.playCash();
       if (order.isCriticVip) {
-        this.showToast(`⭐ Giám khảo ẩm thực ngồi vào ${seatedAtTable.name} thưởng thức & thẩm định! (+${paid.toLocaleString('vi-VN')}đ) 🍽️`);
+        this.showToast(`⭐ Giám khảo ẩm thực ngồi ${seatedAtTable.name} (+${paid.toLocaleString('vi-VN')}đ)`);
       } else {
-        this.showToast(`🍽️ ${order.customerName} ngồi vào ${seatedAtTable.name} dùng món nóng giòn! (+${paid.toLocaleString('vi-VN')}đ) ✨`);
+        this.showToast(`🍽️ ${order.customerName} dùng tại ${seatedAtTable.name} (+${paid.toLocaleString('vi-VN')}đ)`);
       }
     } else {
       audio.playCash();
-      const personalityTag = order.personalityLabel ? `[${order.personalityLabel}] ` : '';
-      const notesStr = (feedbackNotes && feedbackNotes.length > 0)
-        ? feedbackNotes.join(' · ')
-        : (finalTip > 0 ? `+${(finalTip / 1000).toLocaleString('vi-VN')}k tip` : '0đ tip');
-      this.showToast(`${personalityTag}+${(paid + finalTip).toLocaleString('vi-VN')}đ (${notesStr}) 💵`);
+      const tipText = finalTip > 0 ? ` (+${Math.round(finalTip / 1000)}k tip)` : '';
+      this.showToast(`+${(paid + finalTip).toLocaleString('vi-VN')}đ 💵${tipText}`);
     }
     this.render();
   }
@@ -4028,18 +4029,6 @@ class AppController {
       };
     }
 
-    // Nút Mở Quà Quê Tri Kỷ Hẻm 1102 từ màn Tổng Kết Cuối Ngày
-    const summaryLoyaltyBtn = document.getElementById('btn-summary-open-loyalty');
-    if (summaryLoyaltyBtn) {
-      summaryLoyaltyBtn.onclick = () => {
-        audio.playPop();
-        openLoyaltyHandbookModal(stateManager.getState(), () => {
-          stateManager.saveState();
-          this.openModal(renderSummaryModal(stateManager.getState(), ledger, review, advisorTip));
-          this.bindSummaryEvents(ledger, review, advisorTip, rentDue);
-        });
-      };
-    }
 
     // Nút Lọc Cặn Dầu & Vớt Bột Cháy Cuối Ngày
     const oilFilterBtn = document.getElementById('btn-open-oil-filter');
@@ -4210,6 +4199,14 @@ class AppController {
       setTimeout(() => {
         this.showToast('💬 Bạn đã đồng hành 3 ngày! Vào Cài đặt ➔ [💬 Góp ý & Báo lỗi] để gửi cảm nhận nha! 🎁');
       }, 2500);
+    }
+
+    // Thông báo bưu kiện Quà Quê từ cư dân Hẻm gửi đến Hòm Thư
+    const pendingGiftsCount = curSt.loyaltyState?.pendingAlleyGifts?.length ?? 0;
+    if (pendingGiftsCount > 0) {
+      setTimeout(() => {
+        this.showToast(`📬 Bạn có ${pendingGiftsCount} bưu kiện Quà Quê đang chờ ở Hòm Thư! Hãy mở nhận nhé! 🎁`);
+      }, 1800);
     }
 
     // Thông báo hàng hết hạn bị hủy nếu có

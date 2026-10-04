@@ -1,5 +1,6 @@
 import { CustomerReview, ReviewReplyOption } from '../../types/game';
 import { escapeHtml } from '../escapeHtml';
+import { renderCustomerAvatar } from '../renderCustomerAvatar';
 
 const PERSONA_LABELS: Record<string, { label: string; icon: string; color: string }> = {
   student: { label: 'Học Sinh / GenZ', icon: '🎒', color: '#3b82f6' },
@@ -41,7 +42,7 @@ export function renderReviewReplyModal(review: CustomerReview): string {
       <!-- Khách Hàng & Review Gốc -->
       <div class="reply-original-card">
         <div class="reply-author-row">
-          <div class="reply-avatar-box">${review.avatar}</div>
+          <div class="reply-avatar-box">${renderCustomerAvatar(review.avatar, review.authorName, 44)}</div>
           <div class="reply-meta">
             <div class="reply-author-name">${escapeHtml(review.authorName)}</div>
             <div class="reply-persona-tag" style="background: ${persona.color}15; color: ${persona.color};">
@@ -82,7 +83,7 @@ export function renderReviewReplyModal(review: CustomerReview): string {
 
           ${review.playerReply?.customerReaction ? `
             <div class="chat-bubble customer-bubble">
-              <div class="bubble-sender">${review.avatar} ${escapeHtml(review.authorName)} hồi đáp:</div>
+              <div class="bubble-sender" style="display: flex; align-items: center; gap: 6px;">${renderCustomerAvatar(review.avatar, review.authorName, 20)} <span>${escapeHtml(review.authorName)} hồi đáp:</span></div>
               <div class="bubble-text">"${escapeHtml(review.playerReply.customerReaction)}"</div>
             </div>
           ` : ''}

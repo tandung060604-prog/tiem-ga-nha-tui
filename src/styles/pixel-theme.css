@@ -489,8 +489,24 @@ p, span, div, b, small, button, input, select, textarea,
 }
 
 body.selling-mode .toast {
-  top: calc(52px + var(--safe-top)) !important;
+  top: calc(47px + var(--safe-top)) !important;
   bottom: auto !important;
+  font-size: 0.76rem !important;
+  padding: 3px 12px !important;
+  border: 2px solid #b45309 !important;
+  border-radius: 12px !important;
+  background: #fef3c7 !important;
+  color: #78350f !important;
+  box-shadow: 0 2px 0 #92400e, 0 4px 10px rgba(0, 0, 0, 0.25) !important;
+  font-weight: 800 !important;
+  width: -webkit-fit-content !important;
+  width: -moz-fit-content !important;
+  width: fit-content !important;
+  max-width: 85% !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+  z-index: 2800 !important;
 }
 
 /* ==========================================================================
@@ -747,18 +763,18 @@ body.selling-mode .toast {
 }
 
 .kitchen-counter {
-  background: #462210 !important;
-  background-image: repeating-linear-gradient(90deg, #462210 0px, #462210 26px, #361a0b 26px, #361a0b 28px) !important;
-  border-top: 5px solid #8e542d !important;
-  box-shadow: inset 0 3px 0 #2b1810, inset 0 6px 12px rgba(0, 0, 0, 0.4) !important;
+  background: #6a3a1f !important;
+  background-image: repeating-linear-gradient(90deg, #6a3a1f 0px, #6a3a1f 26px, #572e16 26px, #572e16 28px) !important;
+  border-top: 5px solid #b86b3b !important;
+  box-shadow: inset 0 3px 0 #462210, inset 0 6px 12px rgba(0, 0, 0, 0.25) !important;
 }
 
 /* 1. Kệ Sơ Chế Nguyên Liệu Inox & Hộc Gỗ Cổ Điển */
 .prep-baskets-section.docked-materials {
-  background: #2e170c !important;
-  border: 2px solid #1a0c06 !important;
+  background: #542d17 !important;
+  border: 2px solid #7c4422 !important;
   border-radius: 6px !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 0 1px #4a2713, 0 2px 5px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 0 0 1px #6f3b1e, 0 2px 5px rgba(0, 0, 0, 0.25) !important;
   color: #faeed1 !important;
 }
 
@@ -843,11 +859,11 @@ body.selling-mode .toast {
 
 /* Khay Gia Vị Gỗ Chứa 2 Chai Tương Xịt */
 .food-shelf-grid.prep-bottles {
-  background: #241108 !important;
-  border: 1.5px solid #4a2713 !important;
+  background: #462412 !important;
+  border: 1.5px solid #6f3b1e !important;
   border-radius: 6px !important;
   padding: 2px !important;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* Chai Tương Xịt Gỗ Retro (+Tip) */
@@ -865,10 +881,10 @@ body.selling-mode .toast {
 
 /* 2. Cột Trái: Trạm Bếp Chiên Gang & Rót Nước (Commercial Range) */
 .fryer-card {
-  background: #22120a !important;
-  border: 2.5px solid #140904 !important;
+  background: #4d2815 !important;
+  border: 2.5px solid #753c1d !important;
   border-radius: 6px !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 0 0 1px #3a1e10, 0 3px 6px rgba(0, 0, 0, 0.45) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 0 0 0 1px #663318, 0 3px 6px rgba(0, 0, 0, 0.3) !important;
   color: #faeed1 !important;
 }
 
@@ -1006,10 +1022,10 @@ body.selling-mode .toast {
 
 /* Quầy Rót Nước Retro Soda Dispenser */
 .fountain-station {
-  background: #1a0e07 !important;
-  border: 1.5px solid #3d1e0d !important;
+  background: #452413 !important;
+  border: 1.5px solid #6b371b !important;
   border-radius: 6px !important;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3) !important;
   color: #faeed1 !important;
 }
 
@@ -1020,10 +1036,10 @@ body.selling-mode .toast {
 }
 
 .fountain-tap-btn {
-  background: #2d180d !important;
-  border: 1.5px solid #4a2713 !important;
+  background: #562e19 !important;
+  border: 1.5px solid #7c4422 !important;
   color: #faeed1 !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
 .fountain-tap-btn.tap-coca {
@@ -1043,10 +1059,10 @@ body.selling-mode .toast {
 
 /* 3. Cột Phải: Mẹt Ra Món Gỗ & Chuông Đồng Keng (Hero Platter & Bell) */
 .assemble-card.hero-tray-card {
-  background: #3e1f0e !important;
-  border: 2.5px solid #200f07 !important;
+  background: #582f18 !important;
+  border: 2.5px solid #814624 !important;
   border-radius: 6px !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 0 0 1px #5c2e17, 0 3px 6px rgba(0, 0, 0, 0.45) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 0 0 1px #723c1c, 0 3px 6px rgba(0, 0, 0, 0.3) !important;
   color: #faeed1 !important;
 }
 

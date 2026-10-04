@@ -1,5 +1,6 @@
 import { CustomerReview, GameState } from '../../types/game';
 import { escapeHtml } from '../escapeHtml';
+import { renderCustomerAvatar } from '../renderCustomerAvatar';
 
 const PERSONA_LABELS: Record<string, { label: string; icon: string; color: string }> = {
   student: { label: 'Học Sinh / GenZ', icon: '🎒', color: '#3b82f6' },
@@ -44,7 +45,7 @@ export function renderReviewsTab(state: GameState): string {
         <!-- Header khách hàng -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px;">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 1.4rem; line-height: 1;">${rev.avatar}</span>
+            ${renderCustomerAvatar(rev.avatar, rev.authorName, 36)}
             <div>
               <div style="font-weight: 800; font-size: 0.86rem; color: var(--ink);">${escapeHtml(rev.authorName)}</div>
               <div style="display: inline-flex; align-items: center; gap: 3px; font-size: 0.65rem; font-weight: 700; color: ${persona.color}; background: ${persona.color}15; padding: 1px 6px; border-radius: 4px; margin-top: 1px;">
@@ -88,8 +89,9 @@ export function renderReviewsTab(state: GameState): string {
             <div style="color: #431407; font-style: italic;">"${escapeHtml(rev.playerReply?.text || rev.ownerReply || '')}"</div>
 
             ${rev.playerReply?.customerReaction ? `
-              <div style="margin-top: 5px; padding-top: 4px; border-top: 1px dashed #fdba74; color: #166534; font-size: 0.73rem;">
-                <b>${rev.avatar} ${escapeHtml(rev.authorName)}:</b> "${escapeHtml(rev.playerReply.customerReaction)}"
+              <div style="margin-top: 5px; padding-top: 4px; border-top: 1px dashed #fdba74; color: #166534; font-size: 0.73rem; display: flex; align-items: center; gap: 6px;">
+                ${renderCustomerAvatar(rev.avatar, rev.authorName, 20)}
+                <span><b>${escapeHtml(rev.authorName)}:</b> "${escapeHtml(rev.playerReply.customerReaction)}"</span>
               </div>
             ` : ''}
           </div>
