@@ -119,6 +119,21 @@ export function renderCharacterEpisodeModal(
   const choicesHtml = episode.choices.map((choice) => {
     const rewardMoneyHtml = choice.rewardMoney ? `<span style="background: #dcfce7; color: #15803d; padding: 2px 7px; border-radius: 4px; font-size: 0.68rem; font-weight: 800; border: 1px solid #86efac;">💰 +${choice.rewardMoney.toLocaleString('vi-VN')}đ</span>` : '';
 
+    const karmaBadges: string[] = [];
+    if (choice.karmaEffect?.community) {
+      const sign = choice.karmaEffect.community > 0 ? `+${choice.karmaEffect.community}` : `${choice.karmaEffect.community}`;
+      karmaBadges.push(`<span style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; font-weight: 800;">❤️ ${sign} Tình Hẻm</span>`);
+    }
+    if (choice.karmaEffect?.craftsmanship) {
+      const sign = choice.karmaEffect.craftsmanship > 0 ? `+${choice.karmaEffect.craftsmanship}` : `${choice.karmaEffect.craftsmanship}`;
+      karmaBadges.push(`<span style="background: rgba(245, 158, 11, 0.2); color: #fde047; border: 1px solid #f59e0b; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; font-weight: 800;">🔥 ${sign} Nghệ Nhân</span>`);
+    }
+    if (choice.karmaEffect?.ambition) {
+      const sign = choice.karmaEffect.ambition > 0 ? `+${choice.karmaEffect.ambition}` : `${choice.karmaEffect.ambition}`;
+      karmaBadges.push(`<span style="background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid #3b82f6; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; font-weight: 800;">🚀 ${sign} Tham Vọng</span>`);
+    }
+    const karmaBadgesHtml = karmaBadges.length > 0 ? `<div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px;">${karmaBadges.join('')}</div>` : '';
+
     return `
       <button class="btn-char-story-choice retro-clickable vn-choice-card" data-episode-id="${episode.id}" data-choice-id="${choice.id}" style="width: 100%; text-align: left; background: linear-gradient(135deg, rgba(69, 26, 3, 0.95), rgba(43, 16, 2, 0.98)); border: 2px solid #b8860b; border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.4); display: flex; flex-direction: column; gap: 5px;">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
@@ -134,6 +149,7 @@ export function renderCharacterEpisodeModal(
         <div style="font-size: 0.92rem; font-weight: 900; color: #fffbeb; margin-top: 3px; line-height: 1.4; text-shadow: 1px 1px 1px #000;">
           ${escapeHtml(choice.label)}
         </div>
+        ${karmaBadgesHtml}
         ${choice.causalityNotice ? `
           <div style="font-size: 0.74rem; color: #86efac; font-style: italic; margin-top: 2px; display: flex; align-items: center; gap: 4px;">
             <span>⏳</span> <span>${escapeHtml(choice.causalityNotice)}</span>
@@ -182,8 +198,11 @@ export function renderCharacterEpisodeModal(
 
           <!-- Hộp câu hỏi nan giải: BAN ĐẦU ẨN, CHỈ HIỆN KHI HẾT THOẠI -->
           <div id="vn-dilemma-container" style="background: rgba(30, 14, 5, 0.9); border: 1.5px dashed #f59e0b; border-radius: 10px; padding: 10px 12px; text-align: center; display: none; opacity: 0; transform: translateY(14px); transition: all 0.35s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
-            <div style="font-size: 0.76rem; font-weight: 900; color: #fde047; text-transform: uppercase; margin-bottom: 3px; letter-spacing: 0.5px;">
-              🤔 LỰA CHỌN CỦA CHỦ TIỆM GÀ
+            <div style="font-size: 0.78rem; font-weight: 900; color: #fde047; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <div style="width: 26px; height: 26px; border-radius: 50%; overflow: hidden; border: 1.5px solid #38bdf8; background: #0f172a; flex-shrink: 0; box-shadow: 0 0 6px rgba(56, 189, 248, 0.4);">
+                <img src="/assets/characters/char_01_owner.png" alt="Tôi" style="width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated;" />
+              </div>
+              <span>🤔 LỰA CHỌN CỦA CHỦ TIỆM GÀ</span>
             </div>
             <div style="font-size: 0.88rem; font-weight: 800; color: #fffbeb; line-height: 1.4;">
               ${escapeHtml(episode.dilemmaPrompt)}

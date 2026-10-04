@@ -6,6 +6,7 @@ import {
   HEART_EXP_THRESHOLDS, 
   claimAlleyGift 
 } from '../../core/loyaltyEngine';
+import { renderKarmaCompassHtml, getKarmaArchetype, KARMA_ARCHETYPES } from '../../core/karmaEffects';
 import { ASSETS } from '../../content/assets';
 import { audio } from '../../core/audio';
 import confetti from 'canvas-confetti';
@@ -34,7 +35,7 @@ export function openLoyaltyHandbookModal(state: GameState, onUpdate: () => void)
   if (existing) existing.remove();
 
   const loyalty = ensureLoyaltyState(state);
-  let activeTab: 'residents' | 'gifts' = loyalty.pendingAlleyGifts.length > 0 ? 'gifts' : 'residents';
+  let activeTab: 'residents' | 'gifts' | 'karma' = loyalty.pendingAlleyGifts.length > 0 ? 'gifts' : 'residents';
   let activeRoleFilter: string = 'all';
 
   const modalOverlay = document.createElement('div');
@@ -44,6 +45,7 @@ export function openLoyaltyHandbookModal(state: GameState, onUpdate: () => void)
   function renderContent(): void {
     const pendingCount = loyalty.pendingAlleyGifts.length;
     const knownResidents = Object.values(loyalty.residents).filter(r => r.totalVisits > 0).length;
+    const currentArchetype = getKarmaArchetype(state.karma);
 
     modalOverlay.innerHTML = `
       <div class="modal-card loyalty-handbook-card" role="dialog" aria-modal="true" aria-labelledby="loyalty-title">
@@ -67,11 +69,14 @@ export function openLoyaltyHandbookModal(state: GameState, onUpdate: () => void)
           <button class="loyalty-nav-btn ${activeTab === 'gifts' ? 'active' : ''} ${pendingCount > 0 ? 'has-pending' : ''}" data-tab="gifts">
             🎁 Quà Tiếp Tế ${pendingCount > 0 ? `<span class="pending-gift-badge">${pendingCount}</span>` : ''}
           </button>
+          <button class="loyalty-nav-btn ${activeTab === 'karma' ? 'active' : ''}" data-tab="karma">
+            🧭 La Bàn Tâm Tính (${currentArchetype.icon} ${escapeHtml(currentArchetype.title)})
+          </button>
         </div>
 
         <!-- Body Content -->
         <div class="loyalty-modal-body">
-          ${activeTab === 'residents' ? renderResidentsTab(state) : renderGiftsTab(state)}
+          ${activeTab === 'residents' ? renderResidentsTab(state) : (activeTab === 'gifts' ? renderGiftsTab(state) : renderKarmaTab(state))}
         </div>
       </div>
     `;
@@ -241,6 +246,69 @@ export function openLoyaltyHandbookModal(state: GameState, onUpdate: () => void)
     `;
   }
 
+  function renderKarmaTab(state: GameState): string {
+    const compassHtml = renderKarmaCompassHtml(state.karma);
+    const currentArchetype = getKarmaArchetype(state.karma);
+
+    const archetypesListHtml = Object.values(KARMA_ARCHETYPES).map(arch => {
+      const isCurrent = arch.id === currentArchetype.id;
+      return `
+        <div style="
+          background: ${isCurrent ? 'linear-gradient(135deg, rgba(88, 28, 135, 0.4), rgba(30, 27, 46, 0.7))' : 'rgba(255, 255, 255, 0.03)'};
+          border: 1.5px solid ${isCurrent ? arch.badgeColor : 'rgba(255, 255, 255, 0.1)'};
+          border-radius: 10px;
+          padding: 10px 12px;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          position: relative;
+        ">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 1.1rem;">${arch.icon}</span>
+              <span style="font-weight: 800; font-size: 0.88rem; color: ${arch.badgeColor};">${escapeHtml(arch.title)}</span>
+            </div>
+            ${isCurrent ? `<span style="font-size: 0.65rem; background: ${arch.badgeColor}; color: #000; font-weight: 900; padding: 2px 6px; border-radius: 4px;">ĐANG ĐẠT</span>` : ''}
+          </div>
+          <p style="margin: 0; font-size: 0.74rem; color: #cbd5e1; line-height: 1.35;">${escapeHtml(arch.description)}</p>
+          <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 2px;">
+            ${arch.perks.map(p => `<span style="font-size: 0.65rem; background: rgba(0,0,0,0.3); color: #e2e8f0; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.08);">⚡ ${escapeHtml(p)}</span>`).join('')}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="karma-tab-content" style="display: flex; flex-direction: column; gap: 12px; padding: 4px 0;">
+        <!-- La Bàn Tâm Tính Widget -->
+        ${compassHtml}
+
+        <!-- Định hướng 4 Nhánh Kết Cục -->
+        <div style="background: rgba(15, 23, 42, 0.75); border: 1.5px solid rgba(148, 163, 184, 0.2); border-radius: 10px; padding: 12px;">
+          <h4 style="margin: 0 0 8px 0; font-size: 0.85rem; color: #fde047; display: flex; align-items: center; gap: 6px;">
+            <span>📖</span> HƯỚNG DẪN ĐỊNH HÌNH KẾT CỤC (STORY ENDINGS)
+          </h4>
+          <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.74rem; color: #cbd5e1; line-height: 1.4;">
+            <div><b style="color: #4ade80;">🌟 Kết Thúc Viên Mãn (Happy Ending):</b> Đạt Tình Thân Hẻm ≥ 60 & Nghệ Nhân ≥ 60. Tiệm gà trở thành biểu tượng ẩm thực di sản Hẻm 1102.</div>
+            <div><b style="color: #60a5fa;">🚀 Kết Thúc Mở (Open Ending):</b> Đạt Tham Vọng Quy Mô ≥ 65. Mở lối phát triển chuỗi thương hiệu vươn ra đại lộ.</div>
+            <div><b style="color: #f87171;">⚠️ Cảnh Báo Nguy Khốn (Bad Endings):</b> Mất cân bằng trầm trọng hoặc thiếu hụt vốn cọc dẫn đến đóng cửa / bị tập đoàn thâu tóm.</div>
+            <div><b style="color: #c084fc;">🔮 Kết Thúc Ẩn (Secret Ending):</b> Đạt lòng tin tối đa với Bác Ba và giải mã toàn bộ bí mật công thức cổ truyền.</div>
+          </div>
+        </div>
+
+        <!-- Danh Sách 5 Danh Hiệu Archetypes -->
+        <div>
+          <h4 style="margin: 0 0 8px 0; font-size: 0.85rem; color: #fef08a; display: flex; align-items: center; gap: 6px;">
+            <span>🏆</span> 5 PHONG CÁCH CHỦ TIỆM GÀ (ARCHETYPES)
+          </h4>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            ${archetypesListHtml}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   function bindEvents(): void {
     const closeModal = () => {
       audio.playPop();
@@ -267,7 +335,7 @@ export function openLoyaltyHandbookModal(state: GameState, onUpdate: () => void)
     const tabBtns = modalOverlay.querySelectorAll<HTMLButtonElement>('.loyalty-nav-btn');
     tabBtns.forEach(btn => {
       btn.onclick = () => {
-        const tab = btn.dataset.tab as 'residents' | 'gifts';
+        const tab = btn.dataset.tab as 'residents' | 'gifts' | 'karma';
         if (tab && tab !== activeTab) {
           activeTab = tab;
           audio.playPop();

@@ -1,7 +1,25 @@
-import { Storylet, StoryletChoice } from '../../types/game';
+import { Storylet, StoryletChoice, KarmaState } from '../../types/game';
 import { escapeHtml } from '../escapeHtml';
 import { playDialogueSequence } from '../typewriter';
 import { audio } from '../../core/audio';
+
+function renderKarmaDeltaBadges(delta?: Partial<KarmaState>): string {
+  if (!delta) return '';
+  const badges: string[] = [];
+  if (delta.community) {
+    const sign = delta.community > 0 ? `+${delta.community}` : `${delta.community}`;
+    badges.push(`<span style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; font-weight: 800;">❤️ ${sign} Tình Hẻm</span>`);
+  }
+  if (delta.craftsmanship) {
+    const sign = delta.craftsmanship > 0 ? `+${delta.craftsmanship}` : `${delta.craftsmanship}`;
+    badges.push(`<span style="background: rgba(245, 158, 11, 0.2); color: #fde047; border: 1px solid #f59e0b; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; font-weight: 800;">🔥 ${sign} Nghệ Nhân</span>`);
+  }
+  if (delta.ambition) {
+    const sign = delta.ambition > 0 ? `+${delta.ambition}` : `${delta.ambition}`;
+    badges.push(`<span style="background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid #3b82f6; padding: 2px 6px; border-radius: 4px; font-size: 0.68rem; font-weight: 800;">🚀 ${sign} Tham Vọng</span>`);
+  }
+  return badges.length > 0 ? `<div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px;">${badges.join('')}</div>` : '';
+}
 
 function renderCharacterAvatar(avatar: string, name: string): string {
   const isImg = avatar.includes('/') || avatar.includes('.') || avatar.startsWith('http');
@@ -43,6 +61,7 @@ export function renderStoryletModal(storylet: Storylet): string {
         ${choice.kicker ? `<span class="badge" style="font-size: 0.68rem; background: #fef3c7; color: #854d0e; padding: 2px 7px; border-radius: 4px; font-weight: 800; border: 1px solid #fde047; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">${escapeHtml(choice.kicker)}</span>` : ''}
       </div>
       ${choice.subDesc ? `<div style="font-size: 0.76rem; color: #fef08a; font-weight: 600; opacity: 0.95;">${escapeHtml(choice.subDesc)}</div>` : ''}
+      ${renderKarmaDeltaBadges(choice.effect?.karmaDelta)}
     </button>
   `).join('');
 
@@ -94,8 +113,11 @@ export function renderStoryletModal(storylet: Storylet): string {
 
       <!-- Choices Prompt: BAN ĐẦU HOÀN TOÀN ẨN, CHỈ XUẤT HIỆN KHI KẾT THÚC THOẠI -->
       <div id="storylet-choices-section" class="vn-choices-tray" style="display: none; opacity: 0; transform: translateY(14px); transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); margin-top: 4px;">
-        <div style="font-size: 0.82rem; font-weight: 900; color: #fde047; margin-bottom: 8px; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
-          <span>🤔</span> LỰA CHỌN CỦA CHỦ TIỆM GÀ:
+        <div style="font-size: 0.82rem; font-weight: 900; color: #fde047; margin-bottom: 8px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+          <div style="width: 26px; height: 26px; border-radius: 50%; overflow: hidden; border: 1.5px solid #38bdf8; background: #0f172a; flex-shrink: 0; box-shadow: 0 0 6px rgba(56, 189, 248, 0.4);">
+            <img src="/assets/characters/char_01_owner.png" alt="Tôi" style="width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated;" />
+          </div>
+          <span>🤔 LỰA CHỌN CỦA CHỦ TIỆM GÀ:</span>
         </div>
         <div class="storylet-choices-list">
           ${choicesHtml}

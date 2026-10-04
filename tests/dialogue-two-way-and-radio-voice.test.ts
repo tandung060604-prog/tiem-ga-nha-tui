@@ -108,15 +108,16 @@ describe('Visual Novel Dialogue Two-Way RPG & Radio Voice Announcer', () => {
     });
   });
 
-  describe('3. Quản Lý Kho: Nút Thanh Toán Xấp Tiền Pixel Art', () => {
-    it('renderInventoryTab chứa thanh quầy thanh toán tiền sỉ và nút có ảnh xấp tiền', () => {
+  describe('3. Quản Lý Kho: Mua Hàng & Hoàn Tiền Trực Tiếp (+5, +10, -5)', () => {
+    it('renderInventoryTab chứa các nút mua hàng trực tiếp +5, +10 và hoàn vốn -5', () => {
       const state = createInitialState();
       const html = renderInventoryTab(state);
 
-      expect(html).toContain('inv-cash-checkout-banner');
-      expect(html).toContain('btn-inventory-cash-checkout');
-      expect(html).toContain(ASSETS.ui.pixelCashStack);
-      expect(html).toContain('THANH TOÁN XẤP TIỀN');
+      expect(html).not.toContain('inv-cash-checkout-banner');
+      expect(html).toContain('btn-buy');
+      expect(html).toContain('btn-refund');
+      expect(html).toContain('data-qty="5"');
+      expect(html).toContain('data-qty="10"');
     });
   });
 

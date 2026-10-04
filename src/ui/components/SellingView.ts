@@ -1353,18 +1353,6 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <div class="alley-lantern-glow"></div>
         </div>
 
-        <!-- Thú cưng hiên quán sinh động Hẻm 1102 (Interactive Alley Pets) -->
-        <div id="btn-alley-pet-dog" class="alley-pet-actor dog ${state.adoptedPets?.includes('pet_01_dog_vang') ? 'is-adopted' : ''}" title="Chó Vàng Hẻm 1102 (Chạm để cưng nựng)">
-          <img src="${ASSETS.pets.dogWalk}" alt="Chó Vàng" class="pet-walk-sprite" />
-          <div class="pet-reaction-bubble" id="pet-dog-bubble" style="display: none;"></div>
-          ${state.adoptedPets?.includes('pet_01_dog_vang') ? '<span class="pet-adopted-badge">🎀 Tri Kỷ</span>' : ''}
-        </div>
-
-        <div id="btn-alley-pet-cat" class="alley-pet-actor cat ${state.adoptedPets?.includes('pet_02_cat_muop') ? 'is-adopted' : ''}" title="Mèo Mướp sưởi nắng (Chạm để vuốt ve)">
-          <img src="${ASSETS.pets.catWalk}" alt="Mèo Mướp" class="pet-walk-sprite" />
-          <div class="pet-reaction-bubble" id="pet-cat-bubble" style="display: none;"></div>
-          ${state.adoptedPets?.includes('pet_02_cat_muop') ? '<span class="pet-adopted-badge">🔔 Tri Kỷ</span>' : ''}
-        </div>
 
         <!-- Góc Bàn Ăn Hiên Quán (Dine-In Patio Tables) -->
         ${renderDineInPatio(session.dineInTables)}

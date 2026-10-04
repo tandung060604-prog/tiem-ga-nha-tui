@@ -26,19 +26,19 @@ describe('Flying Polymer Banknote & Realistic Cash Payment FX', () => {
     expect(content).toContain('banknote-flutter-particle');
   });
 
-  it('3. InventoryTab.ts đã loại bỏ triệt để canvas-confetti party khi thanh toán tiền sỉ kho', () => {
+  it('3. InventoryTab.ts đã loại bỏ cơ chế thanh toán gom đơn/confetti, mua trực tiếp +5, +10 và hoàn vốn -5 như cũ', () => {
     const invTabPath = path.resolve('src/ui/components/InventoryTab.ts');
     const content = fs.readFileSync(invTabPath, 'utf-8');
 
-    // Không còn gọi confetti khi bấm thanh toán tiền hàng
+    // Không còn banner quầy thanh toán xấp tiền hay confetti
+    expect(content).not.toContain('inv-cash-checkout-banner');
+    expect(content).not.toContain('btn-inventory-cash-checkout');
     expect(content).not.toContain('(window as any).confetti');
-    expect(content).not.toContain("colors: ['#22c55e'");
 
-    // Có hiệu ứng chi tiền chuyên biệt với tờ tiền polymer pixel và dấu mộc
-    expect(content).toContain('triggerBanknotePaymentFx');
-    expect(content).toContain('pixel-paid-stamp');
-    expect(content).toContain('expense-cash-float');
-    expect(content).toContain('banknote-flutter-particle');
+    // Mua trực tiếp +5, +10 trừ tiền ngay
+    expect(content).toContain('draft.money -= totalCost');
+    expect(content).toContain('addStock(targetItem, qty, unitCost');
+    expect(content).toContain('refundPurchase(draft.inventory[itemId], qty)');
   });
 
   it('4. kitchen.css đã có đầy đủ animation tokens cho tờ tiền bay, rung rinh flutter, dấu mộc và trừ quỹ', () => {

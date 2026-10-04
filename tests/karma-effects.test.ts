@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { karmaEffects, describeKarmaEffects, KARMA_LIMITS } from '../src/core/karmaEffects';
+import { karmaEffects, describeKarmaEffects, KARMA_LIMITS, getKarmaArchetype, renderKarmaCompassHtml } from '../src/core/karmaEffects';
 import { OrdersEngine } from '../src/core/orders';
 import { EconomyEngine } from '../src/core/economy';
 import { closeDay, eventForDay } from '../src/core/day';
@@ -65,4 +65,25 @@ describe('karma có tác dụng thật trong ca bán', () => {
     expect(chooseDialogueOption(s, 0, option!.id).success).toBe(true);
     expect(karmaEffects(s.karma).patiencePct).toBeGreaterThan(0);
   });
+
+  it('phân loại đúng 5 danh hiệu Karma Archetype', () => {
+    // 1. Mặc định / trung tính
+    expect(getKarmaArchetype({ community: 50, craftsmanship: 50, ambition: 50 }).id).toBe('novice_dreamer');
+    // 2. Tình Hẻm vượt trội
+    expect(getKarmaArchetype({ community: 75, craftsmanship: 50, ambition: 40 }).id).toBe('alley_soul');
+    // 3. Nghệ Nhân vượt trội
+    expect(getKarmaArchetype({ community: 40, craftsmanship: 80, ambition: 50 }).id).toBe('artisan_flame');
+    // 4. Doanh Nhân vượt trội
+    expect(getKarmaArchetype({ community: 45, craftsmanship: 50, ambition: 85 }).id).toBe('street_tycoon');
+    // 5. Cân bằng xuất sắc cả 3
+    expect(getKarmaArchetype({ community: 70, craftsmanship: 70, ambition: 70 }).id).toBe('alley_heart');
+  });
+
+  it('renderKarmaCompassHtml trả về HTML hợp lệ chứa ảnh avatar Chủ quán và danh hiệu', () => {
+    const html = renderKarmaCompassHtml({ community: 75, craftsmanship: 50, ambition: 50 });
+    expect(html).toContain('char_01_owner.png');
+    expect(html).toContain('Hồn Hẻm Nghĩa Tình');
+    expect(html).toContain('75/100');
+  });
 });
+

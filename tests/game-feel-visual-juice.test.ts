@@ -43,10 +43,9 @@ describe('Gói Game Feel & Visual Juice Polish (v3.2.0)', () => {
     };
 
     const html = renderSellingView(state, session);
-    expect(html).toContain('id="btn-alley-pet-dog"');
-    expect(html).toContain('id="btn-alley-pet-cat"');
-    expect(html).toContain('id="pet-dog-bubble"');
-    expect(html).toContain('id="pet-cat-bubble"');
+    // Chó và Mèo đã được gỡ bỏ khỏi màn bán hàng để giao diện gọn gàng, tập trung
+    expect(html).not.toContain('id="btn-alley-pet-dog"');
+    expect(html).not.toContain('id="btn-alley-pet-cat"');
   });
 
   it('3. Khi có món chiên trong khay, renderSellingView tạo các hạt khói nóng plate-steam-particles', async () => {

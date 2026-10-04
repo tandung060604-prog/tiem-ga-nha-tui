@@ -727,6 +727,7 @@ class AppController {
     if (!overlay || !content) return;
     content.innerHTML = contentHtml;
     overlay.removeAttribute('hidden');
+    overlay.scrollTop = 0;
   }
 
   public closeModal() {
