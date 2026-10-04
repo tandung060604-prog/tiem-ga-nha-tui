@@ -674,8 +674,8 @@ class OvernightMonkey {
         return true;
       }
 
-      // 4. Thả nguyên liệu vào chảo rán từ khay sơ chế (Đùi, má đùi, khoai, gà viên, phô mai)
-      const fryAction = page.locator('#btn-fry-chicken:not([disabled]), #btn-fry-thigh:not([disabled]), #btn-fry-fries:not([disabled]), #btn-fry-popcorn:not([disabled]), #btn-fry-cheese:not([disabled])');
+      // 4. Thả nguyên liệu vào chảo rán từ khay sơ chế (Đùi, má đùi, khoai, gà viên, phô mai, khay tiếp tế khẩn cấp)
+      const fryAction = page.locator('#btn-fry-chicken:not([disabled]), #btn-fry-thigh:not([disabled]), #btn-fry-fries:not([disabled]), #btn-fry-popcorn:not([disabled]), #btn-fry-cheese:not([disabled]), .pan-emergency-restock');
       if (await fryAction.first().isVisible({ timeout: 30 }).catch(() => false)) {
         await fryAction.first().click({ force: true }).catch(() => {});
         return true;
@@ -708,10 +708,15 @@ class OvernightMonkey {
       // 8. Nếu khách chờ quá lâu hoặc thiếu món, hủy đơn để khách mới vào (tránh kẹt ca bán khi cạn nguyên liệu)
       const cancelBtn = page.locator('.btn-cancel-order');
       if (await cancelBtn.first().isVisible({ timeout: 40 }).catch(() => false)) {
-        if (Math.random() < 0.35) {
-          await cancelBtn.first().click({ force: true }).catch(() => {});
-          return true;
-        }
+        await cancelBtn.first().click({ force: true }).catch(() => {});
+        return true;
+      }
+
+      // 9. Thao tác phụ: chạm chuông keng hoặc khay món để giữ nhịp tương tác ca bán liên tục
+      const bellEl = page.locator('#btn-bell-serve, .kitchen-bell-btn, .counter-bell, #btn-serve-order');
+      if (await bellEl.first().isVisible({ timeout: 30 }).catch(() => false)) {
+        await bellEl.first().click({ force: true }).catch(() => {});
+        return true;
       }
 
       return false; // Không có thao tác cụ thể nào được thực hiện

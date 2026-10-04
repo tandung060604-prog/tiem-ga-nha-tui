@@ -961,3 +961,13 @@
   - **Chiến lược Fix:** `contract_first_type_fix` (Độ tin cậy: 54.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
 ---
+
+### 🐞 [19:55:28 4/10/2026] (via Jev MCP) Deadlock when money is negative and oil is dirty without free filter
+- **Triệu chứng:** Player with negative balance cannot afford 150k oil replacement while oil is dirty, creating a potential gameplay friction / stall.
+- **Vị trí:** `src/core/sellingSim.ts, scripts/overnight-browser-monkey.mjs` (Ảnh: `logs/screenshots/deadlock-day-20-1791093851973.png`)
+- **Đánh giá Jev (648ms):**
+  - **Mức độ (Severity):** `p0_blocker` (Độ tin cậy: 58.0%)
+  - **Nguyên nhân gốc (Root Cause):** `economy_math` (Độ tin cậy: 99.0%)
+  - **Chiến lược Fix:** `defensive_nullcheck_fallback` (Độ tin cậy: 49.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---
