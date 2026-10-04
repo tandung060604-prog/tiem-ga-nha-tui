@@ -1314,8 +1314,10 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         ` : ''}
         <div class="hud-actions" style="display: flex; gap: 5px; align-items: center;">
           <button id="btn-open-kitchen-guide" class="btn-sm" style="display: none !important;" aria-hidden="true" title="Sổ Tay Bếp Trưởng"></button>
-          <button id="btn-toggle-fast" class="btn-sm btn-toggle-fast">
-            ${session.isFastForward ? '⏩ Tua x2' : '▶️ 1x'}
+          <button id="btn-toggle-fast" class="btn-toggle-fast ${session.isFastForward ? 'mode-fast is-fast-active' : 'mode-normal'}" data-action="toggle-fast" title="${session.isFastForward ? 'Đang bật tốc độ nhanh x2. Bấm để về 1x bình thường' : 'Bấm để bật chế độ tua nhanh x2'}">
+            <span class="speed-badge">${session.isFastForward ? '⚡ 2.0x' : '▶ 1.0x'}</span>
+            <span class="speed-text">${session.isFastForward ? 'TUA NHANH' : 'Thong thả'}</span>
+            ${session.isFastForward ? '<span class="speed-flame-icon">🔥</span>' : ''}
           </button>
         </div>
       </div>

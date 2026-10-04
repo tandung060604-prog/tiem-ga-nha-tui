@@ -9,6 +9,13 @@ export const Haptics = {
     }
   },
 
+  // Vi rung sột soạt khi chà cọ khăn lau bàn: 1 nhịp siêu nhẹ 6ms
+  tick: (): void => {
+    if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+      try { navigator.vibrate(6); } catch { /* ignore */ }
+    }
+  },
+
   // Vớt mẻ gà Vàng Giòn (Perfect): Rung 1 nhịp giòn tan sắc nét 18ms
   perfect: (): void => {
     if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {

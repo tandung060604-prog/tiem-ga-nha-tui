@@ -105,4 +105,40 @@ describe('Step 1: ZzFX Procedural Audio & Advanced Haptics Integration Tests', (
       });
     });
   });
+
+  describe('Audio Resilience & Self-Healing Engine', () => {
+    it('executes playSpeedToggle for both fast and normal mode safely', () => {
+      expect(() => audio.playSpeedToggle(true)).not.toThrow();
+      expect(() => audio.playSpeedToggle(false)).not.toThrow();
+    });
+
+    it('provides detailed audio diagnostic report with diagnose()', () => {
+      const status = audio.diagnose();
+      expect(status).toHaveProperty('hasWebAudio');
+      expect(status).toHaveProperty('contextState');
+      expect(status).toHaveProperty('isMuted');
+      expect(status).toHaveProperty('sfxVolume');
+      expect(status).toHaveProperty('canPlay');
+      expect(typeof status.canPlay).toBe('boolean');
+    });
+
+    it('safely handles resume() promise without unhandled rejections', async () => {
+      const res = await audio.resume();
+      expect(typeof res).toBe('boolean');
+    });
+
+    it('correctly sets and retrieves sfxVolume within [0, 1] range', () => {
+      const prevVol = audio.getSfxVolume();
+      audio.setSfxVolume(0.5);
+      expect(audio.getSfxVolume()).toBe(0.5);
+
+      audio.setSfxVolume(1.5); // clamped to 1
+      expect(audio.getSfxVolume()).toBe(1);
+
+      audio.setSfxVolume(-0.2); // clamped to 0
+      expect(audio.getSfxVolume()).toBe(0);
+
+      audio.setSfxVolume(prevVol);
+    });
+  });
 });

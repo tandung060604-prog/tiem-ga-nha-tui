@@ -177,8 +177,8 @@ export interface ScrubResult {
 
 /**
  * Thao tác chà / lau bàn bằng tay của người chơi:
- * - baseScrubMs: thời gian mặc định để chà sạch (~3500ms = 3.5s)
- * - isVigorous: cọ xát ngón tay di chuyển qua lại (tăng tốc độ lên ~1.85x, chỉ mất ~1.8s - 2.0s)
+ * - baseScrubMs: thời gian mặc định để chà sạch (~4700ms = 4.7s, tăng thêm 1.2s theo yêu cầu)
+ * - isVigorous: cọ xát ngón tay di chuyển qua lại (tăng tốc độ lên ~1.55x, mất ~3.0s, lâu thêm ~1.1s - 1.2s)
  */
 export function scrubDineInTable(
   session: SellingSession,
@@ -193,8 +193,8 @@ export function scrubDineInTable(
   }
 
   table.isBeingCleaned = true;
-  const baseTimeMs = 3500;
-  const speedMultiplier = isVigorous ? 1.85 : 1.0;
+  const baseTimeMs = 4700;
+  const speedMultiplier = isVigorous ? 1.55 : 1.0;
   const progressGain = (deltaMs / baseTimeMs) * 100 * speedMultiplier;
 
   table.cleanProgress = Math.min(100, (table.cleanProgress || 0) + progressGain);

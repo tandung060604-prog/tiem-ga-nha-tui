@@ -229,6 +229,9 @@ class AppController {
   private scrubbingTableIndex: number | null = null;
   private scrubIntervalId: number | null = null;
   private lastScrubPos: { x: number; y: number } = { x: 0, y: 0 };
+  private lastScrubSoundTime = 0;
+  private scrubSoundStep = 0;
+  private scrubTickCount = 0;
   private lastSummaryData: { ledger: DayLedger; review: CustomerReview; advisorTip: string; rentDue?: DayResult['rentDue'] } | null = null;
 
   constructor() {
@@ -305,12 +308,33 @@ class AppController {
     // Initial render
     this.render();
 
+    // Đồng bộ âm lượng SFX từ State Game
+    const initialSfxVol = stateManager.getState().sfxVolume;
+    if (typeof initialSfxVol === 'number') {
+      audio.setSfxVolume(initialSfxVol);
+    }
+
     // Âm thanh: tắt tiếng thì tắt nhạc; chuyển app/khóa máy thì dừng nhạc (iOS treo AudioContext)
     audio.onMuteChange(muted => (muted ? music.stop() : this.titleDismissed && music.start()));
     window.addEventListener('pagehide', () => this.snapshotShift());
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') { this.snapshotShift(); music.stop(); stopNarration(); }
-      else if (this.titleDismissed) music.start();
+      if (document.visibilityState === 'hidden') {
+        this.snapshotShift();
+        music.stop();
+        stopNarration();
+      } else if (this.titleDismissed) {
+        void audio.resume();
+        music.start();
+      }
+    });
+    window.addEventListener('pageshow', () => {
+      void audio.resume();
+      if (this.titleDismissed && music.isEnabled()) {
+        music.start();
+      }
+    });
+    window.addEventListener('focus', () => {
+      void audio.resume();
     });
     // iOS Safari bỏ qua user-scalable=no: chặn phóng to bằng 2 ngón để không vỡ bố cục khi đang chiên
     document.addEventListener('gesturestart', e => e.preventDefault());
@@ -2974,7 +2998,8 @@ class AppController {
     switch (action) {
       case 'toggle-fast':
         session.isFastForward = !session.isFastForward;
-        audio.playPop();
+        audio.playSpeedToggle(session.isFastForward);
+        Haptics.tap();
         break;
 
       case 'fry-chicken':
@@ -3198,14 +3223,14 @@ class AppController {
   private cleanPatioTable(tableIndex: number) {
     const session = this.sellingSession;
     if (!session) return;
-    // Mỗi cú tap cọ xát một nhịp (~600ms tương đương ~18% tiến trình)
-    const res = scrubDineInTable(session, tableIndex, 600, false);
+    // Mỗi cú tap cọ xát một nhịp (~450ms tương đương ~9.5% tiến trình trên 4.7s)
+    const res = scrubDineInTable(session, tableIndex, 450, false);
     if (res.completed) {
       this.onTableCleanCompleted(tableIndex, res.tipCollected ?? 0, res.tableName ?? `Bàn ${tableIndex + 1}`);
     } else {
-      Haptics.tap();
-      audio.playPop();
-      this.showToast(`🧼 Chà ngón tay qua lại trên bàn 3-4s để lau sạch bong nhé! (${res.progress}%)`);
+      Haptics.tick();
+      audio.playTableScrub(this.scrubSoundStep++);
+      this.showToast(`🧼 Chà ngón tay qua lại trên bàn 4-5s để lau sạch bong nhé! (${res.progress}%)`);
     }
   }
 
@@ -3215,8 +3240,12 @@ class AppController {
     if (!session) return;
     this.scrubbingTableIndex = tableIndex;
     this.lastScrubPos = { x: clientX, y: clientY };
+    this.scrubTickCount = 0;
+    this.lastScrubSoundTime = Date.now();
 
     // Kích hoạt ngay một nhịp cọ ban đầu
+    audio.playTableScrub(0);
+    Haptics.tick();
     const res = scrubDineInTable(session, tableIndex, 100, false);
     if (res.completed) {
       this.onTableCleanCompleted(tableIndex, res.tipCollected ?? 0, res.tableName ?? `Bàn ${tableIndex + 1}`);
@@ -3229,6 +3258,12 @@ class AppController {
       if (this.scrubbingTableIndex === null || !this.sellingSession) {
         this.stopScrubbingPatioTable();
         return;
+      }
+      this.scrubTickCount++;
+      // Mỗi 160ms (2 nhịp 80ms) phát tiếng sột soạt cọ khăn vải
+      if (this.scrubTickCount % 2 === 0) {
+        audio.playTableScrub(this.scrubSoundStep++);
+        Haptics.tick();
       }
       const tickRes = scrubDineInTable(this.sellingSession, this.scrubbingTableIndex, 80, false);
       if (tickRes.completed) {
@@ -3245,9 +3280,15 @@ class AppController {
     const dy = clientY - this.lastScrubPos.y;
     const dist = Math.hypot(dx, dy);
 
-    // Người chơi di chuyển chà ngón tay: gia tốc tốc độ lau gấp ~1.85 lần (chỉ mất ~1.8s - 2.0s)
+    // Người chơi di chuyển chà ngón tay: gia tốc tốc độ lau gấp ~1.55 lần (mất ~3.0s, lâu thêm ~1.1s - 1.2s)
     if (dist >= 6) {
       this.lastScrubPos = { x: clientX, y: clientY };
+      const now = Date.now();
+      if (now - this.lastScrubSoundTime >= 120) {
+        this.lastScrubSoundTime = now;
+        audio.playTableScrub(this.scrubSoundStep++);
+        Haptics.tick();
+      }
       const res = scrubDineInTable(this.sellingSession, this.scrubbingTableIndex, 120, true);
       if (res.completed) {
         this.onTableCleanCompleted(this.scrubbingTableIndex, res.tipCollected ?? 0, res.tableName ?? `Bàn ${this.scrubbingTableIndex + 1}`);

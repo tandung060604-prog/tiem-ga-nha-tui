@@ -118,17 +118,63 @@ export function zzfxGenerate(
   return samples;
 }
 
+const SFX_MUTED_KEY = 'tiem_ga_sfx_muted';
+const SFX_VOLUME_KEY = 'tiem_ga_sfx_volume';
+
 class AudioManager {
   private ctx: AudioContext | null = null;
   private isMuted: boolean = false;
   private sizzleNode: AudioNode | null = null;
   private sizzleGain: GainNode | null = null;
+  private sfxVolume: number = 0.8;
+  private sfxGainNode: GainNode | null = null;
+  private unsupported = false;
+  private muteListeners: Array<(muted: boolean) => void> = [];
+  private hasSetupGlobalUnlock = false;
 
   constructor() {
-    // AudioContext will be initialized on first user interaction
+    this.isMuted = this.readMutedPref();
+    this.sfxVolume = this.readVolumePref();
+    if (typeof window !== 'undefined') {
+      this.setupGlobalUnlockListeners();
+    }
   }
 
-  private muteListeners: Array<(muted: boolean) => void> = [];
+  private readMutedPref(): boolean {
+    if (typeof window === 'undefined') return false;
+    try {
+      return localStorage.getItem(SFX_MUTED_KEY) === '1';
+    } catch {
+      return false;
+    }
+  }
+
+  private readVolumePref(): number {
+    if (typeof window === 'undefined') return 0.8;
+    try {
+      const v = localStorage.getItem(SFX_VOLUME_KEY);
+      return v !== null ? Math.max(0, Math.min(1, parseFloat(v))) : 0.8;
+    } catch {
+      return 0.8;
+    }
+  }
+
+  /**
+   * Tự động đăng ký các sự kiện chạm của người dùng để mở khóa Web Audio API
+   * Bảo đảm giải quyết triệt để vấn đề mất tiếng trên mobile do Autoplay Policy
+   */
+  public setupGlobalUnlockListeners() {
+    if (this.hasSetupGlobalUnlock || typeof window === 'undefined') return;
+    this.hasSetupGlobalUnlock = true;
+
+    const unlockHandler = () => {
+      void this.resume();
+    };
+
+    ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(evt => {
+      window.addEventListener(evt, unlockHandler, { passive: true });
+    });
+  }
 
   public onMuteChange(listener: (muted: boolean) => void) {
     this.muteListeners.push(listener);
@@ -141,29 +187,58 @@ class AudioManager {
     return this.ctx;
   }
 
-  private unsupported = false;
-
-  // Không có Web Audio (trình duyệt nhúng, máy cũ, chế độ hạn chế, Node test): game vẫn chạy, chỉ im lặng
+  // Khởi tạo AudioContext và tự động giải phóng trạng thái suspended / interrupted
   private initContext() {
-    if (typeof window === 'undefined') return;
-    if (!this.ctx && !this.unsupported) {
+    if (typeof window === 'undefined' || this.unsupported) return;
+    if (!this.ctx || this.ctx.state === 'closed') {
       const AudioCtx = window.AudioContext
         || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       try {
         if (!AudioCtx) throw new Error('no Web Audio');
         this.ctx = new AudioCtx();
+        this.sfxGainNode = null;
       } catch {
         this.unsupported = true;
         return;
       }
     }
-    if (this.ctx && this.ctx.state === 'suspended') {
+    const state = this.ctx.state as string;
+    if (state === 'suspended' || state === 'interrupted') {
       void this.ctx.resume().catch(() => {});
     }
   }
 
-  private sfxVolume: number = 0.8;
-  private sfxGainNode: GainNode | null = null;
+  /**
+   * Phục hồi trạng thái Web Audio Context một cách chủ động (khi quay lại tab, thoát khoá màn hình...)
+   */
+  public async resume(): Promise<boolean> {
+    if (typeof window === 'undefined' || this.unsupported) return false;
+    this.initContext();
+    if (!this.ctx) return false;
+    const state = this.ctx.state as string;
+    if (state === 'suspended' || state === 'interrupted') {
+      try {
+        await this.ctx.resume();
+      } catch {
+        return false;
+      }
+    }
+    return this.ctx.state === 'running';
+  }
+
+  /**
+   * Chẩn đoán tình trạng hoạt động của hệ thống âm thanh hiệu ứng SFX
+   */
+  public diagnose() {
+    return {
+      hasWebAudio: typeof window !== 'undefined' && Boolean(window.AudioContext || (window as unknown as { webkitAudioContext?: unknown }).webkitAudioContext),
+      contextState: this.ctx ? this.ctx.state : 'uninitialized',
+      isMuted: this.isMuted,
+      sfxVolume: this.sfxVolume,
+      currentTime: this.ctx ? this.ctx.currentTime : 0,
+      canPlay: !this.isMuted && this.sfxVolume > 0 && (!this.ctx || this.ctx.state === 'running')
+    };
+  }
 
   public getSfxVolume(): number {
     return this.sfxVolume;
@@ -171,6 +246,7 @@ class AudioManager {
 
   public setSfxVolume(vol: number) {
     this.sfxVolume = Math.max(0, Math.min(1, vol));
+    try { localStorage.setItem(SFX_VOLUME_KEY, String(this.sfxVolume)); } catch {}
     if (this.ctx && this.sfxGainNode) {
       this.sfxGainNode.gain.setValueAtTime(this.sfxVolume, this.ctx.currentTime);
     }
@@ -188,6 +264,7 @@ class AudioManager {
 
   public setMuted(muted: boolean) {
     this.isMuted = muted;
+    try { localStorage.setItem(SFX_MUTED_KEY, muted ? '1' : '0'); } catch {}
     this.muteListeners.forEach(l => l(muted));
     if (muted && this.sizzleGain) {
       this.sizzleGain.gain.setValueAtTime(0, this.ctx?.currentTime || 0);
@@ -941,9 +1018,60 @@ class AudioManager {
     this.playZzfx(0.35, 0.02, 1760, 0.01, 0.25, 0.35, 1, 1.1, 0, 0, 0, 0, 0, 0, 0, 0, 0.1, 0.8, 0.02, 0);
   }
 
-  // 5. Tiếng cạch cạch gỗ mộc ấm áp khi chạm dọn bàn ăn hiên quán
+  // 5. Tiếng cạch cạch gỗ mộc ấm áp khi dọn xong bàn ăn hiên quán
   public playWoodClean() {
     this.playZzfx(0.25, 0.05, 400, 0.01, 0.06, 0.1, 1, 1.5, -3, 0, 0, 0, 0, 0.3, 0, 0, 0, 0.5, 0.02, 0);
+  }
+
+  // 5b. Tiếng sột soạt khăn vải chà miết lên mặt bàn (Cloth scrubbing rustle / squeak)
+  public playTableScrub(pitchMod = 0) {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const duration = 0.12; // 120ms nhịp cọ sột soạt ngắn gọn
+      const sampleRate = this.ctx.sampleRate || 44100;
+      const length = Math.floor(sampleRate * duration);
+      const buffer = this.ctx.createBuffer(1, length, sampleRate);
+      const data = buffer.getChannelData(0);
+
+      // Pinkish filtered noise mô phỏng thớ vải khăn lau ẩm cọ sát
+      let b0 = 0, b1 = 0;
+      for (let i = 0; i < length; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.92 * b0 + white * 0.08;
+        b1 = 0.65 * b1 + white * 0.35;
+        data[i] = (b0 + b1) * 0.85;
+      }
+
+      const source = this.ctx.createBufferSource();
+      source.buffer = buffer;
+
+      // Bandpass Filter tái tạo dải âm sột soạt cọ khăn (1200Hz - 2400Hz)
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      const centerFreq = 1450 + (pitchMod % 5) * 160 + (Math.random() * 60 - 30);
+      filter.frequency.setValueAtTime(centerFreq, now);
+      filter.Q.setValueAtTime(2.6, now);
+
+      // Gain Envelope: Attack 15ms, fade out 105ms êm dịu
+      const gain = this.ctx.createGain();
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.24, now + 0.018);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+      source.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.dest());
+
+      source.start(now);
+      source.stop(now + duration);
+    } catch {
+      // Safe fallback ZzFX noise
+      this.playZzfx(0.18, 0.2, 750 + pitchMod * 70, 0.02, 0.03, 0.07, 4, 1.2, 0, 0, 0, 0, 0, 0.8);
+    }
   }
 
   // 6. Tiếng còi cảnh sát huýt sắc nhọn khi tóm sống kẻ gian đóng giả khách
@@ -1010,6 +1138,18 @@ class AudioManager {
 
     if (callback) {
       setTimeout(callback, 750);
+    }
+  }
+
+  // 12. Chuyển đổi tốc độ bán hàng 1x <-> 2x (Retro Cassette Turbo Speed Switch)
+  public playSpeedToggle(isFast: boolean) {
+    if (this.isMuted) return;
+    if (isFast) {
+      // Tua nhanh 2x: Âm thanh vút cao tốc độ 2 nốt điện tử phấn khích
+      this.playZzfx(0.26, 0.02, 1046, 0.01, 0.05, 0.12, 1, 1.4, 6, 0, 160, 0.04, 0, 0, 0, 0, 0.05, 0.7, 0.02, 0);
+    } else {
+      // Trở về 1x: Âm thanh hạ cánh êm đềm 2 nốt ấm cúng
+      this.playZzfx(0.22, 0.02, 784, 0.01, 0.07, 0.14, 0, 1.2, -4, 0, 0, 0, 0, 0, 0, 0, 0, 0.6, 0.02, 0);
     }
   }
 }

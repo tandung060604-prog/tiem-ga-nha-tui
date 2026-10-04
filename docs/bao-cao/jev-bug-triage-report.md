@@ -941,3 +941,13 @@
   - **Chiến lược Fix:** `contract_first_type_fix` (Độ tin cậy: 92.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
 ---
+
+### 🐞 [11:37:29 4/10/2026] (via Jev MCP) SFX audio lost intermittently while BGM continues playing
+- **Triệu chứng:** Player hears game background music, but all procedural sound effects (click, cash, cooking, table scrub) are completely silent.
+- **Vị trí:** `src/core/audio.ts, src/main.ts, src/core/music.ts` 
+- **Đánh giá Jev (1038ms):**
+  - **Mức độ (Severity):** `p2_ui_friction` (Độ tin cậy: 76.0%)
+  - **Nguyên nhân gốc (Root Cause):** `state_lifecycle` (Độ tin cậy: 99.0%)
+  - **Chiến lược Fix:** `defensive_nullcheck_fallback` (Độ tin cậy: 94.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `200` ngày chơi
+---

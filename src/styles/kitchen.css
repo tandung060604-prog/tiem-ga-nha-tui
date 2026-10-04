@@ -2249,10 +2249,116 @@
   align-items: center;
 }
 
+/* ==========================================================================
+   RETRO CASSETTE TURBO SPEED SWITCH (Nút Tăng Tốc Độ Bán Hàng)
+   ========================================================================== */
+
 .btn-toggle-fast {
-  font-size: 0.7rem;
-  padding: 2px 8px;
-  min-height: 28px;
+  min-height: 44px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.btn-toggle-fast:active {
+  transform: translateY(2px);
+}
+
+/* Chế độ 1x (Thong thả / Êm đềm) */
+.btn-toggle-fast.mode-normal {
+  background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 50%, #fde68a 100%);
+  border: 2px solid #d97706;
+  border-bottom: 3px solid #b45309;
+  box-shadow: 0 2px 4px rgba(180, 83, 9, 0.25), inset 0 1px 0 #ffffff;
+  color: #78350f;
+}
+
+.btn-toggle-fast.mode-normal .speed-badge {
+  background: #ffffff;
+  color: #b45309;
+  font-weight: 900;
+  font-size: 0.72rem;
+  padding: 2px 5px;
+  border-radius: 4px;
+  border: 1px solid #fcd34d;
+  font-family: var(--font-pixel-mono), "VT323", monospace;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.btn-toggle-fast.mode-normal .speed-text {
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  font-family: var(--font-handbook), "Baloo 2", sans-serif;
+  color: #854d0e;
+}
+
+/* Chế độ 2x (Tua nhanh Turbo / Neon Flame) */
+.btn-toggle-fast.mode-fast {
+  background: linear-gradient(135deg, #ef4444 0%, #f97316 45%, #ea580c 100%);
+  border: 2px solid #fef08a;
+  border-bottom: 3px solid #991b1b;
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.65), 0 2px 6px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  text-shadow: 0 1px 2px #7f1d1d;
+  animation: fastModePulse 1.4s infinite ease-in-out;
+}
+
+.btn-toggle-fast.mode-fast .speed-badge {
+  background: #991b1b;
+  color: #fef08a;
+  font-weight: 900;
+  font-size: 0.72rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #fca5a5;
+  font-family: var(--font-pixel-mono), "VT323", monospace;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.btn-toggle-fast.mode-fast .speed-text {
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  font-family: var(--font-pixel-title), "VT323", monospace;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.speed-flame-icon {
+  display: inline-block;
+  font-size: 0.76rem;
+  animation: flameFlicker 0.6s infinite alternate ease-in-out;
+}
+
+@keyframes fastModePulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(249, 115, 22, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.8), 0 3px 8px rgba(0, 0, 0, 0.4);
+    filter: brightness(1.08);
+  }
+}
+
+@keyframes flameFlicker {
+  0% {
+    transform: scale(0.9) rotate(-3deg);
+  }
+  100% {
+    transform: scale(1.15) rotate(4deg);
+  }
 }
 
 /* ==========================================================================
