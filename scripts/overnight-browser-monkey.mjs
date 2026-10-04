@@ -431,6 +431,7 @@ class OvernightMonkey {
     // 8a. Modal Xác Nhận & Kết Quả Sự Cố Hàng Ngày (Reaction / Continue)
     const incidentAction = page.locator('#btn-incident-continue, #btn-incident-confirm-yes, .btn-reaction-continue');
     if (await incidentAction.first().isVisible({ timeout: 60 }).catch(() => false)) {
+      this.incidentClickStreak = 0;
       log(`⚡ Bấm tiếp tục sự cố hàng ngày...`);
       await incidentAction.first().click({ force: true });
       await sleep(250);
@@ -438,12 +439,23 @@ class OvernightMonkey {
     }
 
     // 8b. Modal Lựa Chọn Sự Cố Hàng Ngày (Daily Incident Choices)
-    const incidentChoice = page.locator('.incident-choice-btn:not([disabled]), .btn-neutral-choice:not([disabled]), .btn-security-choice:not([disabled]), .incident-btn');
-    if (await incidentChoice.first().isVisible({ timeout: 60 }).catch(() => false)) {
-      log(`⚡ Chọn phương án sự cố hàng ngày...`);
-      await incidentChoice.first().click({ force: true });
-      await sleep(250);
+    const incidentChoice = page.locator('.incident-choice-btn:not(:disabled):not(.is-disabled):not(.btn-locked-choice), .btn-neutral-choice:not(:disabled):not(.is-disabled):not(.btn-locked-choice)');
+    const choiceCount = await incidentChoice.count().catch(() => 0);
+    if (choiceCount > 0) {
+      this.incidentClickStreak = (this.incidentClickStreak || 0) + 1;
+      if (this.incidentClickStreak > 5) {
+        log(`⚠️ Phát hiện lặp click modal sự cố > 5 lần -> Kích hoạt thoát khẩn cấp...`);
+        this.incidentClickStreak = 0;
+        await this.emergencyRecover(page);
+        return true;
+      }
+      const targetIdx = Math.floor(Math.random() * choiceCount);
+      log(`⚡ Chọn phương án sự cố hàng ngày (phương án ${targetIdx + 1}/${choiceCount})...`);
+      await incidentChoice.nth(targetIdx).click({ force: true }).catch(() => {});
+      await sleep(350);
       return true;
+    } else {
+      this.incidentClickStreak = 0;
     }
 
     // 9. Modal Công An Kiểm Tra ATVSTP
@@ -935,7 +947,7 @@ class OvernightMonkey {
       const nextDayBtn = document.querySelector('#btn-start-next-day, #btn-summary-next-day');
       if (nextDayBtn instanceof HTMLElement) nextDayBtn.click();
 
-      const incidentButtons = document.querySelectorAll('#btn-incident-continue, #btn-incident-confirm-yes, .incident-choice-btn, #btn-police-confirm');
+      const incidentButtons = document.querySelectorAll('#btn-incident-continue, #btn-incident-confirm-yes, .incident-choice-btn:not(:disabled):not(.is-disabled), #btn-police-confirm, #btn-pay-rent, #btn-skip-rent');
       for (const b of incidentButtons) {
         if (b instanceof HTMLElement) b.click();
       }
