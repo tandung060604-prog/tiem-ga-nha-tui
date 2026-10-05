@@ -143,7 +143,7 @@ import { claimBadgeReward, claimAllBadgesReward } from './core/achievementsEngin
 import { renderShopThemeModal } from './ui/components/ShopThemeModal';
 import { unlockShopTheme, setActiveShopTheme, getActiveShopTheme } from './content/shopThemes';
 import { renderEndlessModeModal } from './ui/components/EndlessModeModal';
-import { canEnterEndlessMode } from './core/endlessMode';
+import { canEnterEndlessMode, getEndlessRecord } from './core/endlessMode';
 import type { DailyIncident, DeliveryRunResult, CarePackageType, ThiefEncounter, CharacterEpisode } from './types/game';
 import confetti from 'canvas-confetti';
 
@@ -1478,6 +1478,87 @@ class AppController {
         this.closeModal();
         this.showToast('🔥 BẮT ĐẦU CA ĐÊM BẤT TẬN! Đợt sóng khách ùa vào!');
         this.setPhase('selling');
+      };
+    }
+
+    const shareEndlessBtn = document.getElementById('btn-share-endless-record');
+    if (shareEndlessBtn) {
+      shareEndlessBtn.onclick = async () => {
+        audio.playPop();
+        const record = getEndlessRecord(stateManager.getState());
+        const shopName = stateManager.getState().shopName || 'Tiệm Gà Nhà Tui';
+        
+        // Vẽ canvas thẻ kỷ lục Ca Đêm
+        const canvas = document.createElement('canvas');
+        canvas.width = 600;
+        canvas.height = 600;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.fillStyle = '#0f172a';
+          ctx.fillRect(0, 0, 600, 600);
+          ctx.lineWidth = 10;
+          ctx.strokeStyle = '#f43f5e';
+          ctx.strokeRect(5, 5, 590, 590);
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = '#fb7185';
+          ctx.strokeRect(15, 15, 570, 570);
+
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#fbcfe8';
+          ctx.font = 'bold 20px monospace';
+          ctx.fillText('🌙 TIỆM GÀ NHÀ TUI · HẺM 1102', 300, 70);
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '900 34px monospace';
+          ctx.fillText('KỶ LỤC CA ĐÊM BẤT TẬN', 300, 120);
+
+          ctx.fillStyle = '#facc15';
+          ctx.font = 'bold 22px monospace';
+          ctx.fillText(`Quán: ${shopName}`, 300, 165);
+
+          ctx.fillStyle = '#1e293b';
+          ctx.fillRect(60, 205, 480, 130);
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(60, 205, 480, 130);
+
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = 'bold 16px monospace';
+          ctx.fillText('LÀN SÓNG CAO NHẤT ĐÃ VƯỢT QUA', 300, 240);
+
+          ctx.fillStyle = '#38bdf8';
+          ctx.font = '900 52px monospace';
+          ctx.fillText(`WAVE ${record.highestWave}`, 300, 310);
+
+          ctx.fillStyle = '#1e293b';
+          ctx.fillRect(60, 360, 480, 110);
+          ctx.strokeStyle = '#f59e0b';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(60, 360, 480, 110);
+
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = 'bold 16px monospace';
+          ctx.fillText('TỔNG ĐIỂM SINH TỒN', 300, 395);
+
+          ctx.fillStyle = '#facc15';
+          ctx.font = '900 40px monospace';
+          ctx.fillText(`${record.highScore.toLocaleString('vi-VN')} ĐIỂM`, 300, 450);
+
+          ctx.fillStyle = '#fda4af';
+          ctx.font = 'italic 16px monospace';
+          ctx.fillText('🍗 "Khách cú đêm cũng phải chào thua tài chiên gà!" 👨‍🍳', 300, 530);
+
+          const blob = await new Promise<Blob | null>(res => canvas.toBlob(res, 'image/png'));
+          if (blob) {
+            const outcome = await shareImage(
+              blob,
+              `TiemGaNhaTui_KyLuc_CaDem_Wave_${record.highestWave}.png`,
+              'Kỷ Lục Ca Đêm Bất Tận - Tiệm Gà Nhà Tui',
+              `🌙🔥 Tui vừa vượt Wave ${record.highestWave} Ca Đêm với ${record.highScore.toLocaleString('vi-VN')} điểm! Nhóm mình ai so tài không? 🍗✨`
+            );
+            if (outcome === 'downloaded') this.showToast('Đã tải thẻ Kỷ Lục Ca Đêm về máy! Hãy gửi vào nhóm bạn nhé! 📸');
+          }
+        }
       };
     }
   }

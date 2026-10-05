@@ -751,6 +751,17 @@
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
 }
 
+.cook-gauge-pointer.is-perfect {
+  background: linear-gradient(180deg, #ffffff 0%, #facc15 35%, #22c55e 100%) !important;
+  box-shadow: 0 0 8px #facc15, 0 0 16px #22c55e, 0 0 4px #fff !important;
+  animation: pointerPerfectPulse 0.4s infinite alternate ease-in-out;
+}
+
+@keyframes pointerPerfectPulse {
+  0% { transform: translateX(-50%) scaleY(1.08); filter: drop-shadow(0 0 4px #22c55e); }
+  100% { transform: translateX(-50%) scaleY(1.22); filter: drop-shadow(0 0 8px #facc15); }
+}
+
 .pot-hint {
   font-size: 0.7rem;
   font-weight: 800;

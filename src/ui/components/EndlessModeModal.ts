@@ -80,8 +80,8 @@ export function renderEndlessModeModal(state: GameState): string {
             <span style="color: #38bdf8; font-weight: 800;">${nextWaveSample.customerCount} Khách · Tốc độ ${Math.round((1 - nextWaveSample.patienceMultiplier) * 100)}% nhanh hơn</span>
           </div>
 
-          <!-- Nút Bắt Đầu -->
-          <div style="margin-top: 4px;">
+          <!-- Nút Bắt Đầu & Khoe Kỷ Lục Bạn Bè -->
+          <div style="margin-top: 4px; display: flex; flex-direction: column; gap: 8px;">
             ${check.canEnter ? `
               <button id="btn-start-endless-run" style="width: 100%; padding: 12px; font-size: 0.9rem; font-weight: 900; background: linear-gradient(135deg, #f43f5e, #be123c); color: #fff; border: 2px solid #fb7185; border-radius: 10px; cursor: pointer; box-shadow: 0 0 15px rgba(244, 63, 94, 0.5); font-family: 'Silkscreen', 'VT323', monospace; letter-spacing: 0.5px;">
                 🔥 BƯỚC VÀO CA ĐÊM BẤT TẬN
@@ -91,6 +91,11 @@ export function renderEndlessModeModal(state: GameState): string {
                 🔒 ${escapeHtml(check.reason || 'Chưa đủ điều kiện')}
               </div>
             `}
+            ${record.highestWave > 0 ? `
+              <button id="btn-share-endless-record" style="width: 100%; padding: 10px; font-size: 0.82rem; font-weight: 800; background: #1e293b; color: #38bdf8; border: 1.5px solid #0284c7; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <span>📸</span> Khoe Kỷ Lục Ca Đêm (Gửi Bạn Bè)
+              </button>
+            ` : ''}
           </div>
 
         </div>

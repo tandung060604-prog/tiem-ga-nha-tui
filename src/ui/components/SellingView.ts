@@ -1442,10 +1442,12 @@ export function renderSellingView(state: GameState, session: SellingSession): st
                   <span><img src="${ASSETS.icons.burntAlert}" class="btn-pixel-icon-xs" alt="" /> DẦU ĐEN! THAY DẦU KẺO CHÁY GÀ!</span>
                 </div>
               ` : ''}
-              <div class="bubble" style="left: 15%; animation-delay: 0s;"></div>
-              <div class="bubble" style="left: 38%; animation-delay: 0.3s;"></div>
-              <div class="bubble" style="left: 65%; animation-delay: 0.6s;"></div>
-              <div class="bubble" style="left: 82%; animation-delay: 0.9s;"></div>
+              <div class="bubble b1" style="left: 15%; animation-delay: 0s;"></div>
+              <div class="bubble b2" style="left: 32%; animation-delay: 0.3s;"></div>
+              <div class="bubble b3" style="left: 52%; animation-delay: 0.6s;"></div>
+              <div class="bubble b4" style="left: 70%; animation-delay: 0.2s;"></div>
+              <div class="bubble b5" style="left: 85%; animation-delay: 0.8s;"></div>
+              <div class="bubble b6" style="left: 42%; animation-delay: 0.45s;"></div>
               
               <div class="pot-chicken">
                 ${panFoodHtml}
@@ -1471,7 +1473,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
                   <div class="zone-good"></div>
                   <div class="zone-burnt"></div>
                 </div>
-                <div class="cook-gauge-pointer" style="left: ${potProgressPercent}%;"></div>
+                <div class="cook-gauge-pointer ${cookState.isFrying && quality === 'perfect' ? 'is-perfect' : ''}" style="left: ${potProgressPercent}%;"></div>
               </div>
             </div>
 
