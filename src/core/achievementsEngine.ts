@@ -97,3 +97,43 @@ export function claimBadgeReward(
     badge,
   };
 }
+
+/**
+ * Nhận thưởng toàn bộ các Bằng Khen đã hoàn thành nhưng chưa nhận thưởng (Claim All)
+ */
+export function claimAllBadgesReward(state: GameState): {
+  success: boolean;
+  claimedCount: number;
+  totalMoney: number;
+  badges: HeritageBadge[];
+  message: string;
+} {
+  let totalMoney = 0;
+  const claimedBadges: HeritageBadge[] = [];
+
+  // Vòng lặp tối đa 5 đợt cascade (nhận thưởng tăng Karma/Tiền mở tiếp bằng khen mới)
+  for (let pass = 0; pass < 5; pass++) {
+    const claimable = getAllBadgesProgress(state).filter(p => p.isCompleted && !p.isClaimed);
+    if (claimable.length === 0) break;
+
+    for (const item of claimable) {
+      const res = claimBadgeReward(state, item.badge.id as HeritageBadgeId);
+      if (res.success && res.badge) {
+        totalMoney += res.badge.rewardMoney;
+        claimedBadges.push(res.badge);
+      }
+    }
+  }
+
+  if (claimedBadges.length === 0) {
+    return { success: false, claimedCount: 0, totalMoney: 0, badges: [], message: 'Không có bằng khen nào đang chờ nhận!' };
+  }
+
+  return {
+    success: true,
+    claimedCount: claimedBadges.length,
+    totalMoney,
+    badges: claimedBadges,
+    message: `Đã đóng mộc vinh danh ${claimedBadges.length} bằng khen! Nhận tổng cộng +${totalMoney.toLocaleString('vi-VN')}đ!`
+  };
+}

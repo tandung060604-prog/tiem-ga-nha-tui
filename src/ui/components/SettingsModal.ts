@@ -128,12 +128,6 @@ export function renderSettingsModal(state: GameState): string {
         </button>
       </div>
 
-      <!-- Shop Themes Customization -->
-      <div style="border-top: 1px dashed var(--line); padding-top: 10px; text-align: center;">
-        <button id="btn-settings-shop-themes" class="btn-sm" style="width: 100%; padding: 8px; font-weight: 800; background: linear-gradient(135deg, #fdf4ff, #fae8ff); border: 1.5px solid #c084fc; color: #6b21a8; border-radius: 8px; cursor: pointer;">
-          🏮 Đổi Biển Hiệu & Giao Diện Quán
-        </button>
-      </div>
 
       <!-- Story Ending & Memory Gallery Preview -->
       <div style="border-top: 1px dashed var(--line); padding-top: 10px; text-align: center;">

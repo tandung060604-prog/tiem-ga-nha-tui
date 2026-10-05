@@ -322,10 +322,19 @@ export interface DayLedger {
   taxVat?: number;
   taxPit?: number;
   taxCit?: number;
+  aidLoanReceived?: number;  // tiền tạm ứng từ Quỹ Tương Trợ Bác Ba trong ngày
+  aidLoanRepaid?: number;    // tiền trích từ lợi nhuận ròng hoàn trả Quỹ Tương Trợ
 }
 
 // Hình thức kinh doanh: Chương 1–3 hộ kinh doanh, Chương 4–5 công ty TNHH (core/accounting.ts)
 export type BusinessForm = 'household' | 'company';
+
+// Quỹ Tương Trợ Hẻm 1102 (Bác Ba cứu trợ chống kẹt vốn 0% lãi suất)
+export interface MutualAidState {
+  activeLoan: number;        // Dư nợ quỹ tương trợ còn lại (VND)
+  totalAssisted: number;     // Tổng số lần Bác Ba đã cứu trợ
+  lastAidDay: number;        // Ngày nhận cứu trợ gần nhất
+}
 
 // Báo cáo lãi lỗ cuối ngày, nhóm theo khoản mục để UI đọc (dựng từ DayLedger bằng financialLedger()).
 export interface FinancialLedger {
@@ -337,6 +346,7 @@ export interface FinancialLedger {
   preTaxProfit: number;
   tax: { form: BusinessForm; vat: number; pit: number; cit: number; total: number };
   netProfit: number;
+  aid?: { received: number; repaid: number };
 }
 
 // Một khay inox GN trên quầy sơ chế (core/prepStation.ts). Khay luôn được dựng đủ, kể cả khi còn khóa.
@@ -660,6 +670,7 @@ export interface GameState {
   day3FeedbackPrompted?: boolean;    // Đã hiện lời mời tester chấm sao & góp ý sau Ngày 2/3 chưa
   storyFlags?: string[];             // Danh sách các cờ sự kiện cốt truyện đã kích hoạt
   loyaltyState?: CustomerLoyaltyState; // Hệ thống Tri Kỷ Hẻm 1102 & Khẩu Vị Ruột
+  mutualAid?: MutualAidState;        // Quỹ Tương Trợ Hẻm 1102 (Bác Ba cứu trợ chống kẹt vốn)
 }
 
 export interface BargainWholesaler {
@@ -1022,12 +1033,12 @@ export type HeritageBadgeId =
   | 'badge_tieng_cuoi_xom_dao'    // Đạt 100 điểm Karma Cộng Đồng
   | 'badge_trieu_phu_hem_sau'     // Tích lũy 1.000.000đ tiền mặt
   | 'badge_doi_ngu_tinh_nhue'     // Nâng cấp 3 nhân viên lên cấp 2 trở lên
-  | 'badge_chuoi_cung_ung_vang'   // Mua hàng chợ đầu mối chiết khấu 8 lần
-  | 'badge_bien_hieu_ruc_ro'      // Mở khóa 2 biển hiệu Vintage
-  | 'badge_khong_mot_don_huy'     // Phục vụ liên tục 40 khách không huỷ
+  | 'badge_chuoi_cung_ung_vang'   // Mua hàng chợ đầu mối chiết khấu 10 lần
+  | 'badge_bien_hieu_ruc_ro'      // Cơ ngơi khang trang (Nâng cấp không gian/mặt bằng cấp 2+)
+  | 'badge_khong_mot_don_huy'     // Phục vụ liên tục 60 khách không huỷ
   | 'badge_sieu_toc_phuc_vu'      // Tốc độ phục vụ trung bình nhanh
-  | 'badge_thinh_gia_trung_thanh' // Bật Đài FM 99.9 nhận buff 8 đêm
-  | 'badge_chinh_phuc_ca_dem'     // Vượt Wave 10 Ca Đêm Bất Tận
+  | 'badge_thinh_gia_trung_thanh' // Bật Đài FM 99.9 nhận buff 10 đêm
+  | 'badge_chinh_phuc_ca_dem'     // Vượt Wave 12 Ca Đêm Bất Tận
   | 'badge_thu_tho_cam_bi_an'     // Thu thập 5 bức thư thỏ cam
   | 'badge_truong_ton_sai_gon'    // Mở khóa Chương 3 trở lên
   | 'badge_dai_ket_cuc_vien_man'; // Đạt ít nhất 2 kết cục khác nhau

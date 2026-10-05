@@ -129,3 +129,52 @@ describe('bảng P&L cuối ngày', () => {
     expect(renderPnl(EconomyEngine.finalizeDayLedger({ ...base, chapter: 5, revenueCounter: 5_000_000 }))).toContain('Công ty TNHH');
   });
 });
+
+import { canTriggerMutualAid, triggerMutualAidLoan } from '../src/core/day';
+
+describe('Quỹ Tương Trợ Hẻm 1102 (Bác Ba cứu trợ chống kẹt vốn)', () => {
+  it('chỉ kích hoạt khi âm tiền và cạn gà tươi (< 5 miếng)', () => {
+    const s = createInitialState();
+    expect(canTriggerMutualAid(s)).toBe(false); // ngày 1 có tiền và có gà
+    s.money = -25_000;
+    expect(canTriggerMutualAid(s)).toBe(false); // còn gà (mặc định amount = 8)
+    s.inventory.chicken_meat!.amount = 2;
+    expect(canTriggerMutualAid(s)).toBe(true); // âm tiền và hết gà -> đủ điều kiện
+  });
+
+  it('Bác Ba tạm ứng 75k vốn mồi, ghi nhận nợ và chống nhận 2 lần trong 1 ngày', () => {
+    const s = createInitialState();
+    s.money = -50_000;
+    s.inventory.chicken_meat!.amount = 0;
+    const res = triggerMutualAidLoan(s);
+    expect(res.success).toBe(true);
+    expect(res.amount).toBe(75_000);
+    expect(s.money).toBe(25_000);
+    expect(s.mutualAid?.activeLoan).toBe(75_000);
+    expect(s.mutualAid?.totalAssisted).toBe(1);
+    expect(s.lifetimeStats.totalBonus).toBe(75_000);
+
+    // Thử nhận lần 2 trong cùng ngày -> bị từ chối
+    s.money = -10_000;
+    expect(canTriggerMutualAid(s)).toBe(false);
+    expect(triggerMutualAidLoan(s).success).toBe(false);
+  });
+
+  it('cuối ngày có lãi trích tối đa 10% trả góp, ngày lỗ không trừ tiền', () => {
+    const s = createInitialState();
+    s.mutualAid = { activeLoan: 75_000, totalAssisted: 1, lastAidDay: 1 };
+    s.money = 200_000;
+    const session = createSellingSession();
+    session.grossRevenue = 300_000;
+    session.servedCount = 5;
+    const { ledger } = closeDay(s, session, eventForDay(s.day));
+    expect(ledger.aidLoanRepaid).toBeGreaterThan(0);
+    expect(ledger.aidLoanRepaid).toBeLessThanOrEqual(Math.floor(ledger.netProfit * 0.1) + 1);
+    expect(s.mutualAid.activeLoan).toBe(75_000 - (ledger.aidLoanRepaid ?? 0));
+
+    // Kiểm tra financialLedger phản ánh aid
+    const fl = financialLedger(ledger);
+    expect(fl.aid).toBeDefined();
+    expect(fl.aid?.repaid).toBe(ledger.aidLoanRepaid);
+  });
+});

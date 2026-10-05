@@ -161,13 +161,6 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
                   <button id="btn-secret-sauce" class="btn-sm btn-toolbox btn-sauce-card ${state.secretSauceDay?.buffActive ? 'is-active' : ''}" title="Pha nồi sốt bí truyền nhận Buff Vàng (+3k tip & +0.25★ Hương vị)">
                     <img src="${ASSETS.icons.sauce}" class="btn-pixel-icon-xs" alt="" /> ${state.secretSauceDay?.buffActive ? '✨ Sốt Thần Thánh' : 'Nấu Sốt Bí Truyền'}
                   </button>
-                  ${(day >= 5 || chapter >= 2) ? `
-                    <button id="btn-open-shop-themes" class="btn-sm btn-toolbox" title="Biển Hiệu Vintage & Đổi Giao Diện Quán">
-                      <img src="${ASSETS.icons.upgrade}" class="btn-pixel-icon-xs" alt="" /> Biển Hiệu Vintage
-                    </button>
-                  ` : `
-                    <span class="drawer-locked-hint">🔒 Biển hiệu (Ngày 5)</span>
-                  `}
                 </div>
               </div>
 

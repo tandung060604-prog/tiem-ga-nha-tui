@@ -86,6 +86,10 @@ export function financialLedger(l: DayLedger): FinancialLedger {
   tax.total = tax.vat + tax.pit + tax.cit;
   const fines = l.fines ?? 0;
   const preTaxProfit = l.preTaxProfit ?? l.netProfit;
+  const aid = (l.aidLoanReceived || l.aidLoanRepaid) ? {
+    received: l.aidLoanReceived ?? 0,
+    repaid: l.aidLoanRepaid ?? 0
+  } : undefined;
   return {
     // Doanh thu gộp theo giá niêm yết: món cháy bị trả nửa giá được ghi ở dòng hao hụt
     revenue: { counter, delivery, tips: l.tips, gross: counter + delivery + burnt },
@@ -95,6 +99,7 @@ export function financialLedger(l: DayLedger): FinancialLedger {
     fines,
     preTaxProfit,
     tax,
-    netProfit: l.netProfit
+    netProfit: l.netProfit,
+    ...(aid ? { aid } : {})
   };
 }

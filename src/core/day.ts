@@ -898,9 +898,18 @@ export function closeDay(draft: GameState, session: SellingSession, event?: Game
   ledger.friedCount = session.totalFriedCount;
   ledger.perfectCount = session.perfectCount;
   ledger.wrongOrderCount = session.wrongOrderCount ?? 0;
-  ledger.missedItemsCount = session.missedItemsCount ?? 0;
   draft.money -= EconomyEngine.closingCharges(ledger);
   draft.debtStreak = draft.money < 0 ? (draft.debtStreak ?? 0) + 1 : 0; // phá sản khi âm quỹ nhiều ngày liền
+  // Trả góp Quỹ Tương Trợ Bác Ba (tối đa 10% lợi nhuận ròng nếu có lãi)
+  if (draft.mutualAid && draft.mutualAid.activeLoan > 0 && ledger.netProfit > 0 && draft.money > 0) {
+    const maxRepay = Math.floor(ledger.netProfit * 0.1);
+    const repayAmount = Math.min(maxRepay, draft.mutualAid.activeLoan, draft.money);
+    if (repayAmount > 0) {
+      draft.money -= repayAmount;
+      draft.mutualAid.activeLoan -= repayAmount;
+      ledger.aidLoanRepaid = repayAmount;
+    }
+  }
   draft.ratings = newRatings;
   draft.dayHistory.push(ledger);
   draft.recentReviews.unshift(generatedReview);
@@ -973,4 +982,37 @@ export function applyGangsterThreat(draft: GameState): void {
   draft.gangsterThreatDays = 3;
   // Phạt thêm karma cộng đồng (hẻm mất lòng tin)
   draft.karma = applyKarmaChange(draft.karma, { community: -2 });
+}
+
+// === Quỹ Tương Trợ Hẻm 1102 (Bác Ba cứu trợ vốn mồi 0% lãi suất khi cạn tiền & hết gà) ===
+export function canTriggerMutualAid(state: GameState): boolean {
+  const isBroke = state.money < 0;
+  const chickenStock = state.inventory.chicken_meat?.amount ?? state.inventory.raw_chicken?.amount ?? 0;
+  const isOutOfChicken = chickenStock < 5;
+  const alreadyAidedToday = (state.mutualAid?.lastAidDay ?? 0) === state.day;
+  return isBroke && isOutOfChicken && !alreadyAidedToday;
+}
+
+export function triggerMutualAidLoan(state: GameState, amount = 75000): { success: boolean; amount: number; message: string } {
+  if (!canTriggerMutualAid(state)) {
+    return { success: false, amount: 0, message: 'Chưa đủ điều kiện nhận Quỹ Tương Trợ hoặc đã nhận hôm nay.' };
+  }
+  state.money += amount;
+  state.mutualAid = state.mutualAid || { activeLoan: 0, totalAssisted: 0, lastAidDay: 0 };
+  state.mutualAid.activeLoan += amount;
+  state.mutualAid.totalAssisted += 1;
+  state.mutualAid.lastAidDay = state.day;
+  state.lifetimeStats.totalBonus = (state.lifetimeStats.totalBonus ?? 0) + amount;
+
+  // Ghi nhận vào ngày hiện tại nếu có
+  const todayLedger = state.dayHistory[state.dayHistory.length - 1];
+  if (todayLedger && todayLedger.day === state.day) {
+    todayLedger.aidLoanReceived = (todayLedger.aidLoanReceived ?? 0) + amount;
+  }
+
+  return {
+    success: true,
+    amount,
+    message: `Bác Ba ghé tiệm hỗ trợ 75k vốn mồi: "Cố lên con, hẻm mình tương trợ nhau!" 🤝`
+  };
 }

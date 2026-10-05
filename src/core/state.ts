@@ -188,6 +188,11 @@ export function createInitialState(): GameState {
     onboardingGuideDismissed: false,
     day3FeedbackPrompted: false,
     loyaltyState: createInitialLoyaltyState(),
+    mutualAid: {
+      activeLoan: 0,
+      totalAssisted: 0,
+      lastAidDay: 0
+    },
   };
   getOrCreatePetPatio(state);
   ensureLoyaltyState(state);
@@ -246,6 +251,9 @@ export function migrateSave(raw: unknown): { state: GameState; repaired: string[
   }
   if (typeof state.day3FeedbackPrompted !== 'boolean') {
     state.day3FeedbackPrompted = false;
+  }
+  if (!state.mutualAid || typeof state.mutualAid !== 'object' || typeof (state.mutualAid as any).activeLoan !== 'number') {
+    state.mutualAid = { activeLoan: 0, totalAssisted: 0, lastAidDay: 0 };
   }
   // Save từ trước khi có hướng dẫn: đã qua ngày 1 thì coi như đã học, không bật lại
   if (typeof src.tutorialDone !== 'boolean') state.tutorialDone = typeof src.day === 'number' && src.day > 1;

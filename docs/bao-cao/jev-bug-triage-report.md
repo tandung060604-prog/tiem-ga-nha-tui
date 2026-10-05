@@ -971,3 +971,43 @@
   - **Chiến lược Fix:** `defensive_nullcheck_fallback` (Độ tin cậy: 49.0%)
   - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
 ---
+
+### 🐞 [11:41:00 5/10/2026] (via Jev MCP) Visual Clutter & Crowding in Selling View on 360px/390px mobile screens
+- **Triệu chứng:** Screen feels congested; multiple gray locked slots waste vertical/horizontal space; 5 large customer cards make it difficult to prioritize the first customer receiving food.
+- **Vị trí:** `src/ui/components/SellingView.ts & PrepStation.ts` 
+- **Đánh giá Jev (360ms):**
+  - **Mức độ (Severity):** `p2_ui_friction` (Độ tin cậy: 99.0%)
+  - **Nguyên nhân gốc (Root Cause):** `ui_modal_stack` (Độ tin cậy: 92.0%)
+  - **Chiến lược Fix:** `contract_first_type_fix` (Độ tin cậy: 12.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---
+
+### 🐞 [11:41:03 5/10/2026] (via Jev MCP) Negative cash deadlock when player runs out of money and raw chicken
+- **Triệu chứng:** Player cannot prepare food, customers leave angry, debt deepens, game becomes unplayable without save wipe.
+- **Vị trí:** `src/core/orders.ts & src/core/day.ts` 
+- **Đánh giá Jev (293ms):**
+  - **Mức độ (Severity):** `p0_blocker` (Độ tin cậy: 96.0%)
+  - **Nguyên nhân gốc (Root Cause):** `economy_math` (Độ tin cậy: 97.0%)
+  - **Chiến lược Fix:** `defensive_nullcheck_fallback` (Độ tin cậy: 55.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---
+
+### 🐞 [14:29:59 5/10/2026] (via Jev MCP) Customer Queue Split Refactor & Event Delegation Ripple Effect
+- **Triệu chứng:** Potential risk of broken order serving event handlers, desynchronized DOM cache in patchSellingView, or test bot clicking non-existent elements.
+- **Vị trí:** `src/ui/components/SellingView.ts` 
+- **Đánh giá Jev (428ms):**
+  - **Mức độ (Severity):** `p2_ui_friction` (Độ tin cậy: 80.0%)
+  - **Nguyên nhân gốc (Root Cause):** `ui_modal_stack` (Độ tin cậy: 47.0%)
+  - **Chiến lược Fix:** `defensive_nullcheck_fallback` (Độ tin cậy: 22.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---
+
+### 🐞 [17:19:17 5/10/2026] (via Jev MCP) Customer card 184px overflow & blind queue on mobile 360-390px
+- **Triệu chứng:** Người chơi bị mù thông tin hàng đợi, khách sau bỏ về liên tục mà không kịp phản ứng, thao tác vuốt cuộn xung đột với nhịp canh chảo chiên.
+- **Vị trí:** `src/styles/customers.css & src/ui/components/SellingView.ts` 
+- **Đánh giá Jev (426ms):**
+  - **Mức độ (Severity):** `p2_ui_friction` (Độ tin cậy: 86.0%)
+  - **Nguyên nhân gốc (Root Cause):** `ui_modal_stack` (Độ tin cậy: 88.0%)
+  - **Chiến lược Fix:** `modal_queue_guard` (Độ tin cậy: 2.0%)
+  - **Số ngày chạy bù khuyến nghị (Dò bù):** `100` ngày chơi
+---

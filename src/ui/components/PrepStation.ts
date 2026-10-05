@@ -16,17 +16,17 @@ export function prepStationKey(state: GameState): string {
 function panHtml(slot: PrepSlotState, frying: boolean, activeAction: string | null): string {
   const label = escapeHtml(slot.label);
   if (slot.status === 'locked' && slot.lock) {
-    const lockArt = ASSETS.kitchen.gnPanLocked
-      ? `<img class="gn-pan-img" src="${ASSETS.kitchen.gnPanLocked}" alt="Đã khóa" width="30" height="30" />`
-      : slot.asset
-      ? `<img class="gn-pan-img" src="${slot.asset}" alt="${label}" width="30" height="30" />`
-      : `<span class="gn-pan-emoji" aria-hidden="true">${slot.icon}</span>`;
+    const dishArt = slot.asset
+      ? `<img class="gn-pan-img gn-pan-silhouette" src="${slot.asset}" alt="${label}" width="30" height="30" />`
+      : `<span class="gn-pan-emoji gn-pan-silhouette" aria-hidden="true">${slot.icon}</span>`;
     return `
       <button type="button" class="gn-pan" data-pan="${slot.pan}" data-state="locked" data-prep-lock="${slot.id}"
-        aria-label="${label} — khóa: ${escapeHtml(slot.lock.label)}">
-        ${lockArt}
-        <span class="gn-pan-lock" aria-hidden="true"><img src="${ASSETS.icons.lock}" class="pixel-lock-img" alt="Khóa" /></span>
-        <span class="gn-pan-lock-label">${escapeHtml(slot.lock.label)}</span>
+        aria-label="${label} — khóa: ${escapeHtml(slot.lock.label)}" title="${label} (Chạm để xem điều kiện mở khóa)">
+        <div class="gn-glass-lid">
+          ${dishArt}
+          <div class="glass-reflection" aria-hidden="true"></div>
+          <span class="brass-lock-badge" aria-hidden="true"><img src="${ASSETS.icons.lock}" class="pixel-lock-img-xs" alt="" /> ${escapeHtml(slot.lock.label)}</span>
+        </div>
         <span class="gn-pan-label">${label}</span>
       </button>`;
   }
@@ -79,17 +79,38 @@ export function renderPrepStation(state: GameState): string {
     </div>`;
 }
 
-// Chạm khay khóa: hiện bóng hướng dẫn cách mở (tự ẩn)
+// Chạm khay khóa: hiện bảng Popover retro giải thích chi tiết món ăn và cách mở (tự ẩn)
 export function showPrepPopover(root: HTMLElement, slotId: string, state: GameState): void {
   const slot = prepStationSlots(state).find(s => s.id === slotId);
   const station = root.querySelector<HTMLElement>('.prep-station');
   if (!slot?.lock || !station) return;
   station.querySelector('.prep-popover')?.remove();
+
+  if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    try { navigator.vibrate(10); } catch {}
+  }
+
   const pop = document.createElement('div');
-  pop.className = 'prep-popover';
+  pop.className = 'prep-popover prep-popover-retro';
   pop.setAttribute('role', 'status');
   pop.dataset.for = slotId;
-  pop.textContent = `🔒 ${slot.lock.hint}`;
+
+  const dishThumb = slot.asset
+    ? `<img src="${slot.asset}" class="popover-dish-img" width="30" height="30" alt="${escapeHtml(slot.label)}" />`
+    : `<span class="popover-dish-emoji">${slot.icon}</span>`;
+
+  pop.innerHTML = `
+    <div class="popover-inner">
+      <div class="popover-top-row">
+        ${dishThumb}
+        <div class="popover-info">
+          <span class="popover-name">${escapeHtml(slot.label)}</span>
+          <span class="popover-badge">🔒 ${escapeHtml(slot.lock.label)}</span>
+        </div>
+      </div>
+      <div class="popover-hint-text">${escapeHtml(slot.lock.hint)}</div>
+    </div>
+  `;
   station.appendChild(pop);
-  setTimeout(() => pop.remove(), 3500);
+  setTimeout(() => pop.remove(), 3800);
 }

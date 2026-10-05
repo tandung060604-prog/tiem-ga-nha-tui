@@ -6,6 +6,7 @@ import { createSellingSession } from '../src/core/sellingSim';
 import { createInitialState, migrateSave } from '../src/core/state';
 import { FRY_RECIPES, fryingItemId } from '../src/core/staff';
 import { audio } from '../src/core/audio';
+import { renderPrepStation, showPrepPopover } from '../src/ui/components/PrepStation';
 
 beforeAll(() => audio.setMuted(true));
 
@@ -41,6 +42,16 @@ describe('quầy khay inox GN', () => {
     expect(cheese().status).toBe('empty');
     s.inventory.cheese_stick_raw!.amount = 6;
     expect(cheese()).toMatchObject({ status: 'ready', stock: 6 });
+  });
+
+  it('khay khóa hiển thị Nắp Kính Mờ (gn-glass-lid) kèm bóng Silhouette và brass-lock-badge', () => {
+    const s = createInitialState();
+    const html = renderPrepStation(s);
+    expect(html).toContain('gn-glass-lid');
+    expect(html).toContain('brass-lock-badge');
+    expect(html).toContain('gn-pan-silhouette');
+    expect(html).toContain('Má Đùi');
+    expect(html).toContain('Phô Mai');
   });
 });
 

@@ -139,7 +139,7 @@ import {
 } from './core/petPatioSystem';
 import { renderPetPatioModal } from './ui/components/PetPatioComponent';
 import { renderAchievementsWallModal } from './ui/components/AchievementsWallModal';
-import { claimBadgeReward } from './core/achievementsEngine';
+import { claimBadgeReward, claimAllBadgesReward } from './core/achievementsEngine';
 import { renderShopThemeModal } from './ui/components/ShopThemeModal';
 import { unlockShopTheme, setActiveShopTheme, getActiveShopTheme } from './content/shopThemes';
 import { renderEndlessModeModal } from './ui/components/EndlessModeModal';
@@ -164,7 +164,7 @@ export function updateThemeColor(color: string) {
       meta.content = color;
       document.head.appendChild(meta);
     }
-  } catch {}
+  } catch { }
 }
 
 const SELLING_ACTIONS = [
@@ -259,7 +259,7 @@ class AppController {
           }, 1200);
         }
       }
-    } catch {}
+    } catch { }
 
     // Có ca bán dở (thoát app giữa ca) thì giữ nguyên, tiếp tục sau khi chạm "Chơi tiếp" ở màn tiêu đề
 
@@ -1163,7 +1163,7 @@ class AppController {
         if (choiceId) {
           audio.playCash();
           const { choice } = resolveCharacterChoice(stateManager.getState(), episode.id, choiceId);
-          
+
           // Tự động kiểm tra và mở khóa kỷ vật & món ăn kỷ niệm mới
           const currentState = stateManager.getState();
           const unlockedCurios = getUnlockedCurios(currentState);
@@ -1350,7 +1350,26 @@ class AppController {
       });
     });
 
-    // Nút đóng dấu mộc đỏ nhận thưởng
+    // Nút Nhận Tất Cả Bằng Khen (Claim All)
+    const claimAllBtn = document.getElementById('btn-claim-all-badges');
+    if (claimAllBtn) {
+      claimAllBtn.onclick = () => {
+        const res = claimAllBadgesReward(stateManager.getState());
+        if (res.claimedCount > 0) {
+          audio.playCash();
+          confetti({ particleCount: 120, spread: 90, origin: { y: 0.45 } });
+          this.showToast(`🎉 ${res.message}`);
+          stateManager.saveState();
+          this.render(); // Cập nhật số tiền header
+          this.openAchievementsWallModal(filterCat);
+        } else {
+          audio.playBurnt();
+          this.showToast(`⚠️ ${res.message}`);
+        }
+      };
+    }
+
+    // Nút đóng dấu mộc đỏ nhận thưởng từng cái
     const claimBtns = document.querySelectorAll('.btn-claim-badge');
     claimBtns.forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -2177,7 +2196,7 @@ class AppController {
                 draft.guidedFeatures.push(dailyGuide.key);
               }
             });
-            syncTutorialLayer(null, { onButton: () => {}, onSkip: () => {} });
+            syncTutorialLayer(null, { onButton: () => { }, onSkip: () => { } });
           },
           onSkip: () => {
             stateManager.update(draft => {
@@ -2186,7 +2205,7 @@ class AppController {
                 draft.guidedFeatures.push(dailyGuide.key);
               }
             });
-            syncTutorialLayer(null, { onButton: () => {}, onSkip: () => {} });
+            syncTutorialLayer(null, { onButton: () => { }, onSkip: () => { } });
           }
         });
         return;
@@ -2251,7 +2270,7 @@ class AppController {
 
   private endPrepTutorial() {
     this.prepTutorialStep = null;
-    syncTutorialLayer(null, { onButton: () => {}, onSkip: () => {} });
+    syncTutorialLayer(null, { onButton: () => { }, onSkip: () => { } });
     stateManager.update(draft => { draft.prepTutorialDone = true; });
     stateManager.flush();
   }
@@ -2295,7 +2314,7 @@ class AppController {
           target,
           button: 'Dạ Bác Ba!'
         }, {
-          onButton: () => {},
+          onButton: () => { },
           onSkip: () => {
             stateManager.update(draft => {
               draft.guidedFeatures = draft.guidedFeatures || [];
@@ -2304,7 +2323,7 @@ class AppController {
               }
             });
             this.sauceGuideActive = false;
-            syncTutorialLayer(null, { onButton: () => {}, onSkip: () => {} });
+            syncTutorialLayer(null, { onButton: () => { }, onSkip: () => { } });
           }
         });
       } else if (!cookState.isFrying) {
@@ -2314,7 +2333,7 @@ class AppController {
           target: '#btn-fry-chicken',
           button: 'Dạ con chiên liền!'
         }, {
-          onButton: () => {},
+          onButton: () => { },
           onSkip: () => {
             stateManager.update(draft => {
               draft.guidedFeatures = draft.guidedFeatures || [];
@@ -2323,7 +2342,7 @@ class AppController {
               }
             });
             this.sauceGuideActive = false;
-            syncTutorialLayer(null, { onButton: () => {}, onSkip: () => {} });
+            syncTutorialLayer(null, { onButton: () => { }, onSkip: () => { } });
           }
         });
       } else {
@@ -2335,19 +2354,19 @@ class AppController {
           }
         });
         this.sauceGuideActive = false;
-        syncTutorialLayer(null, { onButton: () => {}, onSkip: () => {} });
+        syncTutorialLayer(null, { onButton: () => { }, onSkip: () => { } });
       }
       return;
     } else if (this.sauceGuideActive) {
       this.sauceGuideActive = false;
-      syncTutorialLayer(null, { onButton: () => {}, onSkip: () => {} });
+      syncTutorialLayer(null, { onButton: () => { }, onSkip: () => { } });
     }
   }
 
   private endTutorial() {
     this.tutorial = null;
     if (this.sellingSession) this.sellingSession.tutorial = false;
-    syncTutorialLayer(null, { onButton: () => {}, onSkip: () => {} });
+    syncTutorialLayer(null, { onButton: () => { }, onSkip: () => { } });
     stateManager.update(draft => { draft.tutorialDone = true; });
   }
   private timerAlerted = new Set<TimerStationId>();
@@ -2462,7 +2481,7 @@ class AppController {
   }
 
   private stopSellingPhase() {
-    syncTutorialLayer(null, { onButton: () => {}, onSkip: () => {} });
+    syncTutorialLayer(null, { onButton: () => { }, onSkip: () => { } });
     if (this.animFrameId) {
       cancelAnimationFrame(this.animFrameId);
       this.animFrameId = null;
@@ -2784,9 +2803,9 @@ class AppController {
             "${quote}"
           </div>
           <p class="incident-story-desc" style="margin-top: 10px; font-size: 0.82rem; color: #555;">
-            ${isStrike1 
-              ? '📋 Điểm sao Vệ Sinh của tiệm đã bị hạ và ghi vào nhật ký đánh giá. Hãy bấm "Thay dầu" để đảm bảo chất lượng!' 
-              : '💸 200.000đ tiền phạt đã bị khấu trừ từ quỹ tiệm. Nếu tái phạm lần 3, bạn sẽ bị bắt đi tù (Game Over lập tức)!'}
+            ${isStrike1
+        ? '📋 Điểm sao Vệ Sinh của tiệm đã bị hạ và ghi vào nhật ký đánh giá. Hãy bấm "Thay dầu" để đảm bảo chất lượng!'
+        : '💸 200.000đ tiền phạt đã bị khấu trừ từ quỹ tiệm. Nếu tái phạm lần 3, bạn sẽ bị bắt đi tù (Game Over lập tức)!'}
           </p>
         </div>
         <div class="incident-choices-list" style="margin-top: 14px;">
@@ -3038,8 +3057,8 @@ class AppController {
                 if (flour && flour.amount < 5) addStock(flour, 5, 5000, 0);
               });
               audio.playCash();
-              this.showToast(deductCost > 0 
-                ? '🛵 Bác Ba tiếp tế khẩn cấp: Gà tươi & Bột chiên (-50.000đ)! 🍗' 
+              this.showToast(deductCost > 0
+                ? '🛵 Bác Ba tiếp tế khẩn cấp: Gà tươi & Bột chiên (-50.000đ)! 🍗'
                 : '❤️ Bác Ba tương trợ khẩn cấp: Cho mượn tạm gà tươi & bột chiên! 🍗');
               if (this.useIngredients([...recipe.stock])) {
                 session.totalFriedCount += 1;
@@ -3905,7 +3924,7 @@ class AppController {
           origin: { y: 0.6 },
           colors: ['#f7d046', '#c98e1e', '#3ca346', '#faeed1']
         });
-      } catch {}
+      } catch { }
     }
     // Lưu lại kết quả rent để hiển thị modal sau summary
     const rentResult = result.rentDue;
@@ -4119,9 +4138,9 @@ class AppController {
         <div class="incident-story-box">
           <p class="incident-story-desc">
             Chủ nhà tới thu tiền mặt bằng tuần ${rentDue.weekNum}. 
-            ${rentDue.canPay 
-              ? `Bạn cần trả <b>${vnd(rentDue.amount)}</b>. Tiền trong ví đủ chi trả.`
-              : `Bạn cần <b>${vnd(rentDue.amount)}</b> nhưng ví chỉ còn <b>${vnd(stateManager.getState().money)}</b>. Thiếu tiền rồi nè!`}
+            ${rentDue.canPay
+        ? `Bạn cần trả <b>${vnd(rentDue.amount)}</b>. Tiền trong ví đủ chi trả.`
+        : `Bạn cần <b>${vnd(rentDue.amount)}</b> nhưng ví chỉ còn <b>${vnd(stateManager.getState().money)}</b>. Thiếu tiền rồi nè!`}
           </p>
           ${!rentDue.canPay ? `
             <div class="incident-security-tip">
@@ -4380,7 +4399,7 @@ class AppController {
     const introSettingsBtn = document.getElementById('btn-settings-intro');
     if (introSettingsBtn) {
       introSettingsBtn.onclick = () => {
-        openIntroCinematicModal({ forceShow: true, onComplete: () => {} });
+        openIntroCinematicModal({ forceShow: true, onComplete: () => { } });
       };
     }
 
@@ -4759,7 +4778,7 @@ class AppController {
           } else {
             this.lastLobbyEntriesCount = newCount;
           }
-        } catch {}
+        } catch { }
       }, 4000);
     }
   }
@@ -4823,7 +4842,7 @@ class AppController {
           }
         }
       }
-    } catch {}
+    } catch { }
   }
 
   public openWeeklyQuests() {

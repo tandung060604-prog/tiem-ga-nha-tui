@@ -8,53 +8,84 @@ import { CONDIMENT_COST, GAS_PER_BATCH, ServiceCounts, businessForm, computeTaxe
 import { GAME_HOUR_MS, OFF_PEAK_HOURS, RUSH_HOURS, isWeekend, WEEKEND_CUSTOMER_MULTIPLIER } from './clock';
 
 export class EconomyEngine {
-  // Tính toán lượng khách dự kiến trong ngày
+  // Tính toán lượng khách dự kiến trong ngày - Biến thiên theo Mặt bằng chương, Thứ trong tuần và Nâng cấp
   public static calculateDailyCustomerCount(state: GameState, weatherMultiplier: number = 1.0): number {
-    // Khách nền theo từng chương: Đường cong tăng trưởng mượt mà (Jev Decision Confidence 1.0)
-    const baseCustomersPerChapter: { [key: number]: number } = {
-      1: 10,
-      2: 22, // Tăng trưởng lũy tiến 18 -> 26 khách, tránh ồ ạt quá tải khi vừa mở chương mới
-      3: 36,
-      4: 55,
-      5: 90
-    };
+    const chapter = state.currentChapter || 1;
+    const uEffects = upgradeEffects(state.upgrades);
+    const day = state.day;
 
-    let base = baseCustomersPerChapter[state.currentChapter] || 16;
-    if (state.currentChapter === 2) {
-      const daysIntoCh2 = Math.max(0, state.day - 20);
-      base = 18 + Math.min(8, Math.floor(daysIntoCh2 * 0.7)); // Ngày 21: 18, Ngày 25: 21, Ngày 30: 25
+    // 1. Khách nền biến thiên theo Mặt bằng từng chương & Không gian quán
+    let base = 10;
+    if (chapter === 1) {
+      // Chương 1: Xe đẩy vỉa hè (10 - 13 khách) - Tăng khi nâng cấp mái che, đèn LED xe đẩy
+      const cartLevel = typeof state.upgrades?.cart === 'object' ? (state.upgrades.cart.currentLevel ?? 1) : 1;
+      base = 10 + (cartLevel >= 3 ? 3 : cartLevel >= 2 ? 1 : 0);
+    } else if (chapter === 2) {
+      // Chương 2: Tiệm nhỏ trong hẻm (16 - 24 khách) - Tăng dần theo thâm niên mở tiệm & Không gian bàn ghế
+      const daysInCh2 = Math.max(0, day - 20);
+      const dayBonus = Math.min(8, Math.floor(daysInCh2 * 0.8));
+      const spaceBonus = Math.min(3, Math.floor((uEffects.pricePremiumPct || 0) / 10));
+      base = 16 + dayBonus + spaceBonus;
+    } else if (chapter === 3) {
+      // Chương 3: Mặt tiền phố hẻm (22 - 30 khách) - Mặt bằng 2 gian thoáng đãng, vỉa hè rộng
+      const daysInCh3 = Math.max(0, day - 50);
+      const dayBonus = Math.min(6, Math.floor(daysInCh3 * 0.4));
+      const spaceBonus = Math.min(4, Math.floor((uEffects.pricePremiumPct || 0) / 8));
+      base = 22 + dayBonus + spaceBonus;
+    } else if (chapter === 4) {
+      // Chương 4: Bistro hiện đại (28 - 38 khách) - Không gian máy lạnh, nhiều bàn phục vụ
+      const daysInCh4 = Math.max(0, day - 90);
+      const dayBonus = Math.min(6, Math.floor(daysInCh4 * 0.3));
+      const spaceBonus = Math.min(5, Math.floor((uEffects.pricePremiumPct || 0) / 6));
+      base = 28 + dayBonus + spaceBonus;
+    } else {
+      // Chương 5: Đại bản doanh chuỗi 5 chi nhánh (34 - 46 khách) - Công suất lớn có nhân sự gánh vác
+      const daysInCh5 = Math.max(0, day - 140);
+      const dayBonus = Math.min(8, Math.floor(daysInCh5 * 0.25));
+      const spaceBonus = Math.min(6, Math.floor((uEffects.pricePremiumPct || 0) / 5));
+      base = 34 + dayBonus + spaceBonus;
     }
+
+    // 2. Hệ số Thứ Trong Tuần (Biến thiên nhịp sống Sài Gòn chân thực)
+    // Thứ 2: đầu tuần nhẹ nhàng (0.95x); Thứ 3-6: ngày thường ổn định (1.0x); Thứ 7 & CN: cuối tuần bùng nổ (WEEKEND_CUSTOMER_MULTIPLIER = 1.4x)
+    const dayOfWeek = (((day - 1) % 7) + 7) % 7; // 0 = Thứ 2, 4 = Thứ 6, 5 = Thứ 7, 6 = CN
+    const weekdayMultiplier = isWeekend(day) ? WEEKEND_CUSTOMER_MULTIPLIER : (dayOfWeek === 0 ? 0.95 : 1.0);
     
-    // Hệ số đánh giá sao (GDD: 3 sao ≈ 0.6x, 4 sao ≈ 1.0x, 4.8 sao trở lên ≈ 1.6x)
+    // 3. Hệ số đánh giá sao của quán (GDD: 3 sao ≈ 0.6x, 4 sao ≈ 1.0x, 4.8 sao trở lên ≈ 1.4x)
     const stars = state.ratings.overall;
     let starMultiplier = 1.0;
     if (stars <= 3.0) {
       starMultiplier = 0.6 + (stars - 1) * 0.15;
     } else if (stars <= 4.0) {
-      starMultiplier = 0.6 + (stars - 3.0) * 0.4; // 3.0 -> 0.6x, 4.0 -> 1.0x
+      starMultiplier = 0.6 + (stars - 3.0) * 0.4;
     } else {
       starMultiplier = 1.0 + (stars - 4.0) * 0.75; // 4.0 -> 1.0x, 4.8 -> 1.6x
     }
 
-    // Nâng cấp có ghi "+% khách" (Marketing, App giao hàng, Không gian check-in…)
-    // Nhân viên Idol TikTok cũng kéo khách tới
-    // + Tham Vọng (karma): quảng bá mạnh tay → thêm khách
-    const marketingMultiplier = 1.0 + (upgradeEffects(state.upgrades).customersPct + staffEffects(state.staff).customersPct + karmaEffects(state.karma).customersPct) / 100;
+    // 4. Nâng cấp có ghi "+% khách" (Marketing, App giao hàng, Nhân viên, Karma)
+    const marketingMultiplier = 1.0 + (uEffects.customersPct + staffEffects(state.staff).customersPct + karmaEffects(state.karma).customersPct) / 100;
 
-    // Thứ Bảy, Chủ Nhật khách đông hơn ngày thường
-    const weekendMultiplier = isWeekend(state.day) ? WEEKEND_CUSTOMER_MULTIPLIER : 1;
-
-    // Tiếng giá của quán: đắt → ít người ghé, rẻ → đông hơn (core/pricing.ts)
+    // 5. Tiếng giá của quán: đắt → ít người ghé, rẻ → đông hơn (core/pricing.ts)
     const priceMultiplier = customerMultiplierFromPrice(averagePriceRatio(state));
 
-    // Giang hồ đe dọa: khách sợ không dám ghé (chưa trả tiền mặt bằng)
+    // 6. Giang hồ & Dầu đen
     const gangsterMultiplier = (state.gangsterThreatDays ?? 0) > 0 ? 0.7 : 1;
-
-    // Dầu đen carry-over: tiếng xấu lan → ít khách hơn
     const oilRepMultiplier = (state.dirtyOilPenaltyDays ?? 0) > 0 ? 0.9 : 1;
 
-    const total = Math.round(base * starMultiplier * marketingMultiplier * weatherMultiplier * weekendMultiplier * priceMultiplier * gangsterMultiplier * oilRepMultiplier);
-    return Math.max(8, total);
+    const rawTotal = Math.round(base * starMultiplier * marketingMultiplier * weatherMultiplier * weekdayMultiplier * priceMultiplier * gangsterMultiplier * oilRepMultiplier);
+
+    // 7. Trần an toàn tối đa cho Mobile (Safe Ergonomic Ceiling) - Bảo đảm không bao giờ gây loạn trên màn hình 360-390px
+    const maxSafeCapPerChapter: Record<number, number> = {
+      1: 16,
+      2: 28,
+      3: 36,
+      4: 44,
+      5: 50
+    };
+    const maxSafeCap = maxSafeCapPerChapter[chapter] || 32;
+
+    // Sàn tối thiểu là 3 khách để đảm bảo ngày mưa bão/giá cao vẫn phản ánh đúng tỉ lệ suy giảm
+    return Math.max(3, Math.min(maxSafeCap, rawTotal));
   }
 
   private static readonly RUSH_RATE_FACTOR = 1.75; // giờ cao điểm khách đến dày gấp 1,75

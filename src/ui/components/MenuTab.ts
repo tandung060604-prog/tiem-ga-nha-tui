@@ -1,7 +1,7 @@
 import { GameState, MenuItem } from '../../types/game';
 import { audio } from '../../core/audio';
 import { REGULAR_CUSTOMERS } from '../../content/customers';
-import { ASSETS } from '../../content/assets';
+import { ASSETS, foodImage } from '../../content/assets';
 import { PRICE_BANDS, PRICE_STEP, adjustPrice, averagePriceRatio, communityDriftFromPrice, customerMultiplierFromPrice, priceBand, priceLimits, priceRatio, pricingTarget } from '../../core/pricing';
 import { canMake } from '../../core/orders';
 import { SIGNATURE_STORY_DISHES, getUnlockedSignatureDishes } from '../../content/signatureStoryDishes';
@@ -52,6 +52,18 @@ export function renderMenuTab(state: GameState): string {
     `;
   }).join('');
 
+const DISH_TASTING_NOTES: Record<string, string> = {
+  spicy_thigh: 'Má đùi chiên vàng giòn rụm, lắc sốt Gochujang cay ngọt đánh thức vị giác.',
+  danmuji: 'Củ cải muối vàng giòn chua ngọt, món kèm kinh điển giải ngấy tăng sao Hương Vị.',
+  cheese_stick: 'Phô mai que kéo sợi béo ngậy, món ăn vặt triệu view của giới trẻ Hẻm 1102.',
+  coleslaw: 'Bắp cải giòn trộn sốt kem chua béo dịu, cân bằng hoàn hảo vị béo gà rán.',
+  popcorn_chicken: 'Gà viên lắc phô mai vừa miệng, món khoái khẩu của học sinh và shipper ca đêm.',
+  pasta_beef: 'Mì Ý sốt bò bằm đậm đà, trạm nấu trụng mì mở ở Chương 2 cho bữa trưa no bụng.',
+  biscuit_honey: 'Bánh quy bơ mật ong nóng hổi từ lò nướng Chương 3, thơm nức mũi cả con hẻm.',
+  chicken_burger: 'Burger gà giòn kẹp rau xà lách sốt cay, combo bán chạy nhất giờ cao điểm.',
+  tokbokki: 'Bánh gạo cay dẻo dai sốt ớt đỏ rực, món ăn đường phố ấm lòng ngày mưa Sài Gòn.'
+};
+
   // 12 Khách quen
   const regularCustomersHtml = REGULAR_CUSTOMERS.map(cust => {
     return `
@@ -94,6 +106,54 @@ export function renderMenuTab(state: GameState): string {
     `;
   }).join('');
 
+  // 🌟 Sổ Tay Món Mới Sắp Ra Mắt Hẻm 1102 (Upcoming Dishes)
+  const upcomingDishes = state.menu.filter(item => {
+    const canCook = canMake(state, item.id);
+    const dayLocked = (item.unlockDay ?? 1) > state.day;
+    return item.chapter > currentChapter || dayLocked || !canCook;
+  });
+
+  const upcomingDishesHtml = upcomingDishes.length > 0 ? `
+    <div class="sec-title upcoming-sec-title" style="margin-top: 16px; border-top: 1.5px solid var(--line); padding-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+      <span>🌟 Sổ Tay Món Mới Sắp Ra Mắt (${upcomingDishes.length})</span>
+      <span class="upcoming-badge-pill" style="font-size: 0.65rem; background: #fef08a; color: #854d0e; padding: 2px 8px; border-radius: 999px; font-weight: 800; border: 1px solid #eab308;">Lộ Trình Khám Phá</span>
+    </div>
+    <div class="sec-desc">
+      Khám phá trước các món ăn đặc sắc sắp mở ở các chương sau. Đặt cọc mặt bằng mới và ký hợp đồng nguyên liệu trong Kho để đưa vào thực đơn!
+    </div>
+    <div class="upcoming-dishes-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+      ${upcomingDishes.map(item => {
+        const dayLocked = (item.unlockDay ?? 1) > state.day;
+        const canCook = canMake(state, item.id);
+        const lockBadge = item.chapter > currentChapter
+          ? `Chương ${item.chapter}`
+          : (dayLocked ? `Ngày ${item.unlockDay}` : (!canCook ? 'Ký HĐ Kho Hàng' : 'Sắp mở'));
+        const img = foodImage(item.id, 'perfect');
+        const note = DISH_TASTING_NOTES[item.id] || `Món ăn đặc sản ${item.name} sẽ ra mắt khi quán mở rộng quy mô.`;
+
+        return `
+          <div class="upcoming-dish-card" style="background: linear-gradient(135deg, #fffbf5, #fef7ed); border: 1.5px solid #fed7aa; border-radius: 10px; padding: 10px; display: flex; gap: 10px; align-items: center; box-shadow: 0 2px 6px rgba(180, 83, 9, 0.08);">
+            <div style="width: 44px; height: 44px; border-radius: 8px; background: #ffedd5; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1.5px solid #fdba74; overflow: hidden;">
+              ${img ? `<img src="${img}" alt="${item.name}" width="38" height="38" style="image-rendering: pixelated; object-fit: contain;" />` : `<span style="font-size: 1.5rem;">${item.icon}</span>`}
+            </div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap;">
+                <b style="font-size: 0.86rem; color: #9a3412;">${item.name}</b>
+                <span style="font-size: 0.65rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: #ea580c; color: #fff;">🔒 ${lockBadge}</span>
+              </div>
+              <div style="font-size: 0.72rem; color: #78350f; margin-top: 2px; line-height: 1.35;">
+                ${note}
+              </div>
+              <div style="font-size: 0.68rem; color: #c2410c; margin-top: 3px; font-weight: 700;">
+                💰 Giá niêm yết: ${item.basePrice.toLocaleString('vi-VN')}đ · Quy trình: ${item.steps.join(' ➔ ')}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  ` : '';
+
   const avg = averagePriceRatio(state);
   const bandKey = priceBand(avg);
   const avgBand = PRICE_BANDS[bandKey];
@@ -123,6 +183,8 @@ export function renderMenuTab(state: GameState): string {
     <div class="menu-list">
       ${menuRows}
     </div>
+
+    ${upcomingDishesHtml}
 
     <!-- Món Ăn Kỷ Niệm Cốt Truyện Hẻm 1102 (Signature Story Dishes) -->
     <div class="sec-title" style="margin-top: 16px; border-top: 1px solid var(--line); padding-top: 10px; display: flex; justify-content: space-between; align-items: center;">

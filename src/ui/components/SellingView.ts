@@ -204,8 +204,8 @@ export function renderFx(events: readonly FxEvent[]): void {
   const spawnParabola = (text: string, isTip = false) => {
     const el = document.createElement('div');
     el.className = isTip ? 'money-float tip-parabola' : 'money-float cash-parabola';
-    el.innerHTML = isTip 
-      ? `<img src="${ASSETS.ui.pixelBanknoteFly}" class="flying-banknote-img tip-glow" alt="Tiền" /><img src="${ASSETS.icons.sparkle}" class="btn-pixel-icon-xs" alt="" /><span>${text}</span>` 
+    el.innerHTML = isTip
+      ? `<img src="${ASSETS.ui.pixelBanknoteFly}" class="flying-banknote-img tip-glow" alt="Tiền" /><img src="${ASSETS.icons.sparkle}" class="btn-pixel-icon-xs" alt="" /><span>${text}</span>`
       : `<img src="${ASSETS.ui.pixelBanknoteFly}" class="flying-banknote-img" alt="Tiền" /><span>${text}</span>`;
     layer!.appendChild(el);
     setTimeout(() => el.remove(), 1150);
@@ -220,7 +220,7 @@ export function renderFx(events: readonly FxEvent[]): void {
       flutter.style.setProperty('--fly-x', `${(Math.random() - 0.5) * 50}px`);
       layer!.appendChild(flutter);
       setTimeout(() => flutter.remove(), 950);
-    } catch {}
+    } catch { }
   };
 
   for (const fx of events) {
@@ -381,13 +381,13 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
       c.ringFill.classList.toggle('low', p.cls === 'low');
     }
     if (c.moodEmoji) {
-      c.moodEmoji.innerHTML = p.angry 
+      c.moodEmoji.innerHTML = p.angry
         ? `<img src="${ASSETS.icons.emoteAnger}" class="badge-pixel-star-xs" alt="💢" />`
-        : p.cls === 'low' 
-        ? `<img src="${ASSETS.icons.emoteSweat}" class="badge-pixel-star-xs" alt="💦" />`
-        : p.cls === 'mid' 
-        ? `<img src="${ASSETS.icons.emoteYum}" class="badge-pixel-star-xs" alt="😋" />`
-        : `<img src="${ASSETS.icons.sparkle}" class="badge-pixel-star-xs" alt="✨" />`;
+        : p.cls === 'low'
+          ? `<img src="${ASSETS.icons.emoteSweat}" class="badge-pixel-star-xs" alt="💦" />`
+          : p.cls === 'mid'
+            ? `<img src="${ASSETS.icons.emoteYum}" class="badge-pixel-star-xs" alt="😋" />`
+            : `<img src="${ASSETS.icons.sparkle}" class="badge-pixel-star-xs" alt="✨" />`;
     }
     if (c.emoteBubble) {
       const thoughtMsg = getMoodThought(mood, order, state);
@@ -395,12 +395,12 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
       const targetIcon = p.angry
         ? ASSETS.icons.emoteAnger
         : p.cls === 'low'
-        ? ASSETS.icons.emoteSweat
-        : order.isVip || order.isBunny
-        ? ASSETS.icons.emoteHeart
-        : p.cls === 'mid'
-        ? ASSETS.icons.emoteQuestion
-        : ASSETS.icons.emoteYum;
+          ? ASSETS.icons.emoteSweat
+          : order.isVip || order.isBunny
+            ? ASSETS.icons.emoteHeart
+            : p.cls === 'mid'
+              ? ASSETS.icons.emoteQuestion
+              : ASSETS.icons.emoteYum;
 
       const img = c.emoteBubble.querySelector<HTMLImageElement>('img');
       if (img) {
@@ -592,10 +592,10 @@ export function patchSellingView(root: HTMLElement, session: SellingSession, sta
           const newText = isStaff
             ? `${table.staffCleanerName || 'Phục vụ'} lau (${progress}%)`
             : isCleaning
-            ? `Đang chà... (${progress}%)`
-            : progress > 0
-            ? `Chà tiếp (${progress}%)`
-            : 'Chà lau';
+              ? `Đang chà... (${progress}%)`
+              : progress > 0
+                ? `Chà tiếp (${progress}%)`
+                : 'Chà lau';
           if (cleanText.textContent?.trim() !== newText.trim()) {
             cleanText.textContent = newText;
           }
@@ -733,11 +733,11 @@ export function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
     const profile = CHAR_MAP.get(order.characterId)!;
     const asset = charUrl(profile.id);
     const walkAsset = profile.id === 'char_19_shipper_tuan' ? ASSETS.shipper.walk :
-                      profile.id === 'char_30_student_bus' ? ASSETS.hocsinh.walk :
-                      profile.id === 'char_07_trendy_vy' ? ASSETS.vanphong.walk :
-                      profile.id.includes('dog') ? ASSETS.pets.dogWalk :
-                      profile.id.includes('cat') ? ASSETS.pets.catWalk :
-                      profile.id.includes('rat') ? ASSETS.pets.ratWalk : asset;
+      profile.id === 'char_30_student_bus' ? ASSETS.hocsinh.walk :
+        profile.id === 'char_07_trendy_vy' ? ASSETS.vanphong.walk :
+          profile.id.includes('dog') ? ASSETS.pets.dogWalk :
+            profile.id.includes('cat') ? ASSETS.pets.catWalk :
+              profile.id.includes('rat') ? ASSETS.pets.ratWalk : asset;
     const leaveAsset = profile.id === 'char_19_shipper_tuan' ? ASSETS.shipper.leave : ASSETS.takeawayCustomer;
     return {
       stand: asset,
@@ -948,11 +948,11 @@ export function getCustomerVisual(order: CustomerOrder): CustomerVisualModel {
   const picked = HUMAN_CHAR_POOL[Math.abs(hash) % HUMAN_CHAR_POOL.length] || HUMAN_CHAR_POOL[0]!;
   const asset = charUrl(picked.id);
   const walkAsset = picked.id === 'char_19_shipper_tuan' ? ASSETS.shipper.walk :
-                    picked.id === 'char_30_student_bus' ? ASSETS.hocsinh.walk :
-                    picked.id === 'char_07_trendy_vy' ? ASSETS.vanphong.walk : asset;
+    picked.id === 'char_30_student_bus' ? ASSETS.hocsinh.walk :
+      picked.id === 'char_07_trendy_vy' ? ASSETS.vanphong.walk : asset;
   const leaveAsset = picked.id === 'char_19_shipper_tuan' ? ASSETS.shipper.leave : ASSETS.takeawayCustomer;
   const badgeClass = order.isVip ? 'vip-badge' : getBadgeClassForChar(picked.category, picked.id);
-  const badgeText = order.isVip 
+  const badgeText = order.isVip
     ? (order.archetypeBadge ? `<img src="${ASSETS.icons.crownVip}" class="badge-pixel-star-xs" alt="" /> ${order.archetypeBadge}` : `<img src="${ASSETS.icons.crownVip}" class="badge-pixel-star-xs" alt="" /> ${picked.roleTitle} (Khách Sộp)`)
     : (order.archetypeBadge || picked.roleTitle);
 
@@ -1073,7 +1073,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
     const hasMatchInTray = tray.some(t => ord.items.some(it => it.menuItemId === t.menuItemId && !it.completed));
 
     const comboHtml = ord.comboName ? `<div class="order-combo"><img src="${ASSETS.icons.gift}" class="btn-pixel-icon-xs" alt="" /> ${escapeHtml(ord.comboName)}</div>` : '';
-    
+
     // Tách món chưa xong (pending) và món đã xong (completed) để đưa món chưa giao lên trên cùng
     const pendingItems = ord.items.filter(it => !it.completed);
     const completedItems = ord.items.filter(it => it.completed);
@@ -1104,11 +1104,11 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         <span class="completed-summary-label">✓ Đã giao (${completedItems.length}/${ord.items.length}):</span>
         <div class="completed-chips-list">
           ${completedItems.map(it => {
-            const menuItem = state.menu.find(m => m.id === it.menuItemId);
-            const name = menuItem ? menuItem.name : it.menuItemId;
-            const shortName = shortFoodName(name);
-            return `<span class="completed-chip" title="Đã giao đủ ${it.count} phần ${escapeHtml(name)}">✓ ${escapeHtml(shortName)}</span>`;
-          }).join('')}
+      const menuItem = state.menu.find(m => m.id === it.menuItemId);
+      const name = menuItem ? menuItem.name : it.menuItemId;
+      const shortName = shortFoodName(name);
+      return `<span class="completed-chip" title="Đã giao đủ ${it.count} phần ${escapeHtml(name)}">✓ ${escapeHtml(shortName)}</span>`;
+    }).join('')}
         </div>
       </div>
     ` : '';
@@ -1137,14 +1137,14 @@ export function renderSellingView(state: GameState, session: SellingSession): st
     const emoteIcon = isAngry
       ? ASSETS.icons.emoteAnger
       : patiencePercent < 25
-      ? ASSETS.icons.emoteSweat
-      : ord.isBunny || ord.isVip
-      ? ASSETS.icons.emoteHeart
-      : hasMatchInTray
-      ? ASSETS.icons.sparkle
-      : patiencePercent < 55
-      ? ASSETS.icons.emoteQuestion
-      : ASSETS.icons.emoteYum;
+        ? ASSETS.icons.emoteSweat
+        : ord.isBunny || ord.isVip
+          ? ASSETS.icons.emoteHeart
+          : hasMatchInTray
+            ? ASSETS.icons.sparkle
+            : patiencePercent < 55
+              ? ASSETS.icons.emoteQuestion
+              : ASSETS.icons.emoteYum;
 
     return `
       <div class="customer-card ${ord.isBunny ? 'bunny-card' : ''} ${ord.isVip ? 'vip-card' : ''} ${ord.isCriticVip ? 'critic-card' : ''} ${isAngry ? 'angry' : ''} ${isFirstInQueue ? 'active at-counter' : alleySlotClass}" 
@@ -1181,13 +1181,13 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <div class="cust-info-col">
             <div class="cust-name-row">
               <span class="cust-name">${visual.name}</span>
-              <span class="mood-indicator">${isAngry 
-                ? `<img src="${ASSETS.icons.emoteAnger}" class="badge-pixel-star-xs" alt="💢" />` 
-                : patienceColorClass === 'low' 
-                ? `<img src="${ASSETS.icons.emoteSweat}" class="badge-pixel-star-xs" alt="🥺" />` 
-                : (ord.isVip 
-                  ? `<img src="${ASSETS.icons.heart}" class="badge-pixel-star-xs" alt="" />` 
-                  : `<img src="${ASSETS.icons.sparkle}" class="badge-pixel-star-xs" alt="" />`)}</span>
+              <span class="mood-indicator">${isAngry
+        ? `<img src="${ASSETS.icons.emoteAnger}" class="badge-pixel-star-xs" alt="💢" />`
+        : patienceColorClass === 'low'
+          ? `<img src="${ASSETS.icons.emoteSweat}" class="badge-pixel-star-xs" alt="🥺" />`
+          : (ord.isVip
+            ? `<img src="${ASSETS.icons.heart}" class="badge-pixel-star-xs" alt="" />`
+            : `<img src="${ASSETS.icons.sparkle}" class="badge-pixel-star-xs" alt="" />`)}</span>
             </div>
             <div class="cust-badges-row">
               <span class="queue-pos-badge ${isFirstInQueue ? 'first' : 'wait'}">${queuePosText}</span>
@@ -1294,10 +1294,10 @@ export function renderSellingView(state: GameState, session: SellingSession): st
       const drinkTag = item.menuItemId === 'soda'
         ? 'COCA ĐÁ LẠNH'
         : item.menuItemId === 'seven_up'
-        ? '7UP CHANH ĐÁ'
-        : item.menuItemId === 'fanta_orange'
-        ? 'FANTA CAM ĐÁ'
-        : 'ƯỚP LẠNH';
+          ? '7UP CHANH ĐÁ'
+          : item.menuItemId === 'fanta_orange'
+            ? 'FANTA CAM ĐÁ'
+            : 'ƯỚP LẠNH';
       const qText = isDrink ? drinkTag : TRAY_QUALITY_LABEL[item.quality];
       const drinkClass = item.menuItemId === 'soda' ? 'drink-coca' : item.menuItemId === 'seven_up' ? 'drink-7up' : item.menuItemId === 'fanta_orange' ? 'drink-fanta' : '';
       const shortName = shortFoodName(item.name);
@@ -1387,7 +1387,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
         <!-- Customer Queue Lane (Khách vào/ra quán) -->
         <div class="customer-lane">
           ${(session.orders.length > 0 || (session.departingCustomers && session.departingCustomers.length > 0)) ? `${departingCardsHtml}${customerCardsHtml}` : (
-            (session.disruptionTimerSec ?? 0) > 0 ? `
+      (session.disruptionTimerSec ?? 0) > 0 ? `
               <div class="empty-queue disruption-alert" style="background: #fff1f0; border: 1.5px solid #ff4d4f; color: #cf1322; padding: 12px 14px; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(255,77,79,0.15);">
                 <div style="font-weight: 800; font-size: 0.92rem; display: flex; align-items: center; justify-content: center; gap: 6px;">
                   <img src="${ASSETS.icons.burntAlert}" class="btn-pixel-icon-sm" alt="" /> <span>QUÁN ĐANG HỖN LOẠN: KHÁCH CHẠY HẾT!</span>
@@ -1400,7 +1400,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
                 </div>
               </div>
             ` : `<div class="empty-queue"><img src="${ASSETS.icons.chickenCrispy}" class="btn-pixel-icon-xs" alt="" /> Mùi gà thơm phức bay khắp hẻm... Khách đang tấp nập tới!</div>`
-          )}
+    )}
         </div>
 
         <!-- Lớp vỉa hè lát đá Nam Bộ & gờ đá vỉa hè -->
@@ -1783,11 +1783,11 @@ export function renderStaffCornerCard(_state: GameState, _session: SellingSessio
   return '';
 }
 
-const FRY_ICON: Record<string, string> = { 
-  crispy_chicken: `<img src="${ASSETS.icons.chickenCrispy}" class="btn-pixel-icon-xs" alt="" />`, 
-  spicy_chicken: `<img src="${ASSETS.icons.chickenSpicy}" class="btn-pixel-icon-xs" alt="" />`, 
-  honey_garlic_chicken: `<img src="${ASSETS.icons.chickenHoney}" class="btn-pixel-icon-xs" alt="" />`, 
-  shake_fries: `<img src="${ASSETS.icons.shakeFries}" class="btn-pixel-icon-xs" alt="" />`, 
+const FRY_ICON: Record<string, string> = {
+  crispy_chicken: `<img src="${ASSETS.icons.chickenCrispy}" class="btn-pixel-icon-xs" alt="" />`,
+  spicy_chicken: `<img src="${ASSETS.icons.chickenSpicy}" class="btn-pixel-icon-xs" alt="" />`,
+  honey_garlic_chicken: `<img src="${ASSETS.icons.chickenHoney}" class="btn-pixel-icon-xs" alt="" />`,
+  shake_fries: `<img src="${ASSETS.icons.shakeFries}" class="btn-pixel-icon-xs" alt="" />`,
   popcorn_chicken: `<img src="${ASSETS.food.popcornChicken}" class="btn-pixel-icon-xs" alt="" />`,
   cheese_stick: `<img src="${ASSETS.icons.cheeseStick}" class="btn-pixel-icon-xs" alt="" />`
 };

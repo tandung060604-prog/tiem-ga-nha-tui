@@ -4,7 +4,8 @@ import {
   getBadgeProgress,
   getAllBadgesProgress,
   getClaimableBadgesCount,
-  claimBadgeReward
+  claimBadgeReward,
+  claimAllBadgesReward
 } from '../src/core/achievementsEngine';
 import { renderAchievementsWallModal } from '../src/ui/components/AchievementsWallModal';
 import { createInitialState } from '../src/core/state';
@@ -30,19 +31,19 @@ describe('Heritage Badges & Wall of Fame System (Bằng Khen Tổ Dân Phố)', 
   describe('2. Progress & Eligibility Engine', () => {
     it('calculates progress accurately based on game state stats', () => {
       const state = createInitialState();
-      state.lifetimeStats.perfectFriedCount = 25; // 25 / 50 (50%)
+      state.lifetimeStats.perfectFriedCount = 30; // 30 / 60 (50%)
 
       const perfectBadge = HERITAGE_BADGES.find(b => b.id === 'badge_ban_tay_vang')!;
       const prog = getBadgeProgress(perfectBadge, state);
 
-      expect(prog.current).toBe(25);
-      expect(prog.target).toBe(50);
+      expect(prog.current).toBe(30);
+      expect(prog.target).toBe(60);
       expect(prog.percent).toBe(50);
       expect(prog.isCompleted).toBe(false);
       expect(prog.isClaimed).toBe(false);
 
-      // Khi đạt 50 mẻ
-      state.lifetimeStats.perfectFriedCount = 50;
+      // Khi đạt 60 mẻ
+      state.lifetimeStats.perfectFriedCount = 60;
       const progComplete = getBadgeProgress(perfectBadge, state);
       expect(progComplete.isCompleted).toBe(true);
       expect(progComplete.percent).toBe(100);
@@ -58,13 +59,13 @@ describe('Heritage Badges & Wall of Fame System (Bằng Khen Tổ Dân Phố)', 
       expect(cleanOilProg.current).toBe(0);
       expect(cleanOilProg.isCompleted).toBe(false);
 
-      // Đạt đủ 5 ngày sạch dầu
-      freshState.cleanOilStreakDays = 5;
+      // Đạt đủ 7 ngày sạch dầu
+      freshState.cleanOilStreakDays = 7;
       expect(getBadgeProgress(cleanOilBadge, freshState).isCompleted).toBe(true);
 
       // Thêm 2 badge khác hoàn thành
       freshState.lifetimeStats.perfectFriedCount = 60; // Badge 1 complete
-      freshState.thiefStats = { totalCaught: 4, totalEscaped: 0, totalFinesPaid: 0 }; // Badge 2 complete
+      freshState.thiefStats = { totalCaught: 5, totalEscaped: 0, totalFinesPaid: 0 }; // Badge 2 complete
 
       const claimable = getClaimableBadgesCount(freshState);
       expect(claimable).toBeGreaterThanOrEqual(3);
@@ -74,7 +75,7 @@ describe('Heritage Badges & Wall of Fame System (Bằng Khen Tổ Dân Phố)', 
   describe('3. Reward Claiming Flow', () => {
     it('refuses reward if badge condition is not met', () => {
       const state = createInitialState();
-      state.lifetimeStats.perfectFriedCount = 10; // Chưa đủ 50
+      state.lifetimeStats.perfectFriedCount = 10; // Chưa đủ 60
 
       const result = claimBadgeReward(state, 'badge_ban_tay_vang');
       expect(result.success).toBe(false);
@@ -83,28 +84,46 @@ describe('Heritage Badges & Wall of Fame System (Bằng Khen Tổ Dân Phố)', 
 
     it('claims reward, adds money, boosts karma, and sets claimed state', () => {
       const state = createInitialState();
-      state.lifetimeStats.perfectFriedCount = 55;
+      state.lifetimeStats.perfectFriedCount = 60;
       const initialMoney = state.money;
       const initialCraft = state.karma.craftsmanship;
 
       const result = claimBadgeReward(state, 'badge_ban_tay_vang');
       expect(result.success).toBe(true);
-      expect(state.money).toBe(initialMoney + 50000);
-      expect(state.karma.craftsmanship).toBe(initialCraft + 10);
+      expect(state.money).toBe(initialMoney + 75000);
+      expect(state.karma.craftsmanship).toBe(initialCraft + 12);
       expect(state.claimedHeritageBadgeIds).toContain('badge_ban_tay_vang');
 
       // Thử nhận lần thứ 2: Không được nhận trùng
       const resultDuplicate = claimBadgeReward(state, 'badge_ban_tay_vang');
       expect(resultDuplicate.success).toBe(false);
       expect(resultDuplicate.message).toContain('đã nhận');
-      expect(state.money).toBe(initialMoney + 50000); // Tiền không tăng thêm
+      expect(state.money).toBe(initialMoney + 75000); // Tiền không tăng thêm
+    });
+
+    it('claims all pending badges in a single tap with claimAllBadgesReward', () => {
+      const state = createInitialState();
+      state.lifetimeStats.perfectFriedCount = 60; // Badge 1
+      state.cleanOilStreakDays = 7; // Badge 2
+      state.thiefStats = { totalCaught: 5, totalEscaped: 0, totalFinesPaid: 0 }; // Badge 3
+
+      const claimableCount = getClaimableBadgesCount(state);
+      expect(claimableCount).toBeGreaterThanOrEqual(3);
+
+      const initialMoney = state.money;
+      const res = claimAllBadgesReward(state);
+      expect(res.success).toBe(true);
+      expect(res.claimedCount).toBeGreaterThanOrEqual(claimableCount);
+      expect(res.totalMoney).toBeGreaterThan(0);
+      expect(state.money).toBe(initialMoney + res.totalMoney);
+      expect(getClaimableBadgesCount(state)).toBe(0);
     });
   });
 
   describe('4. UI Modal Rendering', () => {
     it('renders wall of fame modal with red seal stamps and category filters', () => {
       const state = createInitialState();
-      state.lifetimeStats.perfectFriedCount = 50; // Hoàn thành
+      state.lifetimeStats.perfectFriedCount = 60; // Hoàn thành
 
       const html = renderAchievementsWallModal(state, 'all');
       expect(html).toContain('modal-achievements-wall');

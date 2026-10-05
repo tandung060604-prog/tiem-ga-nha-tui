@@ -32,8 +32,13 @@
 }
 
 @keyframes lanternSway {
-  0% { transform: rotate(-5deg); }
-  100% { transform: rotate(5deg); }
+  0% {
+    transform: rotate(-5deg);
+  }
+
+  100% {
+    transform: rotate(5deg);
+  }
 }
 
 .alley-lantern-glow {
@@ -49,8 +54,17 @@
 }
 
 @keyframes lanternFlicker {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 0.9; transform: scale(1.15); }
+
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.9;
+    transform: scale(1.15);
+  }
 }
 
 .alley-sidewalk-sign {
@@ -157,9 +171,20 @@
 }
 
 @keyframes emoteBounce {
-  0% { transform: scale(0.3) translateY(8px); opacity: 0; }
-  65% { transform: scale(1.2) translateY(-2px); opacity: 1; }
-  100% { transform: scale(1) translateY(0); opacity: 1; }
+  0% {
+    transform: scale(0.3) translateY(8px);
+    opacity: 0;
+  }
+
+  65% {
+    transform: scale(1.2) translateY(-2px);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
 }
 
 .customer-card.active,
@@ -195,8 +220,13 @@
 }
 
 @keyframes angryShake {
-  0% { transform: translateX(-3px) rotate(-1deg); }
-  100% { transform: translateX(3px) rotate(1deg); }
+  0% {
+    transform: translateX(-3px) rotate(-1deg);
+  }
+
+  100% {
+    transform: translateX(3px) rotate(1deg);
+  }
 }
 
 /* 2D Character Stage inside Customer Card */
@@ -245,16 +275,38 @@
 }
 
 @keyframes customerReceiveDelight {
-  0% { transform: scale(1) translateY(0); }
-  35% { transform: scale(1.04) translateY(-6px); }
-  70% { transform: scale(0.99) translateY(0); }
-  100% { transform: scale(1) translateY(0); }
+  0% {
+    transform: scale(1) translateY(0);
+  }
+
+  35% {
+    transform: scale(1.04) translateY(-6px);
+  }
+
+  70% {
+    transform: scale(0.99) translateY(0);
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+  }
 }
 
 @keyframes customerWalkOutAlley {
-  0% { transform: translateX(0) scale(1); opacity: 1; }
-  25% { transform: translateX(25px) scale(0.98); opacity: 0.95; }
-  100% { transform: translateX(130px) scale(0.85); opacity: 0; }
+  0% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+
+  25% {
+    transform: translateX(25px) scale(0.98);
+    opacity: 0.95;
+  }
+
+  100% {
+    transform: translateX(130px) scale(0.85);
+    opacity: 0;
+  }
 }
 
 /* 2D Actor Receiving & Leaving Staging */
@@ -264,12 +316,18 @@
 }
 
 @keyframes charHopHappy {
-  0% { transform: translateY(0) rotate(-1deg); }
-  100% { transform: translateY(-6px) rotate(2deg); }
+  0% {
+    transform: translateY(0) rotate(-1deg);
+  }
+
+  100% {
+    transform: translateY(-6px) rotate(2deg);
+  }
 }
 
 .char-actor.char-flip-exit {
-  transform: scaleX(-1); /* Lật người sang hướng bước đi ra hẻm */
+  transform: scaleX(-1);
+  /* Lật người sang hướng bước đi ra hẻm */
 }
 
 .char-sprite-img.walking-out {
@@ -281,8 +339,15 @@
 }
 
 @keyframes charShadowPacing {
-  0% { transform: scaleX(1.15); opacity: 0.35; }
-  100% { transform: scaleX(0.85); opacity: 0.2; }
+  0% {
+    transform: scaleX(1.15);
+    opacity: 0.35;
+  }
+
+  100% {
+    transform: scaleX(0.85);
+    opacity: 0.2;
+  }
 }
 
 /* Túi Giấy Kraft Mang Về Đính Kèm (Takeaway Bag Prop) */
@@ -304,8 +369,13 @@
 }
 
 @keyframes bagWiggle {
-  0% { transform: rotate(-3deg) translateY(0); }
-  100% { transform: rotate(3deg) translateY(-2px); }
+  0% {
+    transform: rotate(-3deg) translateY(0);
+  }
+
+  100% {
+    transform: rotate(3deg) translateY(-2px);
+  }
 }
 
 .prop-takeaway-bag .bag-steam {
@@ -315,8 +385,15 @@
 }
 
 @keyframes steamRise {
-  0% { transform: translateY(0); opacity: 0.8; }
-  100% { transform: translateY(-5px); opacity: 0; }
+  0% {
+    transform: translateY(0);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translateY(-5px);
+    opacity: 0;
+  }
 }
 
 /* Phiếu Order Hoàn Tất */
@@ -402,8 +479,15 @@
 }
 
 @keyframes vipAuraPulse {
-  0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.55; }
-  100% { transform: translate(-50%, -50%) scale(1.18); opacity: 0.9; }
+  0% {
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0.55;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1.18);
+    opacity: 0.9;
+  }
 }
 
 /* 2D Actor Motions & Life-like Movements */
@@ -412,9 +496,17 @@
 }
 
 @keyframes charIdleBreath {
-  0% { transform: translateY(0) scale(1, 1); }
-  50% { transform: translateY(-2px) scale(1.02, 0.98); }
-  100% { transform: translateY(0) scale(1, 1); }
+  0% {
+    transform: translateY(0) scale(1, 1);
+  }
+
+  50% {
+    transform: translateY(-2px) scale(1.02, 0.98);
+  }
+
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
 }
 
 .char-actor.char-walk-in {
@@ -422,9 +514,20 @@
 }
 
 @keyframes customerWalkInEntrance {
-  0% { transform: translateX(35px) scale(0.88); opacity: 0; }
-  60% { transform: translateX(-3px) scale(1.03); opacity: 0.95; }
-  100% { transform: translateX(0) scale(1); opacity: 1; }
+  0% {
+    transform: translateX(35px) scale(0.88);
+    opacity: 0;
+  }
+
+  60% {
+    transform: translateX(-3px) scale(1.03);
+    opacity: 0.95;
+  }
+
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
 }
 
 .char-actor.char-tremble-angry .char-sprite-img {
@@ -433,8 +536,13 @@
 }
 
 @keyframes charAngryTremble {
-  0% { transform: translateX(-2.5px) rotate(-1.5deg); }
-  100% { transform: translateX(2.5px) rotate(1.5deg); }
+  0% {
+    transform: translateX(-2.5px) rotate(-1.5deg);
+  }
+
+  100% {
+    transform: translateX(2.5px) rotate(1.5deg);
+  }
 }
 
 .char-shadow.shadow-idle {
@@ -442,9 +550,20 @@
 }
 
 @keyframes charShadowBreath {
-  0% { transform: scaleX(1); opacity: 0.24; }
-  50% { transform: scaleX(0.88); opacity: 0.18; }
-  100% { transform: scaleX(1); opacity: 0.24; }
+  0% {
+    transform: scaleX(1);
+    opacity: 0.24;
+  }
+
+  50% {
+    transform: scaleX(0.88);
+    opacity: 0.18;
+  }
+
+  100% {
+    transform: scaleX(1);
+    opacity: 0.24;
+  }
 }
 
 .focus-actor {
@@ -456,20 +575,34 @@
 }
 
 @keyframes customerWalkIn {
-  0% { transform: translateX(35px) scale(0.9); opacity: 0; }
-  100% { transform: translateX(0) scale(1); opacity: 1; }
+  0% {
+    transform: translateX(35px) scale(0.9);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
 }
 
 @keyframes customerWalkOut {
-  0% { transform: translateX(0) scale(1); opacity: 1; }
-  100% { transform: translateX(-45px) scale(0.85); opacity: 0; }
+  0% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(-45px) scale(0.85);
+    opacity: 0;
+  }
 }
 
 .char-sprite-img {
   width: 34px;
   height: 34px;
   object-fit: contain;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
   transition: transform 0.2s ease, filter 0.2s ease;
 }
 
@@ -487,21 +620,45 @@
 }
 
 @keyframes charStepCycle {
-  0% { transform: translateY(0) rotate(-3deg); }
-  50% { transform: translateY(-4px) rotate(0deg); }
-  100% { transform: translateY(0) rotate(3deg); }
+  0% {
+    transform: translateY(0) rotate(-3deg);
+  }
+
+  50% {
+    transform: translateY(-4px) rotate(0deg);
+  }
+
+  100% {
+    transform: translateY(0) rotate(3deg);
+  }
 }
 
 @keyframes charIdleBob {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
-  100% { transform: translateY(0); }
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-2px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
 }
 
 @keyframes charAngryHiss {
-  0% { transform: scale(1) translateY(0); }
-  50% { transform: scale(1.08) translateY(-2px); }
-  100% { transform: scale(1) translateY(0); }
+  0% {
+    transform: scale(1) translateY(0);
+  }
+
+  50% {
+    transform: scale(1.08) translateY(-2px);
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+  }
 }
 
 .char-avatar-circle {
@@ -521,7 +678,7 @@
 .char-shadow {
   width: 28px;
   height: 5px;
-  background: rgba(0,0,0,0.22);
+  background: rgba(0, 0, 0, 0.22);
   border-radius: 50%;
   margin-top: -3px;
   transition: transform 0.3s ease;
@@ -605,8 +762,15 @@
 }
 
 @keyframes firstQueuePulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.04); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.04);
+  }
 }
 
 .cust-badge.trait-badge {
@@ -617,23 +781,109 @@
   padding: 1px 4px;
 }
 
-.cust-badge.bunny-badge { background: #ffe4e6; color: #e11d48; border: 1px solid #fecdd3; }
-.cust-badge.vip-badge { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; box-shadow: 0 1px 3px rgba(245, 158, 11, 0.25); }
-.cust-badge.mystery-badge { background: #ede9fe; color: #6d28d9; border: 1px solid #ddd6fe; }
-.cust-badge.delivery-badge { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
-.cust-badge.student-badge { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
-.cust-badge.office-badge { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
-.cust-badge.genz-badge { background: #fae8ff; color: #86198f; border: 1px solid #f5d0fe; }
-.cust-badge.demanding-badge { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
-.cust-badge.family-badge { background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; }
-.cust-badge.kid-badge { background: #fef9c3; color: #a16207; border: 1px solid #fef08a; }
-.cust-badge.local-badge { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
-.cust-badge.regular-badge { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; }
-.cust-badge.worker-badge { background: #e0f2fe; color: #0284c7; border: 1px solid #7dd3fc; }
-.cust-badge.elder-badge { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-.cust-badge.security-badge { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
-.cust-badge.staff-badge { background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; }
-.cust-badge.thief-badge { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; font-weight: 900; }
+.cust-badge.bunny-badge {
+  background: #ffe4e6;
+  color: #e11d48;
+  border: 1px solid #fecdd3;
+}
+
+.cust-badge.vip-badge {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+  box-shadow: 0 1px 3px rgba(245, 158, 11, 0.25);
+}
+
+.cust-badge.mystery-badge {
+  background: #ede9fe;
+  color: #6d28d9;
+  border: 1px solid #ddd6fe;
+}
+
+.cust-badge.delivery-badge {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+.cust-badge.student-badge {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #7dd3fc;
+}
+
+.cust-badge.office-badge {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.cust-badge.genz-badge {
+  background: #fae8ff;
+  color: #86198f;
+  border: 1px solid #f5d0fe;
+}
+
+.cust-badge.demanding-badge {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+.cust-badge.family-badge {
+  background: #ffedd5;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+.cust-badge.kid-badge {
+  background: #fef9c3;
+  color: #a16207;
+  border: 1px solid #fef08a;
+}
+
+.cust-badge.local-badge {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.cust-badge.regular-badge {
+  background: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+}
+
+.cust-badge.worker-badge {
+  background: #e0f2fe;
+  color: #0284c7;
+  border: 1px solid #7dd3fc;
+}
+
+.cust-badge.elder-badge {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.cust-badge.security-badge {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+.cust-badge.staff-badge {
+  background: #ffedd5;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+.cust-badge.thief-badge {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+  font-weight: 900;
+}
 
 /* Customer Header legacy support */
 .cust-header {
@@ -820,9 +1070,12 @@
 }
 
 @keyframes condimentPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.05);
   }
@@ -919,8 +1172,15 @@
 }
 
 @keyframes partialBlink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
 }
 
 /* Patience Bar */
@@ -982,10 +1242,13 @@
 }
 
 @keyframes bunnyPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 4px 14px rgba(255, 152, 0, 0.35);
     border-color: #ff9800;
   }
+
   50% {
     box-shadow: 0 6px 20px rgba(255, 87, 34, 0.55);
     border-color: #ff5722;
@@ -1031,7 +1294,8 @@
   width: 100%;
   box-sizing: border-box;
   margin-bottom: 4px;
-  display: none; /* Hide on background cards */
+  display: none;
+  /* Hide on background cards */
 }
 
 .customer-card.active .thought-bubble,
@@ -1054,6 +1318,7 @@
   box-shadow: 0 3px 10px rgba(34, 197, 94, 0.2);
   animation: thoughtBounce 2.5s infinite ease-in-out;
 }
+
 .thought-bubble.happy::after,
 .customer-card[data-mood="happy"] .thought-bubble::after {
   border-color: #22c55e transparent;
@@ -1068,6 +1333,7 @@
   box-shadow: 0 3px 8px rgba(234, 179, 8, 0.2);
   animation: thoughtGentle 3s infinite ease-in-out;
 }
+
 .thought-bubble.waiting::after,
 .customer-card[data-mood="waiting"] .thought-bubble::after {
   border-color: #eab308 transparent;
@@ -1082,6 +1348,7 @@
   box-shadow: 0 3px 10px rgba(249, 115, 22, 0.25);
   animation: thoughtWobble 1.6s infinite ease-in-out;
 }
+
 .thought-bubble.impatient::after,
 .customer-card[data-mood="impatient"] .thought-bubble::after {
   border-color: #f97316 transparent;
@@ -1099,6 +1366,7 @@
   box-shadow: 0 3px 12px rgba(239, 68, 68, 0.35);
   animation: thoughtShudder 0.4s infinite alternate ease-in-out;
 }
+
 .thought-bubble.leaving::after,
 .thought-bubble.angry::after,
 .customer-card[data-mood="leaving"] .thought-bubble::after,
@@ -1108,28 +1376,58 @@
 }
 
 @keyframes thoughtBounce {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-3px); }
+
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  50% {
+    transform: translateX(-50%) translateY(-3px);
+  }
 }
 
 @keyframes thoughtGentle {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-2px); }
+
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  50% {
+    transform: translateX(-50%) translateY(-2px);
+  }
 }
 
 @keyframes thoughtWobble {
-  0%, 100% { transform: translateX(-50%) rotate(0deg); }
-  25% { transform: translateX(-50%) rotate(-1.5deg) translateY(-2px); }
-  75% { transform: translateX(-50%) rotate(1.5deg) translateY(-2px); }
+
+  0%,
+  100% {
+    transform: translateX(-50%) rotate(0deg);
+  }
+
+  25% {
+    transform: translateX(-50%) rotate(-1.5deg) translateY(-2px);
+  }
+
+  75% {
+    transform: translateX(-50%) rotate(1.5deg) translateY(-2px);
+  }
 }
 
 @keyframes thoughtShudder {
-  0% { transform: translateX(-52%) rotate(-2deg) scale(1); }
-  100% { transform: translateX(-48%) rotate(2deg) scale(1.04); }
+  0% {
+    transform: translateX(-52%) rotate(-2deg) scale(1);
+  }
+
+  100% {
+    transform: translateX(-48%) rotate(2deg) scale(1.04);
+  }
 }
 
 /* Prefers Reduced Motion Accessibility for Customers */
 @media (prefers-reduced-motion: reduce) {
+
   .thought-bubble,
   .thought-bubble.happy,
   .thought-bubble.waiting,
@@ -1139,6 +1437,7 @@
     animation: none !important;
     transform: translateX(-50%) !important;
   }
+
   .customer-card.angry,
   .char-actor,
   .customer-card.leaving,
@@ -1159,6 +1458,7 @@
     min-height: 98px;
     max-height: 110px;
   }
+
   .customer-card {
     flex: 0 0 155px;
     min-height: 96px;
@@ -1166,40 +1466,49 @@
     padding: 2px 4px;
     gap: 2px;
   }
+
   .cust-stage {
     min-height: 34px;
     max-height: 38px;
     gap: 3px;
   }
+
   .char-actor {
     width: 34px;
     height: 36px;
   }
+
   .char-sprite-img {
     width: 32px;
     height: 32px;
   }
+
   .char-shadow {
     width: 20px;
     height: 3px;
   }
+
   .speech-bubble {
     padding: 2px 3px;
     max-height: 58px;
     gap: 1px;
   }
+
   .order-row {
     min-height: 20px;
     height: auto;
   }
+
   .order-item-title {
     gap: 2px;
     min-width: 0;
   }
+
   .order-food-name {
     font-size: 0.64rem;
     line-height: 1.1;
   }
+
   .order-condiment {
     font-size: 0.5rem;
     padding: 1px 2px;
@@ -1253,7 +1562,7 @@
   padding: 1px 3px;
   border: 1px solid #d97706;
   white-space: nowrap;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
   pointer-events: none;
 }
 
@@ -1286,14 +1595,27 @@
 }
 
 @keyframes petTailWag {
-  0% { transform: rotate(-10deg) scale(1.08); }
-  100% { transform: rotate(10deg) scale(1.08); }
+  0% {
+    transform: rotate(-10deg) scale(1.08);
+  }
+
+  100% {
+    transform: rotate(10deg) scale(1.08);
+  }
 }
 
 @keyframes petCatStretch {
-  0% { transform: scaleX(1) scaleY(1); }
-  40% { transform: scaleX(1.18) scaleY(0.82) translateY(2px); }
-  100% { transform: scaleX(1) scaleY(1); }
+  0% {
+    transform: scaleX(1) scaleY(1);
+  }
+
+  40% {
+    transform: scaleX(1.18) scaleY(0.82) translateY(2px);
+  }
+
+  100% {
+    transform: scaleX(1) scaleY(1);
+  }
 }
 
 .alley-pest-actor.rat {
@@ -1305,7 +1627,8 @@
   animation: pestRatScuttle 6s infinite ease-in-out;
 }
 
-.pet-walk-sprite, .pest-scuttle-sprite {
+.pet-walk-sprite,
+.pest-scuttle-sprite {
   width: 24px;
   height: 24px;
   object-fit: contain;
@@ -1313,26 +1636,70 @@
 }
 
 @keyframes petDogTrot {
-  0% { transform: translateX(0) scaleX(1); }
-  45% { transform: translateX(-10px) scaleX(1); }
-  50% { transform: translateX(-10px) scaleX(-1); }
-  95% { transform: translateX(0) scaleX(-1); }
-  100% { transform: translateX(0) scaleX(1); }
+  0% {
+    transform: translateX(0) scaleX(1);
+  }
+
+  45% {
+    transform: translateX(-10px) scaleX(1);
+  }
+
+  50% {
+    transform: translateX(-10px) scaleX(-1);
+  }
+
+  95% {
+    transform: translateX(0) scaleX(-1);
+  }
+
+  100% {
+    transform: translateX(0) scaleX(1);
+  }
 }
 
 @keyframes petCatLaze {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
-  100% { transform: translateY(0); }
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-2px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
 }
 
 @keyframes pestRatScuttle {
-  0% { transform: translateX(-35px) scaleX(1); opacity: 0; }
-  15% { opacity: 0.9; }
-  45% { transform: translateX(50px) scaleX(1); opacity: 0.9; }
-  50% { transform: translateX(50px) scaleX(-1); opacity: 0.9; }
-  85% { transform: translateX(-15px) scaleX(-1); opacity: 0.9; }
-  100% { transform: translateX(-35px) scaleX(1); opacity: 0; }
+  0% {
+    transform: translateX(-35px) scaleX(1);
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 0.9;
+  }
+
+  45% {
+    transform: translateX(50px) scaleX(1);
+    opacity: 0.9;
+  }
+
+  50% {
+    transform: translateX(50px) scaleX(-1);
+    opacity: 0.9;
+  }
+
+  85% {
+    transform: translateX(-15px) scaleX(-1);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: translateX(-35px) scaleX(1);
+    opacity: 0;
+  }
 }
 
 /* Card Action Buttons (Hủy đơn xin lỗi & Giao đơn linh hoạt) */
@@ -1421,8 +1788,15 @@
 }
 
 @keyframes vipPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 /* --- GÓC BÀN ĂN HIÊN QUÁN (DINE-IN PATIO TABLES) - STREET BISTRO TERRACE --- */
@@ -1567,8 +1941,13 @@
 }
 
 @keyframes eatingGlow {
-  0% { box-shadow: 0 0 4px rgba(245, 158, 11, 0.2); }
-  100% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.45); }
+  0% {
+    box-shadow: 0 0 4px rgba(245, 158, 11, 0.2);
+  }
+
+  100% {
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.45);
+  }
 }
 
 .patio-guest-avatar-wrap {
@@ -1593,10 +1972,21 @@
 }
 
 @keyframes chewHeadBob {
-  0% { transform: translateY(0) rotate(0deg); }
-  35% { transform: translateY(-2px) rotate(-1.5deg); }
-  75% { transform: translateY(1px) rotate(1.5deg); }
-  100% { transform: translateY(0) rotate(0deg); }
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  35% {
+    transform: translateY(-2px) rotate(-1.5deg);
+  }
+
+  75% {
+    transform: translateY(1px) rotate(1.5deg);
+  }
+
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
 }
 
 .patio-steam-puff {
@@ -1611,9 +2001,20 @@
 }
 
 @keyframes patioSteamFloat {
-  0% { transform: translateY(0) scale(0.8); opacity: 0; }
-  35% { opacity: 0.9; transform: translateY(-4px) scale(1.05); }
-  100% { transform: translateY(-11px) scale(1.25); opacity: 0; }
+  0% {
+    transform: translateY(0) scale(0.8);
+    opacity: 0;
+  }
+
+  35% {
+    opacity: 0.9;
+    transform: translateY(-4px) scale(1.05);
+  }
+
+  100% {
+    transform: translateY(-11px) scale(1.25);
+    opacity: 0;
+  }
 }
 
 .patio-eating-bubble {
@@ -1751,9 +2152,11 @@
   0% {
     transform: translate(-3px, -2px) rotate(-10deg) scale(1.05);
   }
+
   50% {
     transform: translate(2px, 2px) rotate(8deg) scale(0.98);
   }
+
   100% {
     transform: translate(3px, -2px) rotate(12deg) scale(1.06);
   }
@@ -1792,10 +2195,12 @@
     transform: translateY(4px) scale(0.6);
     opacity: 0.2;
   }
+
   50% {
     transform: translateY(-2px) scale(1.1);
     opacity: 1;
   }
+
   100% {
     transform: translateY(-8px) scale(1.3);
     opacity: 0;
@@ -1807,6 +2212,7 @@
     transform: scale(0.7) rotate(0deg);
     opacity: 0.5;
   }
+
   100% {
     transform: scale(1.2) rotate(45deg);
     opacity: 1;
@@ -1880,9 +2286,17 @@
 }
 
 @keyframes photoFlashPulse {
-  0% { filter: brightness(1); }
-  50% { filter: brightness(1.3); }
-  100% { filter: brightness(1); }
+  0% {
+    filter: brightness(1);
+  }
+
+  50% {
+    filter: brightness(1.3);
+  }
+
+  100% {
+    filter: brightness(1);
+  }
 }
 
 .patio-camera-flash {
@@ -1895,11 +2309,19 @@
 }
 
 @keyframes flashSparkle {
-  from { transform: scale(0.85) rotate(-10deg); opacity: 0.75; }
-  to { transform: scale(1.25) rotate(20deg); opacity: 1; }
+  from {
+    transform: scale(0.85) rotate(-10deg);
+    opacity: 0.75;
+  }
+
+  to {
+    transform: scale(1.25) rotate(20deg);
+    opacity: 1;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .alley-lantern-pixel,
   .alley-lantern-glow,
   .vip-aura-glow,
@@ -1974,6 +2396,13 @@
 }
 
 @keyframes dietaryPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.04); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.04);
+  }
 }

@@ -76,8 +76,8 @@ describe('Kệ Cúp Vàng Tổ Dân Phố & Hệ Thống 44 Bằng Khen Mở R�
       const sauceBadge = HERITAGE_BADGES.find(b => b.id === 'badge_bac_thay_gia_truyen')!;
       const petBadge = HERITAGE_BADGES.find(b => b.id === 'badge_ban_than_thu_cung')!;
 
-      expect(getBadgeProgress(sauceBadge, state).target).toBe(5);
-      expect(getBadgeProgress(petBadge, state).target).toBe(5);
+      expect(getBadgeProgress(sauceBadge, state).target).toBe(6);
+      expect(getBadgeProgress(petBadge, state).target).toBe(7);
     });
   });
 

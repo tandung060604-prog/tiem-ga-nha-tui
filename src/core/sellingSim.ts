@@ -349,10 +349,11 @@ export function tickSelling(session: SellingSession, gameDt: number, ctx: TickCo
   const remainingToSpawn = Math.max(0, ctx.expectedCustomers - (session.spawnedCount ?? 0));
   const hoursLeft = Math.max(0.1, CLOSE_HOUR - session.gameHour);
   const rushFactor = isRushHour(session.gameHour) ? 0.85 : 1.0;
-  // Breather Throttling (Jev Option B - Confidence 1.0): Hàng đợi đông (>=3) tự động giãn nhịp để người chơi có khoảng thở xử lý
+  // Breather Throttling: Hàng đợi đông (>=3) hoặc bàn bẩn cần lau tự động giãn nhịp để người chơi có khoảng thở
   const queueBreather = session.orders.length >= 4 ? 1.75 : session.orders.length >= 3 ? 1.35 : 1.0;
+  const tableBreather = session.dineInTables?.some(t => t.status === 'dirty') ? 1.25 : 1.0;
   const baseInterval = remainingToSpawn > 0 
-    ? ((hoursLeft * GAME_HOUR_MS) / (remainingToSpawn + 0.3)) * rushFactor * queueBreather
+    ? ((hoursLeft * GAME_HOUR_MS) / (remainingToSpawn + 0.3)) * rushFactor * queueBreather * tableBreather
     : EconomyEngine.spawnIntervalMs(ctx.expectedCustomers, isRushHour(session.gameHour));
   const dynamicInterval = Math.max(3800, Math.min(25000, baseInterval));
 

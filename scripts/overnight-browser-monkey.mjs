@@ -679,11 +679,20 @@ class OvernightMonkey {
         return true;
       }
 
-      // 3. Phục vụ món cho khách (Nút 'LÊN MÓN' .btn-serve-cust, #btn-serve-order hoặc Phiếu Gỗ Mini .wooden-order-ticket.is-ready-in-tray)
-      const serveBtn = page.locator('.wooden-order-ticket.is-ready-in-tray, .btn-serve-cust:not([disabled]), #btn-serve-order:not([disabled])');
+      // 3. Phục vụ món cho khách: Ưu tiên Quầy Hero Counter (#1) và các nút LÊN MÓN
+      const serveBtn = page.locator('.hero-counter-card .btn-serve-cust:not([disabled]), .btn-mini-serve:not([disabled]), .wooden-order-ticket.is-ready-in-tray, .btn-serve-cust:not([disabled]), #btn-serve-order:not([disabled])');
       if (await serveBtn.first().isVisible({ timeout: 30 }).catch(() => false)) {
         await serveBtn.first().click({ force: true }).catch(() => {});
         return true;
+      }
+
+      // 3b. Tương tác hàng chờ Mini-Queue: Chạm vào khách chờ có món sẵn sàng để đưa lên quầy
+      if (Math.random() < 0.25) {
+        const miniReady = page.locator('.mini-card:has(.mini-chip.is-ready-in-tray)');
+        if (await miniReady.first().isVisible({ timeout: 30 }).catch(() => false)) {
+          await miniReady.first().click({ force: true }).catch(() => {});
+          return true;
+        }
       }
 
       // 4. Thả nguyên liệu vào chảo rán từ khay sơ chế (Đùi, má đùi, khoai, gà viên, phô mai, khay tiếp tế khẩn cấp)
