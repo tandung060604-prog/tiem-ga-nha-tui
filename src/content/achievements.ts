@@ -568,17 +568,17 @@ export const HERITAGE_BADGES: HeritageBadge[] = [
   },
   {
     id: 'badge_thinh_gia_trung_thanh',
-    title: 'Thính Giả Tri Âm Đài Đêm FM 99.9',
-    kicker: 'ĐÀI TIẾNG NÓI NHÂN DÂN TP.HCM',
-    icon: '📻',
+    title: 'Bậc Thầy Hộc Tủ Đồ Nghề Bếp Gà',
+    kicker: 'HỘC TỦ TRUYỀN ĐỜI TIỆM GÀ',
+    icon: '🗄️',
     category: 'legend',
     categoryLabel: 'Huyền Thoại & Sử Ký',
     targetCount: 10,
-    requirementDesc: 'Lắng nghe làn sóng FM 99.9 MHz và tiếp nhận lời khuyên Buff Đêm đủ 10 lần',
+    requirementDesc: 'Tận dụng hộc tủ đồ nghề (sốt bí truyền, thú cưng hiên quán hoặc ca đêm) tích lũy 10 kinh nghiệm',
     rewardMoney: 95000,
     rewardKarma: { craftsmanship: 12, community: 12 },
-    honorTitle: 'Giai Điệu Hoài Niệm',
-    quote: 'Tiếng đài radio rè rè vang lên trong đêm vắng, những ca khúc xưa cũ cùng lời khuyên mộc mạc tiếp thêm nghị lực cho ngày mới.',
+    honorTitle: 'Bậc Thầy Đồ Nghề',
+    quote: 'Mỗi món đồ trong hộc tủ bếp gà đều thấm đượm tâm huyết và bí quyết cha truyền con nối của tiệm.',
   },
   {
     id: 'badge_chinh_phuc_ca_dem',
@@ -772,8 +772,14 @@ export function getBadgeCurrentProgress(badgeId: HeritageBadgeId, state: GameSta
     case 'badge_huyen_thoai_100_ngay':
       return state.day ?? 1;
 
-    case 'badge_thinh_gia_trung_thanh':
-      return (state.lastRadioBroadcastDay ?? 0) > 0 ? Math.min(10, state.day ?? 1) : 0;
+    case 'badge_thinh_gia_trung_thanh': {
+      const sauceUses = state.secretSauceDay ? 3 : 0;
+      const petLvl = state.petPatio?.patioLevel ?? 0;
+      const petHappiness = (state.petPatio?.pets || []).reduce((acc, p) => acc + (p.happiness > 50 ? 1 : 0), 0);
+      const endlessRecord = (state.endlessRecord?.highestWave ?? 0) > 0 ? 2 : 0;
+      const basePoints = Math.min(5, Math.floor((state.day ?? 1) / 2));
+      return Math.min(10, basePoints + sauceUses + petLvl + petHappiness + endlessRecord);
+    }
 
     case 'badge_chinh_phuc_ca_dem':
       return (state.endlessRecord?.highestWave ?? 0);

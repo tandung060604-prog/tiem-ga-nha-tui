@@ -1342,11 +1342,7 @@ export function renderSellingView(state: GameState, session: SellingSession): st
           <span class="ambience-title">${shiftInfo.title}</span>
           <span class="ambience-sub">· ${shiftInfo.sub}</span>
         </div>
-        ${(state.activeRadioBuff && state.activeRadioBuff.activeForDay === state.day) ? `
-          <span class="radio-buff-hud-badge" style="background: #fef08a; color: #854d0e; border: 1px solid #eab308; border-radius: 12px; padding: 2px 7px; font-size: 0.68rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;" title="${escapeHtml(state.activeRadioBuff.description)}">
-            <img src="${ASSETS.icons.radio}" class="btn-pixel-icon-xs" alt="" /> ${escapeHtml(state.activeRadioBuff.title)}
-          </span>
-        ` : ''}
+
         <div class="hud-actions" style="display: none; gap: 5px; align-items: center;">
           <button id="btn-open-kitchen-guide" class="btn-sm" style="display: none !important;" aria-hidden="true" title="Sổ Tay Bếp Trưởng"></button>
         </div>

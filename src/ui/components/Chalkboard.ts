@@ -137,64 +137,58 @@ export function renderChalkboard(state: GameState, currentEventTitle: string = '
             </div>
           </div>
 
-          <!-- HỘC TỦ ĐỒ NGHỀ BẾP GÀ (COZY COOKING KITCHEN CABINET) -->
-          <div class="toolbox-cabinet cozy-cooking-cabinet">
-            <div class="toolbox-header" style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <img src="${ASSETS.ui.toolboxCabinet}" class="toolbox-cabinet-pixel-art" alt="Tủ Gỗ Bếp Gà" style="width: 38px; height: 38px; image-rendering: pixelated; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); flex-shrink: 0;" />
-                <div>
-                  <span class="toolbox-title" style="display: block; line-height: 1.2;">
-                    HỘC TỦ ĐỒ NGHỀ BẾP GÀ
-                  </span>
-                  <span class="toolbox-subtitle" style="display: block; line-height: 1.2;">Dụng cụ nấu nướng & Không gian quán</span>
-                </div>
+          <!-- HỘC TỦ ĐỒ NGHỀ BẾP GÀ (STARDEW TOOLBOX CABINET WIDGET) -->
+          <div class="stardew-toolbox-section">
+            <div class="toolbox-widget-card cozy-cooking-cabinet" id="btn-open-toolbox-cabinet" title="Hộc Tủ Đồ Nghề Bếp Gà: Nấu Sốt Bí Truyền, Thú Cưng Hiên Quán & Ca Đêm Bất Tận">
+              <div class="toolbox-sprite-frame">
+                <img src="${ASSETS.ui.toolboxCabinet}" class="toolbox-pixel-sprite toolbox-cabinet-pixel-art ${state.secretSauceDay?.buffActive ? 'is-active-sauce' : ''}" alt="Hộc Tủ Đồ Nghề" />
               </div>
-            </div>
-
-            <div class="toolbox-grid">
-              <!-- Ngăn 1: Bếp & Gia Vị Bí Truyền -->
-              <div class="toolbox-drawer drawer-kitchen">
-                <div class="drawer-header">
-                  <img src="${ASSETS.icons.sauce}" class="btn-pixel-icon-xs" alt="" /> Gia Vị & Nồi Sốt
-                </div>
-                <div class="drawer-actions">
-                  <button id="btn-secret-sauce" class="btn-sm btn-toolbox btn-sauce-card ${state.secretSauceDay?.buffActive ? 'is-active' : ''}" title="Pha nồi sốt bí truyền nhận Buff Vàng (+3k tip & +0.25★ Hương vị)">
-                    <img src="${ASSETS.icons.sauce}" class="btn-pixel-icon-xs" alt="" /> ${state.secretSauceDay?.buffActive ? '✨ Sốt Thần Thánh' : 'Nấu Sốt Bí Truyền'}
-                  </button>
-                </div>
-              </div>
-
-              <!-- Ngăn 2: Hiên Quán & Thư Giãn -->
-              <div class="toolbox-drawer drawer-cozy">
-                <div class="drawer-header">
-                  <img src="${ASSETS.icons.radio}" class="btn-pixel-icon-xs" alt="" /> Hiên Quán & Thư Giãn
-                </div>
-                <div class="drawer-actions">
-                  <button id="btn-open-night-radio" class="btn-sm btn-toolbox ${(state.lastRadioBroadcastDay !== state.day) ? 'has-gift' : ''}" title="Đài Phát Thanh Đêm Sài Gòn (FM 99.9 MHz) - Nhận Buff & Dự Báo Thời Tiết">
-                    <img src="${ASSETS.icons.radio}" class="btn-pixel-icon-xs" alt="" /> Đài Đêm FM 99.9 ${(state.lastRadioBroadcastDay !== state.day) ? '<span class="badge-dot-pulse">✨</span>' : (state.activeRadioBuff ? '<span style="color:#16a34a; font-weight:800; font-size:0.65rem;">✓</span>' : '')}
-                  </button>
-                  ${hasPet ? `
-                    <button id="btn-open-pet-patio" class="btn-sm btn-toolbox" title="Góc Thú Cưng Hiên Quán (Cậu Vàng & Bé Mướp)">
-                      <img src="${ASSETS.icons.cat}" class="btn-pixel-icon-xs" alt="" /> Thú Cưng Hiên Quán
-                    </button>
-                  ` : (day >= 4 ? '' : `
-                    <span class="drawer-locked-hint">🐾 Nhận nuôi bé (Ngày 4)</span>
+              <div class="toolbox-meta-col">
+                <div class="toolbox-kicker-row">
+                  <span class="toolbox-kicker">BẾP GÀ HẺM 1102</span>
+                  ${state.secretSauceDay?.buffActive ? `
+                    <div class="toolbox-pixel-amber-seal" title="Nồi Sốt Bí Truyền đang phát huy hiệu lực vàng (+3k tip & +0.25★ Hương vị)">
+                      <span class="amber-seal-text">(SỐT VÀNG)</span>
+                    </div>
+                  ` : (day >= 4 ? `
+                    <div class="toolbox-pixel-amber-seal is-ready" title="Đồ nghề bếp sẵn sàng phục vụ">
+                      <span class="amber-seal-text">(SẴN SÀNG)</span>
+                    </div>
+                  ` : `
+                    <div class="toolbox-pixel-amber-seal is-empty" title="Đang mở quán">
+                      <span class="amber-seal-text">(TIỆM GÀ)</span>
+                    </div>
                   `)}
                 </div>
-              </div>
-
-              <!-- Ngăn 3: Thử Thách Bếp Lửa -->
-              <div class="toolbox-drawer drawer-arena">
-                <div class="drawer-header">
-                  <img src="${ASSETS.icons.fireRush}" class="btn-pixel-icon-xs" alt="" /> Thử Thách Bếp Lửa
-                </div>
-                <div class="drawer-actions">
+                <div class="toolbox-main-title">HỘC TỦ ĐỒ NGHỀ BẾP GÀ</div>
+                <div class="toolbox-quick-links">
+                  <!-- 1. Nồi Sốt Bí Truyền -->
+                  <button id="btn-secret-sauce" class="btn-mailbox-pill btn-sauce-card ${state.secretSauceDay?.buffActive ? 'has-gift' : ''}" title="Gia Vị & Nồi Sốt: Pha nồi sốt bí truyền nhận Buff Vàng (+3k tip & +0.25★ Hương vị)">
+                    <img src="${ASSETS.icons.sauce}" class="btn-pixel-icon-xs" alt="" /> ${state.secretSauceDay?.buffActive ? '✨ Sốt Thần Thánh' : 'Gia Vị & Nồi Sốt'}
+                  </button>
+                  <!-- 2. Thú Cưng Hiên Quán -->
+                  ${hasPet ? `
+                    <button id="btn-open-pet-patio" class="btn-mailbox-pill" title="Góc Thú Cưng Hiên Quán (Cậu Vàng & Bé Mướp)">
+                      <img src="${ASSETS.icons.cat}" class="btn-pixel-icon-xs" alt="" /> Thú Cưng Hiên Quán
+                    </button>
+                  ` : (day >= 4 ? `
+                    <button id="btn-open-pet-patio" class="btn-mailbox-pill" title="Góc Thú Cưng Hiên Quán">
+                      <img src="${ASSETS.icons.cat}" class="btn-pixel-icon-xs" alt="" /> Thú Cưng Hiên Quán
+                    </button>
+                  ` : `
+                    <button class="btn-mailbox-pill is-locked" title="Nhận nuôi bé thú cưng vào Ngày 4" disabled>
+                      <img src="${ASSETS.icons.lock}" class="btn-pixel-icon-xs" alt="" /> Thú Cưng (Ng.4)
+                    </button>
+                  `)}
+                  <!-- 3. Ca Đêm Bất Tận -->
                   ${(day >= 4 || chapter >= 2) ? `
-                    <button id="btn-open-endless-mode" class="btn-sm btn-toolbox" title="Thử thách sinh tồn bếp dồn dập (Rush Hour Wave Survival)">
+                    <button id="btn-open-endless-mode" class="btn-mailbox-pill" title="Thử thách sinh tồn bếp dồn dập (Rush Hour Wave Survival)">
                       <img src="${ASSETS.icons.fireRush}" class="btn-pixel-icon-xs" alt="" /> Ca Đêm Bất Tận
                     </button>
                   ` : `
-                    <span class="drawer-locked-hint">🔒 Ca bất tận (Ngày 4)</span>
+                    <button class="btn-mailbox-pill is-locked" title="Mở khóa chế độ sinh tồn Ca Đêm Bất Tận vào Ngày 4 hoặc Chương 2" disabled>
+                      <img src="${ASSETS.icons.lock}" class="btn-pixel-icon-xs" alt="" /> Ca Đêm (Ng.4)
+                    </button>
                   `}
                 </div>
               </div>

@@ -888,132 +888,188 @@ body.selling-mode .awning::after {
   margin-top: 2px;
 }
 
-/* HỘC TỦ ĐỒ NGHỀ BẾP GÀ (COZY COOKING KITCHEN CABINET) */
-.toolbox-cabinet.cozy-cooking-cabinet {
+/* HỘC TỦ ĐỒ NGHỀ BẾP GÀ (STARDEW TOOLBOX CABINET WIDGET) */
+.stardew-toolbox-section {
   width: 100%;
-  margin-top: 10px;
-  background: linear-gradient(180deg, #fdfbf7 0%, #f7ede2 100%);
-  border: 2px solid #a27b5c;
+  margin-top: 8px;
+}
+
+.toolbox-widget-card {
+  width: 100%;
+  background: linear-gradient(135deg, #fffaf5 0%, #ffedd5 100%);
+  border: 2.5px solid #ea580c;
   border-radius: 12px;
-  padding: 10px;
-  box-shadow: 0 4px 12px rgba(92, 53, 31, 0.12), inset 0 1px 0 #fff;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 4px 12px rgba(194, 65, 12, 0.15), inset 0 1px 0 #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
   box-sizing: border-box;
 }
 
-.toolbox-header {
+.toolbox-widget-card:hover {
+  transform: translateY(-2px);
+  border-color: #c2410c;
+  box-shadow: 0 6px 18px rgba(194, 65, 12, 0.25), inset 0 1px 0 #fff;
+}
+
+.toolbox-sprite-frame {
+  width: 68px;
+  height: 68px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  border-bottom: 1.5px dashed #dcbfa2;
-  padding-bottom: 6px;
-  margin-bottom: 8px;
-  flex-wrap: wrap;
+  justify-content: center;
+  background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+  border: 2px solid #c2410c;
+  border-radius: 10px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+.toolbox-pixel-sprite {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.25));
+  animation: toolboxGentlePulse 4s infinite ease-in-out;
+}
+
+.toolbox-pixel-sprite.is-active-sauce {
+  animation: toolboxSauceShine 1.8s infinite ease-in-out;
+}
+
+@keyframes toolboxGentlePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+@keyframes toolboxSauceShine {
+  0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 6px rgba(249, 115, 22, 0.7)); }
+  50% { transform: translateY(-3px) scale(1.08); filter: drop-shadow(0 0 14px rgba(234, 88, 12, 0.9)); }
+}
+
+.toolbox-meta-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
   gap: 4px;
 }
 
-.toolbox-title {
-  font-size: 0.78rem;
-  font-weight: 800;
-  color: #4a2810;
+.toolbox-kicker-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 6px;
+  flex-wrap: wrap;
+}
+
+.toolbox-kicker {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #c2410c;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
 }
 
-.toolbox-subtitle {
-  font-size: 0.66rem;
-  color: #8d6e63;
-  font-style: italic;
-  font-weight: 600;
-}
-
-.toolbox-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  width: 100%;
-}
-
-@media (max-width: 370px) {
-  .toolbox-grid {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-}
-
-.toolbox-drawer {
-  background: #ffffff;
-  border: 1.5px solid #dfcbb5;
-  border-radius: 10px;
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  box-shadow: 0 2px 5px rgba(92, 53, 31, 0.05);
-}
-
-.drawer-header {
-  font-size: 0.7rem;
-  font-weight: 800;
-  color: #4a2810;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  border-bottom: 1.5px solid #f0e2d0;
-  padding-bottom: 4px;
-}
-
-.drawer-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.btn-toolbox {
-  width: 100%;
-  min-height: 44px;
+/* Con Dấu Sáp Hổ Phách Bếp Gà (Amber Seal) */
+.toolbox-pixel-amber-seal {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  font-size: 0.72rem !important;
-  font-weight: 700 !important;
-  padding: 6px 8px !important;
-  border-radius: 8px !important;
-  text-align: center;
-  white-space: normal;
-  line-height: 1.2;
+  padding: 3px 8px;
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 50%, #9a3412 100%);
+  border: 2px solid #fed7aa;
+  outline: 1.5px solid #431407;
+  border-radius: 12px;
+  box-shadow: 
+    0 2px 0 #431407,
+    0 0 10px rgba(234, 88, 12, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  animation: amberSealBob 2s infinite ease-in-out;
   cursor: pointer;
-  background: #faeed1;
-  border: 1.5px solid #c49a6c;
-  color: #4a2810;
-  transition: all 0.15s ease;
 }
 
-.btn-toolbox:hover {
-  background: #fdf6e2;
-  border-color: #8b5e34;
-  transform: translateY(-1px);
+.toolbox-pixel-amber-seal.is-ready {
+  background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+  border-color: #86efac;
+  outline-color: #052e16;
+  box-shadow: 0 2px 0 #052e16, 0 0 10px rgba(34, 197, 94, 0.6);
 }
 
-.btn-toolbox.has-badge {
-  border-color: #e53935 !important;
-  color: #c62828 !important;
-  font-weight: 800 !important;
+.toolbox-pixel-amber-seal.is-empty {
+  background: #e2d3be;
+  border-color: #a88a6d;
+  outline-color: #78583d;
+  box-shadow: none;
+  animation: none;
 }
 
-.badge-dot-pulse {
-  background: #e53935;
-  color: #ffffff;
+.toolbox-pixel-amber-seal .amber-seal-text {
+  font-family: var(--font-pixel, 'Tiny5', monospace);
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #ffedd5;
+  text-shadow: 1px 1px 0 #431407;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+.toolbox-pixel-amber-seal.is-ready .amber-seal-text {
+  color: #f0fdf4;
+  text-shadow: 1px 1px 0 #052e16;
+}
+
+.toolbox-pixel-amber-seal.is-empty .amber-seal-text {
+  color: #78583d;
+  text-shadow: none;
   font-size: 0.62rem;
-  font-weight: 900;
-  border-radius: 10px;
-  padding: 1px 5px;
-  line-height: 1.2;
-  animation: pulseBadge 1.2s infinite ease-in-out;
-  margin-left: 2px;
+}
+
+@keyframes amberSealBob {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 
+      0 4px 0 #431407,
+      0 0 14px rgba(234, 88, 12, 0.9),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+}
+
+.toolbox-main-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #431407;
+  font-family: var(--font-display, sans-serif);
+  letter-spacing: 0.3px;
+}
+
+.toolbox-quick-links {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.btn-mailbox-pill.is-locked {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.btn-mailbox-pill.is-locked:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  transform: none;
 }
 
 @keyframes pulseBadge {

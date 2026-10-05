@@ -1037,7 +1037,7 @@ export type HeritageBadgeId =
   | 'badge_bien_hieu_ruc_ro'      // Cơ ngơi khang trang (Nâng cấp không gian/mặt bằng cấp 2+)
   | 'badge_khong_mot_don_huy'     // Phục vụ liên tục 60 khách không huỷ
   | 'badge_sieu_toc_phuc_vu'      // Tốc độ phục vụ trung bình nhanh
-  | 'badge_thinh_gia_trung_thanh' // Bật Đài FM 99.9 nhận buff 10 đêm
+  | 'badge_thinh_gia_trung_thanh' // Bậc Thầy Hộc Tủ Đồ Nghề (Sốt, Thú cưng, Ca đêm 10 lần)
   | 'badge_chinh_phuc_ca_dem'     // Vượt Wave 12 Ca Đêm Bất Tận
   | 'badge_thu_tho_cam_bi_an'     // Thu thập 5 bức thư thỏ cam
   | 'badge_truong_ton_sai_gon'    // Mở khóa Chương 3 trở lên

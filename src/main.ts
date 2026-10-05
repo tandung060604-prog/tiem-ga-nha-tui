@@ -2000,14 +2000,6 @@ class AppController {
       };
     }
 
-    const openNightRadioBtn = document.getElementById('btn-open-night-radio');
-    if (openNightRadioBtn) {
-      openNightRadioBtn.onclick = () => {
-        audio.playPop();
-        this.openNightRadioModal();
-      };
-    }
-
     const openPetPatioBtn = document.getElementById('btn-open-pet-patio');
     if (openPetPatioBtn) {
       openPetPatioBtn.onclick = () => {
@@ -4074,15 +4066,6 @@ class AppController {
       };
     }
 
-    // Nút Bật Đài Phát Thanh Đêm FM 99.9 từ màn Tổng Kết Cuối Ngày
-    this.lastSummaryData = { ledger, review, advisorTip, rentDue };
-    const summaryRadioBtn = document.getElementById('btn-summary-open-radio');
-    if (summaryRadioBtn) {
-      summaryRadioBtn.onclick = () => {
-        audio.playPop();
-        this.openNightRadioModal();
-      };
-    }
 
     // Nút Bắt đầu Ngày mới
     const nextDayBtn = document.getElementById('btn-start-next-day');
