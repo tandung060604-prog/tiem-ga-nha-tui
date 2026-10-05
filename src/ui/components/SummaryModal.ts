@@ -272,8 +272,8 @@ export function renderSummaryModal(
 
       <!-- Action Buttons -->
       <div class="summary-actions">
-        <button id="btn-share-card" class="btn-share-threads">
-          <span>📸</span> Tải Thẻ Review / Chia Sẻ Lên Threads
+        <button id="btn-share-card" class="btn-share-threads" title="Tạo thẻ ảnh chiến tích gửi vào nhóm bạn Zalo/Messenger hoặc lưu vào máy">
+          <span>📸</span> Thẻ Khoe Chiến Tích / Gửi Bạn Bè (Zalo/Messenger)
         </button>
         ${wrapped ? `<button id="btn-wrapped" class="btn-share-threads btn-wrapped">
           <span>🎁</span> Gà Wrapped tuần ${wrapped.week} — tạo thẻ & chia sẻ

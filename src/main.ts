@@ -4092,7 +4092,7 @@ class AppController {
     const shareBtn = document.getElementById('btn-share-card');
     if (shareBtn) {
       shareBtn.onclick = async () => {
-        this.showToast('Đang tạo ảnh thẻ review Threads sắc nét... 🎨');
+        this.showToast('Đang tạo ảnh thẻ chiến tích gửi bạn bè... 🎨');
         const state = stateManager.getState();
         const blob = await ShareCardEngine.generateReviewCardBlob(review, state, ledger);
         if (!blob) {
@@ -4100,9 +4100,9 @@ class AppController {
           return;
         }
 
-        const outcome = await shareImage(blob, `TiemGaNhaTui_Review_Ngay_${state.day}.png`, 'Tiệm Gà Nhà Tui - Review Khách Hàng',
-          `Khách vừa review tiệm gà của tui nè: "${review.comment}" ⭐ ${review.stars}/5 sao! Chơi ngay nha!`);
-        if (outcome === 'downloaded') this.showToast('Đã tải ảnh thẻ review về máy! Hãy đăng lên Threads nhé! 📸');
+        const outcome = await shareImage(blob, `TiemGaNhaTui_ChienTich_Ngay_${state.day}.png`, 'Tiệm Gà Nhà Tui - Chiến Tích Hôm Nay',
+          `Chiến tích Tiệm Gà của tui hôm nay nè: Doanh thu ${ledger.grossRevenue.toLocaleString('vi-VN')}đ, ${review.stars}/5 sao! Nhóm mình ai so tài không? 🍗✨`);
+        if (outcome === 'downloaded') this.showToast('Đã tải ảnh thẻ về máy! Hãy gửi vào nhóm bạn nhé! 📸');
       };
     }
   }

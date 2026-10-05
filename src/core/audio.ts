@@ -304,6 +304,38 @@ class AudioManager {
     osc.stop(now + 0.06);
   }
 
+  // Tactile Micro-Impulse (Phản hồi xúc giác vi mô cho iOS Safari & Mobile)
+  public playTactileTick(intensity: 'light' | 'medium' | 'heavy' = 'light') {
+    if (this.isMuted) return;
+    this.initContext();
+    if (!this.ctx) return;
+
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const now = this.ctx.currentTime;
+
+      const freq = intensity === 'light' ? 120 : intensity === 'medium' ? 95 : 75;
+      const dur = intensity === 'light' ? 0.012 : intensity === 'medium' ? 0.018 : 0.025;
+      const vol = intensity === 'light' ? 0.08 : intensity === 'medium' ? 0.12 : 0.16;
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now);
+      osc.frequency.exponentialRampToValueAtTime(35, now + dur);
+
+      gain.gain.setValueAtTime(vol, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+      osc.connect(gain);
+      gain.connect(this.dest());
+
+      osc.start(now);
+      osc.stop(now + dur);
+    } catch {
+      // Bỏ qua lỗi audio context trên mobile
+    }
+  }
+
   // Cash Register / Coin Ching sound
   public playCash() {
     if (this.isMuted) return;

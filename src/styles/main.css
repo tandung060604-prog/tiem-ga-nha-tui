@@ -1906,7 +1906,7 @@ body.selling-mode .awning::after {
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 12px 14px calc(12px + var(--safe-bottom));
+  padding: 12px 14px calc(14px + max(var(--safe-bottom), env(safe-area-inset-bottom, 0px)));
   background: linear-gradient(transparent, var(--bg) 35%);
   display: flex;
   justify-content: center;
@@ -1942,13 +1942,23 @@ body.selling-mode .awning::after {
 }
 
 .btn-big-open:active {
-  transform: translateY(3px);
+  transform: scale(0.97) translateY(2px);
   box-shadow: 0 2px 0 #7e0a13, 0 4px 10px rgba(230, 25, 42, 0.3);
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
 }
 
-.btn-big-open:active {
-  transform: translateY(3px);
-  box-shadow: 0 2px 0 var(--red-dark), 0 4px 8px rgba(230, 57, 70, 0.25);
+/* Tactile Mobile & iPhone Touch Interactions */
+@media (hover: none) and (pointer: coarse) {
+  button:active,
+  .btn-mailbox-pill:active,
+  .btn-primary:active,
+  .btn-sm:active,
+  .btn-card-action:active,
+  .tray-item:active,
+  .customer-card:active {
+    transform: scale(0.96);
+    transition: transform 0.05s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
 }
 
 /* Modal Overlay & Card */
